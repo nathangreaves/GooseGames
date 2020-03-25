@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import * as _ from 'lodash';
+import { WerewordsGameService } from '../../services/WerewordsGameService'
 
 @Component({
   selector: 'app-werewords-component',
@@ -11,6 +12,13 @@ export class WerewordsComponent {
   public Games = [];
   public Error = null;
 
+ private _werewordsGameService: WerewordsGameService;
+
+  constructor(werewordsGameService: WerewordsGameService) {
+    this._werewordsGameService = werewordsGameService;
+  }
+
+
   public StartNewGame(password: string) {
     this.clearError();
 
@@ -18,13 +26,25 @@ export class WerewordsComponent {
       this.Error = "No password given for new game";
       return;
     }
-    this.Games.push({ password: password, players: 1 });
+
+    var foundGame = this.findGame(password);
+    if (foundGame) {
+      this.Error = "Game " + password +  " already exists";
+      return;
+    }
+
+    this._werewordsGameService.CreateGame(password).then(data =>
+    {
+      this.Error = "Game added " + data;
+      this.Games.push({ password: password, players: 1 });
+    });
+
   }
 
   public JoinGame(password: string) {
     this.clearError();
 
-    var foundGame = _.find(this.Games, function (game) { return game.password === password; });
+    var foundGame = this.findGame(password);
 
     if (foundGame) {
       foundGame.players++;
@@ -34,6 +54,9 @@ export class WerewordsComponent {
     }
   }
 
+  private findGame(password: string) {
+        return _.find(this.Games, function(game) { return game.password === password; });
+    }
 
   clearError() {
     this.Error = null;

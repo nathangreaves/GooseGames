@@ -1,14 +1,15 @@
 <div>
-  <span>Insert Password to Join Game: </span>
-  <input #password/> 
-  <a class="btn" (click)="JoinGame(password.value)">Join Game</a>
+  <span>Insert Password to Join or Create Game: </span>
+  <input #password />
 </div>
-
-<div>{{Error}}</div>
-
 <div>
-  <a class="btn" (click)="StartNewGame(password.value)">Start New Game</a>
+  <a class="btn btn-primary" style="margin:10px; color:white;" (click)="JoinGame(password.value)">Join Game</a>
+  <a class="btn btn-primary" style="margin:10px; color:white;" (click)="StartNewGame(password.value)">Start New Game</a>
+</div>
+<div style="color:red;">{{Error}}</div>
+
+<div style="margin-top:30px;">
+  <span>Ongoing Games:</span>
 </div>
 
-<span>Ongoing Games:</span>
 <ul><li *ngFor="let game of Games">Password: {{game.password}}    Number of Players: {{game.players}}</li></ul>

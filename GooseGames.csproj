@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,10 +26,12 @@
 
   <ItemGroup>
     <None Remove="ClientApp\src\app\werewords\werewords.component.ts" />
+    <None Remove="ClientApp\src\services\WerewordsGameService.ts" />
   </ItemGroup>
 
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\src\app\werewords\werewords.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\WerewordsGameService.ts" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
