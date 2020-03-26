@@ -10,7 +10,7 @@ import { WerewordsGameService } from '../../services/WerewordsGameService'
 export class WerewordsComponent {
 
   public Games = [];
-  public Error = null;
+  public Message = null;
 
  private _werewordsGameService: WerewordsGameService;
 
@@ -20,45 +20,65 @@ export class WerewordsComponent {
 
 
   public StartNewGame(password: string) {
-    this.clearError();
+    this.clearMessage();
 
     if (!password) {
-      this.Error = "No password given for new game";
+      this.Message = "No password given for new game";
       return;
     }
 
     var foundGame = this.findGame(password);
     if (foundGame) {
-      this.Error = "Game " + password +  " already exists";
+      this.Message = "Game " + password +  " already exists";
       return;
     }
 
     this._werewordsGameService.CreateGame(password).then(data =>
     {
-      this.Error = "Game added " + data;
-      this.Games.push({ password: password, players: 1 });
+      if (data.gameId) {
+        this.Message = "Game added " + data.gameId;
+        this.Games.push({ Id: data.gameId, Password: password, NumberOfPlayers: 1 });
+      }
+      else {
+        this.Message = data.errorMessage;
+      }
     });
 
   }
 
   public JoinGame(password: string) {
-    this.clearError();
+    this.clearMessage();
 
-    var foundGame = this.findGame(password);
+    if (!password) {
+      this.Message = "No password given for joining game";
+      return;
+    }
 
-    if (foundGame) {
-      foundGame.players++;
-    }
-    else {
-      this.Error = "Game not found with password " + password;
-    }
+    this._werewordsGameService.JoinGame(password).then(data => {
+      if (data.gameId) {
+        this.Message = "Game joined " + data.gameId;
+
+        var foundGame = this.findGame(password);
+
+        if (foundGame && data.gameId === foundGame.Id) {
+          foundGame.NumberOfPlayers = data.numberOfPlayers;
+        }
+        else {
+          this.Games.push({ Id: data.gameId, Password: password, NumberOfPlayers: data.numberOfPlayers });
+        }
+      }
+      else {
+        this.Message = data.errorMessage;
+      }
+    });
+
   }
 
   private findGame(password: string) {
-        return _.find(this.Games, function(game) { return game.password === password; });
+        return _.find(this.Games, function(game) { return game.Password === password; });
     }
 
-  clearError() {
-    this.Error = null;
+  clearMessage() {
+    this.Message = null;
   }
 }

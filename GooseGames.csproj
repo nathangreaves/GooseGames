@@ -19,18 +19,40 @@
 
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
+    <Compile Remove="Entities\**" />
+    <Compile Remove="InMemoryRepository\**" />
+    <Compile Remove="RepositoryInterface\**" />
     <Content Remove="$(SpaRoot)**" />
+    <Content Remove="Entities\**" />
+    <Content Remove="InMemoryRepository\**" />
+    <Content Remove="RepositoryInterface\**" />
+    <EmbeddedResource Remove="Entities\**" />
+    <EmbeddedResource Remove="InMemoryRepository\**" />
+    <EmbeddedResource Remove="RepositoryInterface\**" />
     <None Remove="$(SpaRoot)**" />
+    <None Remove="Entities\**" />
+    <None Remove="InMemoryRepository\**" />
+    <None Remove="RepositoryInterface\**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="ClientApp\src\app\werewords\werewords.component.ts" />
+    <None Remove="ClientApp\src\models\werewords\CreateWerewordsGameResponse.ts" />
+    <None Remove="ClientApp\src\models\werewords\JoinWerewordsGameResponse.ts" />
     <None Remove="ClientApp\src\services\WerewordsGameService.ts" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="Entities\Entities.csproj" />
+    <ProjectReference Include="InMemoryRepository\InMemoryRepository.csproj" />
+    <ProjectReference Include="RepositoryInterface\RepositoryInterface.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <TypeScriptCompile Include="ClientApp\src\app\werewords\werewords.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\werewords\CreateWerewordsGameResponse.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\werewords\JoinWerewordsGameResponse.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\WerewordsGameService.ts" />
   </ItemGroup>
 
