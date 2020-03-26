@@ -7,18 +7,14 @@ import { RouterModule } from '@angular/router';
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
-import { CounterComponent } from './counter/counter.component';
-import { FetchDataComponent } from './fetch-data/fetch-data.component';
-import { WerewordsComponent } from './werewords/werewords.component';
+import { JustOneLandingComponent } from './justone/landing.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     HomeComponent,
-    CounterComponent,
-    FetchDataComponent,
-    WerewordsComponent
+    JustOneLandingComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -26,9 +22,7 @@ import { WerewordsComponent } from './werewords/werewords.component';
     FormsModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'counter', component: CounterComponent },
-      { path: 'werewords', component: WerewordsComponent },
-      { path: 'fetch-data', component: FetchDataComponent },
+      { path: 'justone', component: JustOneLandingComponent }
     ])
   ],
   providers: [],

@@ -7,15 +7,3 @@
   <a class="btn btn-primary" style="margin:10px; color:white;" (click)="StartNewGame(password.value)">Start New Game</a>
 </div>
 <div style="color:red;">{{Message}}</div>
-
-<div style="margin-top:30px;">
-  <span>Ongoing Games:</span>
-</div>
-
-<ul><li *ngFor="let game of Games">
-
-      <p>Id: {{game.Id}}</p>
-      <p>Password: {{game.Password}}</p>
-      <p>Number of Players: {{game.NumberOfPlayers}}</p>
-
-  </li></ul>

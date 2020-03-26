@@ -27,7 +27,10 @@ namespace GooseGames
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            InMemoryRepository.DependencyInjectionConfiguration.ConfigureServices(services);
+            //InMemoryRepository.RepositoryConfiguration.ConfigureServices(services);
+            PostGreRepository.RepositoryConfiguration.ConfigureServices(services, Configuration);
+
+            services.AddScoped<Services.JustOne.SessionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
