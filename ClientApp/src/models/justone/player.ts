@@ -1,0 +1,31 @@
+export class PlayerDetails {
+  playerName: string;
+}
+
+export class UpdatePlayerDetailsRequest extends PlayerDetails {
+  playerId: string;
+  sessionId: string;
+}
+
+export class UpdatePlayerDetailsResponse {
+
+}
+
+
+export class GetPlayerDetailsRequest {
+  sessionId: string;
+  playerId: string;
+}
+
+export class PlayerDetailsResponse {
+  playerName: string;
+  id: string;
+  playerNumber: number;
+  isSessionMaster: boolean;
+}
+
+export class GetPlayerDetailsResponse {
+  sessionMaster: boolean;
+  sessionMasterName: string;
+  players: PlayerDetailsResponse[]
+}

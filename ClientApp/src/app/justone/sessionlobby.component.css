@@ -1,0 +1,39 @@
+.session-lobby-player-table {
+  /*padding-right: 15px;*/
+}
+
+  .session-lobby-player-table td {
+    padding-right: 15px;
+  }
+
+  .session-lobby-player-table .player-1.player-name-cell {
+    color: red;
+  }
+
+  .session-lobby-player-table .player-2.player-name-cell {
+    color: orange;
+  }
+
+  .session-lobby-player-table .player-3.player-name-cell {
+    color: green;
+  }
+
+  .session-lobby-player-table .player-4.player-name-cell {
+    color: blue;
+  }
+
+  .session-lobby-player-table .player-5.player-name-cell {
+    color: purple;
+  }
+
+  .session-lobby-player-table .player-6.player-name-cell {
+    color: hotpink;
+  }
+
+  .session-lobby-player-table .player-7.player-name-cell {
+    color: black;
+  }
+
+  .session-lobby-player-table tr.new-player td {
+    color: lightgray;
+  }

@@ -3,5 +3,6 @@ export class SessionLandingRequest {
 }
 
 export class SessionLandingResponse {
-  gameId: string;
+  sessionId: string;
+  playerId: string;
 }

@@ -7,6 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GooseGames.Services.JustOne;
+using Microsoft.Extensions.Logging;
+using NLog;
+using GooseGames.Extensions;
+using GooseGames.Logging;
 
 namespace GooseGames.Controllers.JustOne
 {
@@ -14,11 +18,13 @@ namespace GooseGames.Controllers.JustOne
     [Route("[controller]")]
     public class JustOneSessionController : ControllerBase
     {
-        private readonly SessionService _werewordsGameRepository;
+        private readonly SessionService _sessionService;
+        private readonly RequestLogger<JustOneSessionController> _logger;
 
-        public JustOneSessionController(SessionService werewordsGameRepository)
+        public JustOneSessionController(SessionService sessionService, RequestLogger<JustOneSessionController> logger)
         {
-            _werewordsGameRepository = werewordsGameRepository;
+            _sessionService = sessionService;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -26,12 +32,19 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                return await _werewordsGameRepository.CreateSessionAsync(request);
+                _logger.LogTrace("Received request", request);
+
+                var result = await _sessionService.CreateSessionAsync(request);
+
+                _logger.LogTrace("Returned result", result);
+
+                return result;
             }
             catch (Exception e)
             {
-                //TODO: Log exception
-                return NewResponse.Error<NewSessionResponse>("Unknown Error");
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return NewResponse.Error<NewSessionResponse>($"Unknown Error {errorGuid}");
             }
         }
 
@@ -40,14 +53,19 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                return await _werewordsGameRepository.JoinSessionAsync(request);
+                _logger.LogTrace("Received request", request);
 
-               
+                var result = await _sessionService.JoinSessionAsync(request);
+
+                _logger.LogTrace("Returned result", result);
+
+                return result;
             }
             catch (Exception e)
             {
-                //TODO: Log exception
-                return NewResponse.Error<JoinSessionResponse>("Unknown Error");
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return NewResponse.Error<JoinSessionResponse>($"Unknown Error {errorGuid}");
             }
         }
     }

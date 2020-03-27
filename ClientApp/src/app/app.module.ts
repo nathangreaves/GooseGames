@@ -8,13 +8,17 @@ import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { JustOneLandingComponent } from './justone/landing.component';
+import { JustOneNewPlayerDetailsComponent } from './justone/newplayerdetails.component';
+import { JustOneSessionLobbyComponent } from './justone/sessionlobby.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     HomeComponent,
-    JustOneLandingComponent
+    JustOneLandingComponent,
+    JustOneNewPlayerDetailsComponent,
+    JustOneSessionLobbyComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -22,7 +26,9 @@ import { JustOneLandingComponent } from './justone/landing.component';
     FormsModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'justone', component: JustOneLandingComponent }
+      { path: 'justone', component: JustOneLandingComponent},
+      { path: 'justone/newplayer', component: JustOneNewPlayerDetailsComponent },
+      { path: 'justone/sessionlobby', component: JustOneSessionLobbyComponent }
     ])
   ],
   providers: [],

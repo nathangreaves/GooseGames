@@ -1,5 +1,8 @@
+using GooseGames.Attributes;
+using GooseGames.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +23,15 @@ namespace GooseGames
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(config => 
+            {
+                config.Filters.Add<LogIdGlobalFilter>();            
+            });
+            services.AddControllers(config => 
+            {
+                config.Filters.Add<LogIdGlobalFilter>();
+            });
+
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -29,8 +40,10 @@ namespace GooseGames
 
             //InMemoryRepository.RepositoryConfiguration.ConfigureServices(services);
             PostGreRepository.RepositoryConfiguration.ConfigureServices(services, Configuration);
-
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<Services.JustOne.SessionService>();
+            services.AddScoped<Services.JustOne.PlayerDetailsService>();
+            services.AddScoped(typeof(RequestLogger<>));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

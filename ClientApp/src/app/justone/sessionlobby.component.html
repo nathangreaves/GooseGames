@@ -1,0 +1,40 @@
+
+<div class="loading" *ngIf="Loading">
+  I am loading...
+</div>
+
+<div *ngIf="!Loading">
+
+  <div class="lobby-header" *ngIf="SessionMaster">
+    Waiting for you to start game
+  </div>
+
+  <div class="lobby-header" *ngIf="!SessionMaster">
+    Waiting for {{SessionMasterName}} to start game
+  </div>
+
+  <div>
+    <table class="session-lobby-player-table">
+      <tr *ngFor="let player of Players;" [ngClass]="{'new-player' : player.playerNumber == 0}">
+        <td class="player-number-cell">{{player.playerNumber}}</td>
+        <td class="player-name-cell"
+            [ngClass]="{
+              'player-1' : player.playerNumber == 1,
+              'player-2' : player.playerNumber == 2,
+              'player-3' : player.playerNumber == 3,
+              'player-4' : player.playerNumber == 4,
+              'player-5' : player.playerNumber == 5,
+              'player-6' : player.playerNumber == 6,
+              'player-7' : player.playerNumber == 7
+            }"
+            >{{player.playerName}}</td>
+      </tr>
+    </table>
+  </div>
+
+  <div *ngIf="SessionMaster">
+    <a class="btn btn-primary" style="margin:10px; color:white;" (click)="StartGame()">Start Game</a>
+  </div>
+
+</div>
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

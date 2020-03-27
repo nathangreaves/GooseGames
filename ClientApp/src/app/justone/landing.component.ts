@@ -3,6 +3,7 @@ import * as _ from 'lodash';
 import { JustOneSessionService } from '../../services/justone/session'
 import { GenericResponse } from '../../models/genericresponse'
 import { SessionLandingResponse } from '../../models/justone/session'
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 
 @Component({
   selector: 'app-just-one-landing-component',
@@ -12,11 +13,13 @@ import { SessionLandingResponse } from '../../models/justone/session'
 export class JustOneLandingComponent {
 
   private _sessionService: JustOneSessionService;
+  private _router: Router;
 
-  public Message: string;
+  public ErrorMessage: string;
 
-  constructor(sessionService: JustOneSessionService) {
+  constructor(sessionService: JustOneSessionService, router: Router) {
     this._sessionService = sessionService;
+    this._router = router;
   }
 
 
@@ -24,13 +27,13 @@ export class JustOneLandingComponent {
     this.clearMessage();
 
     if (!password) {
-      this.Message = "No password given for new game";
+      this.ErrorMessage = "No password given for new game";
       return;
     }
 
     this._sessionService.CreateGame({ password: password })
-      .then(this.handleResponse)
-      .catch(this.genericError);
+      .then(data => this.handleResponse(data))
+      .catch(data => this.genericError());
 
   }
 
@@ -38,18 +41,22 @@ export class JustOneLandingComponent {
     this.clearMessage();
 
     if (!password) {
-      this.Message = "No password given for joining game";
+      this.ErrorMessage = "No password given for joining game";
       return;
     }
 
     this._sessionService.JoinGame({ password: password })
-      .then(this.handleResponse)
-      .catch(this.genericError);
+      .then(data => this.handleResponse(data))
+      .catch(data => this.genericError());
   }
 
   private handleResponse(data: GenericResponse<SessionLandingResponse>) {
     if (data.success === true) {
       this.clearMessage();
+
+      this.ErrorMessage = `Session Id: ${data.data.sessionId} :: Player Id: ${data.data.playerId}`;
+
+      this._router.navigate(['/justone/newplayer', { sessionId: data.data.sessionId, playerId: data.data.playerId }]);
 
       //Redirect to add player
       //this.Message = "Game added " + data.gameId;
@@ -57,15 +64,15 @@ export class JustOneLandingComponent {
     }
     else {
       //Stay on page and display error
-      this.Message = data.errorCode;
+      this.ErrorMessage = data.errorCode;
     }
   }
 
   genericError() {
-    this.Message = "An unexpected error occurred";
+    this.ErrorMessage = "An unexpected error occurred";
   }
 
   clearMessage() {
-    this.Message = null;
+    this.ErrorMessage = null;
   }
 }
