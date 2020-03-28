@@ -1,4 +1,5 @@
 using GooseGames.Attributes;
+using GooseGames.Hubs;
 using GooseGames.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,7 +38,8 @@ namespace GooseGames
             {
                 configuration.RootPath = "ClientApp/dist";
             });
-
+            services.AddSignalR(); 
+           
             //InMemoryRepository.RepositoryConfiguration.ConfigureServices(services);
             PostGreRepository.RepositoryConfiguration.ConfigureServices(services, Configuration);
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -74,6 +76,8 @@ namespace GooseGames
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
+
+                endpoints.MapHub<LobbyHub>("/lobbyhub");
             });
 
             app.UseSpa(spa =>

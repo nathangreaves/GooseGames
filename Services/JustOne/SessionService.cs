@@ -1,9 +1,12 @@
 ﻿using Entities.JustOne;
 using Entities.JustOne.Enums;
+using GooseGames.Hubs;
 using GooseGames.Logging;
+using Microsoft.AspNetCore.SignalR;
 using Models.Requests.JustOne;
 using Models.Responses;
 using Models.Responses.JustOne;
+using Models.Responses.JustOne.PlayerDetails;
 using RepositoryInterface.JustOne;
 using System;
 using System.Collections.Generic;
@@ -18,14 +21,15 @@ namespace GooseGames.Services.JustOne
         private readonly ISessionRepository _sessionRepository;
         private readonly IPlayerRepository _playerRepository;
         private readonly RequestLogger<SessionService> _logger;
-
+        private readonly IHubContext<LobbyHub> _lobbyHub;
         private const int MaxNumberOfPlayersPerSession = 7;
 
-        public SessionService(ISessionRepository sessionRepository, IPlayerRepository playerRepository, RequestLogger<SessionService> logger)
+        public SessionService(ISessionRepository sessionRepository, IPlayerRepository playerRepository, RequestLogger<SessionService> logger, IHubContext<LobbyHub> lobbyHub)
         {
             _sessionRepository = sessionRepository;
             _playerRepository = playerRepository;
             _logger = logger;
+            _lobbyHub = lobbyHub;
         }
 
         public async Task<GenericResponse<NewSessionResponse>> CreateSessionAsync(NewSessionRequest request)
@@ -101,6 +105,12 @@ namespace GooseGames.Services.JustOne
             await _playerRepository.InsertAsync(newPlayer);
 
             _logger.LogTrace($"Player inserted");
+
+            _logger.LogTrace("Sending update to clients");
+            await _lobbyHub.SendPlayerAdded(newPlayer.SessionId, new PlayerDetailsResponse
+            {
+                Id = newPlayer.Id
+            });
 
             return NewResponse.Ok(new JoinSessionResponse 
             {

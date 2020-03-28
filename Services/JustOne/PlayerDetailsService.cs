@@ -1,5 +1,8 @@
 ﻿using Entities.JustOne.Enums;
+using GooseGames.Hubs;
 using GooseGames.Logging;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Primitives;
 using Models.Requests.JustOne.PlayerDetails;
 using Models.Responses;
 using Models.Responses.JustOne.PlayerDetails;
@@ -16,12 +19,29 @@ namespace GooseGames.Services.JustOne
         private readonly SessionService _sessionService;
         private readonly IPlayerRepository _playerRepository;
         private readonly RequestLogger<PlayerDetailsService> _logger;
+        private readonly IHubContext<LobbyHub> _lobbyHub;
 
-        public PlayerDetailsService(SessionService sessionService, IPlayerRepository playerRepository, RequestLogger<PlayerDetailsService> logger)
+        public PlayerDetailsService(SessionService sessionService, IPlayerRepository playerRepository, RequestLogger<PlayerDetailsService> logger, IHubContext<LobbyHub> lobbyHub)
         {
             _sessionService = sessionService;
             _playerRepository = playerRepository;
             _logger = logger;
+            _lobbyHub = lobbyHub;
+        }
+
+        internal async Task UpdateSignalRConnectionIdAsync(string playerId, string connectionId)
+        {
+            if (Guid.TryParse(playerId, out Guid id))
+            {
+                var player = await _playerRepository.GetAsync(id);
+
+                if (player != null)
+                {
+                    player.ConnectionId = connectionId;
+
+                    await _playerRepository.UpdateAsync(player);
+                }
+            }
         }
 
         public async Task<GenericResponse<UpdatePlayerDetailsResponse>> UpdatePlayerDetailsAsync(UpdatePlayerDetailsRequest request) 
@@ -69,6 +89,15 @@ namespace GooseGames.Services.JustOne
 
             _logger.LogTrace("Updating player details");
             await _playerRepository.UpdateAsync(player);
+
+            _logger.LogTrace("Sending update to clients");
+            await _lobbyHub.SendPlayerDetailsUpdated(player.SessionId, new PlayerDetailsResponse
+            {
+                Id = player.Id,
+                PlayerName = player.Name,
+                PlayerNumber = player.PlayerNumber,
+                IsSessionMaster = false
+            });
 
             _logger.LogTrace("Finished updating player details");
 

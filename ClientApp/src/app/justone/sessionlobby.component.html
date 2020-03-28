@@ -28,6 +28,7 @@
               'player-7' : player.playerNumber == 7
             }"
             >{{player.playerName}}</td>
+        <td><a *ngIf="{{SessionMaster}}" class="btn btn-primary" style="margin:10px; color:white;" (click)="Kick(player.id)">Kick</a></td>
       </tr>
     </table>
   </div>

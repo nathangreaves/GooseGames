@@ -4,6 +4,7 @@ import { JustOnePlayerDetailsService } from '../../services/justone/playerdetail
 import { GenericResponse } from '../../models/genericresponse'
 import { PlayerDetails, UpdatePlayerDetailsRequest, PlayerDetailsResponse } from '../../models/justone/player'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import * as signalR from "@microsoft/signalr";
 
 @Component({
   selector: 'app-just-one-sessionlobby-component',
@@ -41,12 +42,13 @@ export class JustOneSessionLobbyComponent {
     this._playerDetailsService.GetPlayerDetails({ playerId: this._playerId, sessionId: this._sessionId })
       .then(data => {
         if (data.success) {
+          this.setupConnection();
+
           this.SessionMaster = data.data.sessionMaster;
           this.SessionMasterName = data.data.sessionMasterName ? data.data.sessionMasterName : "Session Master";
           this.Players = data.data.players;
-          _.forEach(this.Players, player =>
-          {
-            player.playerName = player.playerName ? player.playerName : "New Player";
+          _.forEach(this.Players, player => {
+            this.setDefaultNewPlayerName(player);
           });
           this.Loading = false;
         }
@@ -56,26 +58,32 @@ export class JustOneSessionLobbyComponent {
       })
       .catch(() => this.handleGenericError());
   }
+  private setupConnection() {
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(`/lobbyhub?playerId=${this._playerId}&sessionId=${this._sessionId}`)
+      .build();
 
-  //public SubmitPlayerDetails(playerDetails: PlayerDetails) {
+    connection.on("playerAdded", (player: PlayerDetailsResponse) => {
+      this.setDefaultNewPlayerName(player);
+      this.Players.push(player);
+    });
+    connection.on("playerDetailsUpdated", (player: PlayerDetailsResponse) => {
+      var index = _.findIndex(this.Players, p => p.id == player.id);
+      this.Players.splice(index, 1, player);
+    });
+    connection.on("playerRemoved", (player: PlayerDetailsResponse) => {
+      _.remove(this.Players, p => p.id === player.id);
+    });
+    connection.start().catch(err => console.error(err));
+  }
 
-  //  var playerDetailsRequest = <UpdatePlayerDetailsRequest>playerDetails;
-  //  playerDetailsRequest.sessionId = this._sessionId;
-  //  playerDetailsRequest.playerId = this._playerId;
+  private setDefaultNewPlayerName(player: PlayerDetailsResponse) {
+    if (!player.playerName) {
+      player.playerName = "New Player";
+    }
+  }
 
-  //  this._playerDetailsService.UpdatePlayerDetails(playerDetailsRequest)
-  //    .then(data => {
-  //      if (data.success) {
-  //        this._router.navigate(['/justone/sessionlobby', { sessionId: this._sessionId, playerId: this._playerId }])
-  //      }
-  //      else {
-  //        this.ErrorMessage = data.errorCode;
-  //      }
-  //    })
-  //    .catch(() => this.handleGenericError());
-  //}
-
-  handleGenericError() {
+  private handleGenericError() {
     this.ErrorMessage = "An Unknown Error Occurred";
   }
 }
