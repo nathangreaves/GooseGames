@@ -6,6 +6,10 @@
     padding-right: 15px;
   }
 
+  .session-lobby-player-table .player-name-cell{
+      font-weight: bold;
+  }
+  
   .session-lobby-player-table .player-1.player-name-cell {
     color: red;
   }

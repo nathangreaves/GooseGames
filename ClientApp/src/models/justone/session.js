@@ -12,4 +12,10 @@ var SessionLandingResponse = /** @class */ (function () {
     return SessionLandingResponse;
 }());
 exports.SessionLandingResponse = SessionLandingResponse;
+var PlayerSessionRequest = /** @class */ (function () {
+    function PlayerSessionRequest() {
+    }
+    return PlayerSessionRequest;
+}());
+exports.PlayerSessionRequest = PlayerSessionRequest;
 //# sourceMappingURL=session.js.map

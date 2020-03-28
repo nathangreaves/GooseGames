@@ -2,13 +2,12 @@
 using GooseGames.Hubs;
 using GooseGames.Logging;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Primitives;
+using Models.Requests.JustOne;
 using Models.Requests.JustOne.PlayerDetails;
 using Models.Responses;
 using Models.Responses.JustOne.PlayerDetails;
 using RepositoryInterface.JustOne;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,9 +18,9 @@ namespace GooseGames.Services.JustOne
         private readonly SessionService _sessionService;
         private readonly IPlayerRepository _playerRepository;
         private readonly RequestLogger<PlayerDetailsService> _logger;
-        private readonly IHubContext<LobbyHub> _lobbyHub;
+        private readonly IHubContext<PlayerHub> _lobbyHub;
 
-        public PlayerDetailsService(SessionService sessionService, IPlayerRepository playerRepository, RequestLogger<PlayerDetailsService> logger, IHubContext<LobbyHub> lobbyHub)
+        public PlayerDetailsService(SessionService sessionService, IPlayerRepository playerRepository, RequestLogger<PlayerDetailsService> logger, IHubContext<PlayerHub> lobbyHub)
         {
             _sessionService = sessionService;
             _playerRepository = playerRepository;
@@ -44,27 +43,14 @@ namespace GooseGames.Services.JustOne
             }
         }
 
-        public async Task<GenericResponse<UpdatePlayerDetailsResponse>> UpdatePlayerDetailsAsync(UpdatePlayerDetailsRequest request) 
+        public async Task<GenericResponse<UpdatePlayerDetailsResponse>> UpdatePlayerDetailsAsync(UpdatePlayerDetailsRequest request)
         {
             _logger.LogTrace("Starting update of player details");
 
-            if (string.IsNullOrWhiteSpace(request.PlayerName))
+            var validationResult = await ValidatePlayerDetailsAsync(request);
+            if (validationResult != null && !validationResult.Success)
             {
-                _logger.LogInformation("Empty player name provided");
-                return NewResponse.Error<UpdatePlayerDetailsResponse>("Please enter your name.");
-            }
-
-            if (request.PlayerName.Length > 20)
-            {
-                _logger.LogInformation("Player name too long");
-                return NewResponse.Error<UpdatePlayerDetailsResponse>("Please enter a player name that is 20 characters or fewer");
-            }
-
-            if (!(await _sessionService.ValidateSessionStatusAsync(request.SessionId, SessionStatusEnum.New)))
-            {
-                _logger.LogInformation("Unable to find session. Either it is not new or doesn't exist.");
-
-                return NewResponse.Error<UpdatePlayerDetailsResponse>("Unable to find session. Either it started without you or doesn't exist");
+                return validationResult;
             }
 
             var player = await _playerRepository.GetAsync(request.PlayerId);
@@ -104,10 +90,28 @@ namespace GooseGames.Services.JustOne
             return NewResponse.Ok(new UpdatePlayerDetailsResponse());
         }
 
+        public async Task DeletePlayerAsync(DeletePlayerRequest request)
+        {
+            _logger.LogTrace("Deleting Player");
+
+            var playerToDelete = await _playerRepository.GetAsync(request.PlayerToDeleteId);
+
+            var isSessionMaster = await _sessionService.ValidateSessionMasterAsync(playerToDelete.SessionId, request.SessionMasterId);
+            if (isSessionMaster)
+            {
+                await _playerRepository.DeleteAsync(playerToDelete);
+
+                await _lobbyHub.SendPlayerRemoved(playerToDelete.SessionId, playerToDelete.Id);
+            }
+
+            _logger.LogTrace("Deleted Player");
+        }
+
         public async Task<GenericResponse<GetPlayerDetailsResponse>> GetPlayerDetailsAsync(GetPlayerDetailsRequest request)
         {
             _logger.LogTrace("Starting fetch of player details");
 
+            _logger.LogTrace("Fetchomg session");
             var session = await _sessionService.GetSessionAsync(request.SessionId);
             if (session == null)
             {
@@ -129,7 +133,7 @@ namespace GooseGames.Services.JustOne
                 SessionMaster = request.PlayerId == masterPlayerId,
                 Players = players.OrderBy(p => p.PlayerNumber == 0 ? int.MaxValue : p.PlayerNumber).Select(p => new PlayerDetailsResponse 
                 {
-                    Id = p.Id == request.PlayerId ? p.Id : Guid.NewGuid(),
+                    Id = p.Id,
                     IsSessionMaster = p.Id == masterPlayerId,
                     PlayerName = p.Name,
                     PlayerNumber = p.PlayerNumber
@@ -137,6 +141,32 @@ namespace GooseGames.Services.JustOne
             };
 
             return NewResponse.Ok(response);
+        }
+
+        private async Task<GenericResponse<UpdatePlayerDetailsResponse>> ValidatePlayerDetailsAsync(UpdatePlayerDetailsRequest request)
+        {
+            _logger.LogTrace("Starting validation of player details");
+
+            if (string.IsNullOrWhiteSpace(request.PlayerName))
+            {
+                _logger.LogInformation("Empty player name provided");
+                return NewResponse.Error<UpdatePlayerDetailsResponse>("Please enter your name.");
+            }
+
+            if (request.PlayerName.Length > 20)
+            {
+                _logger.LogInformation("Player name too long");
+                return NewResponse.Error<UpdatePlayerDetailsResponse>("Please enter a player name that is 20 characters or fewer");
+            }
+
+            if (!(await _sessionService.ValidateSessionStatusAsync(request.SessionId, SessionStatusEnum.New)))
+            {
+                _logger.LogInformation("Unable to find session. Either it is not new or doesn't exist.");
+
+                return NewResponse.Error<UpdatePlayerDetailsResponse>("Unable to find session. Either it started without you or doesn't exist");
+            }
+
+            return null;
         }
     }
 }

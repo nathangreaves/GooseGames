@@ -1,8 +1,6 @@
-
-<div class="loading" *ngIf="Loading">
+<div class="loading" *ngIf="Loading && !ErrorMessage">
   I am loading...
 </div>
-
 <div *ngIf="!Loading">
 
   <div class="lobby-header" *ngIf="SessionMaster">
@@ -28,7 +26,7 @@
               'player-7' : player.playerNumber == 7
             }"
             >{{player.playerName}}</td>
-        <td><a *ngIf="{{SessionMaster}}" class="btn btn-primary" style="margin:10px; color:white;" (click)="Kick(player.id)">Kick</a></td>
+        <td><a *ngIf="SessionMaster && player.id != PlayerId" class="btn btn-primary" style="margin:10px; color:white;" (click)="KickPlayer(player.id)">Kick</a></td>
       </tr>
     </table>
   </div>

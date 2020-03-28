@@ -68,5 +68,29 @@ namespace GooseGames.Controllers.JustOne
                 return NewResponse.Error<JoinSessionResponse>($"Unknown Error {errorGuid}");
             }
         }
+
+        [HttpPost]
+        [Route("StartSession")]
+        public async Task<GenericResponse<bool>> StartSessionAsync(PlayerSessionRequest request)
+        {
+            try
+            {
+                _logger.LogTrace("Received request", request);
+
+                await _sessionService.StartSessionAsync(request);
+
+                var result = NewResponse.Ok(true);
+
+                _logger.LogTrace("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
+            }
+        }
     }
 }

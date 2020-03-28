@@ -11,10 +11,14 @@ export class UpdatePlayerDetailsResponse {
 
 }
 
-
 export class GetPlayerDetailsRequest {
   sessionId: string;
   playerId: string;
+}
+
+export class DeletePlayerRequest {
+  sessionMasterId: string;
+  playerToDeleteId: string;
 }
 
 export class PlayerDetailsResponse {

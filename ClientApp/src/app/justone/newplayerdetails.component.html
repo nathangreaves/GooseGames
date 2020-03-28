@@ -1,12 +1,17 @@
-<div>
-  <span>Please enter your name</span>
+<div class="loading" *ngIf="Loading && !ErrorMessage">
+  I am loading...
 </div>
-<div>
-  <input #playerName />
-</div>
-<div>
-  <a class="btn btn-primary" style="margin:10px; color:white;" (click)="SubmitPlayerDetails({
+<div *ngIf="!Loading">
+  <div>
+    <span>Please enter your name</span>
+  </div>
+  <div>
+    <input #playerName />
+  </div>
+  <div>
+    <a class="btn btn-primary" style="margin:10px; color:white;" (click)="SubmitPlayerDetails({
    playerName: playerName.value
    })">Enter Game</a>
+  </div>
 </div>
 <div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

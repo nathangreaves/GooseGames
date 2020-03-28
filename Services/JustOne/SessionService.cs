@@ -20,14 +20,23 @@ namespace GooseGames.Services.JustOne
     {
         private readonly ISessionRepository _sessionRepository;
         private readonly IPlayerRepository _playerRepository;
+        private readonly PlayerStatusService _playerStatusService;
+        private readonly RoundService _roundService;
         private readonly RequestLogger<SessionService> _logger;
-        private readonly IHubContext<LobbyHub> _lobbyHub;
+        private readonly IHubContext<PlayerHub> _lobbyHub;
         private const int MaxNumberOfPlayersPerSession = 7;
 
-        public SessionService(ISessionRepository sessionRepository, IPlayerRepository playerRepository, RequestLogger<SessionService> logger, IHubContext<LobbyHub> lobbyHub)
+        public SessionService(ISessionRepository sessionRepository, 
+            IPlayerRepository playerRepository, 
+            PlayerStatusService playerStatusService, 
+            RoundService roundService,
+            RequestLogger<SessionService> logger, 
+            IHubContext<PlayerHub> lobbyHub)
         {
             _sessionRepository = sessionRepository;
             _playerRepository = playerRepository;
+            _playerStatusService = playerStatusService;
+            _roundService = roundService;
             _logger = logger;
             _lobbyHub = lobbyHub;
         }
@@ -45,13 +54,18 @@ namespace GooseGames.Services.JustOne
             }
 
             Player newPlayer = new Player();
+            newPlayer.PlayerStatus = new PlayerStatus
+            {
+                Player = newPlayer,
+                Status = PlayerStatusEnum.New
+            };
             Session newSession = new Session
             {
                 Password = password,
                 Players = new List<Player>
-                    {
-                        newPlayer
-                    }
+                {
+                    newPlayer
+                }
             };
 
             _logger.LogTrace($"Ok to insert session");
@@ -75,17 +89,44 @@ namespace GooseGames.Services.JustOne
             });
         }
 
+        internal async Task<GenericResponse<bool>> StartSessionAsync(PlayerSessionRequest request)
+        {
+            _logger.LogInformation("Starting session", request);
+
+            if (!await ValidateSessionStatusAsync(request.SessionId, SessionStatusEnum.New))
+            {
+                _logger.LogInformation("Session did not exist to start");
+                return GenericResponse<bool>.Error("Session does not exist");
+            }
+            if (!await ValidateSessionMasterAsync(request.SessionId, request.PlayerId))
+            {
+                _logger.LogInformation("Request to start session from player other than the session master");
+                return GenericResponse<bool>.Error("You do not have the authority to start the session");
+            }
+            _logger.LogInformation("Session cleared to start", request);
+
+            await _playerStatusService.UpdateAllPlayersForSessionAsync(request.SessionId, PlayerStatusEnum.Waiting);            
+
+            _logger.LogTrace("Sending update to clients");
+            await _lobbyHub.SendStartingSessionAsync(request.SessionId);
+
+            await Task.Delay(TimeSpan.FromSeconds(5));
+
+            await _roundService.PrepareRoundsAsync(request.SessionId);
+
+            return GenericResponse<bool>.Ok(true);
+        }
+
         internal async Task<GenericResponse<JoinSessionResponse>> JoinSessionAsync(JoinSessionRequest request)
         {
             _logger.LogTrace($"Starting session join");
-
             var password = request.Password;
 
             var session = await GetSessionFromPasswordAsync(password);
 
             if (session == null)
             {
-                _logger.LogTrace("Session doesn't exist");
+                _logger.LogInformation("Session doesn't exist");
                 return NewResponse.Error<JoinSessionResponse>($"Session doesn't exist with password: {password}");
             }
 
@@ -93,7 +134,7 @@ namespace GooseGames.Services.JustOne
             var countOfPlayers = await _playerRepository.CountAsync(p => p.SessionId == session.Id);
             if (countOfPlayers >= MaxNumberOfPlayersPerSession)
             {
-                _logger.LogTrace($"Already {countOfPlayers} on session");
+                _logger.LogDebug($"Already {countOfPlayers} on session");
                 return NewResponse.Error<JoinSessionResponse>($"Session is full");
             }
 
@@ -101,6 +142,11 @@ namespace GooseGames.Services.JustOne
 
             Player newPlayer = new Player();          
             newPlayer.Session = session;
+            newPlayer.PlayerStatus = new PlayerStatus
+            {
+                Player = newPlayer,
+                Status = PlayerStatusEnum.New
+            };
 
             await _playerRepository.InsertAsync(newPlayer);
 
@@ -139,7 +185,12 @@ namespace GooseGames.Services.JustOne
 
             return await _sessionRepository.SingleResultMatchesAsync(sessionId, s => s.StatusId == status);
         }
+        internal async Task<bool> ValidateSessionMasterAsync(Guid sessionId, Guid sessionMasterId)
+        {
+            _logger.LogTrace("Validating session master: ", sessionMasterId);
 
+            return await _sessionRepository.SingleResultMatchesAsync(sessionId, s => s.SessionMasterId == sessionMasterId);
+        }
         public async Task<Session> GetSessionAsync(Guid sessionId)
         {
             _logger.LogTrace("Validating session exists");

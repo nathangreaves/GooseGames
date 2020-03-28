@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Entities.JustOne.Enums;
 using GooseGames.Logging;
 using GooseGames.Services.JustOne;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Models.Requests.JustOne;
 using Models.Requests.JustOne.PlayerDetails;
 using Models.Responses;
 using Models.Responses.JustOne.PlayerDetails;
@@ -17,6 +19,7 @@ namespace GooseGames.Controllers.JustOne
     public class JustOnePlayerDetailsController : ControllerBase
     {
         private readonly PlayerDetailsService _playerDetailsService;
+        private readonly PlayerStatusService _playerStatusService;
         private readonly RequestLogger<JustOnePlayerDetailsController> _logger;
 
         public JustOnePlayerDetailsController(PlayerDetailsService playerDetailsService, RequestLogger<JustOnePlayerDetailsController> logger)
@@ -63,6 +66,29 @@ namespace GooseGames.Controllers.JustOne
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
                 return NewResponse.Error<UpdatePlayerDetailsResponse>($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpDelete]
+        public async Task<GenericResponse<bool>> DeleteAsync([FromQuery]DeletePlayerRequest request)
+        {
+            try
+            {
+                _logger.LogTrace("Received request", request);
+
+                await _playerDetailsService.DeletePlayerAsync(request);
+
+                var result = NewResponse.Ok(true);
+
+                _logger.LogTrace("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
             }
         }
     }

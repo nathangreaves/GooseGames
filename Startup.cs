@@ -1,6 +1,6 @@
-using GooseGames.Attributes;
 using GooseGames.Hubs;
 using GooseGames.Logging;
+using GooseGames.Services.JustOne.RoundStatus;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Linq;
 
 namespace GooseGames
 {
@@ -24,14 +26,7 @@ namespace GooseGames
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews(config => 
-            {
-                config.Filters.Add<LogIdGlobalFilter>();            
-            });
-            services.AddControllers(config => 
-            {
-                config.Filters.Add<LogIdGlobalFilter>();
-            });
+            services.AddControllers();
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -40,12 +35,26 @@ namespace GooseGames
             });
             services.AddSignalR(); 
            
-            //InMemoryRepository.RepositoryConfiguration.ConfigureServices(services);
-            PostGreRepository.RepositoryConfiguration.ConfigureServices(services, Configuration);
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped(typeof(RequestLogger<>));
+
+            PostGreRepository.RepositoryConfiguration.ConfigureServices(services, Configuration);
+
             services.AddScoped<Services.JustOne.SessionService>();
             services.AddScoped<Services.JustOne.PlayerDetailsService>();
-            services.AddScoped(typeof(RequestLogger<>));
+            services.AddScoped<Services.JustOne.PlayerStatusService>();
+            services.AddScoped<Services.JustOne.RoundService>();
+
+            services.AddTransient<RoundServiceProvider>();
+            AddKeyedServices<IRoundStatusKeyedService>(services);
+        }
+
+        private void AddKeyedServices<T>(IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Transient)
+        {
+            var assembly = typeof(Startup).Assembly;
+            var typesFromAssemblies = assembly.DefinedTypes.Where(x => x.GetInterfaces().Contains(typeof(T))).Where(x => !x.IsAbstract);
+            foreach (var type in typesFromAssemblies)
+                services.Add(new ServiceDescriptor(typeof(T), type, lifetime));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -77,7 +86,7 @@ namespace GooseGames
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
 
-                endpoints.MapHub<LobbyHub>("/lobbyhub");
+                endpoints.MapHub<PlayerHub>("/lobbyhub");
             });
 
             app.UseSpa(spa =>

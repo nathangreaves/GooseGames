@@ -33,11 +33,16 @@
   <ItemGroup>
     <None Remove="ClientApp\src\app\justone\landing.component.ts" />
     <None Remove="ClientApp\src\app\justone\newplayerdetails.component.ts" />
+    <None Remove="ClientApp\src\app\justone\round\playerwaiting.component.ts" />
+    <None Remove="ClientApp\src\app\justone\round\submitclue.component.ts" />
+    <None Remove="ClientApp\src\app\justone\round\waiting.component.ts" />
     <None Remove="ClientApp\src\app\justone\sessionlobby.component.ts" />
     <None Remove="ClientApp\src\models\genericresponse.ts" />
     <None Remove="ClientApp\src\models\justone\player.ts" />
+    <None Remove="ClientApp\src\models\justone\playerstatus.ts" />
     <None Remove="ClientApp\src\models\justone\session.ts" />
     <None Remove="ClientApp\src\services\justone\playerdetails.ts" />
+    <None Remove="ClientApp\src\services\justone\playerstatus.ts" />
     <None Remove="ClientApp\src\services\session.ts" />
   </ItemGroup>
 
@@ -51,11 +56,16 @@
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\src\app\justone\landing.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\newplayerdetails.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\justone\round\playerwaiting.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\justone\round\submitclue.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\justone\round\waiting.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\sessionlobby.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\genericresponse.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\justone\player.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\justone\playerstatus.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\justone\session.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\playerdetails.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\justone\playerstatus.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\session.ts" />
   </ItemGroup>
 

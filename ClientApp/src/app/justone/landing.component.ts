@@ -56,7 +56,7 @@ export class JustOneLandingComponent {
 
       this.ErrorMessage = `Session Id: ${data.data.sessionId} :: Player Id: ${data.data.playerId}`;
 
-      this._router.navigate(['/justone/newplayer', { sessionId: data.data.sessionId, playerId: data.data.playerId }]);
+      this._router.navigate(['/justone/newplayer', { SessionId: data.data.sessionId, PlayerId: data.data.playerId }]);
 
       //Redirect to add player
       //this.Message = "Game added " + data.gameId;

@@ -39,6 +39,12 @@ var GetPlayerDetailsRequest = /** @class */ (function () {
     return GetPlayerDetailsRequest;
 }());
 exports.GetPlayerDetailsRequest = GetPlayerDetailsRequest;
+var DeletePlayerRequest = /** @class */ (function () {
+    function DeletePlayerRequest() {
+    }
+    return DeletePlayerRequest;
+}());
+exports.DeletePlayerRequest = DeletePlayerRequest;
 var PlayerDetailsResponse = /** @class */ (function () {
     function PlayerDetailsResponse() {
     }
