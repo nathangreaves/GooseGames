@@ -15,7 +15,7 @@ import { JustOneNewPlayerDetailsComponent } from './justone/newplayerdetails.com
 import { JustOneSessionLobbyComponent } from './justone/sessionlobby.component';
 import { JustOneRoundWaitingComponent } from './justone/round/waiting.component';
 import { JustOneSubmitClueComponent } from './justone/round/submitclue.component';
-import { JustOnePlayerWaitingComponent } from './justone/round/playerwaiting.component';
+import { JustOneActivePlayerWaitingForCluesComponent } from './justone/round/activeplayerwaitingforclues.component';
 
 
 @NgModule({
@@ -28,7 +28,7 @@ import { JustOnePlayerWaitingComponent } from './justone/round/playerwaiting.com
     JustOneSessionLobbyComponent,
     JustOneRoundWaitingComponent,
     JustOneSubmitClueComponent,
-    JustOnePlayerWaitingComponent
+    JustOneActivePlayerWaitingForCluesComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -40,8 +40,8 @@ import { JustOnePlayerWaitingComponent } from './justone/round/playerwaiting.com
       { path: PlayerStatusRoutesMap[PlayerStatus.New], component: JustOneNewPlayerDetailsComponent },
       { path: PlayerStatusRoutesMap[PlayerStatus.InLobby], component: JustOneSessionLobbyComponent },
       { path: PlayerStatusRoutesMap[PlayerStatus.RoundWaiting], component: JustOneRoundWaitingComponent },
-      { path: PlayerStatusRoutesMap[PlayerStatus.RoundSubmitClue], component: JustOneSubmitClueComponent },
-      { path: PlayerStatusRoutesMap[PlayerStatus.RoundPlayerWaiting], component: JustOnePlayerWaitingComponent }
+      { path: PlayerStatusRoutesMap[PlayerStatus.PassivePlayerClue], component: JustOneSubmitClueComponent },
+      { path: PlayerStatusRoutesMap[PlayerStatus.ActivePlayerWaitingForClues], component: JustOneActivePlayerWaitingForCluesComponent }
     ])
   ],
   providers: [],

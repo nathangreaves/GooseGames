@@ -22,8 +22,8 @@ export class DeletePlayerRequest {
 }
 
 export class PlayerDetailsResponse {
-  playerName: string;
   id: string;
+  playerName: string;
   playerNumber: number;
   isSessionMaster: boolean;
 }

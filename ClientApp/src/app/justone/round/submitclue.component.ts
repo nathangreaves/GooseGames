@@ -13,30 +13,31 @@ import { IPlayerSessionComponent } from '../../../models/justone/session';
   templateUrl: './submitclue.component.html'
 })
 
-export class JustOneSubmitClueComponent {
+export class JustOneSubmitClueComponent implements IPlayerSessionComponent {
+
   private _router: Router;
-
-  private SessionId: string;
-  private PlayerId: string;
-
   private _hubConnection: signalR.HubConnection;
+  private _playerStatusService: JustOnePlayerStatusService;
+  SessionId: string;
+  PlayerId: string;
+  ErrorMessage: string;
+  Loading: boolean = true;
 
-  public ErrorMessage: string;
-  public Loading: boolean;
-
-  constructor(router: Router, activatedRoute: ActivatedRoute) {
+  constructor(playerStatusService: JustOnePlayerStatusService, router: Router, activatedRoute: ActivatedRoute) {
     this._router = router;
+    this._playerStatusService = playerStatusService;
 
     this.SessionId = activatedRoute.snapshot.params.SessionId;
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;
 
     this.setupConnection();
 
-    this.validatePlayerStatus();
-  }
-
-  private validatePlayerStatus() {
-    //TODO: If not valid redirect and close connection
+    this._playerStatusService.Validate(this, PlayerStatus.PassivePlayerClue, () => { })
+      .then(data => {
+        if (data.success) {
+          this.Loading = false;
+        }
+      });
   }
 
   private setupConnection() {
@@ -51,7 +52,7 @@ export class JustOneSubmitClueComponent {
     this._hubConnection.start().catch(err => console.error(err));
   }
 
-  handleGenericError() {
+  HandleGenericError() {
     this.ErrorMessage = "An Unknown Error Occurred";
   }
 }

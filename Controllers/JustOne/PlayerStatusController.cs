@@ -42,16 +42,82 @@ namespace GooseGames.Controllers.JustOne
             return await SetStatusAsync(request, PlayerStatusEnum.InLobby);
         }
         [HttpGet]
-        [ActionName("Waiting")]
+        [ActionName(nameof(PlayerStatusEnum.RoundWaiting))]
         public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateWaitingAsync([FromQuery]PlayerSessionRequest request)
         {
-            return await ValidateStatus(request, PlayerStatusEnum.Waiting);
+            return await ValidateStatus(request, PlayerStatusEnum.RoundWaiting);
         }
-        [HttpPost]
-        [ActionName("Waiting")]
-        public async Task<GenericResponse<bool>> SetWaitingAsync(PlayerIdRequest request)
+        [HttpGet]
+        [ActionName(nameof(PlayerStatusEnum.PassivePlayerClue))]
+        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidatePassivePlayerClueAsync([FromQuery]PlayerSessionRequest request)
         {
-            return await SetStatusAsync(request, PlayerStatusEnum.Waiting);
+            return await ValidateStatus(request, PlayerStatusEnum.PassivePlayerClue);
+        }
+        [HttpGet]
+        [ActionName(nameof(PlayerStatusEnum.PassivePlayerWaitingForClues))]
+        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidatePassivePlayerWaitingForCluesAsync([FromQuery]PlayerSessionRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatusEnum.PassivePlayerWaitingForClues);
+        }
+        [HttpGet]
+        [ActionName(nameof(PlayerStatusEnum.PassivePlayerClueVote))]
+        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidatePassivePlayerClueVoteAsync([FromQuery]PlayerSessionRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatusEnum.PassivePlayerClueVote);
+        }
+        [HttpGet]
+        [ActionName(nameof(PlayerStatusEnum.PassivePlayerWaitingForClueVotes))]
+        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidatePassivePlayerWaitingForClueVotesAsync([FromQuery]PlayerSessionRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatusEnum.PassivePlayerWaitingForClueVotes);
+        }
+        [HttpGet]
+        [ActionName(nameof(PlayerStatusEnum.PassivePlayerWaitingForActivePlayer))]
+        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidatePassivePlayerWaitingForActivePlayerAsync([FromQuery]PlayerSessionRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatusEnum.PassivePlayerWaitingForActivePlayer);
+        }
+        [HttpGet]
+        [ActionName(nameof(PlayerStatusEnum.PassivePlayerOutcome))]
+        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidatePassivePlayerOutcomeAsync([FromQuery]PlayerSessionRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatusEnum.PassivePlayerOutcome);
+        }
+        [HttpGet]
+        [ActionName(nameof(PlayerStatusEnum.PassivePlayerOutcomeVote))]
+        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidatePassivePlayerOutcomeVoteAsync([FromQuery]PlayerSessionRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatusEnum.PassivePlayerOutcomeVote);
+        }
+        [HttpGet]
+        [ActionName(nameof(PlayerStatusEnum.ActivePlayerWaitingForClues))]
+        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateActivePlayerWaitingForCluesAsync([FromQuery]PlayerSessionRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatusEnum.ActivePlayerWaitingForClues);
+        }
+        [HttpGet]
+        [ActionName(nameof(PlayerStatusEnum.ActivePlayerWaitingForVotes))]
+        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateActivePlayerWaitingForVotesAsync([FromQuery]PlayerSessionRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatusEnum.ActivePlayerWaitingForVotes);
+        }
+        [HttpGet]
+        [ActionName(nameof(PlayerStatusEnum.ActivePlayerGuess))]
+        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateActivePlayerGuessAsync([FromQuery]PlayerSessionRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatusEnum.ActivePlayerGuess);
+        }
+        [HttpGet]
+        [ActionName(nameof(PlayerStatusEnum.ActivePlayerWaitingForOutcomeVotes))]
+        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateActivePlayerWaitingForOutcomeVotesAsync([FromQuery]PlayerSessionRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatusEnum.ActivePlayerWaitingForOutcomeVotes);
+        }
+        [HttpGet]
+        [ActionName(nameof(PlayerStatusEnum.ActivePlayerOutcome))]
+        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateActivePlayerOutcomeAsync([FromQuery]PlayerSessionRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatusEnum.ActivePlayerOutcome);
         }
 
         private async Task<GenericResponse<bool>> SetStatusAsync(PlayerIdRequest request, Guid status)

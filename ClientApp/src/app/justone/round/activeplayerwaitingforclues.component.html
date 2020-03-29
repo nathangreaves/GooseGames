@@ -2,15 +2,6 @@
   I am loading...
 </div>
 <div *ngIf="!Loading">
-
-  <div class="lobby-header" *ngIf="SessionMaster">
-    Waiting for you to start game
-  </div>
-
-  <div class="lobby-header" *ngIf="!SessionMaster">
-    Waiting for {{SessionMasterName}} to start game
-  </div>
-
   <div>
     <table class="player-table">
       <tr *ngFor="let player of Players;" [ngClass]="{'new-player' : player.playerNumber == 0}">
@@ -24,16 +15,18 @@
               'player-5' : player.playerNumber == 5,
               'player-6' : player.playerNumber == 6,
               'player-7' : player.playerNumber == 7
-            }"
-            >{{player.playerName}}</td>
-        <td><a *ngIf="SessionMaster && player.id != PlayerId" class="btn btn-primary" style="margin:10px; color:white;" (click)="KickPlayer(player.id)">Kick</a></td>
+            }">
+          {{player.playerName}}
+        </td>
+        <td>
+          <span class="response-given" *ngIf="player.hasTakenAction">
+            Tick!
+          </span>
+          <span class="waiting-for-response" *ngIf="!player.hasTakenAction">
+            ...
+          </span>
+        </td>
       </tr>
     </table>
   </div>
-
-  <div *ngIf="SessionMaster">
-    <a class="btn btn-primary" style="margin:10px; color:white;" (click)="StartGame()">Start Game</a>
-  </div>
-
 </div>
-<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

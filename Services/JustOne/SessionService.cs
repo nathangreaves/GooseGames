@@ -105,12 +105,12 @@ namespace GooseGames.Services.JustOne
             }
             _logger.LogInformation("Session cleared to start", request);
 
-            await _playerStatusService.UpdateAllPlayersForSessionAsync(request.SessionId, PlayerStatusEnum.Waiting);            
+            await _playerStatusService.UpdateAllPlayersForSessionAsync(request.SessionId, PlayerStatusEnum.RoundWaiting);            
 
             _logger.LogTrace("Sending update to clients");
             await _lobbyHub.SendStartingSessionAsync(request.SessionId);
 
-            await Task.Delay(TimeSpan.FromSeconds(5));
+            await Task.Delay(TimeSpan.FromSeconds(2));
 
             await _roundService.PrepareRoundsAsync(request.SessionId);
 

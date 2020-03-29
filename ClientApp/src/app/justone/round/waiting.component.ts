@@ -13,30 +13,31 @@ import { IPlayerSessionComponent } from '../../../models/justone/session';
   templateUrl: './waiting.component.html'
 })
 
-export class JustOneRoundWaitingComponent {
+export class JustOneRoundWaitingComponent implements IPlayerSessionComponent {
   private _router: Router;
-
-  private SessionId: string;
-  private PlayerId: string;
-
   private _hubConnection: signalR.HubConnection;
+  private _playerStatusService: JustOnePlayerStatusService
 
-  public Loading: boolean;
-  public ErrorMessage: string;
+  SessionId: string;
+  PlayerId: string;
+  Loading: boolean = true;
+  ErrorMessage: string;
 
-  constructor(router: Router, activatedRoute: ActivatedRoute) {
+  constructor(playerStatusService: JustOnePlayerStatusService, router: Router, activatedRoute: ActivatedRoute) {
     this._router = router;
+    this._playerStatusService = playerStatusService;
 
     this.SessionId = activatedRoute.snapshot.params.SessionId;
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;
 
     this.setupConnection();
 
-    this.validatePlayerStatus();
-  }
-
-  private validatePlayerStatus() {
-    //TODO: If not valid redirect and close connection
+    this._playerStatusService.Validate(this, PlayerStatus.RoundWaiting, () => { })
+      .then(data => {
+        if (data.success) {
+          this.Loading = false;
+        }
+      });
   }
 
   private setupConnection() {
@@ -56,7 +57,7 @@ export class JustOneRoundWaitingComponent {
     this._hubConnection.start().catch(err => console.error(err));
   }
 
-  handleGenericError() {
+  HandleGenericError() {
     this.ErrorMessage = "An Unknown Error Occurred";
   }
 }
