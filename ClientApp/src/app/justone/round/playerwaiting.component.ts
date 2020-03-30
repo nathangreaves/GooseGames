@@ -119,9 +119,9 @@ export class JustOnePlayerWaitingComponent implements OnInit  {
     }
   }
   CloseConnection() {
-    //if (this._hubConnection) {
-    //  this._hubConnection.stop();
-    //  this._hubConnection = null;
-    //}
+    if (this._hubConnection) {
+      this._hubConnection.stop();
+      this._hubConnection = null;
+    }
   }
 }

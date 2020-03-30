@@ -27,7 +27,7 @@ namespace GooseGames.Controllers.JustOne
         }
 
         [HttpGet]
-        public async Task<GenericResponse<IEnumerable<PlayerResponse>>> GetAsync([FromQuery]PlayerSessionRequest request)
+        public async Task<GenericResponse<PlayerResponses>> GetAsync([FromQuery]PlayerSessionRequest request)
         {
             try
             {
@@ -42,12 +42,12 @@ namespace GooseGames.Controllers.JustOne
             {
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return GenericResponse<IEnumerable<PlayerResponse>>.Error($"Unknown Error {errorGuid}");
+                return GenericResponse<PlayerResponses>.Error($"Unknown Error {errorGuid}");
             }
         }
 
         [HttpPost]
-        [Route("SubmitClue")]
+        [Route("SubmitResponse")]
         public async Task<GenericResponseBase> SubmitClueAsync(ResponseRequest request)
         {
             try
@@ -70,7 +70,7 @@ namespace GooseGames.Controllers.JustOne
         }
 
         [HttpPost]
-        [Route("SubmitClueVote")]
+        [Route("SubmitResponseVote")]
         public async Task<GenericResponseBase> SubmitClueVoteAsync(ResponseVotesRequest request)
         {
             try
@@ -78,6 +78,73 @@ namespace GooseGames.Controllers.JustOne
                 _logger.LogTrace("Received request", request);
 
                 await _playerResponseService.SubmitResponseVoteAsync(request);
+
+                var result = GenericResponseBase.Ok();
+
+                _logger.LogTrace("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [Route("SubmitActivePlayerResponse")]
+        public async Task<GenericResponseBase> SubmitActivePlayerResponseAsync(ActivePlayerResponseRequest request) 
+        {
+            try
+            {
+                _logger.LogTrace("Received request", request);
+
+                await _playerResponseService.SubmitActivePlayerResponseAsync(request);
+
+                var result = GenericResponseBase.Ok();
+
+                _logger.LogTrace("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpGet]
+        [Route("ActivePlayerResponse")]
+        public async Task<GenericResponse<PlayerResponse>> GetActivePlayerResponseAsync([FromQuery]PlayerSessionRequest request)
+        {
+            try
+            {
+                _logger.LogTrace("Received request", request);
+
+                var result = await _playerResponseService.GetActivePlayerResponseAsync(request);
+
+                _logger.LogTrace("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponse<PlayerResponse>.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [Route("SubmitActivePlayerResponseVote")]
+        public async Task<GenericResponseBase> SubmitActivePlayerResponseVoteAsync(ResponseVotesRequest request)
+        {
+            try
+            {
+                _logger.LogTrace("Received request", request);
+
+                await _playerResponseService.SubmitActivePlayerResponseVoteAsync(request);
 
                 var result = GenericResponseBase.Ok();
 

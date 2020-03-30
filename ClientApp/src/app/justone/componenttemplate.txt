@@ -4,55 +4,48 @@ import { JustOnePlayerDetailsService } from '../../../services/justone/playerdet
 import { PlayerDetails, UpdatePlayerDetailsRequest } from '../../../models/justone/player'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import * as signalR from "@microsoft/signalr";
+import { IPlayerSessionComponent } from '../../../models/justone/session';
+import { PlayerStatus } from '../../../models/justone/playerstatus';
+import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus';
+import { GenericResponseBase } from '../../../models/genericresponse';
 
 @Component({
   selector: 'app-just-one-*componentname*-component',
   templateUrl: './*componentname*.component.html'
 })
 
-export class JustOne*ComponentName*Component {
-  private _router: Router;
+export class JustOne*componentname*Component implements IPlayerSessionComponent {
+ 
+  _router: Router;
+  _playerStatusService: JustOnePlayerStatusService;
 
   SessionId: string;
-  PlayerId: string;
+  PlayerId: string;  
+  Loading: boolean = true;
+  ErrorMessage: string;
 
-  private _hubConnection: signalR.HubConnection;
-  
-  public Loading: boolean = true;
-  public ErrorMessage: string;
-
-  constructor(router: Router, activatedRoute: ActivatedRoute) {
+  constructor(playerStatusService: JustOnePlayerStatusService, router: Router, activatedRoute: ActivatedRoute) {
     this._router = router;
+    this._playerStatusService = playerStatusService;
 
     this.SessionId = activatedRoute.snapshot.params.SessionId;
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;
 
-    this.setupConnection();
-
-    this.validatePlayerStatus();
+    this._playerStatusService.Validate(this, PlayerStatus.PassivePlayerOutcomeVote, () => { })
+      .then(data => {
+        if (data.success) {
+          return this.load();
+        }
+      })
+      .then(data => {
+        if (data && data.success) {
+          this.Loading = false;
+        }
+      });
   }
 
-  private validatePlayerStatus() {
-    //TODO: If not valid redirect and close connection
-  }
-
-  private setupConnection() {
-    this._hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`/lobbyhub?sessionId=${this._sessionId}&playerId=${this._playerId}`)
-      .build();
-
-    //this._hubConnection.on(*"message"*, () => {
-    //  this._hubConnection.stop();
-    //  this._hubConnection = null;
-    //  this._router.navigate(['/justone/submitclue', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
-    //});
-    //this._hubConnection.on("beginRoundActivePlayer", () => {
-    //  this._hubConnection.stop();
-    //  this._hubConnection = null;
-    //  this._router.navigate(['/justone/playerwaiting', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
-    //});
-
-    this._hubConnection.start().catch(err => console.error(
+  load(): Promise<GenericResponseBase> {
+    return Promise.resolve({ success: true, errorCode: null });
   }
 
   HandleGenericError() {

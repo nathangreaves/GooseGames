@@ -3,6 +3,7 @@ using GooseGames.Logging;
 using GooseGames.Services.JustOne;
 using Microsoft.AspNetCore.Mvc;
 using Models.Requests.JustOne;
+using Models.Requests.JustOne.Round;
 using Models.Responses;
 using Models.Responses.JustOne.PlayerStatus;
 using System;
@@ -34,12 +35,6 @@ namespace GooseGames.Controllers.JustOne
         public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateLobbyAsync([FromQuery]PlayerSessionRequest request)
         {
             return await ValidateStatus(request, PlayerStatusEnum.InLobby);
-        }
-        [HttpPost]
-        [ActionName(nameof(PlayerStatusEnum.InLobby))]
-        public async Task<GenericResponse<bool>> SetLobbyAsync(PlayerIdRequest request)
-        {
-            return await SetStatusAsync(request, PlayerStatusEnum.InLobby);
         }
         [HttpGet]
         [ActionName(nameof(PlayerStatusEnum.RoundWaiting))]
@@ -90,6 +85,12 @@ namespace GooseGames.Controllers.JustOne
             return await ValidateStatus(request, PlayerStatusEnum.PassivePlayerOutcomeVote);
         }
         [HttpGet]
+        [ActionName(nameof(PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes))]
+        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidatePassivePlayerWaitingForOutcomeVotesAsync([FromQuery]PlayerSessionRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes);
+        }
+        [HttpGet]
         [ActionName(nameof(PlayerStatusEnum.ActivePlayerWaitingForClues))]
         public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateActivePlayerWaitingForCluesAsync([FromQuery]PlayerSessionRequest request)
         {
@@ -120,13 +121,16 @@ namespace GooseGames.Controllers.JustOne
             return await ValidateStatus(request, PlayerStatusEnum.ActivePlayerOutcome);
         }
 
-        private async Task<GenericResponse<bool>> SetStatusAsync(PlayerIdRequest request, Guid status)
+
+        [HttpPost]
+        [ActionName(nameof(PlayerStatusEnum.InLobby))]
+        public async Task<GenericResponse<bool>> SetLobbyAsync(PlayerIdRequest request)
         {
             try
             {
                 _logger.LogTrace("Received request", request);
 
-                await _playerStatusService.UpdatePlayerStatusAsync(request.PlayerId, status);
+                await _playerStatusService.UpdatePlayerStatusAsync(request.PlayerId, PlayerStatusEnum.InLobby);
 
                 var result = NewResponse.Ok(true);
 
@@ -140,6 +144,30 @@ namespace GooseGames.Controllers.JustOne
                 return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
             }
         }
+
+        [HttpPost]
+        [ActionName(nameof(PlayerStatusEnum.RoundWaiting))]
+        public async Task<GenericResponse<bool>> SetWaitingAsync(PlayerSessionRoundRequest request)
+        {
+            try
+            {
+                _logger.LogTrace("Received request", request);
+
+                await _playerStatusService.UpdatePlayerStatusToRoundWaitingAsync(request);
+
+                var result = NewResponse.Ok(true);
+
+                _logger.LogTrace("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
+            }
+        }
+
 
 
         private async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateStatus(PlayerSessionRequest request, Guid lobbyStatus)

@@ -14,7 +14,5 @@ namespace GooseGames.Services.JustOne.RoundStatus
         public abstract RoundStatusEnum RoundStatus { get; }
 
         public abstract Task ConditionallyTransitionRoundStatusAsync(Round round);
-        public abstract Task TransitionRoundStatusAsync(Round round);
-        public abstract Task UpdatePlayerStatusAsync(Round round);
     }
 }

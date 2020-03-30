@@ -1,9 +1,10 @@
+Plyers are voting on the outcome
 <div class="loading" *ngIf="Loading && !ErrorMessage">
   I am loading...
 </div>
 <div>
   <div *ngIf="!Loading">
-    <span>Waiting for other players to vote on invalid clues</span>
+    <span>Waiting for other players to vote on round outcome</span>
   </div>
   <app-just-one-playerwaiting-component [playerWaitingComponent]="this"></app-just-one-playerwaiting-component>
 </div>

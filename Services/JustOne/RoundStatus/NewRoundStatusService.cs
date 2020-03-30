@@ -37,7 +37,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
             _logger = logger;
         }
 
-        public override async Task UpdatePlayerStatusAsync(Round round)
+        public async Task UpdatePlayerStatusAsync(Round round)
         {
             var roundId = round.Id;
             var sessionId = round.SessionId;
@@ -52,7 +52,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
             await _playerHub.SendBeginRoundAsync(sessionId, activePlayerConnectionId);
         }
 
-        public override async Task TransitionRoundStatusAsync(Round round)
+        public async Task TransitionRoundStatusAsync(Round round)
          {
             var roundId = round.Id;
 
@@ -66,7 +66,6 @@ namespace GooseGames.Services.JustOne.RoundStatus
 
         public override async Task ConditionallyTransitionRoundStatusAsync(Round round)
         {
-            //TODO: Check all players ready. Status=waiting?
             await TransitionRoundStatusAsync(round);
         }
     }

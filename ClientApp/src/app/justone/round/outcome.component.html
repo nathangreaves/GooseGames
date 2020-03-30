@@ -1,0 +1,64 @@
+<div class="loading" *ngIf="Loading && !ErrorMessage">
+  I am loading...
+</div>
+<div class="loading" *ngIf="!Loading && !ErrorMessage">
+
+
+  <div>
+    <span>{{RoundOutcome.activePlayerName}}</span>
+    <span *ngIf="RoundOutcome.roundOutcome != 2"> guessed</span>
+  </div>
+
+  <div *ngIf="RoundOutcome.roundOutcome == 2">
+    <div>
+      <span class="just-one-important-word">
+        PASSED
+      </span>
+    </div>
+    <div *ngIf="RoundOutcome.wordToGuess">
+      instead of guessing
+    </div>
+  </div>
+
+  <div *ngIf="RoundOutcome.wordToGuess">
+    <span class="just-one-important-word">
+      {{RoundOutcome.wordGuessed}}
+    </span>
+  </div>
+
+  <div *ngIf="RoundOutcome.roundOutcome == 1">
+    Correctly
+  </div>
+  <div *ngIf="RoundOutcome.roundOutcome == 3">
+    Incorrectly
+  </div>
+  <br/>
+  <div *ngIf="RoundOutcome.roundOutcome != 1">
+    <div>
+      The correct answer was
+    </div>
+    <div class="just-one-important-word">
+      {{RoundOutcome.wordToGuess}}
+    </div>
+  </div>
+
+  <div>
+    Your team now has
+  </div>
+  <div class="just-one-important-word">
+    {{RoundOutcome.score}}
+  </div>
+  <div>
+    Points
+  </div>
+
+  <div *ngIf="!RoundOutcome.gameEnded">
+    <button class="btn btn-primary" (click)="NextRound()">Next Round</button>
+  </div>
+
+  <div *ngIf="RoundOutcome.gameEnded">
+    <span>Game Over!</span>
+  </div>
+
+</div>
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

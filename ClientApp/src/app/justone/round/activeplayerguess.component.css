@@ -1,0 +1,12 @@
+.active-player-guess-submission {
+   margin-top: 15px;
+}
+
+.active-player-guess-submission input {
+  margin-bottom: 10px;
+}
+
+.active-player-guess-submission-scorehelp{
+    font-weight: bold;
+    font-size: 12px;
+}

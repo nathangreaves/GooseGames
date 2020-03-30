@@ -6,8 +6,19 @@ export class SubmitClueRequest {
   ResponseWord: string;
 }
 
+export class SubmitActivePlayerResponseRequest extends SubmitClueRequest {
+  Pass: boolean;
+}
+
 export class SubmitClueVotesRequest extends PlayerSessionRequest {
    ValidResponses: string[]
+}
+
+export class PlayerCluesResponse {
+  activePlayerName: string;
+  activePlayerNumber: number;
+  wordToGuess: string;
+  responses: PlayerClue[]
 }
 
 export class PlayerClue {

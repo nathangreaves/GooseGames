@@ -8,7 +8,7 @@
   <div>
     Their word is:
   </div>
-  <div>
+  <div class="just-one-important-word">
     {{Word}}
   </div>
 
@@ -17,7 +17,7 @@
     <input #clue />
   </div>
   <div>
-    <button class="btn btn-primary" style="margin:10px; color:white;" (click)="SubmitClue(clue.value)">Submit</button>
+    <button class="btn btn-primary" (click)="SubmitClue(clue.value)">Submit</button>
   </div>
 </div>
 <div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

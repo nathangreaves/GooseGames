@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace GooseGames.Services.JustOne.RoundStatus
 {
-    public class WaitingForVotesOnDuplicatesRoundStatusService : RoundStatusKeyedServiceBase
+    public class WaitingForVotesOnLeaderResponseRoundStatusService : CanTriggerRoundEndRoundStatusServiceBase
     {
         private readonly IResponseRepository _responseRepository;
         private readonly IResponseVoteRepository _responseVoteRepository;
@@ -19,18 +19,20 @@ namespace GooseGames.Services.JustOne.RoundStatus
         private readonly IPlayerStatusRepository _playerStatusRepository;
         private readonly IPlayerRepository _playerRepository;
         private readonly IHubContext<PlayerHub> _playerHub;
-        private readonly RequestLogger<WaitingForVotesOnDuplicatesRoundStatusService> _logger;
+        private readonly RequestLogger<WaitingForVotesOnLeaderResponseRoundStatusService> _logger;
 
-        public override RoundStatusEnum RoundStatus => RoundStatusEnum.WaitingForVotesOnDuplicates;
+        public override RoundStatusEnum RoundStatus => RoundStatusEnum.WaitingForVotesOnLeaderResponse;
 
-        public WaitingForVotesOnDuplicatesRoundStatusService(
+        public WaitingForVotesOnLeaderResponseRoundStatusService(
             IResponseRepository responseRepository,
             IResponseVoteRepository responseVoteRepository,
             IRoundRepository roundRepository,
+            ISessionRepository sessionRepository,
             IPlayerStatusRepository playerStatusRepository,
             IPlayerRepository playerRepository,
             IHubContext<PlayerHub> playerHub,
-            RequestLogger<WaitingForVotesOnDuplicatesRoundStatusService> logger)
+            RequestLogger<WaitingForVotesOnLeaderResponseRoundStatusService> logger) : base(roundRepository,
+                sessionRepository, playerStatusRepository, playerHub)
         {
             _responseRepository = responseRepository;
             _responseVoteRepository = responseVoteRepository;
@@ -44,7 +46,6 @@ namespace GooseGames.Services.JustOne.RoundStatus
         public override async Task ConditionallyTransitionRoundStatusAsync(Round round)
         {
             _logger.LogTrace("Checking all players have voted for round", round);
-
             if (await PlayersHaveAllVoted(round))
             {
                 _logger.LogTrace("All players have voted");
@@ -59,7 +60,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
 
         private async Task<bool> PlayersHaveAllVoted(Round round)
         {
-            var playerStatus = PlayerStatusEnum.PassivePlayerWaitingForClueVotes;
+            var playerStatus = PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes;
 
             _logger.LogTrace("Getting players for session");
             var playersExceptActivePlayer = await _playerRepository.FilterAsync(p => p.SessionId == round.SessionId && p.Id != round.ActivePlayerId);
@@ -77,20 +78,38 @@ namespace GooseGames.Services.JustOne.RoundStatus
             _logger.LogTrace("Transitioning round status");
 
             _logger.LogTrace("Fetching responses");
-            var allResponses = await _responseRepository.FilterAsync(r => r.RoundId == round.Id);
+            var response = await _responseRepository.SingleOrDefaultAsync(r => r.RoundId == round.Id && r.PlayerId == round.ActivePlayerId);
 
-            _logger.LogTrace("Marking duplicate responses");
-            await MarkInvalidResponses(round, allResponses);
+            _logger.LogTrace("Updating response status");
+            await UpdateResponseStatusAsync(round, response);
 
-            _logger.LogTrace($"Updating round status");
-            round.Status = RoundStatusEnum.WaitingForLeaderResponse;
-            await _roundRepository.UpdateAsync(round);
-
-            _logger.LogTrace($"Updating players");
-            await UpdatePlayerStatusAsync(round);
+            if (response.Status == ResponseStatusEnum.CorrectActivePlayerResponse)
+            {
+                await TransitionRoundStatusOnSuccessAsync(round);
+            }
+            else
+            {
+                await TransitionRoundStatusOnFailAsync(round);
+            }
         }
 
-        private async Task MarkInvalidResponses(Round round, List<Response> allResponses)
+        private async Task TransitionRoundStatusOnSuccessAsync(Round round)
+        {
+            int score = 1;
+            var roundOutcome = RoundOutcomeEnum.Success;
+
+            await TransitionRoundWithOutcomeAsync(round, score, roundOutcome);
+        }
+
+        private async Task TransitionRoundStatusOnFailAsync(Round round)
+        {
+            int score = -1;
+            var roundOutcome = RoundOutcomeEnum.Fail;
+
+            await TransitionRoundWithOutcomeAsync(round, score, roundOutcome);
+        }
+
+        private async Task UpdateResponseStatusAsync(Round round, Response response)
         {
             _logger.LogTrace("Getting number of players for voting");
             var numberOfPlayers = (await _playerRepository.CountAsync(p => p.SessionId == round.SessionId)) - 1;
@@ -99,53 +118,23 @@ namespace GooseGames.Services.JustOne.RoundStatus
             _logger.LogTrace($"Number of votes required = {numberOfVotesRequiredForValid}");
 
             _logger.LogTrace($"Getting all response votes");
-            var allResponseVotes = await _responseVoteRepository.GetNumberOfVotesPerResponseAsync(allResponses.Select(r => r.Id));
+            var allResponseVotes = await _responseVoteRepository.GetNumberOfVotesPerResponseAsync(new List<Guid> { response.Id });
+                        
+            var votes = allResponseVotes[response.Id];
+            _logger.LogTrace($"Response {response.Id} has {votes} votes");
+            if (allResponseVotes[response.Id] < numberOfVotesRequiredForValid)            {
 
-            var responsesToUpdate = new List<Response>();
-
-            foreach (var response in allResponses)
-            {
-                var votes = allResponseVotes[response.Id];
-                _logger.LogTrace($"Response {response.Id} has {votes} votes");
-                if (allResponseVotes[response.Id] < numberOfVotesRequiredForValid)
-                {
-                    if (response.Status != ResponseStatusEnum.AutoInvalid)
-                    {
-                        _logger.LogTrace($"Response {response.Id} not valid");
-                        responsesToUpdate.Add(response);
-                        response.Status = ResponseStatusEnum.ManualInvalid;
-                    }
-                    else
-                    {
-                        _logger.LogTrace($"Response {response.Id} auto invalid");
-                    }
-                }
-                else
-                {
-                    responsesToUpdate.Add(response);
-                    response.Status = ResponseStatusEnum.Valid;
-                    _logger.LogTrace($"Response {response.Id} is valid");
-                }
+                _logger.LogTrace($"Response {response.Id} not valid");
+                response.Status = ResponseStatusEnum.IncorrectActivePlayerResponse;
             }
-
-            _logger.LogTrace($"Responses invalid: {responsesToUpdate.Count}");
-            if (responsesToUpdate.Any())
+            else
             {
-                _logger.LogTrace($"Updating invalid responses");
-                await _responseRepository.UpdateRangeAsync(responsesToUpdate);
+                response.Status = ResponseStatusEnum.CorrectActivePlayerResponse;
+                _logger.LogTrace($"Response {response.Id} is valid");
             }
-        }
-
-        private async Task UpdatePlayerStatusAsync(Round round)
-        {
-            var roundId = round.Id;
-            var sessionId = round.SessionId;
-
-            _logger.LogTrace($"Updating player statuses for round: {roundId}");
-            await _playerStatusRepository.UpdatePlayerStatusesForRoundAsync(roundId, PlayerStatusEnum.PassivePlayerWaitingForActivePlayer, PlayerStatusEnum.ActivePlayerGuess);
-
-            _logger.LogTrace($"Sending all clue votes submitted");
-            await _playerHub.SendAllClueVotesSubmittedAsync(sessionId);
+            
+            _logger.LogTrace($"Updating response with status");
+            await _responseRepository.UpdateAsync(response);            
         }
     }
 }

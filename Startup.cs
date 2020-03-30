@@ -38,7 +38,7 @@ namespace GooseGames
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped(typeof(RequestLogger<>));
 
-            PostGreRepository.RepositoryConfiguration.ConfigureServices(services, Configuration);
+            MSSQLRepository.RepositoryConfiguration.ConfigureServices(services, Configuration);
 
             services.AddScoped<Services.JustOne.SessionService>();
             services.AddScoped<Services.JustOne.PlayerDetailsService>();
@@ -46,6 +46,8 @@ namespace GooseGames
             services.AddScoped<Services.JustOne.RoundService>();
             services.AddScoped<Services.JustOne.PlayerResponseService>();
             services.AddScoped<Services.JustOne.PlayerActionInformationService>();
+            services.AddScoped<Services.JustOne.PrepareNextRoundService>();
+            services.AddScoped<Services.JustOne.RoundStatus.NewRoundStatusService>();
 
             services.AddTransient<RoundServiceProvider>();
             AddKeyedServices<IRoundStatusKeyedService>(services);

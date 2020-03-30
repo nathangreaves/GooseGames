@@ -1,9 +1,9 @@
 <div class="loading" *ngIf="Loading && !ErrorMessage">
   I am loading...
 </div>
-<div *ngIf="!Loading">
-  <div>
-    Waiting for active player...
+<div>
+  <div  *ngIf="!Loading">
+    <span>Waiting for {{ActivePlayerName}}</span> to guess <span>{{Word}}</span>
   </div>
+  <app-just-one-cluelist-component [clueListComponent]="this"></app-just-one-cluelist-component>
 </div>
-<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

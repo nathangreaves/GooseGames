@@ -55,7 +55,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
             }
         }
 
-        public override async Task TransitionRoundStatusAsync(Round round)
+        private async Task TransitionRoundStatusAsync(Round round)
         {
             var allResponses = await _responseRepository.FilterAsync(r => r.RoundId == round.Id);
 
@@ -77,7 +77,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
             await UpdatePlayerStatusAsync(round);
         }
 
-        public override async Task UpdatePlayerStatusAsync(Round round)
+        private async Task UpdatePlayerStatusAsync(Round round)
         {
             var roundId = round.Id;
             var sessionId = round.SessionId;

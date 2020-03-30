@@ -10,9 +10,6 @@ namespace GooseGames.Services.JustOne.RoundStatus
     public interface IRoundStatusKeyedService
     {
         RoundStatusEnum RoundStatus { get; }
-
-        Task UpdatePlayerStatusAsync(Round round);
-        Task TransitionRoundStatusAsync(Round round);
         Task ConditionallyTransitionRoundStatusAsync(Round round);
     }
 }

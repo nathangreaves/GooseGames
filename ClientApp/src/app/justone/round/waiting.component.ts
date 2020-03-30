@@ -45,16 +45,21 @@ export class JustOneRoundWaitingComponent implements IPlayerSessionComponent {
       .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
       .build();
     this._hubConnection.on("beginRoundPassivePlayer", () => {
-      //this._hubConnection.stop();
-      //this._hubConnection = null;
+      this.DisposeConnection();
       this._router.navigate(['/justone/round/submitclue', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
     this._hubConnection.on("beginRoundActivePlayer", () => {
-      //this._hubConnection.stop();
-      //this._hubConnection = null;
+      this.DisposeConnection();
       this._router.navigate(['/justone/round/playerwaiting', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
     this._hubConnection.start().catch(err => console.error(err));
+  }
+
+  DisposeConnection() {
+    if (this._hubConnection) {
+      this._hubConnection.stop();
+      this._hubConnection = null;
+    }
   }
 
   HandleGenericError() {

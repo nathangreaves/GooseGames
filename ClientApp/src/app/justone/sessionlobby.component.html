@@ -26,13 +26,13 @@
               'player-7' : player.playerNumber == 7
             }"
             >{{player.playerName}}</td>
-        <td><a *ngIf="SessionMaster && player.id != PlayerId" class="btn btn-primary" style="margin:10px; color:white;" (click)="KickPlayer(player.id)">Kick</a></td>
+        <td><button *ngIf="SessionMaster && player.id != PlayerId" class="btn btn-primary" (click)="KickPlayer(player.id)">Kick</button></td>
       </tr>
     </table>
   </div>
 
   <div *ngIf="SessionMaster">
-    <a class="btn btn-primary" style="margin:10px; color:white;" (click)="StartGame()">Start Game</a>
+    <button class="btn btn-primary" (click)="StartGame()">Start Game</button>
   </div>
 
 </div>

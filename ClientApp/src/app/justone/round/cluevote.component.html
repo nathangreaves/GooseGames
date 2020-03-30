@@ -1,39 +1,18 @@
 <div class="loading" *ngIf="Loading && !ErrorMessage">
   I am loading...
 </div>
-<div *ngIf="!Loading">
-  <div>
-    <table class="player-table">
-      <tr *ngFor="let clue of Clues;">
-        <td class="player-number-cell">{{clue.playerNumber}}</td>
-        <td class="player-name-cell"
-            [ngClass]="{
-              'player-1' : clue.playerNumber == 1,
-              'player-2' : clue.playerNumber == 2,
-              'player-3' : clue.playerNumber == 3,
-              'player-4' : clue.playerNumber == 4,
-              'player-5' : clue.playerNumber == 5,
-              'player-6' : clue.playerNumber == 6,
-              'player-7' : clue.playerNumber == 7
-            }">
-          {{clue.playerName}}
-        </td>
-        <td>
-          <span class="clue-word" [ngClass]="{
-              'clue-invalid' : clue.responseInvalid,
-              'clue-valid' : !clue.responseInvalid
-            }">
-            {{clue.response}}
-          </span>
-        </td>
-        <td>
-          <a *ngIf="!clue.responseAutoInvalid" class="btn btn-primary" style="margin:10px; color:white;" (click)="MarkClueAsInvalid(clue)">Invalid</a>
-        </td>
-      </tr>
-    </table>
+<div>
+  <div *ngIf="!Loading">
+    <span>{{ActivePlayerName}} is going to be guessing</span>
   </div>
-  <div>
-    <a class="btn btn-primary" style="margin:10px; color:white;" (click)="SubmitClueVote()">Submit</a>
+  <div *ngIf="!Loading" class="just-one-important-word">
+    <span>{{Word}}</span>
+  </div>
+  <div *ngIf="!Loading">
+    <span>Please remove any clues that are duplicates/invalid</span>
+  </div>
+  <app-just-one-cluelist-component [clueListComponent]="this"></app-just-one-cluelist-component>
+  <div *ngIf="!Loading">
+    <button class="btn btn-primary" (click)="SubmitClueVote()">Submit</button>
   </div>
 </div>
-<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

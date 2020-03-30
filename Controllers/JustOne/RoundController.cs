@@ -7,6 +7,7 @@ using GooseGames.Services.JustOne;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.Requests.JustOne;
+using Models.Requests.JustOne.Round;
 using Models.Responses;
 using Models.Responses.JustOne.Round;
 
@@ -27,7 +28,6 @@ namespace GooseGames.Controllers.JustOne
             _logger = logger;
         }
 
-
         [ActionName("PassivePlayerInfo")]
         [HttpGet]
         public async Task<GenericResponse<PassivePlayerRoundInformationResponse>> PassivePlayerInfoAsync([FromQuery]PlayerSessionRequest request)
@@ -46,6 +46,27 @@ namespace GooseGames.Controllers.JustOne
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
                 return GenericResponse<PassivePlayerRoundInformationResponse>.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpGet]
+        [ActionName("Outcome")]
+        public async Task<GenericResponse<RoundOutcomeResponse>> GetRoundOutcome([FromQuery]PlayerSessionRequest request)
+        {
+            try
+            {
+                _logger.LogTrace("Received request", request);
+
+                var result = await _roundService.GetRoundOutcomeAsync(request);
+
+                _logger.LogTrace("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponse<RoundOutcomeResponse>.Error($"Unknown Error {errorGuid}");
             }
         }
     }

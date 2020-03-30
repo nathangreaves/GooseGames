@@ -13,4 +13,10 @@ code {
   color: #fff;
   background-color: #1b6ec2;
   border-color: #1861ac;
+  margin-top: 10px;
+}
+
+.just-one-important-word {
+  font-size: 32px;
+  font-weight: bold;
 }

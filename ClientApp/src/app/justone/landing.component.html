@@ -5,9 +5,9 @@
   <input #password />
 </div>
 <div>
-  <a class="btn btn-primary" style="margin:10px; color:white;" (click)="JoinGame(password.value)">Join Game</a>
+  <button class="btn btn-primary" (click)="JoinGame(password.value)">Join Game</button>
 </div>
 <div>
-  <a class="btn btn-primary" style="margin:10px; color:white;" (click)="StartNewGame(password.value)">Start New Game</a>
+  <button class="btn btn-primary" (click)="StartNewGame(password.value)">Start New Game</button>
 </div>
 <div *ngIf="ErrorMessage"  class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

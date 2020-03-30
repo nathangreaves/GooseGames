@@ -5,66 +5,101 @@ import { JustOnePlayerStatusService } from '../../../services/justone/playerstat
 import { PlayerStatus, PlayerStatusRoutesMap } from '../../../models/justone/playerstatus';
 import { JustOneClueService } from '../../../services/justone/clue';
 import { IPlayerSessionComponent } from '../../../models/justone/session';
-import { PlayerClue } from '../../../models/justone/clue';
+import { PlayerClue, PlayerCluesResponse } from '../../../models/justone/clue';
+import { JustOneClueListComponentBase, JustOneClueListComponent } from './cluelist.component';
+import { GenericResponse, GenericResponseBase } from '../../../models/genericresponse';
 
 @Component({
   selector: 'app-just-one-cluevote-component',
   templateUrl: './cluevote.component.html',
   styleUrls: ['./cluevote.component.css', '../sessionlobby.component.css']
 })
-
-export class JustOneClueVoteComponent implements IPlayerSessionComponent {
-
+export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
   _router: Router;
   _playerStatusService: JustOnePlayerStatusService;
   _clueService: JustOneClueService;
 
-  SessionId: string;
-  PlayerId: string;
-  Loading: boolean = true;
-  ErrorMessage: string;
-
-  Clues: PlayerClue[];
+  ActivePlayerNumber: number;
+  ActivePlayerName: string;
+  Word: string;
+  clueListComponent: JustOneClueListComponent;
 
   //private _hubConnection: signalR.HubConnection;
 
-  constructor(playerStatusService: JustOnePlayerStatusService, clueService: JustOneClueService, router: Router, activatedRoute: ActivatedRoute) {
+  constructor(clueService: JustOneClueService, router: Router, activatedRoute: ActivatedRoute) {
+
+    super(activatedRoute);
+
     this._router = router;
-    this._playerStatusService = playerStatusService;
     this._clueService = clueService;
 
-    this.SessionId = activatedRoute.snapshot.params.SessionId;
-    this.PlayerId = activatedRoute.snapshot.params.PlayerId;
+    //this.SessionId = activatedRoute.snapshot.params.SessionId;
+    //this.PlayerId = activatedRoute.snapshot.params.PlayerId;
 
     //this.setupConnection();
 
-    this._playerStatusService.Validate(this, PlayerStatus.PassivePlayerClueVote, () => { })
-      .then(data => {
-        if (data.success) {
-          return this.load();
-        }
-      })
-      .then(data => {
-        if (data && data.success) {
-          this.Loading = false;
-        }
-      });
+    //this._playerStatusService.Validate(this, PlayerStatus.PassivePlayerClueVote, () => { })
+    //  .then(data => {
+    //    if (data.success) {
+    //      return this.load();
+    //    }
+    //  })
+    //  .then(data => {
+    //    if (data && data.success) {
+    //      this.Loading = false;
+    //    }
+    //  });
   }
 
-  load(): Promise<any> {
-    return this._clueService.GetClues(this)
-      .then(response => {
-        if (response.success) {
-          _.forEach(response.data, clue => clue.responseAutoInvalid = clue.responseInvalid);
-          this.Clues = response.data;
-        }
-        else {
-          this.ErrorMessage = response.errorCode;
-        }
-        return response;
-      })
-      .catch(() => this.HandleGenericError());
+  getPlayerStatus(): PlayerStatus {
+    return PlayerStatus.PassivePlayerClueVote;
   }
+  isClueListReadOnly(): boolean {
+    return false;
+  }
+  loadClues(): Promise<GenericResponse<PlayerCluesResponse>> {
+    return this._clueService.GetClues(this).then(response => {
+      if (response.success) {
+        this.ActivePlayerNumber = response.data.activePlayerNumber;
+        this.ActivePlayerName = response.data.activePlayerName;
+        this.Word = response.data.wordToGuess;
+      }
+      return response;
+    });
+  }
+  loadContent(): Promise<GenericResponseBase> {
+    return Promise.resolve(
+      {
+        success: true,
+        errorCode: null,
+      });
+  }
+  onRedirect() {
+
+  }
+  setClueListComponent(clueListComponent: JustOneClueListComponent) {
+    this.clueListComponent = clueListComponent;
+  }
+
+  //load(): Promise<any> {
+  //  return this._clueService.GetClues(this)
+  //    .then(response => {
+  //      if (response.success) {
+
+  //        this.ActivePlayerNumber = response.data.activePlayerNumber;
+  //        this.ActivePlayerName = response.data.activePlayerName;
+  //        this.Word = response.data.wordToGuess;
+
+  //        _.forEach(response.data.responses, clue => clue.responseAutoInvalid = clue.responseInvalid);
+  //        this.Clues = response.data.responses;
+  //      }
+  //      else {
+  //        this.ErrorMessage = response.errorCode;
+  //      }
+  //      return response;
+  //    })
+  //    .catch(() => this.HandleGenericError());
+  //}
 
   MarkClueAsInvalid(clue: PlayerClue) {
     clue.responseInvalid = !clue.responseInvalid;
@@ -75,7 +110,7 @@ export class JustOneClueVoteComponent implements IPlayerSessionComponent {
       {
         SessionId: this.SessionId,
         PlayerId: this.PlayerId,
-        ValidResponses: _.map(_.filter(this.Clues, clue => !clue.responseInvalid), clue => clue.responseId)
+        ValidResponses: _.map(_.filter(this.clueListComponent.Clues, clue => !clue.responseInvalid), clue => clue.responseId)
       })
       .then(data => {
         if (!data.success) {
@@ -107,8 +142,4 @@ export class JustOneClueVoteComponent implements IPlayerSessionComponent {
 
   //this._hubConnection.start().catch(err => console.error(
   //}
-
-  HandleGenericError() {
-    this.ErrorMessage = "An Unknown Error Occurred";
-  }
 }

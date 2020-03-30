@@ -4,6 +4,7 @@ import { GenericResponse } from '../../models/genericresponse';
 import { IPlayerSession, IPlayerSessionComponent } from '../../models/justone/session'
 import { PlayerStatus, PlayerStatusValidationResponse, PlayerStatusRoutesMap } from '../../models/justone/playerstatus';
 import { Router } from '@angular/router';
+import { PlayerSessionRoundRequest } from '../../models/justone/round';
 
 @Injectable({
   providedIn: 'root',
@@ -57,7 +58,11 @@ export class JustOnePlayerStatusService {
       });
   }
 
+  public SetRoundWaiting(request: PlayerSessionRoundRequest): Promise<GenericResponse<boolean>> {
+    return this._http.post<GenericResponse<boolean>>(this._baseUrl + `JustOnePlayerStatus/${PlayerStatus[PlayerStatus.RoundWaiting]}`, request).toPromise();
+  }
+
   public Set(playerId: string, playerStatus: PlayerStatus): Promise<GenericResponse<boolean>> {
-    return this._http.post<GenericResponse<boolean>>(this._baseUrl + `JustOnePlayerStatus/${PlayerStatus[playerStatus]}`, { playerId: playerId }).toPromise();
+    return this._http.post<GenericResponse<boolean>>(this._baseUrl + `JustOnePlayerStatus/${PlayerStatus[playerStatus]}`, { PlayerId: playerId }).toPromise();
   }
 }

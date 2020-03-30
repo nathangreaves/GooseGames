@@ -10,6 +10,7 @@ export enum PlayerStatus {
   PassivePlayerWaitingForActivePlayer,
   PassivePlayerOutcome,
   PassivePlayerOutcomeVote,
+  PassivePlayerWaitingForOutcomeVotes,
 
   ActivePlayerWaitingForClues,
   ActivePlayerWaitingForVotes,
@@ -31,14 +32,15 @@ export const PlayerStatusRoutesMap: Record<PlayerStatus, string> = {
   [PlayerStatus.PassivePlayerClueVote]: "justone/round/cluevote",
   [PlayerStatus.PassivePlayerWaitingForClueVotes]: "justone/round/passiveplayerwaitingforvotes",
   [PlayerStatus.PassivePlayerWaitingForActivePlayer]: "justone/round/passiveplayerwaitingforactiveplayer",
-  [PlayerStatus.PassivePlayerOutcome]: "justone/round/??",
-  [PlayerStatus.PassivePlayerOutcomeVote]: "justone/round/??",
+  [PlayerStatus.PassivePlayerOutcome]: "justone/round/passiveplayeroutcome",
+  [PlayerStatus.PassivePlayerOutcomeVote]: "justone/round/passiveplayeroutcomevote",
+  [PlayerStatus.PassivePlayerWaitingForOutcomeVotes]: "justone/round/passiveplayerwaitingforoutcomevotes",
 
   [PlayerStatus.ActivePlayerWaitingForClues]: "justone/round/playerwaiting",
   [PlayerStatus.ActivePlayerWaitingForVotes]: "justone/round/activeplayerwaitingforcluevotes",
   [PlayerStatus.ActivePlayerGuess]: "justone/round/activeplayerguess",
-  [PlayerStatus.ActivePlayerWaitingForOutcomeVotes]: "justone/round/??",
-  [PlayerStatus.ActivePlayerOutcome]: "justone/round/??",
+  [PlayerStatus.ActivePlayerWaitingForOutcomeVotes]: "justone/round/activeplayerwaitingforoutcomevotes",
+  [PlayerStatus.ActivePlayerOutcome]: "justone/round/activeplayeroutcome"
 };
 
 export class PlayerStatusValidationResponse {

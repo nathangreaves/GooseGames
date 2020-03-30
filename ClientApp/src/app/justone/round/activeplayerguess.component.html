@@ -1,3 +1,26 @@
-<div>
-  Make yer guess!
+<div class="loading" *ngIf="Loading && !ErrorMessage">
+  I am loading...
 </div>
+<div>
+  <div *ngIf="!Loading">
+    <p>Here are your clues</p>
+  </div>
+  <app-just-one-cluelist-component [clueListComponent]="this"></app-just-one-cluelist-component>
+  <div class="active-player-guess-submission" *ngIf="!Loading">
+    <div>
+      Make a guess:
+    </div>
+    <div>
+      <input #response />
+    </div>
+    <div>
+      <button class="btn btn-primary" (click)="SubmitResponse(response.value)">Submit</button>
+      <p class="active-player-guess-submission-scorehelp">Correct: +1; Incorrect -1</p>
+    </div>
+    <div>
+      <button class="btn btn-primary" (click)="SubmitPass(response.value)">Pass</button>
+      <p class="active-player-guess-submission-scorehelp">Pass: 0</p>
+    </div>
+  </div>
+</div>
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

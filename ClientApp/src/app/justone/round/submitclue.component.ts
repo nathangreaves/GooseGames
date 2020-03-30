@@ -3,7 +3,6 @@ import * as _ from 'lodash';
 import { JustOneRoundService } from '../../../services/justone/round'
 import { PlayerDetails, UpdatePlayerDetailsRequest } from '../../../models/justone/player'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import * as signalR from "@microsoft/signalr";
 import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus'
 import { PlayerStatus, PlayerStatusRoutesMap } from '../../../models/justone/playerstatus'
 import { IPlayerSessionComponent } from '../../../models/justone/session';
@@ -16,8 +15,6 @@ import { JustOneClueService } from '../../../services/justone/clue';
 })
 
 export class JustOneSubmitClueComponent implements IPlayerSessionComponent {
-
-  //_hubConnection: signalR.HubConnection;
 
   _router: Router;
   _playerStatusService: JustOnePlayerStatusService;
@@ -41,8 +38,6 @@ export class JustOneSubmitClueComponent implements IPlayerSessionComponent {
 
     this.SessionId = activatedRoute.snapshot.params.SessionId;
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;
-
-    //this.setupConnection();
 
     this._playerStatusService.Validate(this, PlayerStatus.PassivePlayerClue, () => { })
       .then(data => {
@@ -92,18 +87,6 @@ export class JustOneSubmitClueComponent implements IPlayerSessionComponent {
       })
       .catch(() => this.HandleGenericError());
   }
-
-  //private setupConnection() {
-  //  this._hubConnection = new signalR.HubConnectionBuilder()
-  //    .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
-  //    .build();
-  //  //this._hubConnection.on("beginRoundPassivePlayer", () => {
-  //  //  this._hubConnection.stop();
-  //  //  this._hubConnection = null;
-  //  //  this._router.navigate(['/justone/submitclue', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
-  //  //});
-  //  this._hubConnection.start().catch(err => console.error(err));
-  //}
 
   HandleGenericError() {
     this.ErrorMessage = "An Unknown Error Occurred";

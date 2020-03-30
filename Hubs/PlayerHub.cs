@@ -76,6 +76,22 @@ namespace GooseGames.Hubs
         public static async Task SendAllClueVotesSubmittedAsync(this IHubContext<PlayerHub> hub, Guid sessionId)
         {
             await hub.Clients.Group(sessionId.ToString()).SendAsync("allClueVotesSubmitted");
+        }        
+        public static async Task SendRoundOutcomeAvailableAsync(this IHubContext<PlayerHub> hub, Guid sessionId)
+        {
+            await hub.Clients.Group(sessionId.ToString()).SendAsync("roundOutcomeAvailable");
+        }
+        public static async Task SendActivePlayerResponseVoteRequiredAsync(this IHubContext<PlayerHub> hub, Guid sessionId)
+        {
+            await hub.Clients.Group(sessionId.ToString()).SendAsync("activePlayerResponseVoteRequired");
+        }
+        public static async Task SendResponseVoteSubmittedAsync(this IHubContext<PlayerHub> hub, Guid sessionId, Guid playerId)
+        {
+            await hub.Clients.Group(sessionId.ToString()).SendAsync("responseVoteSubmitted", playerId);
+        }
+        public static async Task SendAllResponseVotesSubmittedAsync(this IHubContext<PlayerHub> hub, Guid sessionId)
+        {
+            await hub.Clients.Group(sessionId.ToString()).SendAsync("allResponseVotesSubmitted");
         }
     }
 }

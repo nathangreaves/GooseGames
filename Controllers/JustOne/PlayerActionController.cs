@@ -66,5 +66,27 @@ namespace GooseGames.Controllers.JustOne
                 return GenericResponse<IEnumerable<PlayerActionResponse>>.Error($"Unknown Error {errorGuid}");
             }
         }
+
+
+        [HttpGet]
+        [ActionName("ResponseOutcomeVoteInfo")]
+        public async Task<GenericResponse<IEnumerable<PlayerActionResponse>>> GetPlayerResponseOutcomeVoteInfoAsync([FromQuery]PlayerSessionRequest request)
+        {
+            try
+            {
+                _logger.LogTrace("Received request", request);
+
+                var result = await _playerActionInfoService.GetPlayerResponseOutcomeVoteInfoAsync(request);
+
+                _logger.LogTrace("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponse<IEnumerable<PlayerActionResponse>>.Error($"Unknown Error {errorGuid}");
+            }
+        }
     }
 }

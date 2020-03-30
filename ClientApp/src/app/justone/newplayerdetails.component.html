@@ -9,9 +9,9 @@
     <input #playerName />
   </div>
   <div>
-    <a class="btn btn-primary" style="margin:10px; color:white;" (click)="SubmitPlayerDetails({
+    <button class="btn btn-primary" (click)="SubmitPlayerDetails({
    playerName: playerName.value
-   })">Enter Game</a>
+   })">Enter Game</button>
   </div>
 </div>
 <div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

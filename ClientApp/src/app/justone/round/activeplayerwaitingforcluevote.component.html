@@ -1,3 +1,6 @@
+<div *ngIf="!Loading">
+  You are the active player. The other players are checking for invalid clues
+</div>
 <app-just-one-playerwaiting-component [playerWaitingComponent]="this"></app-just-one-playerwaiting-component>
 
 <div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

@@ -56,7 +56,7 @@ namespace GooseGames.Services.JustOne
             var responses = await _responseRepository.FilterAsync(p => playerIds.Contains(p.PlayerId) && p.RoundId == currentRound.Id);
 
             _logger.LogTrace("Preparing result");
-            var result = playersExceptActivePlayer.Select(p => new PlayerActionResponse
+            var result = playersExceptActivePlayer.OrderBy(p => p.PlayerNumber).Select(p => new PlayerActionResponse
             {
                 Id = p.Id,
                 PlayerName = p.Name,
@@ -70,6 +70,11 @@ namespace GooseGames.Services.JustOne
         internal async Task<GenericResponse<IEnumerable<PlayerActionResponse>>> GetPlayerResponseVoteInfoAsync(PlayerSessionRequest request)
         {
             return await GetPlayerInfoForPlayerStatus(request, PlayerStatusEnum.PassivePlayerWaitingForClueVotes);
+        }
+
+        internal async Task<GenericResponse<IEnumerable<PlayerActionResponse>>> GetPlayerResponseOutcomeVoteInfoAsync(PlayerSessionRequest request)
+        {
+            return await GetPlayerInfoForPlayerStatus(request, PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes);
         }
 
         private async Task<GenericResponse<IEnumerable<PlayerActionResponse>>> GetPlayerInfoForPlayerStatus(PlayerSessionRequest request, Guid playerStatus)

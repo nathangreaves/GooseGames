@@ -2,8 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { GenericResponse, GenericResponseBase } from '../../models/genericresponse';
 import { IPlayerSession, ConvertToPlayerSessionRequest } from '../../models/justone/session';
-import { PlayerStatusValidationResponse } from '../../models/justone/playerstatus';
-import { SubmitClueRequest, SubmitClueVotesRequest, PlayerClue } from '../../models/justone/clue';
+import { SubmitClueRequest, SubmitClueVotesRequest, PlayerClue, PlayerCluesResponse, SubmitActivePlayerResponseRequest } from '../../models/justone/clue';
 
 @Injectable({
   providedIn: 'root',
@@ -19,17 +18,31 @@ export class JustOneClueService {
     this._http = http;
   }
 
-  public GetClues(request: IPlayerSession): Promise<GenericResponse<PlayerClue[]>> {
+  public GetClues(request: IPlayerSession): Promise<GenericResponse<PlayerCluesResponse>> {
     request = ConvertToPlayerSessionRequest(request);
     var parameters = Object.keys(request).map(key => key + '=' + request[key]).join('&');
-    return this._http.get<GenericResponse<PlayerClue[]>>(this._baseUrl + `JustOnePlayerResponse?${parameters}`).toPromise();
+    return this._http.get<GenericResponse<PlayerCluesResponse>>(this._baseUrl + `JustOnePlayerResponse?${parameters}`).toPromise();
   }
 
   public SubmitClue(request: SubmitClueRequest): Promise<GenericResponseBase> {
-    return this._http.post<GenericResponseBase>(this._baseUrl + 'JustOnePlayerResponse/SubmitClue', request).toPromise();
+    return this._http.post<GenericResponseBase>(this._baseUrl + 'JustOnePlayerResponse/SubmitResponse', request).toPromise();
   }
 
   public SubmitClueVote(request: SubmitClueVotesRequest): Promise<GenericResponseBase> {
-    return this._http.post<GenericResponseBase>(this._baseUrl + 'JustOnePlayerResponse/SubmitClueVote', request).toPromise();
+    return this._http.post<GenericResponseBase>(this._baseUrl + 'JustOnePlayerResponse/SubmitResponseVote', request).toPromise();
+  }
+
+  public SubmitActivePlayerResponse(request: SubmitActivePlayerResponseRequest): Promise<GenericResponseBase> {
+    return this._http.post<GenericResponseBase>(this._baseUrl + 'JustOnePlayerResponse/SubmitActivePlayerResponse', request).toPromise();
+  }
+
+  public SubmitActivePlayerResponseVote(request: SubmitClueVotesRequest): Promise<GenericResponseBase> {
+    return this._http.post<GenericResponseBase>(this._baseUrl + 'JustOnePlayerResponse/SubmitActivePlayerResponseVote', request).toPromise();
+  }
+
+  public GetActivePlayerResponse(request: IPlayerSession): Promise<GenericResponse<PlayerClue>> {
+    request = ConvertToPlayerSessionRequest(request);
+    var parameters = Object.keys(request).map(key => key + '=' + request[key]).join('&');
+    return this._http.get<GenericResponse<PlayerClue>>(this._baseUrl + `JustOnePlayerResponse/ActivePlayerResponse?${parameters}`).toPromise();
   }
 }
