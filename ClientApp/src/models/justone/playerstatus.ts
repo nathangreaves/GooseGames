@@ -27,16 +27,16 @@ export const PlayerStatusRoutesMap: Record<PlayerStatus, string> = {
   [PlayerStatus.RoundWaiting]: "justone/round/waiting",
 
   [PlayerStatus.PassivePlayerClue]: "justone/round/submitclue",
-  [PlayerStatus.PassivePlayerWaitingForClues]: "justone/round/??",
-  [PlayerStatus.PassivePlayerClueVote]: "justone/round/??",
-  [PlayerStatus.PassivePlayerWaitingForClueVotes]: "justone/round/??",
-  [PlayerStatus.PassivePlayerWaitingForActivePlayer]: "justone/round/??",
+  [PlayerStatus.PassivePlayerWaitingForClues]: "justone/round/passiveplayerwaiting",
+  [PlayerStatus.PassivePlayerClueVote]: "justone/round/cluevote",
+  [PlayerStatus.PassivePlayerWaitingForClueVotes]: "justone/round/passiveplayerwaitingforvotes",
+  [PlayerStatus.PassivePlayerWaitingForActivePlayer]: "justone/round/passiveplayerwaitingforactiveplayer",
   [PlayerStatus.PassivePlayerOutcome]: "justone/round/??",
   [PlayerStatus.PassivePlayerOutcomeVote]: "justone/round/??",
 
   [PlayerStatus.ActivePlayerWaitingForClues]: "justone/round/playerwaiting",
-  [PlayerStatus.ActivePlayerWaitingForVotes]: "justone/round/??",
-  [PlayerStatus.ActivePlayerGuess]: "justone/round/??",
+  [PlayerStatus.ActivePlayerWaitingForVotes]: "justone/round/activeplayerwaitingforcluevotes",
+  [PlayerStatus.ActivePlayerGuess]: "justone/round/activeplayerguess",
   [PlayerStatus.ActivePlayerWaitingForOutcomeVotes]: "justone/round/??",
   [PlayerStatus.ActivePlayerOutcome]: "justone/round/??",
 };

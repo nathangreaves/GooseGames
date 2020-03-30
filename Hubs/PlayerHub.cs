@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.SignalR;
 using Models.Responses.JustOne.PlayerDetails;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -53,10 +52,30 @@ namespace GooseGames.Hubs
 
     public static class PlayerWaitingExtensions 
     {
-        public static async Task SendBeginRound(this IHubContext<PlayerHub> hub, Guid sessionId, string activePlayerConnectionId)
+        public static async Task SendBeginRoundAsync(this IHubContext<PlayerHub> hub, Guid sessionId, string activePlayerConnectionId)
         {
             await hub.Clients.GroupExcept(sessionId.ToString(), activePlayerConnectionId).SendAsync("beginRoundPassivePlayer");
             await hub.Clients.Client(activePlayerConnectionId).SendAsync("beginRoundActivePlayer");
+        }
+    }
+
+    public static class RoundExtensions
+    {
+        public static async Task SendClueSubmittedAsync(this IHubContext<PlayerHub> hub, Guid sessionId, Guid playerId)
+        {
+            await hub.Clients.Group(sessionId.ToString()).SendAsync("clueSubmitted", playerId);
+        }
+        public static async Task SendAllCluesSubmittedAsync(this IHubContext<PlayerHub> hub, Guid sessionId)
+        {
+            await hub.Clients.Group(sessionId.ToString()).SendAsync("allCluesSubmitted");
+        }
+        public static async Task SendClueVoteSubmittedAsync(this IHubContext<PlayerHub> hub, Guid sessionId, Guid playerId)
+        {
+            await hub.Clients.Group(sessionId.ToString()).SendAsync("clueVoteSubmitted", playerId);
+        }
+        public static async Task SendAllClueVotesSubmittedAsync(this IHubContext<PlayerHub> hub, Guid sessionId)
+        {
+            await hub.Clients.Group(sessionId.ToString()).SendAsync("allClueVotesSubmitted");
         }
     }
 }

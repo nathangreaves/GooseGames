@@ -1,4 +1,5 @@
-﻿using Entities.JustOne.Enums;
+﻿using Entities.JustOne;
+using Entities.JustOne.Enums;
 using GooseGames.Hubs;
 using GooseGames.Logging;
 using Microsoft.AspNetCore.SignalR;
@@ -36,9 +37,10 @@ namespace GooseGames.Services.JustOne.RoundStatus
             _logger = logger;
         }
 
-        public override async Task UpdatePlayerStatusAsync(Guid sessionId, Guid roundId)
+        public override async Task UpdatePlayerStatusAsync(Round round)
         {
-            //var session = await _sessionRepository.GetAsync(sessionId);
+            var roundId = round.Id;
+            var sessionId = round.SessionId;
 
             _logger.LogTrace($"Updating player statuses for round: {roundId}");
             await _playerStatusRepository.UpdatePlayerStatusesForRoundAsync(roundId, PlayerStatusEnum.PassivePlayerClue, PlayerStatusEnum.ActivePlayerWaitingForClues);
@@ -47,17 +49,25 @@ namespace GooseGames.Services.JustOne.RoundStatus
             var activePlayerConnectionId = await _playerRepository.GetActivePlayerConnectionIdAsync(roundId);
 
             _logger.LogTrace($"Sending begin round. Active player connection id={activePlayerConnectionId}");
-            await _playerHub.SendBeginRound(sessionId, activePlayerConnectionId);
+            await _playerHub.SendBeginRoundAsync(sessionId, activePlayerConnectionId);
         }
 
-        public override async Task TransitionRoundStatusAsync(Guid roundId)
+        public override async Task TransitionRoundStatusAsync(Round round)
          {
-            _logger.LogTrace($"Fetching round: {roundId}");
-            var round = await _roundRepository.GetAsync(roundId);
+            var roundId = round.Id;
+
             round.Status = RoundStatusEnum.WaitingForResponses;
 
             _logger.LogTrace($"Updating round: {roundId}");
             await _roundRepository.UpdateAsync(round);
+
+            await UpdatePlayerStatusAsync(round);
+        }
+
+        public override async Task ConditionallyTransitionRoundStatusAsync(Round round)
+        {
+            //TODO: Check all players ready. Status=waiting?
+            await TransitionRoundStatusAsync(round);
         }
     }
 }

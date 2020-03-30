@@ -1,0 +1,11 @@
+.clue-word{
+    font-weight: bold;
+}
+
+.clue-word.clue-invalid {
+  text-decoration: line-through;
+  color: lightgray;
+}
+.clue-word.clue-valid {
+}
+

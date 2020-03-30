@@ -1,4 +1,5 @@
-﻿using Entities.JustOne.Enums;
+﻿using Entities.JustOne;
+using Entities.JustOne.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,8 @@ namespace GooseGames.Services.JustOne.RoundStatus
     {
         RoundStatusEnum RoundStatus { get; }
 
-        Task UpdatePlayerStatusAsync(Guid sessionId, Guid roundId);
-        Task TransitionRoundStatusAsync(Guid roundId);
+        Task UpdatePlayerStatusAsync(Round round);
+        Task TransitionRoundStatusAsync(Round round);
+        Task ConditionallyTransitionRoundStatusAsync(Round round);
     }
 }

@@ -24,6 +24,7 @@ namespace GooseGames.Services.JustOne
         private readonly RoundService _roundService;
         private readonly RequestLogger<SessionService> _logger;
         private readonly IHubContext<PlayerHub> _lobbyHub;
+        private const int MinNumberOfPlayersPerSession = 3;
         private const int MaxNumberOfPlayersPerSession = 7;
 
         public SessionService(ISessionRepository sessionRepository, 
@@ -103,8 +104,24 @@ namespace GooseGames.Services.JustOne
                 _logger.LogInformation("Request to start session from player other than the session master");
                 return GenericResponse<bool>.Error("You do not have the authority to start the session");
             }
-            _logger.LogInformation("Session cleared to start", request);
+            if (!await ValidateMinimumNumberOfPlayersAsync(request.SessionId))
+            {
+                _logger.LogInformation("Request to start session with not enough players");
+                return GenericResponse<bool>.Error("There are not yet enough players to start");
+            }
+            _logger.LogInformation("Session cleared to start");
 
+            _logger.LogInformation("Fetching session");
+            var session = await _sessionRepository.GetAsync(request.SessionId);
+            session.StatusId = SessionStatusEnum.InProgress;
+
+            _logger.LogInformation("Marking session in progress");
+            await _sessionRepository.UpdateAsync(session);
+
+            _logger.LogInformation("Removing unready players");
+            await _playerRepository.DeleteUnreadyPlayersAsync(request.SessionId);
+
+            _logger.LogInformation("Updating all players to RoundWaiting status");
             await _playerStatusService.UpdateAllPlayersForSessionAsync(request.SessionId, PlayerStatusEnum.RoundWaiting);            
 
             _logger.LogTrace("Sending update to clients");
@@ -115,6 +132,13 @@ namespace GooseGames.Services.JustOne
             await _roundService.PrepareRoundsAsync(request.SessionId);
 
             return GenericResponse<bool>.Ok(true);
+        }
+
+        private async Task<bool> ValidateMinimumNumberOfPlayersAsync(Guid sessionId)
+        {
+            var readyPlayers = await _playerRepository.CountAsync(p => p.SessionId == sessionId && p.Name != null && p.PlayerNumber > 0);
+
+            return readyPlayers >= MinNumberOfPlayersPerSession;
         }
 
         internal async Task<GenericResponse<JoinSessionResponse>> JoinSessionAsync(JoinSessionRequest request)

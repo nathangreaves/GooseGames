@@ -3,6 +3,21 @@
 </div>
 <div *ngIf="!Loading">
   <div>
-    Gizza Clue m8
+    {{ActivePlayerName}} is the active player
+  </div>
+  <div>
+    Their word is:
+  </div>
+  <div>
+    {{Word}}
+  </div>
+
+  <div>
+    <p>Your clue:</p>
+    <input #clue />
+  </div>
+  <div>
+    <button class="btn btn-primary" style="margin:10px; color:white;" (click)="SubmitClue(clue.value)">Submit</button>
   </div>
 </div>
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

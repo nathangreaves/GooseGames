@@ -2,6 +2,9 @@
 using Entities.JustOne.Enums;
 using GooseGames.Logging;
 using GooseGames.Services.JustOne.RoundStatus;
+using Models.Requests.JustOne;
+using Models.Responses;
+using Models.Responses.JustOne.Round;
 using RepositoryInterface.JustOne;
 using System;
 using System.Collections.Generic;
@@ -31,6 +34,26 @@ namespace GooseGames.Services.JustOne
             _playerRepository = playerRepository;
             _roundServiceProvider = roundServiceProvider;
             _logger = logger;
+        }
+
+        internal async Task<GenericResponse<PassivePlayerRoundInformationResponse>> GetPassivePlayerRoundInfoAsync(PlayerSessionRequest request)
+        {
+            _logger.LogTrace("Getting passive player round info", request);
+
+            var round = await GetCurrentRoundAsync(request);
+
+            _logger.LogTrace($"Got round {round.Id} : {round.WordToGuess}", request);
+
+            var activePlayer = await _playerRepository.GetAsync(round.ActivePlayerId.Value);
+
+            _logger.LogTrace($"Got active player {activePlayer.Id} : {activePlayer.Name}", request);
+
+            return GenericResponse<PassivePlayerRoundInformationResponse>.Ok(new PassivePlayerRoundInformationResponse 
+            {
+                ActivePlayerName = activePlayer.Name,
+                ActivePlayerNumber = activePlayer.PlayerNumber,
+                Word = round.WordToGuess
+            });
         }
 
         internal async Task PrepareRoundsAsync(Guid sessionId)
@@ -68,9 +91,18 @@ namespace GooseGames.Services.JustOne
 
             _logger.LogTrace($"Assigned Leader: {firstRound.ActivePlayerId} to round: {firstRound.Id}");
 
-            var roundStatusService = _roundServiceProvider.GetService(firstRound.Status);
-            await roundStatusService.TransitionRoundStatusAsync(firstRound.Id);
-            await roundStatusService.UpdatePlayerStatusAsync(sessionId, firstRound.Id);
+            await ProgressRoundAsync(firstRound.Id);
+        }
+        internal async Task ProgressRoundAsync(Guid roundId)
+        {
+            var round = await _roundRepository.GetAsync(roundId);
+            await ProgressRoundAsync(round);
+;        }
+
+        internal async Task ProgressRoundAsync(Round round)
+        {
+            var roundStatusService = _roundServiceProvider.GetService(round.Status);
+            await roundStatusService.ConditionallyTransitionRoundStatusAsync(round);
         }
 
         private async Task<Player> GetLeaderAsync(Guid sessionId, Guid? previousLeaderId = null)
@@ -102,6 +134,14 @@ namespace GooseGames.Services.JustOne
         public List<string> GetWords(Session session, int numberOfWords)
         {
             return TemporaryWordsList.GetWords(numberOfWords);
+        }
+
+        internal async Task<Round> GetCurrentRoundAsync(PlayerSessionRequest request)
+        {
+            return await _roundRepository.SingleOrDefaultAsync(p =>
+            p.SessionId == request.SessionId
+            && p.ActivePlayerId != null
+            && p.Outcome == RoundOutcomeEnum.Undetermined);
         }
     }
 }

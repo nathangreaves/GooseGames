@@ -4,3 +4,9 @@ export class PlayerAction {
   playerNumber: number;
   hasTakenAction: boolean;
 }
+
+export class PassivePlayerRoundInformationResponse {
+  activePlayerName: string;
+  activePlayerNumber: number;
+  word: string;
+}

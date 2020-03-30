@@ -105,8 +105,8 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
       _.remove(this.Players, p => p.id === playerId);
     });
     this._hubConnection.on("startingSession", () => {
-      this._hubConnection.stop();
-      this._hubConnection = null;;
+      //this._hubConnection.stop();
+      //this._hubConnection = null;;
       this._router.navigate(['/justone/round/waiting', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
     this._hubConnection.start().catch(err => console.error(err));

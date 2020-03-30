@@ -9,24 +9,23 @@ import { JustOneRoundService } from '../../../services/justone/round';
 import { GenericResponse } from '../../../models/genericresponse';
 
 @Component({
-  selector: 'app-just-one-activeplayerwaitingforclues-component',
-  templateUrl: './activeplayerwaitingforclues.component.html',
+  selector: 'app-just-one-passiveplayerwaitingforclues-component',
+  templateUrl: './passiveplayerwaitingforclues.component.html',
   styleUrls: ['../sessionlobby.component.css']
 })
-export class JustOneActivePlayerWaitingForCluesComponent extends JustOnePlayerWaitingComponentBase { 
+export class JustOnePassivePlayerWaitingForCluesComponent extends JustOnePlayerWaitingComponentBase {
 
-  _playerWaitingComponent: JustOnePlayerWaitingComponent; 
+  _playerWaitingComponent: JustOnePlayerWaitingComponent;
   _playerActionsService: JustOneRoundService;
-    _router: Router;
+  _router: Router;
 
-  constructor(router: Router, activatedRoute: ActivatedRoute, playerActionsService: JustOneRoundService)
-  {
+  constructor(router: Router, activatedRoute: ActivatedRoute, playerActionsService: JustOneRoundService) {
     super(activatedRoute);
-    this._router = router;
     this._playerActionsService = playerActionsService;
+    this._router = router;
   }
 
-  getPlayerStatus(): PlayerStatus { return PlayerStatus.ActivePlayerWaitingForClues; }
+  getPlayerStatus(): PlayerStatus { return PlayerStatus.PassivePlayerWaitingForClues; }
 
   setPlayerWaitingComponent(playerWaitingComponent: JustOnePlayerWaitingComponent) {
     this._playerWaitingComponent = playerWaitingComponent;
@@ -51,7 +50,7 @@ export class JustOneActivePlayerWaitingForCluesComponent extends JustOnePlayerWa
     hubConnection.on("allCluesSubmitted", () => {
       this._playerWaitingComponent.CloseConnection();
       this._router.navigate([
-        PlayerStatusRoutesMap[PlayerStatus.ActivePlayerWaitingForVotes], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+        PlayerStatusRoutesMap[PlayerStatus.PassivePlayerClueVote], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
   }
 }  

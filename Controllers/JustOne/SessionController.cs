@@ -77,9 +77,7 @@ namespace GooseGames.Controllers.JustOne
             {
                 _logger.LogTrace("Received request", request);
 
-                await _sessionService.StartSessionAsync(request);
-
-                var result = NewResponse.Ok(true);
+                var result = await _sessionService.StartSessionAsync(request);
 
                 _logger.LogTrace("Returned result", result);
 
