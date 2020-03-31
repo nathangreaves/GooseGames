@@ -64,6 +64,7 @@
     <None Remove="ClientApp\src\services\justone\playerdetails.ts" />
     <None Remove="ClientApp\src\services\justone\playerstatus.ts" />
     <None Remove="ClientApp\src\services\justone\round.ts" />
+    <None Remove="ClientApp\src\services\navbar.ts" />
     <None Remove="ClientApp\src\services\session.ts" />
     <None Remove="ClientApp\tsconfig.json" />
   </ItemGroup>
@@ -112,6 +113,7 @@
     <TypeScriptCompile Include="ClientApp\src\services\justone\playerdetails.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\playerstatus.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\session.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\navbar.ts" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

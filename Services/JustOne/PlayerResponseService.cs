@@ -189,7 +189,7 @@ namespace GooseGames.Services.JustOne
                 PlayerId = request.PlayerId,
                 RoundId = round.Id,
                 Status = request.Pass ? ResponseStatusEnum.PassedActivePlayerResponse : ResponseStatusEnum.New,
-                Word = request.ResponseWord
+                Word = request.ResponseWord != null ? request.ResponseWord.ToUpper() : request.ResponseWord
             };
 
             _logger.LogTrace($"Inserting response");

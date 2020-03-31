@@ -9,12 +9,14 @@ import { JustOnePlayerStatusService } from '../../../services/justone/playerstat
 import { GenericResponseBase, GenericResponse } from '../../../models/genericresponse';
 import { RoundOutcomeResponse } from '../../../models/justone/round';
 import { JustOneRoundService } from '../../../services/justone/round';
+import { NavbarService } from '../../../services/navbar';
 
 export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSessionComponent {
 
   _router: Router;
   _playerStatusService: JustOnePlayerStatusService;
   _roundService: JustOneRoundService;
+  _navbarService: NavbarService;
 
   SessionId: string;
   PlayerId: string;
@@ -23,11 +25,11 @@ export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSession
 
   RoundOutcome: RoundOutcomeResponse;
 
-  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, router: Router, activatedRoute: ActivatedRoute) {
+  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, router:  Router, activatedRoute: ActivatedRoute) {
     this._router = router;
     this._playerStatusService = playerStatusService;
     this._roundService = roundService;
-
+    this._navbarService = navbarService;
     this.SessionId = activatedRoute.snapshot.params.SessionId;
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;
 
@@ -58,6 +60,9 @@ export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSession
           this.RoundOutcome = response.data;
           if (this.isActivePlayer()) {
             this.RoundOutcome.activePlayerName = "You";
+          }
+          if (this.RoundOutcome.gameEnded) {
+            this._navbarService.setReadOnly(false);
           }
         }
         else {
@@ -100,8 +105,8 @@ export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSession
 })
 export class JustOneActivePlayerRoundOutcomeComponent extends JustOneRoundOutcomeComponentBase {
 
-  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, router: Router, activatedRoute: ActivatedRoute) {
-    super(playerStatusService, roundService, router, activatedRoute);
+  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, router: Router, activatedRoute: ActivatedRoute) {
+    super(playerStatusService, roundService, navbarService, router, activatedRoute);
   }
   getPlayerStatus(): PlayerStatus {
     return PlayerStatus.ActivePlayerOutcome;
@@ -118,8 +123,8 @@ export class JustOneActivePlayerRoundOutcomeComponent extends JustOneRoundOutcom
 })
 export class JustOnePassivePlayerRoundOutcomeComponent extends JustOneRoundOutcomeComponentBase {
 
-  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, router: Router, activatedRoute: ActivatedRoute) {
-    super(playerStatusService, roundService, router, activatedRoute);
+  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, router: Router, activatedRoute: ActivatedRoute) {
+    super(playerStatusService, roundService, navbarService, router, activatedRoute);
   }
   getPlayerStatus(): PlayerStatus {
     return PlayerStatus.PassivePlayerOutcome;

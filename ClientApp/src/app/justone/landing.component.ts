@@ -4,6 +4,7 @@ import { JustOneSessionService } from '../../services/justone/session'
 import { GenericResponse } from '../../models/genericresponse'
 import { SessionLandingResponse } from '../../models/justone/session'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { NavbarService } from '../../services/navbar';
 
 @Component({
   selector: 'app-just-one-landing-component',
@@ -12,14 +13,18 @@ import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 
 export class JustOneLandingComponent {
 
-  private _sessionService: JustOneSessionService;
-  private _router: Router;
+  _sessionService: JustOneSessionService;
+  _router: Router;
+  _navbarService: NavbarService;
 
-  public ErrorMessage: string;
+  ErrorMessage: string;
 
-  constructor(sessionService: JustOneSessionService, router: Router) {
+  constructor(sessionService: JustOneSessionService, navbarService: NavbarService, router: Router) {
     this._sessionService = sessionService;
+    this._navbarService = navbarService;
     this._router = router;
+
+    this._navbarService.setAreaTitle("Just One");
   }
 
 
@@ -54,13 +59,9 @@ export class JustOneLandingComponent {
     if (data.success === true) {
       this.clearMessage();
 
-      this.ErrorMessage = `Session Id: ${data.data.sessionId} :: Player Id: ${data.data.playerId}`;
+      this._navbarService.setReadOnly(true);
 
       this._router.navigate(['/justone/newplayer', { SessionId: data.data.sessionId, PlayerId: data.data.playerId }]);
-
-      //Redirect to add player
-      //this.Message = "Game added " + data.gameId;
-      //this.Games.push({ Id: data.gameId, Password: password, NumberOfPlayers: 1 });
     }
     else {
       //Stay on page and display error

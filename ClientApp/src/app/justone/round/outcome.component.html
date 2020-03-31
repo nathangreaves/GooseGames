@@ -33,7 +33,7 @@
     Incorrectly
   </div>
   <br/>
-  <div *ngIf="RoundOutcome.roundOutcome != 1">
+  <div *ngIf="RoundOutcome.roundOutcome != 1 || RoundOutcome.wordGuessed != RoundOutcome.wordToGuess">
     <div>
       The correct answer was
     </div>

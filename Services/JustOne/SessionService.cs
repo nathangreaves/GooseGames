@@ -207,8 +207,8 @@ namespace GooseGames.Services.JustOne
             _logger.LogTrace($"Fetching session with password {password}");
 
             return await _sessionRepository.SingleOrDefaultAsync(session => 
-                session.StatusId == SessionStatusEnum.New 
-                || session.StatusId == SessionStatusEnum.InProgress 
+                (session.StatusId == SessionStatusEnum.New 
+                || session.StatusId == SessionStatusEnum.InProgress) 
                 && session.Password.ToLower() == password.ToLower());
         }
 

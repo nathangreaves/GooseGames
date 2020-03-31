@@ -88,8 +88,8 @@ namespace GooseGames.Services.JustOne
                 GameEnded = roundsRemaining <= 0,
                 RoundOutcome = (Models.Responses.JustOne.Round.RoundOutcomeEnum)(int)round.Outcome,
                 Score = session.Score,
-                WordGuessed = response != null ? response.Word : null,
-                WordToGuess = round.WordToGuess,
+                WordGuessed = response != null ? response.Word.ToUpper() : null,
+                WordToGuess = round.WordToGuess.ToUpper(),
                 RoundId = round.Id
             };
             return GenericResponse<RoundOutcomeResponse>.Ok(outcome);
