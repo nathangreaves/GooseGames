@@ -50,8 +50,6 @@ export abstract class JustOnePlayerWaitingForOutcomeVoteComponentBase extends Ju
     if (this._hubConnection) {
       this._hubConnection.off("responseVoteSubmitted");
       this._hubConnection.off("roundOutcomeAvailable");
-      this._hubConnection.stop();
-      this._hubConnection = null;
     }
   }
 
@@ -64,8 +62,11 @@ export abstract class JustOnePlayerWaitingForOutcomeVoteComponentBase extends Ju
     });
     hubConnection.on("roundOutcomeAvailable", () => {
       this.CloseConnection();
+
+      var statusName = PlayerStatus[this.getRoundOutcomePlayerStatus()];
+
       this._router.navigate([
-        PlayerStatusRoutesMap[this.getRoundOutcomePlayerStatus()], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+        PlayerStatusRoutesMap[statusName], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
   }
 }  

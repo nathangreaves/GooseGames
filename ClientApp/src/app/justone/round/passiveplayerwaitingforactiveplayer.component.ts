@@ -85,8 +85,6 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
     if (this._hubConnection) {
       this._hubConnection.off("roundOutcomeAvailable");
       this._hubConnection.off("activePlayerResponseVoteRequired");
-      this._hubConnection.stop();
-      this._hubConnection = null;
     }
   }
 

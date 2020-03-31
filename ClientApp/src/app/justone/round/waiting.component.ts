@@ -59,8 +59,6 @@ export class JustOneRoundWaitingComponent implements IPlayerSessionComponent {
     if (this._hubConnection) {
       this._hubConnection.off("beginRoundPassivePlayer");
       this._hubConnection.off("beginRoundActivePlayer");
-      this._hubConnection.stop();
-      this._hubConnection = null;
     }
   }
 

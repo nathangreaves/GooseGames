@@ -54,8 +54,6 @@ export class JustOnePassivePlayerWaitingForClueVoteComponent extends JustOnePlay
     if (this._hubConnection) {
       this._hubConnection.off("clueVoteSubmitted");
       this._hubConnection.off("allClueVotesSubmitted");
-      this._hubConnection.stop();
-      this._hubConnection = null;
     }
   }
 
@@ -66,7 +64,7 @@ export class JustOnePassivePlayerWaitingForClueVoteComponent extends JustOnePlay
     hubConnection.on("allClueVotesSubmitted", () => {
       this.CloseConnection();
       this._router.navigate([
-        PlayerStatusRoutesMap[PlayerStatus.PassivePlayerWaitingForActivePlayer], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+        PlayerStatusRoutesMap.PassivePlayerWaitingForActivePlayer, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
   }
 }  
