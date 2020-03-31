@@ -109,12 +109,12 @@ export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {
     this._hubConnection.on("roundOutcomeAvailable", () => {
       this.CloseConnection();
       this._router.navigate([
-        PlayerStatusRoutesMap[PlayerStatus.ActivePlayerOutcome], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+        PlayerStatusRoutesMap.ActivePlayerOutcome, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
     this._hubConnection.on("activePlayerResponseVoteRequired", () => {
       this.CloseConnection();
       this._router.navigate([
-        PlayerStatusRoutesMap[PlayerStatus.ActivePlayerWaitingForOutcomeVotes], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+        PlayerStatusRoutesMap.ActivePlayerWaitingForOutcomeVotes, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
     this._hubConnection.start().catch(err => console.error(err));
   }

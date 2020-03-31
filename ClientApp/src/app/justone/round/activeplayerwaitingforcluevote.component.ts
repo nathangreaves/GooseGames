@@ -50,7 +50,7 @@ export class JustOneActivePlayerWaitingForClueVoteComponent extends JustOnePlaye
     hubConnection.on("allClueVotesSubmitted", () => {
       this._playerWaitingComponent.CloseConnection();
       this._router.navigate([
-        PlayerStatusRoutesMap[PlayerStatus.ActivePlayerGuess], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+        PlayerStatusRoutesMap.ActivePlayerGuess, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
   }
 }  

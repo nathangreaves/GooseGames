@@ -78,7 +78,7 @@ export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSession
       .then(response => {
         if (response.success) {
           this._router.navigate([
-            PlayerStatusRoutesMap[PlayerStatus.RoundWaiting], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+            PlayerStatusRoutesMap.RoundWaiting, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
         }
         else {
           this.ErrorMessage = response.errorCode;

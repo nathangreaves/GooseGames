@@ -22,26 +22,27 @@ export enum PlayerStatus {
 //Also these should be the same as the PlayerStatus values in PlayerStatusEnum in the Entities solution
 
 
-export const PlayerStatusRoutesMap: Record<PlayerStatus, string> = {
-  [PlayerStatus.New]: "justone/newplayer",
-  [PlayerStatus.InLobby]: "justone/sessionlobby",
-  [PlayerStatus.RoundWaiting]: "justone/round/waiting",
+export class PlayerStatusRoutesMaps {
+  New: string = "justone/newplayer";
+  InLobby: string = "justone/sessionlobby";
+  RoundWaiting: string = "justone/round/waiting"
 
-  [PlayerStatus.PassivePlayerClue]: "justone/round/submitclue",
-  [PlayerStatus.PassivePlayerWaitingForClues]: "justone/round/passiveplayerwaiting",
-  [PlayerStatus.PassivePlayerClueVote]: "justone/round/cluevote",
-  [PlayerStatus.PassivePlayerWaitingForClueVotes]: "justone/round/passiveplayerwaitingforvotes",
-  [PlayerStatus.PassivePlayerWaitingForActivePlayer]: "justone/round/passiveplayerwaitingforactiveplayer",
-  [PlayerStatus.PassivePlayerOutcome]: "justone/round/passiveplayeroutcome",
-  [PlayerStatus.PassivePlayerOutcomeVote]: "justone/round/passiveplayeroutcomevote",
-  [PlayerStatus.PassivePlayerWaitingForOutcomeVotes]: "justone/round/passiveplayerwaitingforoutcomevotes",
+  PassivePlayerClue: string = "justone/round/submitclue";
+  PassivePlayerWaitingForClues: string = "justone/round/passiveplayerwaiting";
+  PassivePlayerClueVote: string = "justone/round/cluevote";
+  PassivePlayerWaitingForClueVotes: string = "justone/round/passiveplayerwaitingforvotes";
+  PassivePlayerWaitingForActivePlayer: string = "justone/round/passiveplayerwaitingforactiveplayer";
+  PassivePlayerOutcome: string = "justone/round/passiveplayeroutcome";
+  PassivePlayerOutcomeVote: string = "justone/round/passiveplayeroutcomevote";
+  PassivePlayerWaitingForOutcomeVotes: string = "justone/round/passiveplayerwaitingforoutcomevotes";
 
-  [PlayerStatus.ActivePlayerWaitingForClues]: "justone/round/playerwaiting",
-  [PlayerStatus.ActivePlayerWaitingForVotes]: "justone/round/activeplayerwaitingforcluevotes",
-  [PlayerStatus.ActivePlayerGuess]: "justone/round/activeplayerguess",
-  [PlayerStatus.ActivePlayerWaitingForOutcomeVotes]: "justone/round/activeplayerwaitingforoutcomevotes",
-  [PlayerStatus.ActivePlayerOutcome]: "justone/round/activeplayeroutcome"
+  ActivePlayerWaitingForClues: string = "justone/round/playerwaiting";
+  ActivePlayerWaitingForVotes: string = "justone/round/activeplayerwaitingforcluevotes";
+  ActivePlayerGuess: string = "justone/round/activeplayerguess";
+  ActivePlayerWaitingForOutcomeVotes: string = "justone/round/activeplayerwaitingforoutcomevotes";
+  ActivePlayerOutcome: string = "justone/round/activeplayeroutcome";
 };
+export const PlayerStatusRoutesMap = new PlayerStatusRoutesMaps();
 
 export class PlayerStatusValidationResponse {
   statusCorrect: boolean;

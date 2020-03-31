@@ -8,8 +8,6 @@ import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 
-import { PlayerStatusRoutesMap, PlayerStatus } from '../models/justone/playerstatus';
-
 import { JustOneLandingComponent } from './justone/landing.component';
 
 import { JustOneNewPlayerDetailsComponent } from './justone/newplayerdetails.component';
@@ -68,25 +66,25 @@ import { JustOneClueListComponent } from './justone/round/cluelist.component';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'justone', component: JustOneLandingComponent },
 
-      { path: PlayerStatusRoutesMap[PlayerStatus.New], component: JustOneNewPlayerDetailsComponent },
-      { path: PlayerStatusRoutesMap[PlayerStatus.InLobby], component: JustOneSessionLobbyComponent },
-      { path: PlayerStatusRoutesMap[PlayerStatus.RoundWaiting], component: JustOneRoundWaitingComponent },
+      { path: "justone/newplayer", component: JustOneNewPlayerDetailsComponent },
+      { path: "justone/sessionlobby", component: JustOneSessionLobbyComponent },
+      { path: "justone/round/waiting", component: JustOneRoundWaitingComponent },
 
-      { path: PlayerStatusRoutesMap[PlayerStatus.PassivePlayerClue], component: JustOneSubmitClueComponent },
-      { path: PlayerStatusRoutesMap[PlayerStatus.PassivePlayerWaitingForClues], component: JustOnePassivePlayerWaitingForCluesComponent },
-      { path: PlayerStatusRoutesMap[PlayerStatus.PassivePlayerClueVote], component: JustOneClueVoteComponent },
-      { path: PlayerStatusRoutesMap[PlayerStatus.PassivePlayerWaitingForClueVotes], component: JustOnePassivePlayerWaitingForClueVoteComponent },
-      { path: PlayerStatusRoutesMap[PlayerStatus.PassivePlayerWaitingForActivePlayer], component: JustOnePassivePlayerWaitingForActivePlayerComponent },
-      { path: PlayerStatusRoutesMap[PlayerStatus.PassivePlayerOutcome], component: JustOnePassivePlayerRoundOutcomeComponent },
-      { path: PlayerStatusRoutesMap[PlayerStatus.PassivePlayerOutcomeVote], component: JustOnePassivePlayerOutcomeVoteComponent },
-      { path: PlayerStatusRoutesMap[PlayerStatus.PassivePlayerWaitingForOutcomeVotes], component: JustOnePassivePlayerWaitingForOutcomeVoteComponent },
+      { path: "justone/round/submitclue", component: JustOneSubmitClueComponent },
+      { path: "justone/round/passiveplayerwaiting", component: JustOnePassivePlayerWaitingForCluesComponent },
+      { path: "justone/round/cluevote", component: JustOneClueVoteComponent },
+      { path: "justone/round/passiveplayerwaitingforvotes", component: JustOnePassivePlayerWaitingForClueVoteComponent },
+      { path: "justone/round/passiveplayerwaitingforactiveplayer", component: JustOnePassivePlayerWaitingForActivePlayerComponent },
+      { path: "justone/round/passiveplayeroutcome", component: JustOnePassivePlayerRoundOutcomeComponent },
+      { path: "justone/round/passiveplayeroutcomevote", component: JustOnePassivePlayerOutcomeVoteComponent },
+      { path: "justone/round/passiveplayerwaitingforoutcomevotes", component: JustOnePassivePlayerWaitingForOutcomeVoteComponent },
 
 
-      { path: PlayerStatusRoutesMap[PlayerStatus.ActivePlayerWaitingForClues], component: JustOneActivePlayerWaitingForCluesComponent },
-      { path: PlayerStatusRoutesMap[PlayerStatus.ActivePlayerWaitingForVotes], component: JustOneActivePlayerWaitingForClueVoteComponent },
-      { path: PlayerStatusRoutesMap[PlayerStatus.ActivePlayerGuess], component: JustOneActivePlayerGuess },
-      { path: PlayerStatusRoutesMap[PlayerStatus.ActivePlayerWaitingForOutcomeVotes], component: JustOneActivePlayerWaitingForOutcomeVoteComponent },
-      { path: PlayerStatusRoutesMap[PlayerStatus.ActivePlayerOutcome], component: JustOneActivePlayerRoundOutcomeComponent }
+      { path: "justone/round/playerwaiting", component: JustOneActivePlayerWaitingForCluesComponent },
+      { path: "justone/round/activeplayerwaitingforcluevotes", component: JustOneActivePlayerWaitingForClueVoteComponent },
+      { path: "justone/round/activeplayerguess", component: JustOneActivePlayerGuess },
+      { path: "justone/round/activeplayerwaitingforoutcomevotes", component: JustOneActivePlayerWaitingForOutcomeVoteComponent },
+      { path: "justone/round/activeplayeroutcome", component: JustOneActivePlayerRoundOutcomeComponent }
     ])
   ],
   providers: [],

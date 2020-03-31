@@ -118,7 +118,7 @@ export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
         }
         else {
           this._router.navigate([
-            PlayerStatusRoutesMap[PlayerStatus.PassivePlayerWaitingForClueVotes], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+            PlayerStatusRoutesMap.PassivePlayerWaitingForClueVotes, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
         }
       })
       .catch(() => this.HandleGenericError());

@@ -50,7 +50,7 @@ export class JustOnePassivePlayerWaitingForCluesComponent extends JustOnePlayerW
     hubConnection.on("allCluesSubmitted", () => {
       this._playerWaitingComponent.CloseConnection();
       this._router.navigate([
-        PlayerStatusRoutesMap[PlayerStatus.PassivePlayerClueVote], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+        PlayerStatusRoutesMap.PassivePlayerClueVote, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
   }
 }  

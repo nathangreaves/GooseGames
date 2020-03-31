@@ -23,9 +23,11 @@ export class JustOnePlayerStatusService {
   }
 
   public Reroute(reroute: PlayerStatus, playerSession: IPlayerSession) {
-    var mappedRoute = PlayerStatusRoutesMap[reroute];
 
-    this._router.navigate([mappedRoute, playerSession]);
+    var enumName = PlayerStatus[reroute];
+    var route = PlayerStatusRoutesMap[enumName];
+
+    this._router.navigate([route, playerSession]);
   }
 
   public Validate(component: IPlayerSessionComponent, playerStatus: PlayerStatus, onReroute: Function): Promise<GenericResponse<PlayerStatusValidationResponse>> {

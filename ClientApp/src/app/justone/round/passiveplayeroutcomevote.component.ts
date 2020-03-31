@@ -74,7 +74,7 @@ export class JustOnePassivePlayerOutcomeVoteComponent implements IPlayerSessionC
       .then(response => {
         if (response.success) {
           this._router.navigate([
-            PlayerStatusRoutesMap[PlayerStatus.PassivePlayerWaitingForOutcomeVotes], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+            PlayerStatusRoutesMap.PassivePlayerWaitingForOutcomeVotes, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
         }
         else {
           this.ErrorMessage = response.errorCode;

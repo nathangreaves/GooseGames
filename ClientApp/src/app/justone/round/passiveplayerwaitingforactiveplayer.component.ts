@@ -72,12 +72,12 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
     this._hubConnection.on("roundOutcomeAvailable", () => {
       this.CloseConnection();
       this._router.navigate([
-        PlayerStatusRoutesMap[PlayerStatus.PassivePlayerOutcome], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+        PlayerStatusRoutesMap.PassivePlayerOutcome, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
     this._hubConnection.on("activePlayerResponseVoteRequired", () => {
       this.CloseConnection();
       this._router.navigate([
-        PlayerStatusRoutesMap[PlayerStatus.PassivePlayerOutcomeVote], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+        PlayerStatusRoutesMap.PassivePlayerOutcomeVote, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
     this._hubConnection.start().catch(err => console.error(err));
   }

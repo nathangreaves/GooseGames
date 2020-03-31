@@ -82,7 +82,7 @@ export class JustOneSubmitClueComponent implements IPlayerSessionComponent {
         }
         else {
           this._router.navigate([
-            PlayerStatusRoutesMap[PlayerStatus.PassivePlayerWaitingForClues], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+            PlayerStatusRoutesMap.PassivePlayerWaitingForClues, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
         }
       })
       .catch(() => this.HandleGenericError());
