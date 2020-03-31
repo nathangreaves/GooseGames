@@ -153,6 +153,11 @@ namespace GooseGames.Services.JustOne
                 _logger.LogInformation("Session doesn't exist");
                 return NewResponse.Error<JoinSessionResponse>($"Session doesn't exist with password: {password}");
             }
+            if (session.StatusId != SessionStatusEnum.New)
+            {
+                _logger.LogInformation("Player tried to join an in progress session");
+                return GenericResponse<JoinSessionResponse>.Error("Session is already in progress");
+            }
 
             _logger.LogTrace($"Getting count of players");
             var countOfPlayers = await _playerRepository.CountAsync(p => p.SessionId == session.Id);
@@ -200,7 +205,11 @@ namespace GooseGames.Services.JustOne
         private async Task<Session> GetSessionFromPasswordAsync(string password)
         {
             _logger.LogTrace($"Fetching session with password {password}");
-            return await _sessionRepository.SingleOrDefaultAsync(session => session.Password.ToLower() == password.ToLower());
+
+            return await _sessionRepository.SingleOrDefaultAsync(session => 
+                session.StatusId == SessionStatusEnum.New 
+                || session.StatusId == SessionStatusEnum.InProgress 
+                && session.Password.ToLower() == password.ToLower());
         }
 
         public async Task<bool> ValidateSessionStatusAsync(Guid sessionId, SessionStatusEnum status) 
