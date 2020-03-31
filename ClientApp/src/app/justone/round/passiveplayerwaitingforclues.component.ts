@@ -18,6 +18,7 @@ export class JustOnePassivePlayerWaitingForCluesComponent extends JustOnePlayerW
   _playerWaitingComponent: JustOnePlayerWaitingComponent;
   _playerActionsService: JustOneRoundService;
   _router: Router;
+    _hubConnection: any;
 
   constructor(router: Router, activatedRoute: ActivatedRoute, playerActionsService: JustOneRoundService) {
     super(activatedRoute);
@@ -39,8 +40,23 @@ export class JustOnePassivePlayerWaitingForCluesComponent extends JustOnePlayerW
     return Promise.resolve();
   }
 
+  createConnection() {
+    this._hubConnection = new signalR.HubConnectionBuilder()
+      .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
+      .build();
+    this.setupConnection(this._hubConnection);
+    this._hubConnection.start().catch(err => console.error(err));
+  }
   onRedirect() {
-
+    this.CloseConnection();
+  }
+  CloseConnection() {
+    if (this._hubConnection) {
+      this._hubConnection.off("clueSubmitted");
+      this._hubConnection.off("allCluesSubmitted");
+      this._hubConnection.stop();
+      this._hubConnection = null;
+    }
   }
 
   setupConnection(hubConnection: signalR.HubConnection) {
@@ -48,7 +64,7 @@ export class JustOnePassivePlayerWaitingForCluesComponent extends JustOnePlayerW
       this._playerWaitingComponent.PlayerHasTakenAction(playerId);
     });
     hubConnection.on("allCluesSubmitted", () => {
-      this._playerWaitingComponent.CloseConnection();
+      this.CloseConnection();
       this._router.navigate([
         PlayerStatusRoutesMap.PassivePlayerClueVote, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });

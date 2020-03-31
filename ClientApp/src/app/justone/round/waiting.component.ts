@@ -32,7 +32,7 @@ export class JustOneRoundWaitingComponent implements IPlayerSessionComponent {
 
     this.setupConnection();
 
-    this._playerStatusService.Validate(this, PlayerStatus.RoundWaiting, () => { })
+    this._playerStatusService.Validate(this, PlayerStatus.RoundWaiting, () => { this.CloseConnection(); })
       .then(data => {
         if (data.success) {
           this.Loading = false;
@@ -45,18 +45,20 @@ export class JustOneRoundWaitingComponent implements IPlayerSessionComponent {
       .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
       .build();
     this._hubConnection.on("beginRoundPassivePlayer", () => {
-      this.DisposeConnection();
+      this.CloseConnection();
       this._router.navigate(['/justone/round/submitclue', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
     this._hubConnection.on("beginRoundActivePlayer", () => {
-      this.DisposeConnection();
+      this.CloseConnection();
       this._router.navigate(['/justone/round/playerwaiting', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
     this._hubConnection.start().catch(err => console.error(err));
   }
 
-  DisposeConnection() {
+  CloseConnection() {
     if (this._hubConnection) {
+      this._hubConnection.off("beginRoundPassivePlayer");
+      this._hubConnection.off("beginRoundActivePlayer");
       this._hubConnection.stop();
       this._hubConnection = null;
     }

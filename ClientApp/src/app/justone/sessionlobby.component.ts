@@ -45,7 +45,7 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;
 
 
-    this._playerStatusService.Validate(this, PlayerStatus.InLobby, () => { })
+    this._playerStatusService.Validate(this, PlayerStatus.InLobby, () => { this.CloseConnection(); })
       .then(() => this.load());
   }
 
@@ -105,11 +105,22 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
       _.remove(this.Players, p => p.id === playerId);
     });
     this._hubConnection.on("startingSession", () => {
-      this._hubConnection.stop();
-      this._hubConnection = null;;
+      this.CloseConnection();
       this._router.navigate(['/justone/round/waiting', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
     this._hubConnection.start().catch(err => console.error(err));
+  }
+
+  CloseConnection() {
+    if (this._hubConnection) {
+      this._hubConnection.off("playerAdded");
+      this._hubConnection.off("playerDetailsUpdated");
+      this._hubConnection.off("playerRemoved");
+      this._hubConnection.off("startingSession");
+
+      this._hubConnection.stop();
+      this._hubConnection = null;
+    }
   }
 
   private setDefaultNewPlayerName(player: PlayerDetailsResponse) {

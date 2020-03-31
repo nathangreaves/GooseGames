@@ -18,6 +18,7 @@ export class JustOneActivePlayerWaitingForClueVoteComponent extends JustOnePlaye
   _playerWaitingComponent: JustOnePlayerWaitingComponent;
   _playerActionsService: JustOneRoundService;
   _router: Router;
+    _hubConnection: signalR.HubConnection;
 
   constructor(router: Router, activatedRoute: ActivatedRoute, playerActionsService: JustOneRoundService) {
     super(activatedRoute);
@@ -39,8 +40,23 @@ export class JustOneActivePlayerWaitingForClueVoteComponent extends JustOnePlaye
     return Promise.resolve();
   }
 
+  createConnection() {
+    this._hubConnection = new signalR.HubConnectionBuilder()
+      .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
+      .build();
+    this.setupConnection(this._hubConnection);
+    this._hubConnection.start().catch(err => console.error(err));
+  }
   onRedirect() {
-
+    this.CloseConnection();
+  }
+  CloseConnection() {
+    if (this._hubConnection) {
+      this._hubConnection.off("clueVoteSubmitted");
+      this._hubConnection.off("allClueVotesSubmitted");
+      this._hubConnection.stop();
+      this._hubConnection = null;
+    }
   }
 
   setupConnection(hubConnection: signalR.HubConnection) {
@@ -48,7 +64,7 @@ export class JustOneActivePlayerWaitingForClueVoteComponent extends JustOnePlaye
       this._playerWaitingComponent.PlayerHasTakenAction(playerId);
     });
     hubConnection.on("allClueVotesSubmitted", () => {
-      this._playerWaitingComponent.CloseConnection();
+      this.CloseConnection();
       this._router.navigate([
         PlayerStatusRoutesMap.ActivePlayerGuess, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });

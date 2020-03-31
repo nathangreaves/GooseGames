@@ -1,7 +1,6 @@
 import * as _ from 'lodash';
 import { Component, Input, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import * as signalR from "@microsoft/signalr";
 import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus'
 import { PlayerStatus } from '../../../models/justone/playerstatus'
 import { IPlayerSessionComponent } from '../../../models/justone/session';
@@ -14,8 +13,9 @@ export interface IJustOnePlayerWaitingComponent extends IPlayerSessionComponent 
   loadPlayers(): Promise<GenericResponse<PlayerAction[]>>;
   loadContent(): Promise<any>;
   onRedirect();
-  setupConnection(connection: signalR.HubConnection);
+  createConnection();
   setPlayerWaitingComponent(playerWaitingComponent: JustOnePlayerWaitingComponent);
+
   Loading: boolean;
 }
 
@@ -25,7 +25,7 @@ export abstract class JustOnePlayerWaitingComponentBase implements IJustOnePlaye
   abstract loadContent(): Promise<any>;
   abstract onRedirect();
   abstract setPlayerWaitingComponent(playerWaitingComponent: JustOnePlayerWaitingComponent);
-  abstract setupConnection(connection: signalR.HubConnection);
+  abstract createConnection();
 
   constructor(activatedRoute: ActivatedRoute) {
     this.SessionId = activatedRoute.snapshot.params.SessionId;
@@ -49,7 +49,6 @@ export abstract class JustOnePlayerWaitingComponentBase implements IJustOnePlaye
 })
 export class JustOnePlayerWaitingComponent implements OnInit  {
 
-  private _hubConnection: signalR.HubConnection;
   private _playerStatusService: JustOnePlayerStatusService;
 
   Players: PlayerAction[];
@@ -62,7 +61,6 @@ export class JustOnePlayerWaitingComponent implements OnInit  {
     this._playerStatusService.Validate(this.playerWaitingComponent,
       this.playerWaitingComponent.getPlayerStatus(), () => {
         this.playerWaitingComponent.onRedirect();
-        this.CloseConnection();
       })
       .then(response => {
         if (response.success) {
@@ -87,12 +85,7 @@ export class JustOnePlayerWaitingComponent implements OnInit  {
       .then(response => {
         if (response && response.success) {
 
-          this._hubConnection = new signalR.HubConnectionBuilder()
-            .withUrl(`/lobbyhub?sessionId=${this.playerWaitingComponent.SessionId}&playerId=${this.playerWaitingComponent.PlayerId}`)
-            .build();
-          this.playerWaitingComponent.setupConnection(this._hubConnection);
-          this._hubConnection.start().catch(err => console.error(err));
-
+          this.playerWaitingComponent.createConnection();
           this.playerWaitingComponent.Loading = false;
         }
       })
@@ -117,11 +110,5 @@ export class JustOnePlayerWaitingComponent implements OnInit  {
         return p.id == playerId;
       }).hasTakenAction = true;
     }
-  }
-  CloseConnection() {
-    if (this._hubConnection) {
-      this._hubConnection.stop();
-      this._hubConnection = null;
-    }
-  }
+  }  
 }
