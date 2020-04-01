@@ -29,6 +29,7 @@ export class JustOneSubmitClueComponent implements IPlayerSessionComponent {
   ActivePlayerNumber: number;
   ActivePlayerName: string;
   Word: string;
+  RevealedWord: string;
 
   constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, clueService: JustOneClueService, router: Router, activatedRoute: ActivatedRoute) {
     this._router = router;
@@ -38,6 +39,8 @@ export class JustOneSubmitClueComponent implements IPlayerSessionComponent {
 
     this.SessionId = activatedRoute.snapshot.params.SessionId;
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;
+
+    this.hide();
 
     this._playerStatusService.Validate(this, PlayerStatus.PassivePlayerClue, () => { })
       .then(data => {
@@ -52,13 +55,21 @@ export class JustOneSubmitClueComponent implements IPlayerSessionComponent {
       });
   }
 
+  show() {
+    this.Word = this.RevealedWord;
+  }
+
+  hide() {
+    this.Word = "PRESS TO REVEAL";
+}
+
   load(): Promise<any | GenericResponse<any>> {
     return this._roundService.GetRoundForPassivePlayer(this)
       .then(response => {
         if (response.success) {
           this.ActivePlayerNumber = response.data.activePlayerNumber;
           this.ActivePlayerName = response.data.activePlayerName;
-          this.Word = response.data.word;
+          this.RevealedWord = response.data.word;
         }
         else {
           this.ErrorMessage = response.errorCode;

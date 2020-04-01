@@ -8,10 +8,11 @@
   <div>
     Their word is:
   </div>
-  <div class="just-one-important-word">
-    {{Word}}
+  <div class="just-one-touch-area" (mousedown)="show()" (mouseup)="hide()" (touchstart)="show()" (touchend)="hide()">
+    <div class="just-one-touch-internal just-one-important-word">
+      {{Word}}
+    </div>
   </div>
-
   <div>
     <p>Your clue:</p>
     <input #clue />

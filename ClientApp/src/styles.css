@@ -32,3 +32,8 @@ code {
 .navbar.border-bottom{
     margin-bottom: 0px!important;
 }
+
+.just-one-touch-area {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
