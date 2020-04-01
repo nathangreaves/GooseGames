@@ -10,8 +10,12 @@ import { GenericResponseBase, GenericResponse } from '../../../models/genericres
 import { RoundOutcomeResponse } from '../../../models/justone/round';
 import { JustOneRoundService } from '../../../services/justone/round';
 import { NavbarService } from '../../../services/navbar';
+import { PlayerNumberCss } from '../../../services/justone/ui'
 
 export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSessionComponent {
+
+
+  PlayerNumberCss = PlayerNumberCss;
 
   _router: Router;
   _playerStatusService: JustOnePlayerStatusService;

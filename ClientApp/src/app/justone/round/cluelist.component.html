@@ -2,16 +2,8 @@
   <table class="player-table">
     <tr *ngFor="let clue of Clues;">
       <td class="player-number-cell">{{clue.playerNumber}}</td>
-      <td class="player-name-cell"
-          [ngClass]="{
-              'player-1' : clue.playerNumber == 1,
-              'player-2' : clue.playerNumber == 2,
-              'player-3' : clue.playerNumber == 3,
-              'player-4' : clue.playerNumber == 4,
-              'player-5' : clue.playerNumber == 5,
-              'player-6' : clue.playerNumber == 6,
-              'player-7' : clue.playerNumber == 7
-            }">
+      <td class="player-name-cell just-one-apply-player-color"
+          [ngClass]="PlayerNumberCss.GetClass(clue.playerNumber)">
         {{clue.playerName}}
       </td>
       <td>

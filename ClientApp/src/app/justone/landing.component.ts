@@ -18,6 +18,7 @@ export class JustOneLandingComponent {
   _navbarService: NavbarService;
 
   ErrorMessage: string;
+  DisableButtons: boolean;
 
   constructor(sessionService: JustOneSessionService, navbarService: NavbarService, router: Router) {
     this._sessionService = sessionService;
@@ -36,9 +37,11 @@ export class JustOneLandingComponent {
       return;
     }
 
+    this.DisableButtons = true;
     this._sessionService.CreateGame({ password: password })
       .then(data => this.handleResponse(data))
-      .catch(data => this.genericError());
+      .catch(data => this.genericError())
+      .finally(() => this.DisableButtons = false);
 
   }
 
@@ -50,9 +53,11 @@ export class JustOneLandingComponent {
       return;
     }
 
+    this.DisableButtons = true;
     this._sessionService.JoinGame({ password: password })
       .then(data => this.handleResponse(data))
-      .catch(data => this.genericError());
+      .catch(data => this.genericError())
+      .finally(() => this.DisableButtons = false);
   }
 
   private handleResponse(data: GenericResponse<SessionLandingResponse>) {

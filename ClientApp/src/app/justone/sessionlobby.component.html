@@ -15,24 +15,16 @@
     <table class="player-table">
       <tr *ngFor="let player of Players;" [ngClass]="{'new-player' : player.playerNumber == 0}">
         <td class="player-number-cell">{{player.playerNumber}}</td>
-        <td class="player-name-cell"
-            [ngClass]="{
-              'player-1' : player.playerNumber == 1,
-              'player-2' : player.playerNumber == 2,
-              'player-3' : player.playerNumber == 3,
-              'player-4' : player.playerNumber == 4,
-              'player-5' : player.playerNumber == 5,
-              'player-6' : player.playerNumber == 6,
-              'player-7' : player.playerNumber == 7
-            }"
+        <td class="player-name-cell just-one-apply-player-color"
+            [ngClass]="PlayerNumberCSS.GetClass(player.playerNumber)"
             >{{player.playerName}}</td>
-        <td><button *ngIf="SessionMaster && player.id != PlayerId" class="btn btn-primary" (click)="KickPlayer(player.id)">Kick</button></td>
+        <td><button [disabled]="DisableButtons" *ngIf="SessionMaster && player.id != PlayerId" class="btn btn-primary" (click)="KickPlayer(player.id)">Kick</button></td>
       </tr>
     </table>
   </div>
 
   <div *ngIf="SessionMaster">
-    <button class="btn btn-primary" (click)="StartGame()">Start Game</button>
+    <button [disabled]="DisableButtons || Players.length < 3" class="btn btn-primary" (click)="StartGame()">Start Game</button>
   </div>
 
 </div>

@@ -9,6 +9,7 @@ import { JustOnePlayerStatusService } from '../../../services/justone/playerstat
 import { GenericResponseBase, GenericResponse } from '../../../models/genericresponse';
 import { JustOneClueService } from '../../../services/justone/clue';
 import { PlayerClue, SubmitClueVotesRequest } from '../../../models/justone/clue';
+import { PlayerNumberCss } from '../../../services/justone/ui'
 
 @Component({
   selector: 'app-just-one-passiveplayeroutcomevote-component',
@@ -16,7 +17,7 @@ import { PlayerClue, SubmitClueVotesRequest } from '../../../models/justone/clue
 })
 
 export class JustOnePassivePlayerOutcomeVoteComponent implements IPlayerSessionComponent {
- 
+  PlayerNumberCss = PlayerNumberCss;
   _router: Router;
   _playerStatusService: JustOnePlayerStatusService;
   _clueService: JustOneClueService;

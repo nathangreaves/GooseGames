@@ -3,9 +3,10 @@
 </div>
 <div>
   <div *ngIf="!Loading">
-    <span>{{ActivePlayerName}} is going to be guessing</span>
+    <span [ngClass]="PlayerNumberCss.GetClass(ActivePlayerNumber)" class="just-one-apply-player-color">{{ActivePlayerName}}</span><span> is going to be guessing</span>
   </div>
-  <div *ngIf="!Loading" class="just-one-important-word">
+  <div *ngIf="!Loading" class="just-one-important-word just-one-touch-area"
+       (mousedown)="show()" (mouseup)="hide()" (touchstart)="show()" (touchend)="hide()">       
     <span>{{Word}}</span>
   </div>
   <div *ngIf="!Loading">

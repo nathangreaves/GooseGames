@@ -5,7 +5,7 @@
 
 
   <div>
-    <span>{{RoundOutcome.activePlayerName}}</span>
+    <span [ngClass]="PlayerNumberCss.GetClass(RoundOutcome.activePlayerNumber)" class="just-one-apply-player-color">{{RoundOutcome.activePlayerName}}</span>
     <span *ngIf="RoundOutcome.roundOutcome != 2"> guessed</span>
   </div>
 

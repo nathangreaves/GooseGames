@@ -8,6 +8,7 @@ import { PlayerStatus, PlayerStatusRoutesMap } from '../../../models/justone/pla
 import { IPlayerSessionComponent } from '../../../models/justone/session';
 import { GenericResponse } from '../../../models/genericresponse';
 import { JustOneClueService } from '../../../services/justone/clue';
+import { PlayerNumberCss } from '../../../services/justone/ui'
 
 @Component({
   selector: 'app-just-one-submitclue-component',
@@ -15,6 +16,7 @@ import { JustOneClueService } from '../../../services/justone/clue';
 })
 
 export class JustOneSubmitClueComponent implements IPlayerSessionComponent {
+  PlayerNumberCss = PlayerNumberCss;
 
   _router: Router;
   _playerStatusService: JustOnePlayerStatusService;
@@ -30,6 +32,7 @@ export class JustOneSubmitClueComponent implements IPlayerSessionComponent {
   ActivePlayerName: string;
   Word: string;
   RevealedWord: string;
+  DisableSubmitClue: boolean;
 
   constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, clueService: JustOneClueService, router: Router, activatedRoute: ActivatedRoute) {
     this._router = router;
@@ -82,6 +85,14 @@ export class JustOneSubmitClueComponent implements IPlayerSessionComponent {
   }
 
   SubmitClue(clue: string) {
+
+    this.DisableSubmitClue = true;
+
+    if (clue.indexOf(" ") != -1) {
+      this.ErrorMessage = "Please submit JUST ONE word";
+      return;
+    }
+
     this._clueService.SubmitClue({
       ResponseWord: clue,
       PlayerId: this.PlayerId,
@@ -96,7 +107,10 @@ export class JustOneSubmitClueComponent implements IPlayerSessionComponent {
             PlayerStatusRoutesMap.PassivePlayerWaitingForClues, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
         }
       })
-      .catch(() => this.HandleGenericError());
+      .catch(() => this.HandleGenericError())
+      .finally(() => {
+        this.DisableSubmitClue = false;
+      });
   }
 
   HandleGenericError() {

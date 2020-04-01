@@ -37,3 +37,31 @@ code {
   padding-top: 30px;
   padding-bottom: 30px;
 }
+
+.just-one-player-1.just-one-apply-player-color {
+  color: red;
+}
+
+.just-one-player-2.just-one-apply-player-color {
+  color: orange;
+}
+
+.just-one-player-3.just-one-apply-player-color {
+  color: green;
+}
+
+.just-one-player-4.just-one-apply-player-color {
+  color: blue;
+}
+
+.just-one-player-5.just-one-apply-player-color {
+  color: purple;
+}
+
+.just-one-player-6.just-one-apply-player-color {
+  color: hotpink;
+}
+
+.just-one-player-7.just-one-apply-player-color {
+  color: black;
+}

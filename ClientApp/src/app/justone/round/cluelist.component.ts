@@ -6,7 +6,7 @@ import { PlayerStatus } from '../../../models/justone/playerstatus'
 import { IPlayerSessionComponent } from '../../../models/justone/session';
 import { GenericResponse, GenericResponseBase } from '../../../models/genericresponse';
 import { PlayerCluesResponse, PlayerClue } from '../../../models/justone/clue';
-
+import { PlayerNumberCss } from '../../../services/justone/ui'
 
 export interface IJustOneClueListComponent extends IPlayerSessionComponent {
   getPlayerStatus(): PlayerStatus;
@@ -49,6 +49,8 @@ export abstract class JustOneClueListComponentBase implements IJustOneClueListCo
   styleUrls: ['./cluelist.component.css', '../sessionlobby.component.css']
 })
 export class JustOneClueListComponent implements OnInit {
+
+  PlayerNumberCss = PlayerNumberCss;
 
   private _playerStatusService: JustOnePlayerStatusService;
 

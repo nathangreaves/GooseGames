@@ -6,7 +6,7 @@ import { PlayerStatus } from '../../../models/justone/playerstatus'
 import { IPlayerSessionComponent } from '../../../models/justone/session';
 import { PlayerAction } from '../../../models/justone/playeractions';
 import { GenericResponse } from '../../../models/genericresponse';
-
+import { PlayerNumberCss } from '../../../services/justone/ui'
 
 export interface IJustOnePlayerWaitingComponent extends IPlayerSessionComponent {
   getPlayerStatus(): PlayerStatus;
@@ -49,10 +49,11 @@ export abstract class JustOnePlayerWaitingComponentBase implements IJustOnePlaye
 })
 export class JustOnePlayerWaitingComponent implements OnInit  {
 
+  PlayerNumberCss = PlayerNumberCss;
+
   private _playerStatusService: JustOnePlayerStatusService;
 
   Players: PlayerAction[];
-
   @Input() playerWaitingComponent: IJustOnePlayerWaitingComponent;
 
   ngOnInit() {

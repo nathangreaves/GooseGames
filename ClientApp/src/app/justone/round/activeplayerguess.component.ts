@@ -23,6 +23,7 @@ export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {
   SessionId: string;
   PlayerId: string;
   ErrorMessage: string;
+  DisableButtons: boolean;
 
   public Loading: boolean;
   _clueService: JustOneClueService;
@@ -74,6 +75,7 @@ export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {
       return;
     }
 
+    this.DisableButtons = true;
     this._clueService.SubmitActivePlayerResponse({
       SessionId: this.SessionId,
       PlayerId: this.PlayerId,
@@ -85,10 +87,13 @@ export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {
           this.ErrorMessage = response.errorCode;
         }
       })
-      .catch(() => this.HandleGenericError());
+      .catch(() => this.HandleGenericError())
+      .finally(() => this.DisableButtons = false);
   }
 
   SubmitPass(response: string) {
+
+    this.DisableButtons = true;
     this._clueService.SubmitActivePlayerResponse({
       SessionId: this.SessionId,
       PlayerId: this.PlayerId,
@@ -100,7 +105,8 @@ export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {
         this.ErrorMessage = response.errorCode;
       }
     })
-      .catch(() => this.HandleGenericError());
+      .catch(() => this.HandleGenericError())
+      .finally(() => this.DisableButtons = false);
   }
 
   private setupConnection() {

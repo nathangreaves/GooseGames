@@ -3,12 +3,13 @@
 </div>
 <div *ngIf="!Loading">
   <div>
-    {{ActivePlayerName}} is the active player
+    <span [ngClass]="PlayerNumberCss.GetClass(ActivePlayerNumber)" class="just-one-apply-player-color">{{ActivePlayerName}}</span> is the active player
   </div>
   <div>
     Their word is:
   </div>
-  <div class="just-one-touch-area" (mousedown)="show()" (mouseup)="hide()" (touchstart)="show()" (touchend)="hide()">
+  <div class="just-one-touch-area"
+       (mousedown)="show()" (mouseup)="hide()" (touchstart)="show()" (touchend)="hide()">
     <div class="just-one-touch-internal just-one-important-word">
       {{Word}}
     </div>
@@ -18,7 +19,7 @@
     <input #clue />
   </div>
   <div>
-    <button class="btn btn-primary" (click)="SubmitClue(clue.value)">Submit</button>
+    <button class="btn btn-primary" [disabled]="DisableSubmitClue" (click)="SubmitClue(clue.value)">Submit</button>
   </div>
 </div>
 <div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

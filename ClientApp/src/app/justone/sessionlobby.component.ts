@@ -9,6 +9,7 @@ import * as signalR from "@microsoft/signalr";
 import { JustOnePlayerStatusService } from '../../services/justone/playerstatus'
 import { PlayerStatus } from '../../models/justone/playerstatus'
 import { IPlayerSessionComponent } from '../../models/justone/session';
+import { PlayerNumberCss } from '../../services/justone/ui'
 
 @Component({
   selector: 'app-just-one-sessionlobby-component',
@@ -17,6 +18,8 @@ import { IPlayerSessionComponent } from '../../models/justone/session';
 })
 
 export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
+
+  PlayerNumberCSS = PlayerNumberCss;
 
   private _playerDetailsService: JustOnePlayerDetailsService;
   private _sessionService: JustOneSessionService;
@@ -32,6 +35,9 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
   public SessionMaster: boolean;
   public SessionMasterName: string;
   public Players: PlayerDetailsResponse[];
+
+
+  DisableButtons: boolean;
 
   constructor(playerDetailsService: JustOnePlayerDetailsService, sessionService: JustOneSessionService, playerStatusService: JustOnePlayerStatusService, router: Router, activatedRoute: ActivatedRoute) {
     this._playerDetailsService = playerDetailsService;
@@ -51,21 +57,35 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
 
   public StartGame()
   {
+    if (_.find(this.Players, p => p.playerNumber == 0)) {
+      this.ErrorMessage = "Not all players are ready";
+      return;
+    }
+
+    this.DisableButtons = true;
     this._sessionService.StartSession(this)
-      .catch(() => this.HandleGenericError());
+      .then(response => {
+        if (!response.success) {
+          this.ErrorMessage = response.errorCode;
+        }
+      })
+      .catch(() => this.HandleGenericError())
+      .finally(() => this.DisableButtons = false);
   }
 
   public KickPlayer(playerId: string) {
     if (playerId == this.PlayerId) {
       return;
     }
+    this.DisableButtons = true;
     this._playerDetailsService.DeletePlayer({ sessionMasterId: this.PlayerId, playerToDeleteId: playerId })
       .then(response => {
         if (!response.success) {
           this.ErrorMessage = response.errorCode;
         }
       })
-      .catch(() => this.HandleGenericError());
+      .catch(() => this.HandleGenericError())
+      .finally(() => this.DisableButtons = false);
   }
 
   private load() {

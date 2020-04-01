@@ -64,6 +64,7 @@
     <None Remove="ClientApp\src\services\justone\playerdetails.ts" />
     <None Remove="ClientApp\src\services\justone\playerstatus.ts" />
     <None Remove="ClientApp\src\services\justone\round.ts" />
+    <None Remove="ClientApp\src\services\justone\ui.ts" />
     <None Remove="ClientApp\src\services\navbar.ts" />
     <None Remove="ClientApp\src\services\session.ts" />
     <None Remove="ClientApp\tsconfig.json" />
@@ -113,6 +114,7 @@
     <TypeScriptCompile Include="ClientApp\src\services\justone\playerdetails.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\playerstatus.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\session.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\justone\ui.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\navbar.ts" />
   </ItemGroup>
 

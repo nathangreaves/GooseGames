@@ -8,6 +8,7 @@ import { IPlayerSessionComponent } from '../../../models/justone/session';
 import { PlayerClue, PlayerCluesResponse } from '../../../models/justone/clue';
 import { JustOneClueListComponentBase, JustOneClueListComponent } from './cluelist.component';
 import { GenericResponse, GenericResponseBase } from '../../../models/genericresponse';
+import { PlayerNumberCss } from '../../../services/justone/ui'
 
 @Component({
   selector: 'app-just-one-cluevote-component',
@@ -15,6 +16,7 @@ import { GenericResponse, GenericResponseBase } from '../../../models/genericres
   styleUrls: ['./cluevote.component.css', '../sessionlobby.component.css']
 })
 export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
+  PlayerNumberCss = PlayerNumberCss;
   _router: Router;
   _playerStatusService: JustOnePlayerStatusService;
   _clueService: JustOneClueService;
@@ -22,6 +24,7 @@ export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
   ActivePlayerNumber: number;
   ActivePlayerName: string;
   Word: string;
+  RevealedWord: string;
   clueListComponent: JustOneClueListComponent;
 
   constructor(clueService: JustOneClueService, router: Router, activatedRoute: ActivatedRoute) {
@@ -30,6 +33,8 @@ export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
 
     this._router = router;
     this._clueService = clueService;
+
+    this.hide();
   }
 
   getPlayerStatus(): PlayerStatus {
@@ -38,12 +43,21 @@ export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
   isClueListReadOnly(): boolean {
     return false;
   }
+
+  show() {
+    this.Word = this.RevealedWord;
+  }
+
+  hide() {
+    this.Word = "PRESS TO REVEAL";
+  }
+
   loadClues(): Promise<GenericResponse<PlayerCluesResponse>> {
     return this._clueService.GetClues(this).then(response => {
       if (response.success) {
         this.ActivePlayerNumber = response.data.activePlayerNumber;
         this.ActivePlayerName = response.data.activePlayerName;
-        this.Word = response.data.wordToGuess;
+        this.RevealedWord = response.data.wordToGuess;
       }
       return response;
     });

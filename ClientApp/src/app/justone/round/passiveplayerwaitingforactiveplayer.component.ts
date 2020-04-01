@@ -7,6 +7,7 @@ import { JustOneClueListComponentBase, JustOneClueListComponent } from './clueli
 import { GenericResponse, GenericResponseBase } from '../../../models/genericresponse';
 import { PlayerCluesResponse } from '../../../models/justone/clue';
 import { JustOneClueService } from '../../../services/justone/clue';
+import { PlayerNumberCss } from '../../../services/justone/ui'
 
 @Component({
   selector: 'app-just-one-passiveplayerwaitingforactiveplayer-component',
@@ -14,20 +15,23 @@ import { JustOneClueService } from '../../../services/justone/clue';
 })
 
 export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOneClueListComponentBase {
-
+  PlayerNumberCss = PlayerNumberCss;
   _clueService: JustOneClueService;
   _clueListComponent: JustOneClueListComponent;
   _hubConnection: signalR.HubConnection;
   _router: Router;
     ActivePlayerNumber: number;
     ActivePlayerName: string;
-    Word: string;
+  Word: string;
+  RevealedWord: string;
 
   constructor(clueService: JustOneClueService, router: Router, activatedRoute: ActivatedRoute) {
 
     super(activatedRoute);
     this._router = router;
     this._clueService = clueService;
+
+    this.hide();
 
     this.setupConnection();
   }
@@ -37,12 +41,22 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
   isClueListReadOnly(): boolean {
     return true;
   }
+
+
+  show() {
+    this.Word = this.RevealedWord;
+  }
+
+  hide() {
+    this.Word = "PRESS TO REVEAL 😉";
+  }
+
   loadClues(): Promise<GenericResponse<PlayerCluesResponse>> {
     return this._clueService.GetClues(this).then(response => {
       if (response.success) {
         this.ActivePlayerNumber = response.data.activePlayerNumber;
         this.ActivePlayerName = response.data.activePlayerName;
-        this.Word = response.data.wordToGuess;
+        this.RevealedWord = response.data.wordToGuess;
       }
       return response;
     });

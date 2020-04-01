@@ -2,8 +2,13 @@
   I am loading...
 </div>
 <div>
-  <div  *ngIf="!Loading">
-    <span>Waiting for {{ActivePlayerName}}</span> to guess <span>{{Word}}</span>
+  <div *ngIf="!Loading">
+    <span>Waiting for </span>
+    <span [ngClass]="PlayerNumberCss.GetClass(ActivePlayerNumber)" class="just-one-apply-player-color">{{ActivePlayerName}}</span> to guess
+  </div>
+  <div *ngIf="!Loading" class="just-one-important-word just-one-touch-area"
+       (mousedown)="show()" (mouseup)="hide()" (touchstart)="show()" (touchend)="hide()">
+    <span>{{Word}}</span>
   </div>
   <app-just-one-cluelist-component [clueListComponent]="this"></app-just-one-cluelist-component>
 </div>

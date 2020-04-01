@@ -14,11 +14,11 @@
       <input #response />
     </div>
     <div>
-      <button class="btn btn-primary" (click)="SubmitResponse(response.value)">Submit</button>
+      <button class="btn btn-primary" [disabled]="DisableButtons" (click)="SubmitResponse(response.value)">Submit</button>
       <p class="active-player-guess-submission-scorehelp">Correct: +1; Incorrect -1</p>
     </div>
     <div>
-      <button class="btn btn-primary" (click)="SubmitPass(response.value)">Pass</button>
+      <button class="btn btn-primary" [disabled]="DisableButtons" (click)="SubmitPass(response.value)">Pass</button>
       <p class="active-player-guess-submission-scorehelp">Pass: 0</p>
     </div>
   </div>

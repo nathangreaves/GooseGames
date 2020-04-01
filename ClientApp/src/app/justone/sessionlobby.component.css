@@ -10,35 +10,7 @@
       font-weight: bold;
   }
   
-  .player-table .player-1.player-name-cell {
-    color: red;
-  }
-
-  .player-table .player-2.player-name-cell {
-    color: orange;
-  }
-
-  .player-table .player-3.player-name-cell {
-    color: green;
-  }
-
-  .player-table .player-4.player-name-cell {
-    color: blue;
-  }
-
-  .player-table .player-5.player-name-cell {
-    color: purple;
-  }
-
-  .player-table .player-6.player-name-cell {
-    color: hotpink;
-  }
-
-  .player-table .player-7.player-name-cell {
-    color: black;
-  }
-
-  .player-table tr.new-player td {
+  tr.new-player td {
     color: lightgray;
   }
 
