@@ -114,11 +114,17 @@ namespace GooseGames.Services.JustOne
             });
         }
 
-        internal async Task SubmitClueAsync(ResponseRequest request)
+        internal async Task<GenericResponseBase> SubmitClueAsync(ResponseRequest request)
         {
             _logger.LogTrace($"Submit clue", request);
             _logger.LogTrace($"Getting current round");
             var round = await _roundService.GetCurrentRoundAsync(request);
+
+            if (await PlayerHasAlreadySubmittedResponse(request, round))
+            {
+                _logger.LogInformation($"Active player tried to submit response for round {round.Id}:{round.WordToGuess} more than once", request);
+                return GenericResponseBase.Error("Already submitted a guess for current round. Please refresh your page");
+            }
 
             _logger.LogTrace($"Preparing response");
             var response = new Response
@@ -140,6 +146,8 @@ namespace GooseGames.Services.JustOne
 
             _logger.LogTrace($"Progressing round");
             await _roundService.ProgressRoundAsync(round);
+
+            return GenericResponseBase.Ok();
         }
 
         internal async Task SubmitResponseVoteAsync(ResponseVotesRequest request)
@@ -177,12 +185,18 @@ namespace GooseGames.Services.JustOne
             await _roundService.ProgressRoundAsync(round);
         }
 
-        internal async Task SubmitActivePlayerResponseAsync(ActivePlayerResponseRequest request)
+        internal async Task<GenericResponseBase> SubmitActivePlayerResponseAsync(ActivePlayerResponseRequest request)
         {
             _logger.LogTrace($"Submit active player response request", request);
             _logger.LogTrace($"Getting current round");
-            var round = await _roundService.GetCurrentRoundAsync(request);            
-            
+            var round = await _roundService.GetCurrentRoundAsync(request);
+
+            if (await PlayerHasAlreadySubmittedResponse(request, round))
+            {
+                _logger.LogInformation($"User tried to submit response for round {round.Id}:{round.WordToGuess} more than once", request);
+                return GenericResponseBase.Error("Already submitted response to current round. Please refresh your page");
+            }
+
             _logger.LogTrace($"Preparing response");
             var response = new Response
             {
@@ -197,6 +211,8 @@ namespace GooseGames.Services.JustOne
 
             _logger.LogTrace($"Progressing round");
             await _roundService.ProgressRoundAsync(round);
+
+            return GenericResponseBase.Ok();
         }
 
         internal async Task SubmitActivePlayerResponseVoteAsync(ResponseVotesRequest request)
@@ -229,6 +245,12 @@ namespace GooseGames.Services.JustOne
 
             _logger.LogTrace($"Progressing round");
             await _roundService.ProgressRoundAsync(round);
+        }
+        private async Task<bool> PlayerHasAlreadySubmittedResponse(PlayerSessionRequest request, Round round)
+        {
+            var count = await _responseRepository.CountAsync(r => r.PlayerId == request.PlayerId && r.RoundId == round.Id);
+
+            return count > 0;
         }
     }
 }
