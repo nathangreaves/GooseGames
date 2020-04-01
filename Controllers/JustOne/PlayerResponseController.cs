@@ -54,9 +54,7 @@ namespace GooseGames.Controllers.JustOne
             {
                 _logger.LogTrace("Received request", request);
 
-                await _playerResponseService.SubmitClueAsync(request);
-
-                var result = GenericResponseBase.Ok();
+                var result = await _playerResponseService.SubmitClueAsync(request);
 
                 _logger.LogTrace("Returned result", result);
                 return result;
@@ -100,9 +98,7 @@ namespace GooseGames.Controllers.JustOne
             {
                 _logger.LogTrace("Received request", request);
 
-                await _playerResponseService.SubmitActivePlayerResponseAsync(request);
-
-                var result = GenericResponseBase.Ok();
+                var result = await _playerResponseService.SubmitActivePlayerResponseAsync(request);
 
                 _logger.LogTrace("Returned result", result);
                 return result;
