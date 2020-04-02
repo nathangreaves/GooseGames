@@ -20,8 +20,8 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
   _clueListComponent: JustOneClueListComponent;
   _hubConnection: signalR.HubConnection;
   _router: Router;
-    ActivePlayerNumber: number;
-    ActivePlayerName: string;
+  ActivePlayerNumber: number;
+  ActivePlayerName: string;
   Word: string;
   RevealedWord: string;
 
@@ -32,8 +32,6 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
     this._clueService = clueService;
 
     this.hide();
-
-    this.setupConnection();
   }
   getPlayerStatus(): PlayerStatus {
     return PlayerStatus.PassivePlayerWaitingForActivePlayer;
@@ -42,13 +40,16 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
     return true;
   }
 
+  preValidate(): void {
+    this.setupConnection();
+  }
 
   show() {
     this.Word = this.RevealedWord;
   }
 
   hide() {
-    this.Word = "PRESS TO REVEAL 😉";
+    this.Word = "PRESS TO REVEAL";
   }
 
   loadClues(): Promise<GenericResponse<PlayerCluesResponse>> {

@@ -31,11 +31,11 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 var result = await _playerActionInfoService.GetPlayerResponseInfoAsync(request);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
                 return result;
             }
             catch (Exception e)
@@ -52,11 +52,11 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 var result = await _playerActionInfoService.GetPlayerResponseVoteInfoAsync(request);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
                 return result;
             }
             catch (Exception e)
@@ -74,11 +74,11 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 var result = await _playerActionInfoService.GetPlayerResponseOutcomeVoteInfoAsync(request);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
                 return result;
             }
             catch (Exception e)

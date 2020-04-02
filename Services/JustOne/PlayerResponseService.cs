@@ -23,7 +23,7 @@ namespace GooseGames.Services.JustOne
         private readonly IPlayerStatusRepository _playerStatusRepository;
         private readonly IResponseRepository _responseRepository;
         private readonly IResponseVoteRepository _responseVoteRepository;
-        private readonly IHubContext<PlayerHub> _playerHub;
+        private readonly PlayerHubContext _playerHub;
         private readonly RequestLogger<PlayerResponseService> _logger;
 
         public PlayerResponseService(RoundService roundService, 
@@ -31,7 +31,7 @@ namespace GooseGames.Services.JustOne
             IPlayerStatusRepository playerStatusRepository, 
             IResponseRepository responseRepository, 
             IResponseVoteRepository responseVoteRepository,
-            IHubContext<PlayerHub> playerHub, RequestLogger<PlayerResponseService> logger)
+            PlayerHubContext playerHub, RequestLogger<PlayerResponseService> logger)
         {
             _roundService = roundService;
             _playerRepository = playerRepository;
@@ -122,7 +122,7 @@ namespace GooseGames.Services.JustOne
 
             if (await PlayerHasAlreadySubmittedResponse(request, round))
             {
-                _logger.LogInformation($"Active player tried to submit response for round {round.Id}:{round.WordToGuess} more than once", request);
+                _logger.LogWarning($"Active player tried to submit response for round {round.Id}:{round.WordToGuess} more than once", request);
                 return GenericResponseBase.Error("Already submitted a guess for current round. Please refresh your page");
             }
 
@@ -193,7 +193,7 @@ namespace GooseGames.Services.JustOne
 
             if (await PlayerHasAlreadySubmittedResponse(request, round))
             {
-                _logger.LogInformation($"User tried to submit response for round {round.Id}:{round.WordToGuess} more than once", request);
+                _logger.LogWarning($"User tried to submit response for round {round.Id}:{round.WordToGuess} more than once", request);
                 return GenericResponseBase.Error("Already submitted response to current round. Please refresh your page");
             }
 

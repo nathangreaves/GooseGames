@@ -16,6 +16,7 @@ import { PlayerNumberCss } from '../../../services/justone/ui'
   styleUrls: ['./cluevote.component.css', '../sessionlobby.component.css']
 })
 export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
+  
   PlayerNumberCss = PlayerNumberCss;
   _router: Router;
   _playerStatusService: JustOnePlayerStatusService;
@@ -36,7 +37,8 @@ export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
 
     this.hide();
   }
-
+  preValidate(): void {
+  }
   getPlayerStatus(): PlayerStatus {
     return PlayerStatus.PassivePlayerClueVote;
   }

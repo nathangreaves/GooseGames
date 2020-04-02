@@ -16,7 +16,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
         private readonly IResponseRepository _responseRepository;
         private readonly IRoundRepository _roundRepository;
         private readonly IPlayerStatusRepository _playerStatusRepository;
-        private readonly IHubContext<PlayerHub> _playerHub;
+        private readonly PlayerHubContext _playerHub;
         private readonly RequestLogger<WaitingForLeaderResponseRoundStatusService> _logger;
 
         public override RoundStatusEnum RoundStatus => RoundStatusEnum.WaitingForLeaderResponse;
@@ -25,7 +25,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
             IRoundRepository roundRepository,
             IPlayerStatusRepository playerStatusRepository,
             ISessionRepository sessionRepository,
-            IHubContext<PlayerHub> playerHub,
+            PlayerHubContext playerHub,
             RequestLogger<WaitingForLeaderResponseRoundStatusService> logger) 
             : base(roundRepository, sessionRepository, playerStatusRepository, playerHub)
         {

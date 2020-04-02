@@ -17,7 +17,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
         private readonly IRoundRepository _roundRepository;
         private readonly IPlayerRepository _playerRepository;
         private readonly IPlayerStatusRepository _playerStatusRepository;
-        private readonly IHubContext<PlayerHub> _playerHub;
+        private readonly PlayerHubContext _playerHub;
         private readonly RequestLogger<NewRoundStatusService> _logger;
 
         public override RoundStatusEnum RoundStatus => RoundStatusEnum.New;
@@ -26,7 +26,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
             IRoundRepository roundRepository, 
             IPlayerRepository playerRepository, 
             IPlayerStatusRepository playerStatusRepository,
-            IHubContext<PlayerHub> playerHub,
+            PlayerHubContext playerHub,
             RequestLogger<NewRoundStatusService> logger)
         {
             _sessionRepository = sessionRepository;

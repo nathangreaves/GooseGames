@@ -15,12 +15,12 @@ namespace GooseGames.Services.JustOne.RoundStatus
         private readonly IRoundRepository _roundRepository;
         private readonly ISessionRepository _sessionRepository;
         private readonly IPlayerStatusRepository _playerStatusRepository;
-        private readonly IHubContext<PlayerHub> _playerHub;
+        private readonly PlayerHubContext _playerHub;
 
         public CanTriggerRoundEndRoundStatusServiceBase(IRoundRepository roundRepository,
             ISessionRepository sessionRepository,
             IPlayerStatusRepository playerStatusRepository,
-            IHubContext<PlayerHub> playerHub)
+            PlayerHubContext playerHub)
         {
             _roundRepository = roundRepository;
             _sessionRepository = sessionRepository;

@@ -46,10 +46,10 @@ export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {
   loadClues(): Promise<GenericResponse<PlayerCluesResponse>> {
     return this._clueService.GetClues(this);
   }
-  loadContent(): Promise<GenericResponseBase> {
-
+  preValidate(): void {
     this.setupConnection();
-
+  }
+  loadContent(): Promise<GenericResponseBase> {
     return Promise.resolve(
       {
         success: true,

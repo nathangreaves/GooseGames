@@ -34,11 +34,11 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 var result = await _roundService.GetPassivePlayerRoundInfoAsync(request);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
                 return result;
             }
             catch (Exception e)
@@ -55,11 +55,11 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 var result = await _roundService.GetRoundOutcomeAsync(request);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
                 return result;
             }
             catch (Exception e)

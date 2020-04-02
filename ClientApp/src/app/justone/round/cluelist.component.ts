@@ -9,6 +9,7 @@ import { PlayerCluesResponse, PlayerClue } from '../../../models/justone/clue';
 import { PlayerNumberCss } from '../../../services/justone/ui'
 
 export interface IJustOneClueListComponent extends IPlayerSessionComponent {
+  preValidate();
   getPlayerStatus(): PlayerStatus;
   isClueListReadOnly(): boolean;
   loadClues(): Promise<GenericResponse<PlayerCluesResponse>>;
@@ -27,6 +28,7 @@ export abstract class JustOneClueListComponentBase implements IJustOneClueListCo
   abstract MarkClueAsInvalid(clue: PlayerClue);
   abstract onRedirect();
   abstract setClueListComponent(clueListComponent: JustOneClueListComponent);
+  abstract preValidate(): void;
 
   constructor(activatedRoute: ActivatedRoute) {
     this.SessionId = activatedRoute.snapshot.params.SessionId;
@@ -61,8 +63,9 @@ export class JustOneClueListComponent implements OnInit {
 
   ngOnInit() {
     this.clueListComponent.setClueListComponent(this);
-
     this.ReadOnly = this.clueListComponent.isClueListReadOnly();
+
+    this.clueListComponent.preValidate();
 
     this._playerStatusService.Validate(this.clueListComponent,
       this.clueListComponent.getPlayerStatus(), () => {

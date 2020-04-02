@@ -58,6 +58,7 @@ export class JustOnePlayerWaitingComponent implements OnInit  {
 
   ngOnInit() {
     this.playerWaitingComponent.setPlayerWaitingComponent(this);
+    this.playerWaitingComponent.createConnection();
 
     this._playerStatusService.Validate(this.playerWaitingComponent,
       this.playerWaitingComponent.getPlayerStatus(), () => {
@@ -85,8 +86,6 @@ export class JustOnePlayerWaitingComponent implements OnInit  {
       })
       .then(response => {
         if (response && response.success) {
-
-          this.playerWaitingComponent.createConnection();
           this.playerWaitingComponent.Loading = false;
         }
       })
@@ -99,7 +98,7 @@ export class JustOnePlayerWaitingComponent implements OnInit  {
     this._playerStatusService = playerStatusService;  
   }
   HandlePlayerAction(playerAction: PlayerAction) {
-    if (playerAction && playerAction.hasTakenAction) {
+    if (playerAction && playerAction.hasTakenAction && this.Players && this.Players.length > 0) {
       _.find(this.Players, p => {
         return p.id == playerAction.id;
       }).hasTakenAction = true;

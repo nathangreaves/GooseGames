@@ -23,7 +23,7 @@ namespace GooseGames.Services.JustOne
         private readonly PlayerStatusService _playerStatusService;
         private readonly RoundService _roundService;
         private readonly RequestLogger<SessionService> _logger;
-        private readonly IHubContext<PlayerHub> _lobbyHub;
+        private readonly PlayerHubContext _lobbyHub;
         private const int MinNumberOfPlayersPerSession = 3;
         private const int MaxNumberOfPlayersPerSession = 7;
 
@@ -31,8 +31,8 @@ namespace GooseGames.Services.JustOne
             IPlayerRepository playerRepository, 
             PlayerStatusService playerStatusService, 
             RoundService roundService,
-            RequestLogger<SessionService> logger, 
-            IHubContext<PlayerHub> lobbyHub)
+            RequestLogger<SessionService> logger,
+            PlayerHubContext lobbyHub)
         {
             _sessionRepository = sessionRepository;
             _playerRepository = playerRepository;
@@ -92,36 +92,36 @@ namespace GooseGames.Services.JustOne
 
         internal async Task<GenericResponse<bool>> StartSessionAsync(PlayerSessionRequest request)
         {
-            _logger.LogInformation("Starting session", request);
+            _logger.LogTrace("Starting session", request);
 
             if (!await ValidateSessionStatusAsync(request.SessionId, SessionStatusEnum.New))
             {
-                _logger.LogInformation("Session did not exist to start");
+                _logger.LogWarning("Session did not exist to start");
                 return GenericResponse<bool>.Error("Session does not exist");
             }
             if (!await ValidateSessionMasterAsync(request.SessionId, request.PlayerId))
             {
-                _logger.LogInformation("Request to start session from player other than the session master");
+                _logger.LogWarning("Request to start session from player other than the session master");
                 return GenericResponse<bool>.Error("You do not have the authority to start the session");
             }
             if (!await ValidateMinimumNumberOfPlayersAsync(request.SessionId))
             {
-                _logger.LogInformation("Request to start session with not enough players");
+                _logger.LogWarning("Request to start session with not enough players");
                 return GenericResponse<bool>.Error("There are not yet enough players to start");
             }
-            _logger.LogInformation("Session cleared to start");
+            _logger.LogTrace("Session cleared to start");
 
-            _logger.LogInformation("Fetching session");
+            _logger.LogTrace("Fetching session");
             var session = await _sessionRepository.GetAsync(request.SessionId);
             session.StatusId = SessionStatusEnum.InProgress;
 
-            _logger.LogInformation("Marking session in progress");
+            _logger.LogTrace("Marking session in progress");
             await _sessionRepository.UpdateAsync(session);
 
-            _logger.LogInformation("Removing unready players");
+            _logger.LogTrace("Removing unready players");
             await _playerRepository.DeleteUnreadyPlayersAsync(request.SessionId);
 
-            _logger.LogInformation("Updating all players to RoundWaiting status");
+            _logger.LogTrace("Updating all players to RoundWaiting status");
             await _playerStatusService.UpdateAllPlayersForSessionAsync(request.SessionId, PlayerStatusEnum.RoundWaiting);            
 
             _logger.LogTrace("Sending update to clients");
@@ -150,12 +150,12 @@ namespace GooseGames.Services.JustOne
 
             if (session == null)
             {
-                _logger.LogInformation("Session doesn't exist");
+                _logger.LogWarning("Session doesn't exist");
                 return NewResponse.Error<JoinSessionResponse>($"Session doesn't exist with password: {password}");
             }
             if (session.StatusId != SessionStatusEnum.New)
             {
-                _logger.LogInformation("Player tried to join an in progress session");
+                _logger.LogWarning("Player tried to join an in progress session");
                 return GenericResponse<JoinSessionResponse>.Error("Session is already in progress");
             }
 

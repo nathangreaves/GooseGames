@@ -1,4 +1,5 @@
-﻿using GooseGames.Services.JustOne;
+﻿using GooseGames.Logging;
+using GooseGames.Services.JustOne;
 using Microsoft.AspNetCore.SignalR;
 using Models.Responses.JustOne.PlayerDetails;
 using System;
@@ -10,10 +11,12 @@ namespace GooseGames.Hubs
     public class PlayerHub : Hub
     {
         private readonly PlayerDetailsService _playerDetailsService;
+        private readonly RequestLogger<PlayerHub> _logger;
 
-        public PlayerHub(PlayerDetailsService playerDetailsService)
+        public PlayerHub(PlayerDetailsService playerDetailsService, RequestLogger<PlayerHub> logger)
         {
             _playerDetailsService = playerDetailsService;
+            _logger = logger;
         }
 
         public override async Task OnConnectedAsync()
@@ -26,72 +29,99 @@ namespace GooseGames.Hubs
 
             await Groups.AddToGroupAsync(connectionId, sessionId);
 
+            _logger.LogInformation($"Client Connected: connectionId={connectionId} : playerId={playerId} : sessionId={sessionId}");
+
             await base.OnConnectedAsync();
         }
-    }
+        public override Task OnDisconnectedAsync(Exception e)
+        {
+            var connectionId = Context.ConnectionId;
+            _logger.LogInformation($"Client Disconnected: connectionId={connectionId} : e={e}");
 
-    public static class LobbyExtensions
-    {
-        public static async Task SendPlayerAdded(this IHubContext<PlayerHub> hub, Guid sessionId, PlayerDetailsResponse playerDetailsResponse)
-        {
-            await hub.Clients.Group(sessionId.ToString()).SendAsync("playerAdded", playerDetailsResponse);
-        }
-        public static async Task SendPlayerDetailsUpdated(this IHubContext<PlayerHub> hub, Guid sessionId, PlayerDetailsResponse playerDetailsResponse)
-        {
-            await hub.Clients.Group(sessionId.ToString()).SendAsync("playerDetailsUpdated", playerDetailsResponse);
-        }
-        public static async Task SendPlayerRemoved(this IHubContext<PlayerHub> hub, Guid sessionId, Guid playerId)
-        {
-            await hub.Clients.Group(sessionId.ToString()).SendAsync("playerRemoved", playerId);
-        }
-        public static async Task SendStartingSessionAsync(this IHubContext<PlayerHub> hub, Guid sessionId)
-        {
-            await hub.Clients.Group(sessionId.ToString()).SendAsync("startingSession");
+            return base.OnDisconnectedAsync(e);
         }
     }
 
-    public static class PlayerWaitingExtensions 
+    public class PlayerHubContext
     {
-        public static async Task SendBeginRoundAsync(this IHubContext<PlayerHub> hub, Guid sessionId, string activePlayerConnectionId)
-        {
-            await hub.Clients.GroupExcept(sessionId.ToString(), activePlayerConnectionId).SendAsync("beginRoundPassivePlayer");
-            await hub.Clients.Client(activePlayerConnectionId).SendAsync("beginRoundActivePlayer");
-        }
-    }
+        private readonly IHubContext<PlayerHub> _hub;
+        private readonly RequestLogger<PlayerHubContext> _logger;
 
-    public static class RoundExtensions
-    {
-        public static async Task SendClueSubmittedAsync(this IHubContext<PlayerHub> hub, Guid sessionId, Guid playerId)
+        public PlayerHubContext(IHubContext<PlayerHub> hub, RequestLogger<PlayerHubContext> logger)
         {
-            await hub.Clients.Group(sessionId.ToString()).SendAsync("clueSubmitted", playerId);
+            _hub = hub;
+            _logger = logger;
         }
-        public static async Task SendAllCluesSubmittedAsync(this IHubContext<PlayerHub> hub, Guid sessionId)
+
+        public async Task SendPlayerAdded(Guid sessionId, PlayerDetailsResponse playerDetailsResponse)
         {
-            await hub.Clients.Group(sessionId.ToString()).SendAsync("allCluesSubmitted");
+            _logger.LogInformation($"Sending playerAdded: to {sessionId} :: {playerDetailsResponse.Id}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerAdded", playerDetailsResponse);
         }
-        public static async Task SendClueVoteSubmittedAsync(this IHubContext<PlayerHub> hub, Guid sessionId, Guid playerId)
+        public async Task SendPlayerDetailsUpdated(Guid sessionId, PlayerDetailsResponse playerDetailsResponse)
         {
-            await hub.Clients.Group(sessionId.ToString()).SendAsync("clueVoteSubmitted", playerId);
+            _logger.LogInformation($"Sending playerDetailsUpdated: to {sessionId} :: {playerDetailsResponse.Id}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerDetailsUpdated", playerDetailsResponse);
         }
-        public static async Task SendAllClueVotesSubmittedAsync(this IHubContext<PlayerHub> hub, Guid sessionId)
+        public async Task SendPlayerRemoved(Guid sessionId, Guid playerId)
         {
-            await hub.Clients.Group(sessionId.ToString()).SendAsync("allClueVotesSubmitted");
-        }        
-        public static async Task SendRoundOutcomeAvailableAsync(this IHubContext<PlayerHub> hub, Guid sessionId)
-        {
-            await hub.Clients.Group(sessionId.ToString()).SendAsync("roundOutcomeAvailable");
+            _logger.LogInformation($"Sending playerRemoved: to {sessionId} :: {playerId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerRemoved", playerId);
         }
-        public static async Task SendActivePlayerResponseVoteRequiredAsync(this IHubContext<PlayerHub> hub, Guid sessionId)
+        public async Task SendStartingSessionAsync(Guid sessionId)
         {
-            await hub.Clients.Group(sessionId.ToString()).SendAsync("activePlayerResponseVoteRequired");
+            _logger.LogInformation($"Sending startingSession: to {sessionId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("startingSession");
         }
-        public static async Task SendResponseVoteSubmittedAsync(this IHubContext<PlayerHub> hub, Guid sessionId, Guid playerId)
+
+        public async Task SendBeginRoundAsync(Guid sessionId, string activePlayerConnectionId)
         {
-            await hub.Clients.Group(sessionId.ToString()).SendAsync("responseVoteSubmitted", playerId);
+            _logger.LogInformation($"Sending beginRoundPassivePlayer: to {sessionId}");
+            await _hub.Clients.GroupExcept(sessionId.ToString(), activePlayerConnectionId).SendAsync("beginRoundPassivePlayer");
+
+            _logger.LogInformation($"Sending beginRoundActivePlayer: to {sessionId}");
+            await _hub.Clients.Client(activePlayerConnectionId).SendAsync("beginRoundActivePlayer");
         }
-        public static async Task SendAllResponseVotesSubmittedAsync(this IHubContext<PlayerHub> hub, Guid sessionId)
+
+        public async Task SendClueSubmittedAsync(Guid sessionId, Guid playerId)
         {
-            await hub.Clients.Group(sessionId.ToString()).SendAsync("allResponseVotesSubmitted");
+            _logger.LogInformation($"Sending clueSubmitted: to {sessionId} :: {playerId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("clueSubmitted", playerId);
+        }
+        public async Task SendAllCluesSubmittedAsync(Guid sessionId)
+        {
+            _logger.LogInformation($"Sending allCluesSubmitted: to {sessionId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("allCluesSubmitted");
+        }
+        public async Task SendClueVoteSubmittedAsync(Guid sessionId, Guid playerId)
+        {
+            _logger.LogInformation($"Sending clueVoteSubmitted: to {sessionId} :: {playerId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("clueVoteSubmitted", playerId);
+        }
+        public async Task SendAllClueVotesSubmittedAsync(Guid sessionId)
+        {
+            _logger.LogInformation($"Sending allClueVotesSubmitted: to {sessionId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("allClueVotesSubmitted");
+        }
+        public async Task SendRoundOutcomeAvailableAsync(Guid sessionId)
+        {
+            _logger.LogInformation($"Sending roundOutcomeAvailable: to {sessionId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("roundOutcomeAvailable");
+        }
+        public async Task SendActivePlayerResponseVoteRequiredAsync(Guid sessionId)
+        {
+            _logger.LogInformation($"Sending activePlayerResponseVoteRequired: to {sessionId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("activePlayerResponseVoteRequired");
+        }
+        public async Task SendResponseVoteSubmittedAsync(Guid sessionId, Guid playerId)
+        {
+            _logger.LogInformation($"Sending responseVoteSubmitted: to {sessionId} :: {playerId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("responseVoteSubmitted", playerId);
+        }
+        public async Task SendAllResponseVotesSubmittedAsync(Guid sessionId)
+        {
+            _logger.LogInformation($"Sending allResponseVotesSubmitted: to {sessionId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("allResponseVotesSubmitted");
         }
     }
 }

@@ -49,6 +49,8 @@ namespace GooseGames
             services.AddScoped<Services.JustOne.PrepareNextRoundService>();
             services.AddScoped<Services.JustOne.RoundStatus.NewRoundStatusService>();
 
+            services.AddScoped<PlayerHubContext>();
+
             services.AddTransient<RoundServiceProvider>();
             AddKeyedServices<IRoundStatusKeyedService>(services);
         }

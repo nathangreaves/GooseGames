@@ -31,11 +31,11 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 var result = await _playerResponseService.GetResponsesAsync(request);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
                 return result;
             }
             catch (Exception e)
@@ -52,11 +52,11 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 var result = await _playerResponseService.SubmitClueAsync(request);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
                 return result;
             }
             catch (Exception e)
@@ -73,13 +73,13 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 await _playerResponseService.SubmitResponseVoteAsync(request);
 
                 var result = GenericResponseBase.Ok();
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
                 return result;
             }
             catch (Exception e)
@@ -96,11 +96,11 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 var result = await _playerResponseService.SubmitActivePlayerResponseAsync(request);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
                 return result;
             }
             catch (Exception e)
@@ -117,11 +117,11 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 var result = await _playerResponseService.GetActivePlayerResponseAsync(request);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
                 return result;
             }
             catch (Exception e)
@@ -138,13 +138,13 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 await _playerResponseService.SubmitActivePlayerResponseVoteAsync(request);
 
                 var result = GenericResponseBase.Ok();
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
                 return result;
             }
             catch (Exception e)

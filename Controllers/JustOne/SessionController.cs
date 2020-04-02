@@ -32,11 +32,11 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 var result = await _sessionService.CreateSessionAsync(request);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
 
                 return result;
             }
@@ -53,11 +53,11 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 var result = await _sessionService.JoinSessionAsync(request);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
 
                 return result;
             }
@@ -75,11 +75,11 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 var result = await _sessionService.StartSessionAsync(request);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
 
                 return result;
             }

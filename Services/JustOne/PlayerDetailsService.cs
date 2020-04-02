@@ -18,9 +18,9 @@ namespace GooseGames.Services.JustOne
         private readonly SessionService _sessionService;
         private readonly IPlayerRepository _playerRepository;
         private readonly RequestLogger<PlayerDetailsService> _logger;
-        private readonly IHubContext<PlayerHub> _lobbyHub;
+        private readonly PlayerHubContext _lobbyHub;
 
-        public PlayerDetailsService(SessionService sessionService, IPlayerRepository playerRepository, RequestLogger<PlayerDetailsService> logger, IHubContext<PlayerHub> lobbyHub)
+        public PlayerDetailsService(SessionService sessionService, IPlayerRepository playerRepository, RequestLogger<PlayerDetailsService> logger, PlayerHubContext lobbyHub)
         {
             _sessionService = sessionService;
             _playerRepository = playerRepository;
@@ -56,14 +56,14 @@ namespace GooseGames.Services.JustOne
             var player = await _playerRepository.GetAsync(request.PlayerId);
             if (player == null)
             {
-                _logger.LogInformation("Unable to find player.");
+                _logger.LogWarning("Unable to find player.");
 
                 return NewResponse.Error<UpdatePlayerDetailsResponse>("Unable to find player.");
             }
 
             if (player.Name != null)
             {
-                _logger.LogInformation($"Attempt to set name of {player.Name} to {request.PlayerName}");
+                _logger.LogWarning($"Attempt to set name of {player.Name} to {request.PlayerName}");
                 return NewResponse.Error<UpdatePlayerDetailsResponse>("Unable to set name again.");
             }
 
@@ -115,14 +115,14 @@ namespace GooseGames.Services.JustOne
             var session = await _sessionService.GetSessionAsync(request.SessionId);
             if (session == null)
             {
-                _logger.LogInformation("Unable to find session.");
+                _logger.LogWarning("Unable to find session.");
                 return NewResponse.Error<GetPlayerDetailsResponse>("Unable to find session.");
             }
 
             var players = await _playerRepository.FilterAsync(player => player.SessionId == request.SessionId);
             if (!players.Any(p => p.Id == request.PlayerId))
             {
-                _logger.LogInformation("Player did not exist on session");
+                _logger.LogWarning("Player did not exist on session");
                 return NewResponse.Error<GetPlayerDetailsResponse>("Player does not exist on session");
             }
 
@@ -149,19 +149,19 @@ namespace GooseGames.Services.JustOne
 
             if (string.IsNullOrWhiteSpace(request.PlayerName))
             {
-                _logger.LogInformation("Empty player name provided");
+                _logger.LogWarning("Empty player name provided");
                 return NewResponse.Error<UpdatePlayerDetailsResponse>("Please enter your name.");
             }
 
             if (request.PlayerName.Length > 20)
             {
-                _logger.LogInformation("Player name too long");
+                _logger.LogWarning("Player name too long");
                 return NewResponse.Error<UpdatePlayerDetailsResponse>("Please enter a player name that is 20 characters or fewer");
             }
 
             if (!(await _sessionService.ValidateSessionStatusAsync(request.SessionId, SessionStatusEnum.New)))
             {
-                _logger.LogInformation("Unable to find session. Either it is not new or doesn't exist.");
+                _logger.LogWarning("Unable to find session. Either it is not new or doesn't exist.");
 
                 return NewResponse.Error<UpdatePlayerDetailsResponse>("Unable to find session. Either it started without you or doesn't exist");
             }

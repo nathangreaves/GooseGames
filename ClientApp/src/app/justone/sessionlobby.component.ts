@@ -50,6 +50,7 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
     this.SessionId = activatedRoute.snapshot.params.SessionId;
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;
 
+    this.setupConnection();
 
     this._playerStatusService.Validate(this, PlayerStatus.InLobby, () => { this.CloseConnection(); })
       .then(() => this.load());
@@ -92,7 +93,6 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
     this._playerDetailsService.GetPlayerDetails({ playerId: this.PlayerId, sessionId: this.SessionId })
       .then(data => {
         if (data.success) {
-          this.setupConnection();
 
           this.SessionMaster = data.data.sessionMaster;
           this.SessionMasterName = data.data.sessionMasterName ? data.data.sessionMasterName : "Session Master";
@@ -118,11 +118,15 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
       this.Players.push(player);
     });
     this._hubConnection.on("playerDetailsUpdated", (player: PlayerDetailsResponse) => {
-      var index = _.findIndex(this.Players, p => p.id == player.id);
-      this.Players.splice(index, 1, player);
+      if (this.Players && this.Players.length > 0) {
+        var index = _.findIndex(this.Players, p => p.id == player.id);
+        this.Players.splice(index, 1, player);
+      }
     });
     this._hubConnection.on("playerRemoved", (playerId: string) => {
-      _.remove(this.Players, p => p.id === playerId);
+      if (this.Players && this.Players.length > 0) {
+        _.remove(this.Players, p => p.id === playerId);
+      }
     });
     this._hubConnection.on("startingSession", () => {
       this.CloseConnection();

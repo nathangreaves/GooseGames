@@ -128,13 +128,13 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 await _playerStatusService.UpdatePlayerStatusAsync(request.PlayerId, PlayerStatusEnum.InLobby);
 
                 var result = NewResponse.Ok(true);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
                 return result;
             }
             catch (Exception e)
@@ -151,13 +151,13 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogInformation("Received request", request);
 
                 await _playerStatusService.UpdatePlayerStatusToRoundWaitingAsync(request);
 
                 var result = NewResponse.Ok(true);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
                 return result;
             }
             catch (Exception e)
