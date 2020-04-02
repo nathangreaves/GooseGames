@@ -141,6 +141,9 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
       this._hubConnection.off("playerDetailsUpdated");
       this._hubConnection.off("playerRemoved");
       this._hubConnection.off("startingSession");
+
+      this._hubConnection.stop();
+      this._hubConnection = null;
     }
   }
 

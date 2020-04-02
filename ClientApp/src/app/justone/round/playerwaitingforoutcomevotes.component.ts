@@ -50,6 +50,9 @@ export abstract class JustOnePlayerWaitingForOutcomeVoteComponentBase extends Ju
     if (this._hubConnection) {
       this._hubConnection.off("responseVoteSubmitted");
       this._hubConnection.off("roundOutcomeAvailable");
+
+      this._hubConnection.stop();
+      this._hubConnection = null;
     }
   }
 

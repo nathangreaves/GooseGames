@@ -54,6 +54,9 @@ export class JustOnePassivePlayerWaitingForCluesComponent extends JustOnePlayerW
     if (this._hubConnection) {
       this._hubConnection.off("clueSubmitted");
       this._hubConnection.off("allCluesSubmitted");
+
+      this._hubConnection.stop();
+      this._hubConnection = null;
     }
   }
 

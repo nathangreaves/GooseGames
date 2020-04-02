@@ -54,6 +54,9 @@ export class JustOneActivePlayerWaitingForClueVoteComponent extends JustOnePlaye
     if (this._hubConnection) {
       this._hubConnection.off("clueVoteSubmitted");
       this._hubConnection.off("allClueVotesSubmitted");
+
+      this._hubConnection.stop();
+      this._hubConnection = null;
     }
   }
 
