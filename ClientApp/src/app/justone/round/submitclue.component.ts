@@ -86,15 +86,15 @@ export class JustOneSubmitClueComponent implements IPlayerSessionComponent {
 
   SubmitClue(clue: string) {
 
-    this.DisableSubmitClue = true;
-
-    if (clue.indexOf(" ") != -1) {
+    if (clue.trim().indexOf(" ") != -1) {
       this.ErrorMessage = "Please submit JUST ONE word";
       return;
     }
 
+    this.DisableSubmitClue = true;
+
     this._clueService.SubmitClue({
-      ResponseWord: clue,
+      ResponseWord: clue.trim(),
       PlayerId: this.PlayerId,
       SessionId: this.SessionId
     })

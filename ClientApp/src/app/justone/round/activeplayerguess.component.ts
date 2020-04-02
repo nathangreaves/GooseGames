@@ -70,7 +70,7 @@ export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {
       this.ErrorMessage = "Please submit response";
       return;
     }
-    if (response.indexOf(" ") != -1) {
+    if (response.trim().indexOf(" ") != -1) {
       this.ErrorMessage = "Please submit JUST ONE word";
       return;
     }
@@ -79,7 +79,7 @@ export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {
     this._clueService.SubmitActivePlayerResponse({
       SessionId: this.SessionId,
       PlayerId: this.PlayerId,
-      ResponseWord: response,
+      ResponseWord: response.trim(),
       Pass: false
     })
       .then(response => {
