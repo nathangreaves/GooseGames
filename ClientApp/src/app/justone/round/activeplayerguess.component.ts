@@ -56,7 +56,7 @@ export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {
         errorCode: null,
       });
   }
-  MarkClueAsInvalid() {
+  MarkClueAs() {
   }
   onRedirect() {
     this.CloseConnection();

@@ -28,5 +28,5 @@ export class PlayerClue {
   playerName: string;
   response: string;
   responseInvalid: boolean;
-  responseAutoInvalid: boolean;
+  responseVoted: boolean;
 }

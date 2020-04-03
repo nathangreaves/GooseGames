@@ -15,7 +15,11 @@
         </span>
       </td>
       <td>
-        <button *ngIf="!clue.responseAutoInvalid && !ReadOnly" class="btn btn-primary" (click)="MarkClueAsInvalid(clue)">Invalid</button>
+
+      <tristate-switch *ngIf="!ReadOnly"                         
+                        [TristateSwitchHandler]="ValiditySwitchHandler(clue)" 
+                       >
+        </tristate-switch>
       </td>
     </tr>
   </table>

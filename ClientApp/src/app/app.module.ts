@@ -10,6 +10,8 @@ import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 
+import { TristateSwitch } from '../assets/tristate-switch.component'
+
 import { JustOneLandingComponent } from './justone/landing.component';
 
 import { JustOneNewPlayerDetailsComponent } from './justone/newplayerdetails.component';
@@ -39,6 +41,8 @@ import { JustOneClueListComponent } from './justone/round/cluelist.component';
     NavMenuComponent,
     HomeComponent,
     JustOneLandingComponent,
+
+    TristateSwitch,
 
     JustOneNewPlayerDetailsComponent,
     JustOneSessionLobbyComponent,

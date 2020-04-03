@@ -7,6 +7,7 @@ import { IPlayerSessionComponent } from '../../../models/justone/session';
 import { GenericResponse, GenericResponseBase } from '../../../models/genericresponse';
 import { PlayerCluesResponse, PlayerClue } from '../../../models/justone/clue';
 import { PlayerNumberCss } from '../../../services/justone/ui'
+import { TristateSwitch, ITristateSwitchHandler } from '../../../assets/tristate-switch.component'
 
 export interface IJustOneClueListComponent extends IPlayerSessionComponent {
   preValidate();
@@ -14,7 +15,7 @@ export interface IJustOneClueListComponent extends IPlayerSessionComponent {
   isClueListReadOnly(): boolean;
   loadClues(): Promise<GenericResponse<PlayerCluesResponse>>;
   loadContent(): Promise<any>;
-  MarkClueAsInvalid(clue: PlayerClue);
+  MarkClueAs(clue: PlayerClue, valid: boolean);
   onRedirect();
   setClueListComponent(clueListComponent: JustOneClueListComponent);
   Loading: boolean;
@@ -25,7 +26,7 @@ export abstract class JustOneClueListComponentBase implements IJustOneClueListCo
   abstract isClueListReadOnly(): boolean;
   abstract loadClues(): Promise<GenericResponse<PlayerCluesResponse>>;
   abstract loadContent(): Promise<GenericResponseBase>;
-  abstract MarkClueAsInvalid(clue: PlayerClue);
+  abstract MarkClueAs(clue: PlayerClue, valid: boolean);
   abstract onRedirect();
   abstract setClueListComponent(clueListComponent: JustOneClueListComponent);
   abstract preValidate(): void;
@@ -78,7 +79,6 @@ export class JustOneClueListComponent implements OnInit {
       })
       .then(response => {
         if (response && response.success) {
-          _.forEach(response.data.responses, clue => clue.responseAutoInvalid = clue.responseInvalid);
           this.Clues = response.data.responses;
         }
         else if (response) {
@@ -106,8 +106,23 @@ export class JustOneClueListComponent implements OnInit {
     this._playerStatusService = playerStatusService;
   }
 
-  MarkClueAsInvalid(clue: PlayerClue) {
-    this.clueListComponent.MarkClueAsInvalid(clue);
+
+  ValiditySwitchHandler(clue: PlayerClue): ITristateSwitchHandler {
+    return {
+      SwitchOff: () => this.MarkClueAsInvalid(clue),
+      SwitchOn: () => this.MarkClueAsValid(clue),
+      SwitchUnselected: () => { },
+      DefaultState: clue.responseInvalid ? false : null,
+      AllowUnselected: false,
+      ReadOnly: clue.responseInvalid === true,
+      GroupName: "clue-valid-switch-"
+    }
   }
 
+  MarkClueAsInvalid(clue: PlayerClue) {
+    this.clueListComponent.MarkClueAs(clue, false);
+  }
+  MarkClueAsValid(clue: PlayerClue) {
+    this.clueListComponent.MarkClueAs(clue, true);
+  }
 }

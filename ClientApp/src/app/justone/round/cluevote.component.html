@@ -6,14 +6,16 @@
     <span [ngClass]="PlayerNumberCss.GetClass(ActivePlayerNumber)" class="just-one-apply-player-color">{{ActivePlayerName}}</span><span> is going to be guessing</span>
   </div>
   <div *ngIf="!Loading" class="just-one-important-word just-one-touch-area"
-       (mousedown)="show()" (mouseup)="hide()" (touchstart)="show()" (touchend)="hide()">       
+       (mousedown)="show()" (mouseup)="hide()" (touchstart)="show()" (touchend)="hide()">
     <span>{{Word}}</span>
   </div>
   <div *ngIf="!Loading">
-    <span>Please remove any clues that are duplicates/invalid</span>
+    <span>Please mark clues as either Valid or Invalid</span>
   </div>
   <app-just-one-cluelist-component [clueListComponent]="this"></app-just-one-cluelist-component>
   <div *ngIf="!Loading">
     <button class="btn btn-primary" (click)="SubmitClueVote()">Submit</button>
   </div>
 </div>
+
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

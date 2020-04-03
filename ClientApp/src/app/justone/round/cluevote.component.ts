@@ -60,6 +60,8 @@ export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
         this.ActivePlayerNumber = response.data.activePlayerNumber;
         this.ActivePlayerName = response.data.activePlayerName;
         this.RevealedWord = response.data.wordToGuess;
+
+        _.forEach(response.data.responses, clue => { clue.responseVoted = (clue.responseInvalid === true) ? false : null; });
       }
       return response;
     });
@@ -78,16 +80,31 @@ export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
     this.clueListComponent = clueListComponent;
   }
 
-  MarkClueAsInvalid(clue: PlayerClue) {
-    clue.responseInvalid = !clue.responseInvalid;
+  MarkClueAs(clue: PlayerClue, valid: boolean) {
+
+    if (valid === true) {
+      clue.responseVoted = true;
+    }
+    else if (valid === false) {
+      clue.responseVoted = false;
+    }
+    else {
+      clue.responseVoted = null;
+    }
   }
 
   SubmitClueVote() {
+
+    if (_.find(this.clueListComponent.Clues, clue => clue.responseVoted == null)) {
+      this.ErrorMessage = "Please mark all responses as either Valid or Invalid";
+      return;
+    }
+
     this._clueService.SubmitClueVote(
       {
         SessionId: this.SessionId,
         PlayerId: this.PlayerId,
-        ValidResponses: _.map(_.filter(this.clueListComponent.Clues, clue => !clue.responseInvalid), clue => clue.responseId)
+        ValidResponses: _.map(_.filter(this.clueListComponent.Clues, clue => clue.responseVoted), clue => clue.responseId)
       })
       .then(data => {
         if (!data.success) {

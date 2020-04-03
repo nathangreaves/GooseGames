@@ -70,7 +70,7 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
         errorCode: null,
       });
   }
-  MarkClueAsInvalid() {
+  MarkClueAs() {
     //Do nothing as this is a readonly clue list
   }
   onRedirect() {

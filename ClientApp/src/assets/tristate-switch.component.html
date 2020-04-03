@@ -1,0 +1,61 @@
+<div class="tristate-switch">
+
+
+
+  <div [ngClass]="{
+          'tristate' : AllowUnselected}">
+    <button class="btn tristate-on"
+            (click)="OnClicked()"
+            [disabled]="ReadOnly"
+            [ngClass]="{
+          'tristate' : AllowUnselected,
+          'disabled' : ReadOnly,
+          'selected' : Checked === true
+          }">
+      <i class="fas fa-check"></i>
+    </button>
+  </div>
+
+  <div [ngClass]="{
+          'tristate' : AllowUnselected,
+          'disabled' : !AllowUnselected
+       }">
+    <button class="btn  tristate-unselected" (click)="UnselectedClicked()"
+            [disabled]="ReadOnly || !AllowUnselected"
+            [ngClass]="{
+          'tristate' : AllowUnselected,
+          'disabled' : ReadOnly || !AllowUnselected,
+          'selected' : Checked === undefined
+          }">
+      <i class="fas fa-question"></i>
+    </button>
+  </div>
+  <div [ngClass]="{
+          'tristate' : AllowUnselected}">
+    <button class="btn tristate-off" (click)="OffClicked()"
+            [disabled]="ReadOnly"
+            [ngClass]="{
+          'tristate' : AllowUnselected,
+          'disabled' : ReadOnly,
+          'selected' : Checked === false
+          }">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+</div>
+
+
+
+<!--<div class="switch-toggle switch-3 switch-candy" [attr.id]="groupId">
+
+  <input id="on" name="state-d" type="radio" [attr.group]="groupId" [ngClass]="{'disabled' : ReadOnly}" [disabled]="ReadOnly" (click)="OnClicked()" />
+  <label for="on" [ngClass]="{disabled : 'ReadOnly'}" onclick="">{{LabelOn}}</label>
+
+  <input id="na" name="state-d" type="radio" [attr.group]="groupId" [ngClass]="{'disabled' : AllowUnselected}" [disabled]="AllowUnselected === true" />
+  <label for="na" [ngClass]="{disabled : 'AllowUnselected'}" onclick="">{{UnselectedLabel}}</label>
+
+  <input id="off" name="state-d" type="radio" [attr.group]="groupId" [ngClass]="{'disabled' : ReadOnly}" [disabled]="ReadOnly" (click)="OffClicked()" />
+  <label for="off" [ngClass]="{disabled : 'ReadOnly'}" onclick="">{{LabelOff}}</label>
+
+</div>-->
