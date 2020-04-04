@@ -1,0 +1,19 @@
+.just-one-nav-header{
+}
+
+.just-one-nav-header-item {
+  display: inline-block;
+  width: 33%;
+}
+
+.just-one-nav-header-item.score {
+  text-align: right;
+  font-weight: normal;
+}
+.just-one-nav-header-item.round {
+  text-align: center;
+  font-weight: normal;
+}
+.just-one-nav-header-item.gamename {
+  text-align: left;
+}

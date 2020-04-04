@@ -20,4 +20,11 @@ export class RoundOutcomeResponse {
   activePlayerNumber: number;
   roundOutcome: RoundOutcomeEnum;
   roundId: string;
+  nextRoundInformation: RoundInformationResponse;
+}
+
+export class RoundInformationResponse {
+  roundNumber: number;
+  roundsTotal: number;
+  score: number;
 }

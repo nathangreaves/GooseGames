@@ -16,3 +16,27 @@ html {
 .box-shadow {
   box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
+
+
+.nav-bar-area-title {
+  background-color: aliceblue;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+  margin-bottom: 1em;
+  font-weight: bold;
+}
+
+.navbar.border-bottom {
+  margin-bottom: 0px !important;
+}
+
+.nav-bar-area-content{
+
+}
+
+
+.nav-bar-area-content-unset {
+    height: 0px;
+    margin: 0px;
+    padding: 0px;
+}

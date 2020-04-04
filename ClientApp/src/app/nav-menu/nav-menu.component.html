@@ -41,7 +41,13 @@
       </div>
     </div>
   </nav>
-  <div *ngIf="NavbarService.AreaTitle" class="container nav-bar-area-title">
+  <div class="container nav-bar-area-title" [ngClass]="{
+      'nav-bar-area-content' : ComponentSet,
+       'nav-bar-area-content-unset' : !ComponentSet
+       }">
+    <ng-template navbar-header></ng-template>
+  </div>
+  <div *ngIf="!ComponentSet && NavbarService.AreaTitle" class="container nav-bar-area-title">
     {{NavbarService.AreaTitle}}
   </div>
 </header>

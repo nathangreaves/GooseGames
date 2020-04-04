@@ -7,10 +7,11 @@ import { IPlayerSessionComponent } from '../../../models/justone/session';
 import { PlayerStatus, PlayerStatusRoutesMap } from '../../../models/justone/playerstatus';
 import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus';
 import { GenericResponseBase, GenericResponse } from '../../../models/genericresponse';
-import { RoundOutcomeResponse } from '../../../models/justone/round';
+import { RoundOutcomeResponse, RoundInformationResponse } from '../../../models/justone/round';
 import { JustOneRoundService } from '../../../services/justone/round';
 import { NavbarService } from '../../../services/navbar';
 import { PlayerNumberCss } from '../../../services/justone/ui'
+import { NavbarHeaderEnum } from '../../nav-menu/navbar-header';
 
 export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSessionComponent {
 
@@ -29,7 +30,7 @@ export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSession
 
   RoundOutcome: RoundOutcomeResponse;
 
-  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, router:  Router, activatedRoute: ActivatedRoute) {
+  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, router: Router, activatedRoute: ActivatedRoute) {
     this._router = router;
     this._playerStatusService = playerStatusService;
     this._roundService = roundService;
@@ -65,15 +66,36 @@ export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSession
           if (this.isActivePlayer()) {
             this.RoundOutcome.activePlayerName = "You";
           }
+
           if (this.RoundOutcome.gameEnded) {
             this._navbarService.setReadOnly(false);
           }
+          this.updateCurrentRoundInformation();
         }
         else {
           this.ErrorMessage = response.errorCode;
         }
         return response;
       });
+  }
+
+  updateCurrentRoundInformation() {
+    var currentRoundInformation;
+    var roundInformationString = localStorage.getItem('just-one-navbar-round-info');
+    if (roundInformationString) {
+      currentRoundInformation = <RoundInformationResponse>JSON.parse(roundInformationString);
+    }
+    else {
+      currentRoundInformation = <RoundInformationResponse>{
+        roundNumber: 1
+      }
+    }
+    currentRoundInformation.score = this.RoundOutcome.score;
+    currentRoundInformation.roundsTotal = this.RoundOutcome.nextRoundInformation.roundsTotal;
+
+    localStorage.setItem('just-one-navbar-round-info', JSON.stringify(currentRoundInformation));
+
+    this._navbarService.setAreaContent(NavbarHeaderEnum.JustOne);
   }
 
   NextRound() {
@@ -86,6 +108,10 @@ export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSession
         })
       .then(response => {
         if (response.success) {
+
+          localStorage.setItem('just-one-navbar-round-info', JSON.stringify(this.RoundOutcome.nextRoundInformation));
+          this._navbarService.setAreaContent(NavbarHeaderEnum.JustOne);
+
           this._router.navigate([
             PlayerStatusRoutesMap.RoundWaiting, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
         }

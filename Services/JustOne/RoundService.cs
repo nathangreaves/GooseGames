@@ -73,7 +73,7 @@ namespace GooseGames.Services.JustOne
             var round = await _roundRepository.GetAsync(session.CurrentRoundId.Value);
 
             _logger.LogTrace($"Getting rounds remaining");
-            var roundsRemaining = await _roundRepository.CountAsync(r => r.Status == RoundStatusEnum.New);
+            var roundsRemaining = await _roundRepository.CountAsync(r => r.Status == RoundStatusEnum.New && r.SessionId == request.SessionId);
 
             _logger.LogTrace($"Getting active player");
             var activePlayer = await _playerRepository.GetAsync(round.ActivePlayerId.Value);
@@ -81,16 +81,29 @@ namespace GooseGames.Services.JustOne
             _logger.LogTrace($"Getting active player response");
             var response = await _responseRepository.SingleOrDefaultAsync(r => r.PlayerId == activePlayer.Id && r.RoundId == round.Id);
 
+            bool gameEnded = roundsRemaining <= 0;
+
+             _logger.LogTrace("Getting total number of rounds");
+            var roundsTotal = await _roundRepository.CountAsync(r => r.SessionId == request.SessionId);
+
+            var nextRoundInformation = new RoundInformationResponse
+            {
+                Score = session.Score,
+                RoundsTotal = roundsTotal,
+                RoundNumber = gameEnded ? roundsTotal : (roundsTotal - roundsRemaining) + 1
+            };
+
             var outcome = new RoundOutcomeResponse
             {
                 ActivePlayerName = activePlayer.Name,
                 ActivePlayerNumber = activePlayer.PlayerNumber,
-                GameEnded = roundsRemaining <= 0,
+                GameEnded = gameEnded,
                 RoundOutcome = (Models.Responses.JustOne.Round.RoundOutcomeEnum)(int)round.Outcome,
                 Score = session.Score,
                 WordGuessed = response != null ? response.Word.ToUpper() : null,
                 WordToGuess = round.WordToGuess.ToUpper(),
-                RoundId = round.Id
+                RoundId = round.Id,
+                NextRoundInformation = nextRoundInformation
             };
             return GenericResponse<RoundOutcomeResponse>.Ok(outcome);
         }

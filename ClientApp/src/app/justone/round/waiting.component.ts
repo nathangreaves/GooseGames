@@ -7,6 +7,11 @@ import * as signalR from "@microsoft/signalr";
 import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus'
 import { PlayerStatus } from '../../../models/justone/playerstatus'
 import { IPlayerSessionComponent } from '../../../models/justone/session';
+import { JustOneRoundService } from '../../../services/justone/round';
+import { RoundInformationResponse } from '../../../models/justone/round';
+import { GenericResponse } from '../../../models/genericresponse';
+import { NavbarService } from '../../../services/navbar';
+import { NavbarHeaderEnum } from '../../nav-menu/navbar-header';
 
 @Component({
   selector: 'app-just-one-roundwaiting-component',
@@ -14,18 +19,22 @@ import { IPlayerSessionComponent } from '../../../models/justone/session';
 })
 
 export class JustOneRoundWaitingComponent implements IPlayerSessionComponent {
-  private _router: Router;
-  private _hubConnection: signalR.HubConnection;
-  private _playerStatusService: JustOnePlayerStatusService
+  _router: Router;
+  _hubConnection: signalR.HubConnection;
+  _playerStatusService: JustOnePlayerStatusService
+  _roundService: JustOneRoundService;
+  _navbarService: NavbarService;
 
   SessionId: string;
   PlayerId: string;
   Loading: boolean = true;
   ErrorMessage: string;
 
-  constructor(playerStatusService: JustOnePlayerStatusService, router: Router, activatedRoute: ActivatedRoute) {
+  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, router: Router, activatedRoute: ActivatedRoute) {
     this._router = router;
     this._playerStatusService = playerStatusService;
+    this._roundService = roundService;
+    this._navbarService = navbarService;
 
     this.SessionId = activatedRoute.snapshot.params.SessionId;
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;

@@ -21,18 +21,6 @@ code {
   font-weight: bold;
 }
 
-.nav-bar-area-title{
-    background-color: aliceblue;
-    padding-top: 0.25em;
-    padding-bottom: 0.25em;
-    margin-bottom: 1em;
-    font-weight: bold;
-}
-
-.navbar.border-bottom{
-    margin-bottom: 0px!important;
-}
-
 .just-one-touch-area {
   padding-top: 30px;
   padding-bottom: 30px;

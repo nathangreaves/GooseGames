@@ -13,6 +13,8 @@ import { HomeComponent } from './home/home.component';
 import { TristateSwitch } from '../assets/tristate-switch.component'
 
 import { JustOneLandingComponent } from './justone/landing.component';
+import { JustOneNavbarHeaderComponent } from './justone/navbarheader.component';
+
 
 import { JustOneNewPlayerDetailsComponent } from './justone/newplayerdetails.component';
 import { JustOneSessionLobbyComponent } from './justone/sessionlobby.component';
@@ -33,14 +35,17 @@ import { JustOneActivePlayerGuess } from './justone/round/activeplayerguess.comp
 
 import { JustOnePlayerWaitingComponent } from './justone/round/playerwaiting.component';
 import { JustOneClueListComponent } from './justone/round/cluelist.component';
+import { NavbarHeaderDirective } from './nav-menu/navbar-header-directive';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
+    NavbarHeaderDirective,
     HomeComponent,
     JustOneLandingComponent,
+    JustOneNavbarHeaderComponent,
 
     TristateSwitch,
 
@@ -92,6 +97,9 @@ import { JustOneClueListComponent } from './justone/round/cluelist.component';
       { path: "justone/round/activeplayerwaitingforoutcomevotes", component: JustOneActivePlayerWaitingForOutcomeVoteComponent },
       { path: "justone/round/activeplayeroutcome", component: JustOneActivePlayerRoundOutcomeComponent }
     ])
+  ],
+  entryComponents: [
+    JustOneNavbarHeaderComponent
   ],
   providers: [
     NavbarService

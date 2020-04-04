@@ -37,6 +37,8 @@
 
   <ItemGroup>
     <None Remove="ClientApp\src\app\justone\landing.component.ts" />
+    <None Remove="ClientApp\src\app\justone\navbarheader.component.css" />
+    <None Remove="ClientApp\src\app\justone\navbarheader.component.ts" />
     <None Remove="ClientApp\src\app\justone\newplayerdetails.component.ts" />
     <None Remove="ClientApp\src\app\justone\round\activeplayerguess.component.ts" />
     <None Remove="ClientApp\src\app\justone\round\activeplayerwaitingforclues.component.ts" />
@@ -53,6 +55,9 @@
     <None Remove="ClientApp\src\app\justone\round\submitclue.component.ts" />
     <None Remove="ClientApp\src\app\justone\round\waiting.component.ts" />
     <None Remove="ClientApp\src\app\justone\sessionlobby.component.ts" />
+    <None Remove="ClientApp\src\app\nav-menu\navbar-header-content.ts" />
+    <None Remove="ClientApp\src\app\nav-menu\navbar-header-directive.ts" />
+    <None Remove="ClientApp\src\app\nav-menu\navbar-header.ts" />
     <None Remove="ClientApp\src\assets\tristate-switch.component.ts" />
     <None Remove="ClientApp\src\models\genericresponse.ts" />
     <None Remove="ClientApp\src\models\justone\clue.ts" />
@@ -84,7 +89,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\justone\navbarheader.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\landing.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\justone\navbarheader.component.css" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\newplayerdetails.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\round\activeplayerguess.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\round\activeplayerwaitingforcluevote.component.ts">
@@ -103,6 +110,9 @@
     <TypeScriptCompile Include="ClientApp\src\app\justone\round\submitclue.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\round\waiting.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\sessionlobby.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\nav-menu\navbar-header-content.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\nav-menu\navbar-header-directive.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\nav-menu\navbar-header.ts" />
     <TypeScriptCompile Include="ClientApp\src\assets\tristate-switch.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\genericresponse.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\justone\clue.ts" />

@@ -12,5 +12,6 @@ export class HomeComponent {
 
     this._navbarService.setReadOnly(false);
     this._navbarService.setAreaTitle('');
+    this._navbarService.setAreaContent(null);
   }
 }
