@@ -34,6 +34,7 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
   public Loading: boolean;
   public SessionMaster: boolean;
   public SessionMasterName: string;
+  public SessionMasterPlayerNumber: number;
   public Players: PlayerDetailsResponse[];
 
 
@@ -96,6 +97,7 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
 
           this.SessionMaster = data.data.sessionMaster;
           this.SessionMasterName = data.data.sessionMasterName ? data.data.sessionMasterName : "Session Master";
+          this.SessionMasterPlayerNumber = data.data.sessionMasterPlayerNumber ? data.data.sessionMasterPlayerNumber : null;
           this.Players = data.data.players;
           _.forEach(this.Players, player => {
             this.setDefaultNewPlayerName(player);

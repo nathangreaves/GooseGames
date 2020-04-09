@@ -94,7 +94,18 @@ namespace GooseGames.Services.JustOne
         {
             _logger.LogTrace("Deleting Player");
 
+            var requestingPlayer = await _playerRepository.GetAsync(request.SessionMasterId);
+            if (requestingPlayer == null)
+            {
+                return;
+            }
+
             var playerToDelete = await _playerRepository.GetAsync(request.PlayerToDeleteId);
+            if (playerToDelete == null)
+            {
+                await _lobbyHub.SendPlayerRemoved(requestingPlayer.SessionId, request.PlayerToDeleteId);
+                return;
+            }
 
             var isSessionMaster = await _sessionService.ValidateSessionMasterAsync(playerToDelete.SessionId, request.SessionMasterId);
             if (isSessionMaster)
@@ -111,7 +122,7 @@ namespace GooseGames.Services.JustOne
         {
             _logger.LogTrace("Starting fetch of player details");
 
-            _logger.LogTrace("Fetchomg session");
+            _logger.LogTrace("Fetching session");
             var session = await _sessionService.GetSessionAsync(request.SessionId);
             if (session == null)
             {
@@ -128,9 +139,13 @@ namespace GooseGames.Services.JustOne
 
             var masterPlayerId = session.SessionMasterId;
 
+            var sessionMaster = players.FirstOrDefault(p => p.Id == masterPlayerId);
+
             var response = new GetPlayerDetailsResponse
             {
                 SessionMaster = request.PlayerId == masterPlayerId,
+                SessionMasterName = sessionMaster?.Name,
+                SessionMasterPlayerNumber = sessionMaster?.PlayerNumber,
                 Players = players.OrderBy(p => p.PlayerNumber == 0 ? int.MaxValue : p.PlayerNumber).Select(p => new PlayerDetailsResponse 
                 {
                     Id = p.Id,

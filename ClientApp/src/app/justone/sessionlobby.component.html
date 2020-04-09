@@ -3,12 +3,18 @@
 </div>
 <div *ngIf="!Loading">
 
-  <div class="lobby-header" *ngIf="SessionMaster">
+  <div class="lobby-header" *ngIf="SessionMaster && Players.length >= 3">
     Waiting for you to start game
   </div>
+  <div class="lobby-header" *ngIf="SessionMaster && Players.length < 3">
+    Waiting for at least 3 players before you can start game
+  </div>
 
-  <div class="lobby-header" *ngIf="!SessionMaster">
-    Waiting for {{SessionMasterName}} to start game
+  <div class="lobby-header" *ngIf="!SessionMaster && Players.length >= 3">
+    Waiting for <span [ngClass]="PlayerNumberCSS.GetClass(SessionMasterPlayerNumber)" class="just-one-apply-player-color">{{SessionMasterName}}</span> to start game
+  </div>
+  <div class="lobby-header" *ngIf="!SessionMaster && Players.length < 3">
+    Waiting for enough players before <span [ngClass]="PlayerNumberCSS.GetClass(SessionMasterPlayerNumber)" class="just-one-apply-player-color">{{SessionMasterName}}</span> can start game
   </div>
 
   <div>
@@ -16,8 +22,9 @@
       <tr *ngFor="let player of Players;" [ngClass]="{'new-player' : player.playerNumber == 0}">
         <td class="player-number-cell">{{player.playerNumber}}</td>
         <td class="player-name-cell just-one-apply-player-color"
-            [ngClass]="PlayerNumberCSS.GetClass(player.playerNumber)"
-            >{{player.playerName}}</td>
+            [ngClass]="PlayerNumberCSS.GetClass(player.playerNumber)">
+          {{player.playerName}}
+        </td>
         <td><button [disabled]="DisableButtons" *ngIf="SessionMaster && player.id != PlayerId" class="btn btn-primary" (click)="KickPlayer(player.id)">Kick</button></td>
       </tr>
     </table>

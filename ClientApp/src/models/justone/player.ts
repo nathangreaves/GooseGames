@@ -31,5 +31,6 @@ export class PlayerDetailsResponse {
 export class GetPlayerDetailsResponse {
   sessionMaster: boolean;
   sessionMasterName: string;
+  sessionMasterPlayerNumber: number;
   players: PlayerDetailsResponse[]
 }
