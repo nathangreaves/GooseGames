@@ -6,12 +6,11 @@ using System.Text;
 
 namespace Entities.JustOne
 {
-    public class Round : IHasGuidId
+    public class Round : IHasGuidId, IHasCreatedUtc
     {
         public Round()
         {
             Id = Guid.NewGuid();
-            CreatedUtc = DateTime.UtcNow;
         }
         public Guid Id { get; set; }
         public DateTime CreatedUtc { get; set; }

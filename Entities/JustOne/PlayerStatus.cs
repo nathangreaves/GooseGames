@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Entities.JustOne
 {
-    public class PlayerStatus : IHasGuidId
+    public class PlayerStatus : IHasGuidId, IHasCreatedUtc
     {
         private Guid _status;
 
@@ -31,7 +31,6 @@ namespace Entities.JustOne
         public PlayerStatus()
         {
             Id = Guid.NewGuid();
-            CreatedUtc = DateTime.UtcNow;
         }
     }
 }

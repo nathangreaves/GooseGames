@@ -5,12 +5,8 @@ using System.Text;
 
 namespace Entities.JustOne
 {
-    public class ResponseVote : IHasGuidId
+    public class ResponseVote : IHasGuidId, IHasCreatedUtc
     {
-        public ResponseVote()
-        {
-            CreatedUtc = DateTime.UtcNow;
-        }
         public Guid Id { get; set; }
         public DateTime CreatedUtc { get; set; }
         public Guid PlayerId { get; set; }

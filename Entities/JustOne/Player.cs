@@ -5,15 +5,13 @@ using System.Text;
 
 namespace Entities.JustOne
 {
-    public class Player : IHasGuidId
+    public class Player : IHasGuidId, IHasCreatedUtc
     {
         public Player()
         {
             Id = Guid.NewGuid();
-            CreatedUtc = DateTime.UtcNow;
         }
         public DateTime CreatedUtc { get; set; }
-
         public Guid Id { get; set; }
         public Guid SessionId { get; set; }
         public Session Session { get; set; }

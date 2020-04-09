@@ -9,13 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entities", "Entities\Entiti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepositoryInterface", "RepositoryInterface\RepositoryInterface.csproj", "{F30D2866-9A3D-4EE9-B591-E06F5E6189FC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PostGreRepository", "PostGreRepository\PostGreRepository.csproj", "{CF94A543-1DA8-46FE-9B8A-08E144949F6A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "Models\Models.csproj", "{B07C18E0-E842-400B-A3D0-809CBAD0A3EB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GooseGames.Tests", "GooseGames.Tests\GooseGames.Tests.csproj", "{02B960AA-218C-4FCF-9DEB-AA545D096B12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSSQLRepository", "MSSQLRepository\MSSQLRepository.csproj", "{5D901347-5649-4BCF-A069-F124E6FDA70C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MSSQLRepository", "MSSQLRepository\MSSQLRepository.csproj", "{5D901347-5649-4BCF-A069-F124E6FDA70C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +33,6 @@ Global
 		{F30D2866-9A3D-4EE9-B591-E06F5E6189FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F30D2866-9A3D-4EE9-B591-E06F5E6189FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F30D2866-9A3D-4EE9-B591-E06F5E6189FC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CF94A543-1DA8-46FE-9B8A-08E144949F6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CF94A543-1DA8-46FE-9B8A-08E144949F6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CF94A543-1DA8-46FE-9B8A-08E144949F6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF94A543-1DA8-46FE-9B8A-08E144949F6A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B07C18E0-E842-400B-A3D0-809CBAD0A3EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B07C18E0-E842-400B-A3D0-809CBAD0A3EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B07C18E0-E842-400B-A3D0-809CBAD0A3EB}.Release|Any CPU.ActiveCfg = Release|Any CPU

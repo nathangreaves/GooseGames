@@ -6,12 +6,11 @@ using System.Text;
 
 namespace Entities.JustOne
 {
-    public class Session : IHasGuidId
+    public class Session : IHasGuidId, IHasCreatedUtc
     {
         public Session()
         {
             Id = Guid.NewGuid();
-            CreatedUtc = DateTime.UtcNow;
         }
         public Guid Id { get; set; }
         public DateTime CreatedUtc { get; set; }

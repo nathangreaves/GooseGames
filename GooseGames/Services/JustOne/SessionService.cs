@@ -53,15 +53,21 @@ namespace GooseGames.Services.JustOne
                 _logger.LogTrace("Session already exists");
                 return NewResponse.Error<NewSessionResponse>($"Session already exists with password: {password}");
             }
+            var dateTime = DateTime.UtcNow;
 
-            Player newPlayer = new Player();
+            Player newPlayer = new Player 
+            {
+                CreatedUtc = dateTime
+            };
             newPlayer.PlayerStatus = new PlayerStatus
             {
+                CreatedUtc = dateTime,
                 Player = newPlayer,
                 Status = PlayerStatusEnum.New
             };
             Session newSession = new Session
             {
+                CreatedUtc = dateTime,
                 Password = password,
                 Players = new List<Player>
                 {
@@ -173,6 +179,7 @@ namespace GooseGames.Services.JustOne
             newPlayer.Session = session;
             newPlayer.PlayerStatus = new PlayerStatus
             {
+                CreatedUtc = DateTime.UtcNow,
                 Player = newPlayer,
                 Status = PlayerStatusEnum.New
             };

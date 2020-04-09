@@ -10,7 +10,7 @@ using RepositoryInterface;
 
 namespace MSSQLRepository
 {
-    public class CommonRepository<T> : ICommonRepository<T> where T : class, IHasGuidId
+    public class CommonRepository<T> : ICommonRepository<T> where T : class, IHasGuidId, IHasCreatedUtc
     {
         public DbContext DbContext { get; }
 
@@ -67,6 +67,8 @@ namespace MSSQLRepository
 
         public async Task InsertAsync(T entity)
         {
+            entity.CreatedUtc = DateTime.UtcNow;
+
             DbContext.Add(entity);
 
             await DbContext.SaveChangesAsync().ConfigureAwait(false);
@@ -74,7 +76,11 @@ namespace MSSQLRepository
 
         public async Task InsertRangeAsync(IEnumerable<T> entities)
         {
-            DbContext.AddRange(entities);
+            foreach (var item in entities)
+            {
+                item.CreatedUtc = DateTime.UtcNow;
+                DbContext.Add(item);
+            }
 
             await DbContext.SaveChangesAsync().ConfigureAwait(false);
         }
