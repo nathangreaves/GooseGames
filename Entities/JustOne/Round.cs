@@ -22,5 +22,6 @@ namespace Entities.JustOne
         public string WordToGuess { get; set; }
         public RoundStatusEnum Status { get; set; }
         public RoundOutcomeEnum Outcome { get; set; }
+        public ICollection<Response> Responses { get; set; }
     }
 }

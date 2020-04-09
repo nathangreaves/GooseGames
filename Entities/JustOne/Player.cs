@@ -21,5 +21,6 @@ namespace Entities.JustOne
         public string Name { get; set; }
         public string ConnectionId { get; set; }
         public PlayerStatus PlayerStatus { get; set; }
+        public ICollection<Response> Responses { get; set; }
     }
 }

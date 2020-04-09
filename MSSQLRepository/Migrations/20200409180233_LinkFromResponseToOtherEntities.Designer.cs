@@ -4,14 +4,16 @@ using MSSQLRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MSSQLRepository.Migrations
 {
     [DbContext(typeof(JustOneContext))]
-    partial class JustOneContextModelSnapshot : ModelSnapshot
+    [Migration("20200409180233_LinkFromResponseToOtherEntities")]
+    partial class LinkFromResponseToOtherEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -25,6 +25,9 @@ namespace MSSQLRepository
             modelBuilder.Entity<Round>().HasOne(s => s.ActivePlayer).WithMany().HasForeignKey(r => r.ActivePlayerId);
 
             modelBuilder.Entity<PlayerStatus>().HasOne(s => s.Player).WithOne(s => s.PlayerStatus).HasForeignKey<PlayerStatus>(s => s.PlayerId);
+
+            modelBuilder.Entity<Response>().HasOne(s => s.Player).WithMany(p => p.Responses).HasForeignKey(r => r.PlayerId).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Response>().HasOne(s => s.Round).WithMany(r => r.Responses).HasForeignKey(r => r.RoundId).OnDelete(DeleteBehavior.NoAction);
         }
 
         public DbSet<Session> Sessions { get; set; }
