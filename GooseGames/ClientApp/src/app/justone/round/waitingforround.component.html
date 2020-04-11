@@ -1,0 +1,11 @@
+<div class="loading" *ngIf="Loading && !ErrorMessage">
+  I am loading...
+</div>
+<div>
+  <div *ngIf="!Loading">
+    <span>Waiting for next round</span>
+  </div>
+  <app-just-one-playerwaiting-component [playerWaitingComponent]="this"></app-just-one-playerwaiting-component>
+</div>
+
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

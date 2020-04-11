@@ -77,7 +77,7 @@ namespace GooseGames.Services.JustOne
             return await GetPlayerInfoForPlayerStatus(request, PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes);
         }
 
-        private async Task<GenericResponse<IEnumerable<PlayerActionResponse>>> GetPlayerInfoForPlayerStatus(PlayerSessionRequest request, Guid playerStatus)
+        private async Task<GenericResponse<IEnumerable<PlayerActionResponse>>> GetPlayerInfoForPlayerStatus(PlayerSessionRequest request, Guid playerStatus, bool excludeActivePlayer = true)
         {
             _logger.LogTrace($"Getting player info for status {PlayerStatusEnum.GetDescription(playerStatus)}", request);
 
@@ -93,14 +93,14 @@ namespace GooseGames.Services.JustOne
             }
 
             _logger.LogTrace("Getting players for session");
-            var playersExceptActivePlayer = await _playerRepository.FilterAsync(p => p.SessionId == request.SessionId && p.Id != currentRound.ActivePlayerId);
-            var playerIds = playersExceptActivePlayer.Select(player => player.Id).ToList();
+            var playersToSelect = await _playerRepository.FilterAsync(p => p.SessionId == request.SessionId && (!excludeActivePlayer || p.Id != currentRound.ActivePlayerId));
+            var playerIds = playersToSelect.Select(player => player.Id).ToList();
 
             _logger.LogTrace("Getting player status");
             var playersThatHaveVoted = await _playerStatusRepository.FilterAsync(p => playerIds.Contains(p.PlayerId) && p.Status == playerStatus);
 
             _logger.LogTrace("Preparing result");
-            var result = playersExceptActivePlayer.Select(p => new PlayerActionResponse
+            var result = playersToSelect.Select(p => new PlayerActionResponse
             {
                 Id = p.Id,
                 PlayerName = p.Name,
@@ -109,6 +109,11 @@ namespace GooseGames.Services.JustOne
             });
 
             return GenericResponse<IEnumerable<PlayerActionResponse>>.Ok(result);
+        }
+
+        internal async Task<GenericResponse<IEnumerable<PlayerActionResponse>>> GetPlayersWaitingForRoundAsync(PlayerSessionRequest request)
+        {
+            return await GetPlayerInfoForPlayerStatus(request, PlayerStatusEnum.RoundWaiting, false);
         }
     }
 }

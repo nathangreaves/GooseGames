@@ -51,7 +51,7 @@ namespace GooseGames.Services.JustOne
             if (await SessionExistsForPasswordAsync(password))
             {
                 _logger.LogTrace("Session already exists");
-                return NewResponse.Error<NewSessionResponse>($"Session already exists with password: {password}");
+                return NewResponse.Error<NewSessionResponse>($"Session already exists with identifier: {password}");
             }
             var dateTime = DateTime.UtcNow;
 
@@ -157,7 +157,7 @@ namespace GooseGames.Services.JustOne
             if (session == null)
             {
                 _logger.LogWarning("Session doesn't exist");
-                return NewResponse.Error<JoinSessionResponse>($"Session doesn't exist with password: {password}");
+                return NewResponse.Error<JoinSessionResponse>($"Session doesn't exist with identifier: {password}");
             }
             if (session.StatusId != SessionStatusEnum.New)
             {

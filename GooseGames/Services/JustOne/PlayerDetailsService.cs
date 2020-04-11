@@ -146,6 +146,7 @@ namespace GooseGames.Services.JustOne
                 SessionMaster = request.PlayerId == masterPlayerId,
                 SessionMasterName = sessionMaster?.Name,
                 SessionMasterPlayerNumber = sessionMaster?.PlayerNumber,
+                Password = session.Password,
                 Players = players.OrderBy(p => p.PlayerNumber == 0 ? int.MaxValue : p.PlayerNumber).Select(p => new PlayerDetailsResponse 
                 {
                     Id = p.Id,

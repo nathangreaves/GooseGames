@@ -37,6 +37,12 @@ export class JustOneRoundService {
     return this._http.get<GenericResponse<PlayerAction[]>>(this._baseUrl + `JustOnePlayerAction/ResponseVoteInfo?${parameters}`).toPromise();
   }
 
+  public GetPlayersWaitingForRound(request: IPlayerSession): Promise<GenericResponse<PlayerAction[]>> {
+    request = ConvertToPlayerSessionRequest(request);
+    var parameters = Object.keys(request).map(key => key + '=' + request[key]).join('&');
+    return this._http.get<GenericResponse<PlayerAction[]>>(this._baseUrl + `JustOnePlayerAction/WaitingForRound?${parameters}`).toPromise();
+  }
+
   public GetRoundForPassivePlayer(request: IPlayerSession): Promise<GenericResponse<PassivePlayerRoundInformationResponse>> {
     request = ConvertToPlayerSessionRequest(request);
     var parameters = Object.keys(request).map(key => key + '=' + request[key]).join('&');
@@ -47,4 +53,6 @@ export class JustOneRoundService {
     var parameters = Object.keys(request).map(key => key + '=' + request[key]).join('&');
     return this._http.get<GenericResponse<RoundOutcomeResponse>>(this._baseUrl + `JustOneRound/Outcome?${parameters}`).toPromise();
   }
+
+
 }

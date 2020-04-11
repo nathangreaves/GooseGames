@@ -14,11 +14,12 @@ import { TristateSwitch } from '../assets/tristate-switch.component'
 
 import { JustOneLandingComponent } from './justone/landing.component';
 import { JustOneNavbarHeaderComponent } from './justone/navbarheader.component';
-
+import { JustOneDeclarationComponent } from './justone/declaration.component';
 
 import { JustOneNewPlayerDetailsComponent } from './justone/newplayerdetails.component';
 import { JustOneSessionLobbyComponent } from './justone/sessionlobby.component';
 import { JustOneRoundWaitingComponent } from './justone/round/waiting.component';
+import { JustOneWaitingForRoundComponent } from './justone/round/waitingforround.component';
 
 import { JustOneSubmitClueComponent } from './justone/round/submitclue.component';
 import { JustOnePassivePlayerWaitingForCluesComponent } from './justone/round/passiveplayerwaitingforclues.component';
@@ -46,6 +47,7 @@ import { NavbarHeaderDirective } from './nav-menu/navbar-header-directive';
     HomeComponent,
     JustOneLandingComponent,
     JustOneNavbarHeaderComponent,
+    JustOneDeclarationComponent,
 
     TristateSwitch,
 
@@ -65,6 +67,7 @@ import { NavbarHeaderDirective } from './nav-menu/navbar-header-directive';
     JustOnePassivePlayerOutcomeVoteComponent,
     JustOnePassivePlayerWaitingForOutcomeVoteComponent,
     JustOneActivePlayerWaitingForOutcomeVoteComponent,
+    JustOneWaitingForRoundComponent,
 
     JustOnePlayerWaitingComponent,
     JustOneClueListComponent
@@ -77,9 +80,11 @@ import { NavbarHeaderDirective } from './nav-menu/navbar-header-directive';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'justone', component: JustOneLandingComponent },
 
+      { path: "justone/declaration", component: JustOneDeclarationComponent },
       { path: "justone/newplayer", component: JustOneNewPlayerDetailsComponent },
       { path: "justone/sessionlobby", component: JustOneSessionLobbyComponent },
-      { path: "justone/round/waiting", component: JustOneRoundWaitingComponent },
+      { path: "justone/waitingforgame", component: JustOneRoundWaitingComponent },
+      { path: "justone/round/waitingforround", component: JustOneWaitingForRoundComponent },
 
       { path: "justone/round/submitclue", component: JustOneSubmitClueComponent },
       { path: "justone/round/passiveplayerwaiting", component: JustOnePassivePlayerWaitingForCluesComponent },

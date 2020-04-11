@@ -75,7 +75,7 @@ namespace GooseGames.Services.JustOne
                     PlayerId = p.Id,
                     PlayerName = p.Name,
                     PlayerNumber = p.PlayerNumber,
-                    Response = isActivePlayer && responseInvalid ? null : response.Word,
+                    Response = isActivePlayer && responseInvalid && round.Status == RoundStatusEnum.WaitingForLeaderResponse ? null : response.Word,
                     ResponseInvalid = responseInvalid
                 };
             }).ToList();

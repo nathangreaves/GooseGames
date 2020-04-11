@@ -1,38 +1,34 @@
 <div class="loading" *ngIf="Loading && !ErrorMessage">
   I am loading...
 </div>
-<div class="loading" *ngIf="!Loading && !ErrorMessage">
-
+<div class="loading" style="margin-bottom: 10px;"  *ngIf="!Loading && !ErrorMessage">
 
   <div>
     <span [ngClass]="PlayerNumberCss.GetClass(RoundOutcome.activePlayerNumber)" class="just-one-apply-player-color">{{RoundOutcome.activePlayerName}}</span>
     <span *ngIf="RoundOutcome.roundOutcome != 2"> guessed</span>
   </div>
-
   <div *ngIf="RoundOutcome.roundOutcome == 2">
     <div>
       <span class="just-one-important-word">
         PASSED
       </span>
     </div>
-    <div *ngIf="RoundOutcome.wordToGuess">
+    <div *ngIf="RoundOutcome.wordGuessed">
       instead of guessing
     </div>
   </div>
-
-  <div *ngIf="RoundOutcome.wordToGuess">
+  <div *ngIf="RoundOutcome.wordGuessed">
     <span class="just-one-important-word">
       {{RoundOutcome.wordGuessed}}
     </span>
   </div>
-
   <div *ngIf="RoundOutcome.roundOutcome == 1">
     Correctly
   </div>
   <div *ngIf="RoundOutcome.roundOutcome == 3">
     Incorrectly
   </div>
-  <br/>
+
   <div *ngIf="RoundOutcome.roundOutcome != 1 || RoundOutcome.wordGuessed != RoundOutcome.wordToGuess">
     <div>
       The correct answer was
@@ -42,14 +38,10 @@
     </div>
   </div>
 
+  <br />
+
   <div>
-    Your team now has
-  </div>
-  <div class="just-one-important-word">
-    {{RoundOutcome.score}}
-  </div>
-  <div>
-    Points
+    Your team now has <span style="font-weight:bold;">{{RoundOutcome.score}} </span><span *ngIf="RoundOutcome.score == 1">point</span><span *ngIf="RoundOutcome.score != 1">points</span>
   </div>
 
   <div *ngIf="!RoundOutcome.gameEnded">
@@ -60,5 +52,10 @@
     <span>Game Over!</span>
   </div>
 
+</div>
+
+<div>
+  <span style="font-size: 12px; font-weight:bold;">Clues:</span>
+  <app-just-one-cluelist-component [clueListComponent]="this"></app-just-one-cluelist-component>
 </div>
 <div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

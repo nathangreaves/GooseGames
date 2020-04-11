@@ -34,7 +34,7 @@ export class JustOneLandingComponent {
     this.clearMessage();
 
     if (!password) {
-      this.ErrorMessage = "No password given for new game";
+      this.ErrorMessage = "No game identifier given for new game";
       return;
     }
 
@@ -50,7 +50,7 @@ export class JustOneLandingComponent {
     this.clearMessage();
 
     if (!password) {
-      this.ErrorMessage = "No password given for joining game";
+      this.ErrorMessage = "No game identifier given for joining game";
       return;
     }
 
@@ -67,7 +67,7 @@ export class JustOneLandingComponent {
 
       this._navbarService.setReadOnly(true);
 
-      this._router.navigate(['/justone/newplayer', { SessionId: data.data.sessionId, PlayerId: data.data.playerId }]);
+      this._router.navigate(['/justone/declaration', { SessionId: data.data.sessionId, PlayerId: data.data.playerId }]);
     }
     else {
       //Stay on page and display error

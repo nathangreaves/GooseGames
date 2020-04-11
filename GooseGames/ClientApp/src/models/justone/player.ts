@@ -32,5 +32,6 @@ export class GetPlayerDetailsResponse {
   sessionMaster: boolean;
   sessionMasterName: string;
   sessionMasterPlayerNumber: number;
+  password: string;
   players: PlayerDetailsResponse[]
 }

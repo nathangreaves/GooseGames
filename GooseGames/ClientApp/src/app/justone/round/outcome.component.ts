@@ -12,8 +12,11 @@ import { JustOneRoundService } from '../../../services/justone/round';
 import { NavbarService } from '../../../services/navbar';
 import { PlayerNumberCss } from '../../../services/justone/ui'
 import { NavbarHeaderEnum } from '../../nav-menu/navbar-header';
+import { JustOneClueListComponentBase, JustOneClueListComponent } from './cluelist.component';
+import { PlayerCluesResponse, PlayerClue } from '../../../models/justone/clue';
+import { JustOneClueService } from '../../../services/justone/clue';
 
-export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSessionComponent {
+export abstract class JustOneRoundOutcomeComponentBase extends JustOneClueListComponentBase {
 
 
   PlayerNumberCss = PlayerNumberCss;
@@ -22,6 +25,8 @@ export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSession
   _playerStatusService: JustOnePlayerStatusService;
   _roundService: JustOneRoundService;
   _navbarService: NavbarService;
+  _clueService: JustOneClueService;
+  _clueListComponent: JustOneClueListComponent;
 
   SessionId: string;
   PlayerId: string;
@@ -30,54 +35,33 @@ export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSession
 
   RoundOutcome: RoundOutcomeResponse;
 
-  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, router: Router, activatedRoute: ActivatedRoute) {
+  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, clueService: JustOneClueService, router: Router, activatedRoute: ActivatedRoute) {
+
+    super(activatedRoute);
+
     this._router = router;
     this._playerStatusService = playerStatusService;
     this._roundService = roundService;
     this._navbarService = navbarService;
+    this._clueService = clueService;
     this.SessionId = activatedRoute.snapshot.params.SessionId;
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;
 
-    this._playerStatusService.Validate(this, this.getPlayerStatus(), () => { })
-      .then(data => {
-        if (data.success) {
-          return this.load();
-        }
-      })
-      .then(data => {
-        if (data && data.success) {
-          this.Loading = false;
-        }
-      })
-      .catch(() => this.HandleGenericError());
+    //this._playerStatusService.Validate(this, this.getPlayerStatus(), () => { })
+    //  .then(data => {
+    //    if (data.success) {
+    //      return this.load();
+    //    }
+    //  })
+    //  .then(data => {
+    //    if (data && data.success) {
+    //      this.Loading = false;
+    //    }
+    //  })
+    //  .catch(() => this.HandleGenericError());
   }
 
-  abstract getPlayerStatus(): PlayerStatus;
   abstract isActivePlayer(): boolean;
-
-  load(): Promise<GenericResponse<RoundOutcomeResponse>> {
-    return this._roundService.GetRoundOutcome({
-      SessionId: this.SessionId,
-      PlayerId: this.PlayerId
-    })
-      .then(response => {
-        if (response.success) {
-          this.RoundOutcome = response.data;
-          if (this.isActivePlayer()) {
-            this.RoundOutcome.activePlayerName = "You";
-          }
-
-          if (this.RoundOutcome.gameEnded) {
-            this._navbarService.setReadOnly(false);
-          }
-          this.updateCurrentRoundInformation();
-        }
-        else {
-          this.ErrorMessage = response.errorCode;
-        }
-        return response;
-      });
-  }
 
   updateCurrentRoundInformation() {
     var currentRoundInformation;
@@ -122,6 +106,51 @@ export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSession
       .catch(() => this.HandleGenericError());
   }
 
+  isClueListReadOnly(): boolean {
+    return true;
+  }
+  loadClues(): Promise<GenericResponse<PlayerCluesResponse>> {
+    return this._clueService.GetClues(this);
+  }
+  loadContent(): Promise<GenericResponseBase> {
+    return this._roundService.GetRoundOutcome({
+      SessionId: this.SessionId,
+      PlayerId: this.PlayerId
+    })
+      .then(response => {
+        if (response.success) {
+          this.RoundOutcome = response.data;
+          if (this.isActivePlayer()) {
+            this.RoundOutcome.activePlayerName = "You";
+          }
+
+          if (this.RoundOutcome.gameEnded) {
+            this._navbarService.setReadOnly(false);
+          }
+          this.updateCurrentRoundInformation();
+        }
+        else {
+          this.ErrorMessage = response.errorCode;
+        }
+        return response;
+      });
+  }
+
+  abstract getPlayerStatus(): PlayerStatus;
+
+  MarkClueAs(clue: PlayerClue, valid: boolean) {
+
+  }
+  onRedirect() {
+
+  }
+  setClueListComponent(clueListComponent: JustOneClueListComponent) {
+    this._clueListComponent = clueListComponent;
+  }
+  preValidate(): void {
+
+  }
+
   HandleGenericError() {
     this.ErrorMessage = "An Unknown Error Occurred";
   }
@@ -133,10 +162,10 @@ export abstract class JustOneRoundOutcomeComponentBase implements IPlayerSession
   templateUrl: './outcome.component.html',
   styleUrls: ['../sessionlobby.component.css']
 })
-export class JustOneActivePlayerRoundOutcomeComponent extends JustOneRoundOutcomeComponentBase {
+export class JustOneActivePlayerRoundOutcomeComponent extends JustOneRoundOutcomeComponentBase {  
 
-  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, router: Router, activatedRoute: ActivatedRoute) {
-    super(playerStatusService, roundService, navbarService, router, activatedRoute);
+  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, clueService: JustOneClueService, router: Router, activatedRoute: ActivatedRoute) {
+    super(playerStatusService, roundService, navbarService, clueService, router, activatedRoute);
   }
   getPlayerStatus(): PlayerStatus {
     return PlayerStatus.ActivePlayerOutcome;
@@ -153,8 +182,8 @@ export class JustOneActivePlayerRoundOutcomeComponent extends JustOneRoundOutcom
 })
 export class JustOnePassivePlayerRoundOutcomeComponent extends JustOneRoundOutcomeComponentBase {
 
-  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, router: Router, activatedRoute: ActivatedRoute) {
-    super(playerStatusService, roundService, navbarService, router, activatedRoute);
+  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, clueService: JustOneClueService, router: Router, activatedRoute: ActivatedRoute) {
+    super(playerStatusService, roundService, navbarService, clueService, router, activatedRoute);
   }
   getPlayerStatus(): PlayerStatus {
     return PlayerStatus.PassivePlayerOutcome;

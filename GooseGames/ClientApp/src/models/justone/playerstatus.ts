@@ -25,7 +25,7 @@ export enum PlayerStatus {
 export class PlayerStatusRoutesMaps {
   New: string = "justone/newplayer";
   InLobby: string = "justone/sessionlobby";
-  RoundWaiting: string = "justone/round/waiting"
+  RoundWaiting: string = "justone/round/waitingforround"
 
   PassivePlayerClue: string = "justone/round/submitclue";
   PassivePlayerWaitingForClues: string = "justone/round/passiveplayerwaiting";

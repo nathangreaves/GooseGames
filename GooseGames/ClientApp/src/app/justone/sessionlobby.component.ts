@@ -35,6 +35,7 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
   public SessionMaster: boolean;
   public SessionMasterName: string;
   public SessionMasterPlayerNumber: number;
+  public Password: string;
   public Players: PlayerDetailsResponse[];
 
 
@@ -98,6 +99,7 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
           this.SessionMaster = data.data.sessionMaster;
           this.SessionMasterName = data.data.sessionMasterName ? data.data.sessionMasterName : "Session Master";
           this.SessionMasterPlayerNumber = data.data.sessionMasterPlayerNumber ? data.data.sessionMasterPlayerNumber : null;
+          this.Password = data.data.password;
           this.Players = data.data.players;
           _.forEach(this.Players, player => {
             this.setDefaultNewPlayerName(player);
@@ -132,7 +134,7 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
     });
     this._hubConnection.on("startingSession", () => {
       this.CloseConnection();
-      this._router.navigate(['/justone/round/waiting', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+      this._router.navigate(['/justone/waitingforgame', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
     this._hubConnection.start().catch(err => console.error(err));
   }

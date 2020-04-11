@@ -1,7 +1,6 @@
 <div>
   <table class="player-table">
     <tr *ngFor="let player of Players;" [ngClass]="{'new-player' : player.playerNumber == 0}">
-      <td class="player-number-cell">{{player.playerNumber}}</td>
       <td [ngClass]="PlayerNumberCss.GetClass(player.playerNumber)"
           class="player-name-cell just-one-apply-player-color">
         {{player.playerName}}

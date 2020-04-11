@@ -88,5 +88,26 @@ namespace GooseGames.Controllers.JustOne
                 return GenericResponse<IEnumerable<PlayerActionResponse>>.Error($"Unknown Error {errorGuid}");
             }
         }
+
+        [HttpGet]
+        [ActionName("WaitingForRound")]
+        public async Task<GenericResponse<IEnumerable<PlayerActionResponse>>> GetPlayersWaitingForRound([FromQuery]PlayerSessionRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _playerActionInfoService.GetPlayersWaitingForRoundAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponse<IEnumerable<PlayerActionResponse>>.Error($"Unknown Error {errorGuid}");
+            }
+        }
     }
 }

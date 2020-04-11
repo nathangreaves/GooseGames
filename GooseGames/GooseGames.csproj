@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\src\app\justone\declaration.component.ts" />
     <None Remove="ClientApp\src\app\justone\landing.component.ts" />
     <None Remove="ClientApp\src\app\justone\navbarheader.component.css" />
     <None Remove="ClientApp\src\app\justone\navbarheader.component.ts" />
@@ -54,6 +55,7 @@
     <None Remove="ClientApp\src\app\justone\round\playerwaitingforoutcomevotes.component.ts" />
     <None Remove="ClientApp\src\app\justone\round\submitclue.component.ts" />
     <None Remove="ClientApp\src\app\justone\round\waiting.component.ts" />
+    <None Remove="ClientApp\src\app\justone\round\waitingforround.component.ts" />
     <None Remove="ClientApp\src\app\justone\sessionlobby.component.ts" />
     <None Remove="ClientApp\src\app\nav-menu\navbar-header-content.ts" />
     <None Remove="ClientApp\src\app\nav-menu\navbar-header-directive.ts" />
@@ -88,6 +90,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\justone\declaration.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\navbarheader.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\landing.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\navbarheader.component.css" />
@@ -108,6 +111,7 @@
     <TypeScriptCompile Include="ClientApp\src\app\justone\round\playerwaiting.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\round\submitclue.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\round\waiting.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\justone\round\waitingforround.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\sessionlobby.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\nav-menu\navbar-header-content.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\nav-menu\navbar-header-directive.ts" />
