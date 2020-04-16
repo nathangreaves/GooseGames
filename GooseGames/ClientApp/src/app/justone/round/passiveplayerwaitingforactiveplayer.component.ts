@@ -40,8 +40,8 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
     return true;
   }
 
-  preValidate(): void {
-    this.setupConnection();
+  preValidate(): Promise<any> {
+    return this.setupConnection();
   }
 
   show() {
@@ -63,7 +63,6 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
     });
   }
   loadContent(): Promise<GenericResponseBase> {
-    this.setupConnection();
     return Promise.resolve(
       {
         success: true,
@@ -80,10 +79,24 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
     this._clueListComponent = clueListComponent;
   }
 
-  private setupConnection() {
+  private setupConnection() : Promise<any> {
     this._hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
+      .withAutomaticReconnect()
       .build();
+
+    this._hubConnection.onreconnected(() => {
+      this._clueListComponent.Validate()
+        .catch(err => {
+          console.error(err);
+          this.HandleGenericError();
+        })
+    });
+    this._hubConnection.onclose(() =>
+    {
+      this.HandleGenericError();
+    });
+
     this._hubConnection.on("roundOutcomeAvailable", () => {
       this.CloseConnection();
       this._router.navigate([
@@ -94,15 +107,21 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
       this._router.navigate([
         PlayerStatusRoutesMap.PassivePlayerOutcomeVote, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
-    this._hubConnection.start().catch(err => console.error(err));
+    return this._hubConnection.start().catch(err => { this.HandleGenericError(); console.error(err) });
   }
   CloseConnection() {
     if (this._hubConnection) {
       this._hubConnection.off("roundOutcomeAvailable");
       this._hubConnection.off("activePlayerResponseVoteRequired");
 
-      this._hubConnection.stop();
-      this._hubConnection = null;
+      this._hubConnection.onclose(() => { });
+      this._hubConnection.stop().then(() => {
+        this._hubConnection = null;
+      })
+        .catch(err => {
+          console.error(err);
+          this.HandleGenericError();
+        });
     }
   }
 

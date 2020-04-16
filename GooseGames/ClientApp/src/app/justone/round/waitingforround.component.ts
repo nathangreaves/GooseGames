@@ -18,7 +18,6 @@ export class JustOneWaitingForRoundComponent extends JustOnePlayerWaitingCompone
   _playerWaitingComponent: JustOnePlayerWaitingComponent;
   _playerActionsService: JustOneRoundService;
   _router: Router;
-  _hubConnection: any;
 
   constructor(router: Router, activatedRoute: ActivatedRoute, playerActionsService: JustOneRoundService) {
     super(activatedRoute);
@@ -26,48 +25,34 @@ export class JustOneWaitingForRoundComponent extends JustOnePlayerWaitingCompone
     this._router = router;
   }
 
-  getPlayerStatus(): PlayerStatus { return PlayerStatus.RoundWaiting; }
+  GetPlayerStatus(): PlayerStatus { return PlayerStatus.RoundWaiting; }
 
-  setPlayerWaitingComponent(playerWaitingComponent: JustOnePlayerWaitingComponent) {
+  SetPlayerWaitingComponent(playerWaitingComponent: JustOnePlayerWaitingComponent) {
     this._playerWaitingComponent = playerWaitingComponent;
   }
 
-  loadPlayers(): Promise<GenericResponse<PlayerAction[]>> {
+  LoadPlayers(): Promise<GenericResponse<PlayerAction[]>> {
     return this._playerActionsService.GetPlayersWaitingForRound(this);
   }
 
-  loadContent(): Promise<any> {
+  LoadContent(): Promise<any> {
     return Promise.resolve();
   }
 
-  createConnection() {
-    this._hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
-      .build();
-    this.setupConnection(this._hubConnection);
-    this._hubConnection.start().catch(err => console.error(err));
-  }
-  onRedirect() {
-    this.CloseConnection();
-  }
-  CloseConnection() {
-    if (this._hubConnection) {
-      this._hubConnection.off("beginRoundPassivePlayer");
-      this._hubConnection.off("beginRoundActivePlayer");
-
-      this._hubConnection.stop();
-      this._hubConnection = null;
-    }
-  }
-
-  setupConnection(hubConnection: signalR.HubConnection) {
+  SetupHubConnection(hubConnection: signalR.HubConnection) {
     hubConnection.on("beginRoundPassivePlayer", () => {
-      this.CloseConnection();
+      this._playerWaitingComponent.CloseHubConnection();
       this._router.navigate([PlayerStatusRoutesMap.PassivePlayerClue, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
     hubConnection.on("beginRoundActivePlayer", () => {
-      this.CloseConnection();
+      this._playerWaitingComponent.CloseHubConnection();
       this._router.navigate([PlayerStatusRoutesMap.ActivePlayerWaitingForClues, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
   }
+
+  OnCloseHubConnection(hubConnection: signalR.HubConnection) {
+    hubConnection.off("beginRoundPassivePlayer");
+    hubConnection.off("beginRoundActivePlayer");
+  }
+
 }  

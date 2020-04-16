@@ -10,7 +10,7 @@ import { PlayerNumberCss } from '../../../services/justone/ui'
 import { TristateSwitch, ITristateSwitchHandler } from '../../../assets/tristate-switch.component'
 
 export interface IJustOneClueListComponent extends IPlayerSessionComponent {
-  preValidate();
+  preValidate() : Promise<any>;
   getPlayerStatus(): PlayerStatus;
   isClueListReadOnly(): boolean;
   loadClues(): Promise<GenericResponse<PlayerCluesResponse>>;
@@ -27,9 +27,9 @@ export abstract class JustOneClueListComponentBase implements IJustOneClueListCo
   abstract loadClues(): Promise<GenericResponse<PlayerCluesResponse>>;
   abstract loadContent(): Promise<GenericResponseBase>;
   abstract MarkClueAs(clue: PlayerClue, valid: boolean);
-  abstract onRedirect();
+  onRedirect() { };
   abstract setClueListComponent(clueListComponent: JustOneClueListComponent);
-  abstract preValidate(): void;
+  preValidate(): Promise<any> { return Promise.resolve(); }
 
   constructor(activatedRoute: ActivatedRoute) {
     this.SessionId = activatedRoute.snapshot.params.SessionId;
@@ -51,7 +51,7 @@ export abstract class JustOneClueListComponentBase implements IJustOneClueListCo
   templateUrl: './cluelist.component.html',
   styleUrls: ['./cluelist.component.css', '../sessionlobby.component.css']
 })
-export class JustOneClueListComponent implements OnInit {
+export class JustOneClueListComponent implements OnInit {   
 
   PlayerNumberCss = PlayerNumberCss;
 
@@ -61,17 +61,18 @@ export class JustOneClueListComponent implements OnInit {
   ReadOnly = true;
 
   @Input() clueListComponent: IJustOneClueListComponent;
-
+  Validate(): any {
+    throw new Error("Method not implemented.");
+  }
   ngOnInit() {
     this.clueListComponent.setClueListComponent(this);
     this.ReadOnly = this.clueListComponent.isClueListReadOnly();
 
-    this.clueListComponent.preValidate();
-
-    this._playerStatusService.Validate(this.clueListComponent,
-      this.clueListComponent.getPlayerStatus(), () => {
-        this.clueListComponent.onRedirect();
-      })
+    this.clueListComponent.preValidate()
+      .then(() =>
+      {
+        return this.ValidateStatus()
+      })    
       .then(response => {
         if (response.success) {
           return this.clueListComponent.loadClues();
@@ -106,6 +107,12 @@ export class JustOneClueListComponent implements OnInit {
     this._playerStatusService = playerStatusService;
   }
 
+
+  ValidateStatus() {
+      return this._playerStatusService.Validate(this.clueListComponent, this.clueListComponent.getPlayerStatus(), () => {
+          this.clueListComponent.onRedirect();
+      });
+  }
 
   ValiditySwitchHandler(clue: PlayerClue): ITristateSwitchHandler {
     return {

@@ -18,7 +18,6 @@ export class JustOnePassivePlayerWaitingForCluesComponent extends JustOnePlayerW
   _playerWaitingComponent: JustOnePlayerWaitingComponent;
   _playerActionsService: JustOneRoundService;
   _router: Router;
-    _hubConnection: any;
 
   constructor(router: Router, activatedRoute: ActivatedRoute, playerActionsService: JustOneRoundService) {
     super(activatedRoute);
@@ -26,48 +25,33 @@ export class JustOnePassivePlayerWaitingForCluesComponent extends JustOnePlayerW
     this._router = router;
   }
 
-  getPlayerStatus(): PlayerStatus { return PlayerStatus.PassivePlayerWaitingForClues; }
+  GetPlayerStatus(): PlayerStatus { return PlayerStatus.PassivePlayerWaitingForClues; }
 
-  setPlayerWaitingComponent(playerWaitingComponent: JustOnePlayerWaitingComponent) {
+  SetPlayerWaitingComponent(playerWaitingComponent: JustOnePlayerWaitingComponent) {
     this._playerWaitingComponent = playerWaitingComponent;
   }
 
-  loadPlayers(): Promise<GenericResponse<PlayerAction[]>> {
+  LoadPlayers(): Promise<GenericResponse<PlayerAction[]>> {
     return this._playerActionsService.GetPlayerResponseInformation(this);
   }
 
-  loadContent(): Promise<any> {
+  LoadContent(): Promise<any> {
     return Promise.resolve();
   }
-
-  createConnection() {
-    this._hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
-      .build();
-    this.setupConnection(this._hubConnection);
-    this._hubConnection.start().catch(err => console.error(err));
-  }
-  onRedirect() {
-    this.CloseConnection();
-  }
-  CloseConnection() {
-    if (this._hubConnection) {
-      this._hubConnection.off("clueSubmitted");
-      this._hubConnection.off("allCluesSubmitted");
-
-      this._hubConnection.stop();
-      this._hubConnection = null;
-    }
-  }
-
-  setupConnection(hubConnection: signalR.HubConnection) {
+  SetupHubConnection(hubConnection: signalR.HubConnection) {
     hubConnection.on("clueSubmitted", (playerId: string) => {
       this._playerWaitingComponent.PlayerHasTakenAction(playerId);
     });
     hubConnection.on("allCluesSubmitted", () => {
-      this.CloseConnection();
+      this._playerWaitingComponent.CloseHubConnection();
       this._router.navigate([
         PlayerStatusRoutesMap.PassivePlayerClueVote, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
   }
+
+  OnCloseHubConnection(connection: signalR.HubConnection) {
+    connection.off("clueSubmitted");
+    connection.off("allCluesSubmitted");
+  }
+
 }  

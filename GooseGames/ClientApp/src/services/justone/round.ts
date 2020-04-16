@@ -34,7 +34,7 @@ export class JustOneRoundService {
   public GetPlayerOutcomeVoteInformation(request: IPlayerSession): Promise<GenericResponse<PlayerAction[]>> {
     request = ConvertToPlayerSessionRequest(request);
     var parameters = Object.keys(request).map(key => key + '=' + request[key]).join('&');
-    return this._http.get<GenericResponse<PlayerAction[]>>(this._baseUrl + `JustOnePlayerAction/ResponseVoteInfo?${parameters}`).toPromise();
+    return this._http.get<GenericResponse<PlayerAction[]>>(this._baseUrl + `JustOnePlayerAction/ResponseOutcomeVoteInfo?${parameters}`).toPromise();
   }
 
   public GetPlayersWaitingForRound(request: IPlayerSession): Promise<GenericResponse<PlayerAction[]>> {

@@ -11,6 +11,8 @@ namespace MSSQLRepository.JustOne
 {
     public class PlayerRepository : CommonRepository<Player>, IPlayerRepository
     {
+        private const int MaxPlayers = 7;
+
         public JustOneContext Context
         {
             get
@@ -42,6 +44,22 @@ namespace MSSQLRepository.JustOne
                     await DeleteAsync(unreadyPlayer).ConfigureAwait(false);
                 }
             }
+        }
+
+        public async Task<int> GetNextPlayerNumberAsync(Guid sessionId)
+        {
+            var comparisonList = new List<int>();
+            for (int i = 1; i <= MaxPlayers; i++)
+            {
+                comparisonList.Add(i);
+            }
+
+            var reservedPlayerNumbers = await Context.Players
+                .Where(p => p.SessionId == sessionId && p.PlayerNumber != 0)
+                .Select(x => x.PlayerNumber)
+                .OrderBy(x => x).ToListAsync();
+
+            return comparisonList.First(c => !reservedPlayerNumbers.Contains(c));
         }
     }
 }

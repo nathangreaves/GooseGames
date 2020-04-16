@@ -113,7 +113,7 @@ namespace GooseGames.Controllers.JustOne
 
         [HttpGet]
         [Route("ActivePlayerResponse")]
-        public async Task<GenericResponse<PlayerResponse>> GetActivePlayerResponseAsync([FromQuery]PlayerSessionRequest request)
+        public async Task<GenericResponse<PlayerResponses>> GetActivePlayerResponseAsync([FromQuery]PlayerSessionRequest request)
         {
             try
             {
@@ -128,7 +128,7 @@ namespace GooseGames.Controllers.JustOne
             {
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return GenericResponse<PlayerResponse>.Error($"Unknown Error {errorGuid}");
+                return GenericResponse<PlayerResponses>.Error($"Unknown Error {errorGuid}");
             }
         }
 

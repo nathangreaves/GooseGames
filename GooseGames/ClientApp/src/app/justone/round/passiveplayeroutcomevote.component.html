@@ -3,10 +3,23 @@
 </div>
 <div *ngIf="!Loading">
   <div>
+    <span [ngClass]="PlayerNumberCss.GetClass(ActivePlayerNumber)" class="just-one-apply-player-color">{{ActivePlayerName}}</span> is the active player
+  </div>
+  <div>
+    Their word was:
+  </div>
+  <div class="just-one-important-word">
+    {{WordToGuess}}
+  </div>
+
+  <div>
     <p>
-      <span class="just-one-apply-player-color" [ngClass]="PlayerNumberCss.GetClass(ActivePlayerNumber)">{{ActivePlayerName}}</span> guessed
+      <span>They guessed</span>
     </p>
     <p class="just-one-important-word">{{ResponseWord}}</p>
+    <p>
+      <span>This wasn't automatically correct. Please vote on whether it was actually:</span>
+    </p>
   </div>
   <div>
     <button class="btn btn-primary" (click)="VoteCorrect()">Correct</button>

@@ -14,8 +14,7 @@ export abstract class JustOnePlayerWaitingForOutcomeVoteComponentBase extends Ju
   _playerActionsService: JustOneRoundService;
   _router: Router;
 
-  IsActivePlayer: any;
-    _hubConnection: signalR.HubConnection;
+  IsActivePlayer: boolean;
 
   constructor(router: Router, activatedRoute: ActivatedRoute, playerActionsService: JustOneRoundService) {
     super(activatedRoute);
@@ -24,53 +23,37 @@ export abstract class JustOnePlayerWaitingForOutcomeVoteComponentBase extends Ju
     this.IsActivePlayer = this.isActivePlayer();
   }
 
-  setPlayerWaitingComponent(playerWaitingComponent: JustOnePlayerWaitingComponent) {
-    this._playerWaitingComponent = playerWaitingComponent;
-  }
-
-  loadPlayers(): Promise<GenericResponse<PlayerAction[]>> {
-    return this._playerActionsService.GetPlayerOutcomeVoteInformation(this);
-  }
-
-  loadContent(): Promise<any> {
-    return Promise.resolve();
-  }
-
-  createConnection() {
-    this._hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
-      .build();
-    this.setupConnection(this._hubConnection);
-    this._hubConnection.start().catch(err => console.error(err));
-  }
-  onRedirect() {
-    this.CloseConnection();
-  }
-  CloseConnection() {
-    if (this._hubConnection) {
-      this._hubConnection.off("responseVoteSubmitted");
-      this._hubConnection.off("roundOutcomeAvailable");
-
-      this._hubConnection.stop();
-      this._hubConnection = null;
-    }
-  }
-
   abstract getRoundOutcomePlayerStatus(): PlayerStatus;
   abstract isActivePlayer(): boolean;
 
-  setupConnection(hubConnection: signalR.HubConnection) {
+  SetPlayerWaitingComponent(playerWaitingComponent: JustOnePlayerWaitingComponent) {
+    this._playerWaitingComponent = playerWaitingComponent;
+  }
+
+  LoadPlayers(): Promise<GenericResponse<PlayerAction[]>> {
+    return this._playerActionsService.GetPlayerOutcomeVoteInformation(this);
+  }
+
+  LoadContent(): Promise<any> {
+    return Promise.resolve();
+  }
+
+  SetupHubConnection(hubConnection: signalR.HubConnection) {
     hubConnection.on("responseVoteSubmitted", (playerId: string) => {
       this._playerWaitingComponent.PlayerHasTakenAction(playerId);
     });
     hubConnection.on("roundOutcomeAvailable", () => {
-      this.CloseConnection();
+      this._playerWaitingComponent.CloseHubConnection();
 
       var statusName = PlayerStatus[this.getRoundOutcomePlayerStatus()];
 
       this._router.navigate([
         PlayerStatusRoutesMap[statusName], { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
+  }
+  OnCloseHubConnection(hubConnection: signalR.HubConnection) {
+    hubConnection.off("responseVoteSubmitted");
+    hubConnection.off("roundOutcomeAvailable");
   }
 }  
 
@@ -80,7 +63,7 @@ export abstract class JustOnePlayerWaitingForOutcomeVoteComponentBase extends Ju
   styleUrls: ['../sessionlobby.component.css']
 })
 export class JustOnePassivePlayerWaitingForOutcomeVoteComponent extends JustOnePlayerWaitingForOutcomeVoteComponentBase {
-  getPlayerStatus(): PlayerStatus { return PlayerStatus.PassivePlayerWaitingForOutcomeVotes; }
+  GetPlayerStatus(): PlayerStatus { return PlayerStatus.PassivePlayerWaitingForOutcomeVotes; }
   getRoundOutcomePlayerStatus(): PlayerStatus { return PlayerStatus.PassivePlayerOutcome; }
   isActivePlayer(): boolean { return false; }
 
@@ -95,7 +78,7 @@ export class JustOnePassivePlayerWaitingForOutcomeVoteComponent extends JustOneP
   styleUrls: ['../sessionlobby.component.css']
 })
 export class JustOneActivePlayerWaitingForOutcomeVoteComponent extends JustOnePlayerWaitingForOutcomeVoteComponentBase {
-  getPlayerStatus(): PlayerStatus { return PlayerStatus.ActivePlayerWaitingForOutcomeVotes; }
+  GetPlayerStatus(): PlayerStatus { return PlayerStatus.ActivePlayerWaitingForOutcomeVotes; }
   getRoundOutcomePlayerStatus(): PlayerStatus { return PlayerStatus.ActivePlayerOutcome; }
   isActivePlayer(): boolean { return true; }
 

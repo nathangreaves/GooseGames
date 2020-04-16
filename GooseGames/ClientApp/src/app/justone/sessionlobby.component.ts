@@ -54,12 +54,15 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
 
     this.setupConnection();
 
-    this._playerStatusService.Validate(this, PlayerStatus.InLobby, () => { this.CloseConnection(); })
+    this.Validate()
       .then(() => this.load());
   }
 
-  public StartGame()
-  {
+  private Validate(): Promise<any> {
+    return this._playerStatusService.Validate(this, PlayerStatus.InLobby, () => { this.CloseConnection(); });
+  }
+
+  public StartGame() {
     if (_.find(this.Players, p => p.playerNumber == 0)) {
       this.ErrorMessage = "Not all players are ready";
       return;
@@ -112,10 +115,18 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
       })
       .catch(() => this.HandleGenericError());
   }
-  private setupConnection() {
+  private setupConnection() : Promise<any> {
     this._hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
+      .withAutomaticReconnect()
       .build();
+
+    this._hubConnection.onreconnected(() => {
+      this.Validate();
+    });
+    this._hubConnection.onclose(() => {
+      this.HandleGenericError();
+    });
 
     this._hubConnection.on("playerAdded", (player: PlayerDetailsResponse) => {
       this.setDefaultNewPlayerName(player);
@@ -136,18 +147,22 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
       this.CloseConnection();
       this._router.navigate(['/justone/waitingforgame', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
-    this._hubConnection.start().catch(err => console.error(err));
+    return this._hubConnection.start().catch(err => console.error(err));
   }
 
   CloseConnection() {
-    if (this._hubConnection) {
-      this._hubConnection.off("playerAdded");
-      this._hubConnection.off("playerDetailsUpdated");
-      this._hubConnection.off("playerRemoved");
-      this._hubConnection.off("startingSession");
+    var connection = this._hubConnection;
+    if (connection) {
+      connection.off("playerAdded");
+      connection.off("playerDetailsUpdated");
+      connection.off("playerRemoved");
+      connection.off("startingSession");
 
-      this._hubConnection.stop();
-      this._hubConnection = null;
+      connection.onclose(() => { });
+
+      connection.stop().then(() => {
+        this._hubConnection = null;
+      });
     }
   }
 

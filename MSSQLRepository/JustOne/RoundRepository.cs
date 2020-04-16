@@ -24,17 +24,21 @@ namespace MSSQLRepository.JustOne
 
         }
 
-        public async Task RemoveRoundsAsync(Guid sessionId, int numberOfRoundsToRemove)
+        public async Task<int> RemoveRoundsAsync(Guid sessionId, int numberOfRoundsToRemove)
         {
             var rounds = await Context.Rounds.Where(r => r.SessionId == sessionId
             && r.ActivePlayerId == null && r.Status == Entities.JustOne.Enums.RoundStatusEnum.New)
                 .Take(numberOfRoundsToRemove)
                 .ToListAsync();
-            
+
+            int roundsRemoved = 0;
             foreach (var round in rounds)
             {
+                roundsRemoved++;
                 await DeleteAsync(round);
-            }            
+            }
+
+            return roundsRemoved;
         }
 
         public async Task<Round> GetCurrentRoundForSessionAsync(Guid sessionId)

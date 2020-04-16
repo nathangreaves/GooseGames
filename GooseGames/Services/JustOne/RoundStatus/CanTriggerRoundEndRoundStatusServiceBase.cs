@@ -35,13 +35,18 @@ namespace GooseGames.Services.JustOne.RoundStatus
 
             await _roundRepository.UpdateAsync(round);
 
-            var session = await _sessionRepository.GetAsync(round.SessionId);
-            session.Score = session.Score + score;
-
             var roundsToRemove = score;
             if (roundsToRemove < 0)
             {
-                await _roundRepository.RemoveRoundsAsync(session.Id, Math.Abs(roundsToRemove));
+                var roundsRemoved = await _roundRepository.RemoveRoundsAsync(round.SessionId, Math.Abs(roundsToRemove));
+                score = score + roundsRemoved;
+            }
+
+            if (score != 0)
+            {
+                var session = await _sessionRepository.GetAsync(round.SessionId);
+                session.Score = session.Score + score;
+                await _sessionRepository.UpdateAsync(session);
             }
 
             await _playerStatusRepository.UpdatePlayerStatusesForRoundAsync(round.Id, PlayerStatusEnum.PassivePlayerOutcome, PlayerStatusEnum.ActivePlayerOutcome);

@@ -9,7 +9,7 @@ import { PlayerStatus } from '../../../models/justone/playerstatus'
 import { IPlayerSessionComponent } from '../../../models/justone/session';
 import { JustOneRoundService } from '../../../services/justone/round';
 import { RoundInformationResponse } from '../../../models/justone/round';
-import { GenericResponse } from '../../../models/genericresponse';
+import { GenericResponse, GenericResponseBase } from '../../../models/genericresponse';
 import { NavbarService } from '../../../services/navbar';
 import { NavbarHeaderEnum } from '../../nav-menu/navbar-header';
 
@@ -39,20 +39,33 @@ export class JustOneRoundWaitingComponent implements IPlayerSessionComponent {
     this.SessionId = activatedRoute.snapshot.params.SessionId;
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;
 
-    this.setupConnection();
-
-    this._playerStatusService.Validate(this, PlayerStatus.RoundWaiting, () => { this.CloseConnection(); })
-      .then(data => {
-        if (data.success) {
-          this.Loading = false;
-        }
+    this.setupConnection().then(() => {
+      return this._playerStatusService.Validate(this, PlayerStatus.RoundWaiting, () => { this.CloseConnection(); })
+        .then(data => {
+          if (data.success) {
+            this.Loading = false;
+          }
+        })
+    })
+      .catch((err) => {
+        console.error(err);
+        this.HandleGenericError();
       });
   }
 
   private setupConnection() {
     this._hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
+      .withAutomaticReconnect()
       .build();
+
+    this._hubConnection.onreconnected(() => {
+      this.Validate();
+    });
+    this._hubConnection.onclose(() => {
+      this.HandleGenericError();
+    });
+
     this._hubConnection.on("beginRoundPassivePlayer", () => {
       this.CloseConnection();
       this._router.navigate(['/justone/round/submitclue', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
@@ -61,16 +74,22 @@ export class JustOneRoundWaitingComponent implements IPlayerSessionComponent {
       this.CloseConnection();
       this._router.navigate(['/justone/round/playerwaiting', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
-    this._hubConnection.start().catch(err => console.error(err));
+    return this._hubConnection.start().catch(err => console.error(err));
+  }
+  Validate(): Promise<GenericResponseBase> {
+    return this._playerStatusService.Validate(this, PlayerStatus.RoundWaiting, () => { this.CloseConnection(); });
   }
 
   CloseConnection() {
-    if (this._hubConnection) {
-      this._hubConnection.off("beginRoundPassivePlayer");
-      this._hubConnection.off("beginRoundActivePlayer");
+    var connection = this._hubConnection;
 
-      this._hubConnection.stop();
-      this._hubConnection = null;
+    if (connection) {
+      connection.off("beginRoundPassivePlayer");
+      connection.off("beginRoundActivePlayer");
+
+      connection.onclose(() => { });
+      connection.stop().then(() => { this._hubConnection = null; });
+
     }
   }
 

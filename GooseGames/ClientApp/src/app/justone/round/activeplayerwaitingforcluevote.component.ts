@@ -14,11 +14,10 @@ import { GenericResponse } from '../../../models/genericresponse';
   styleUrls: ['../sessionlobby.component.css']
 })
 export class JustOneActivePlayerWaitingForClueVoteComponent extends JustOnePlayerWaitingComponentBase {
-
+  
   _playerWaitingComponent: JustOnePlayerWaitingComponent;
   _playerActionsService: JustOneRoundService;
   _router: Router;
-    _hubConnection: signalR.HubConnection;
 
   constructor(router: Router, activatedRoute: ActivatedRoute, playerActionsService: JustOneRoundService) {
     super(activatedRoute);
@@ -26,48 +25,32 @@ export class JustOneActivePlayerWaitingForClueVoteComponent extends JustOnePlaye
     this._router = router;
   }
 
-  getPlayerStatus(): PlayerStatus { return PlayerStatus.ActivePlayerWaitingForVotes; }
+  GetPlayerStatus(): PlayerStatus { return PlayerStatus.ActivePlayerWaitingForVotes; }
 
-  setPlayerWaitingComponent(playerWaitingComponent: JustOnePlayerWaitingComponent) {
+  SetPlayerWaitingComponent(playerWaitingComponent: JustOnePlayerWaitingComponent) {
     this._playerWaitingComponent = playerWaitingComponent;
   }
 
-  loadPlayers(): Promise<GenericResponse<PlayerAction[]>> {
+  LoadPlayers(): Promise<GenericResponse<PlayerAction[]>> {
     return this._playerActionsService.GetPlayerResponseVoteInformation(this);
   }
 
-  loadContent(): Promise<any> {
+  LoadContent(): Promise<any> {
     return Promise.resolve();
   }
 
-  createConnection() {
-    this._hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
-      .build();
-    this.setupConnection(this._hubConnection);
-    this._hubConnection.start().catch(err => console.error(err));
-  }
-  onRedirect() {
-    this.CloseConnection();
-  }
-  CloseConnection() {
-    if (this._hubConnection) {
-      this._hubConnection.off("clueVoteSubmitted");
-      this._hubConnection.off("allClueVotesSubmitted");
-
-      this._hubConnection.stop();
-      this._hubConnection = null;
-    }
-  }
-
-  setupConnection(hubConnection: signalR.HubConnection) {
+  SetupHubConnection(hubConnection: signalR.HubConnection) {
     hubConnection.on("clueVoteSubmitted", (playerId: string) => {
       this._playerWaitingComponent.PlayerHasTakenAction(playerId);
     });
     hubConnection.on("allClueVotesSubmitted", () => {
-      this.CloseConnection();
+      this._playerWaitingComponent.CloseHubConnection();
       this._router.navigate([
         PlayerStatusRoutesMap.ActivePlayerGuess, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
+  }
+  OnCloseHubConnection(connection: signalR.HubConnection) {
+    connection.off("clueVoteSubmitted");
+    connection.off("allClueVotesSubmitted");
   }
 }  

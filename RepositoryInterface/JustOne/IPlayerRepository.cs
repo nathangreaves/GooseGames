@@ -10,5 +10,6 @@ namespace RepositoryInterface.JustOne
     {
         Task<string> GetActivePlayerConnectionIdAsync(Guid roundId);
         Task DeleteUnreadyPlayersAsync(Guid sessionId);
+        Task<int> GetNextPlayerNumberAsync(Guid sessionId);
     }
 }

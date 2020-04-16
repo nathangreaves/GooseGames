@@ -147,9 +147,6 @@ export abstract class JustOneRoundOutcomeComponentBase extends JustOneClueListCo
   setClueListComponent(clueListComponent: JustOneClueListComponent) {
     this._clueListComponent = clueListComponent;
   }
-  preValidate(): void {
-
-  }
 
   HandleGenericError() {
     this.ErrorMessage = "An Unknown Error Occurred";

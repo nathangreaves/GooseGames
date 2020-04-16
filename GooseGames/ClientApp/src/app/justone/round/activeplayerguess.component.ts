@@ -28,7 +28,6 @@ export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {
   public Loading: boolean;
   _clueService: JustOneClueService;
   _clueListComponent: JustOneClueListComponent;
-    _hubConnection: any;
 
   constructor(clueService: JustOneClueService, router: Router, activatedRoute: ActivatedRoute) {
 
@@ -46,9 +45,6 @@ export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {
   loadClues(): Promise<GenericResponse<PlayerCluesResponse>> {
     return this._clueService.GetClues(this);
   }
-  preValidate(): void {
-    this.setupConnection();
-  }
   loadContent(): Promise<GenericResponseBase> {
     return Promise.resolve(
       {
@@ -57,9 +53,6 @@ export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {
       });
   }
   MarkClueAs() {
-  }
-  onRedirect() {
-    this.CloseConnection();
   }
   setClueListComponent(clueListComponent: JustOneClueListComponent) {
     this._clueListComponent = clueListComponent;
@@ -83,16 +76,13 @@ export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {
       Pass: false
     })
       .then(response => {
-        if (!response.success) {
-          this.ErrorMessage = response.errorCode;
-        }
+        this.HandleResponse(response);
       })
       .catch(() => this.HandleGenericError())
       .finally(() => this.DisableButtons = false);
   }
 
   SubmitPass(response: string) {
-
     this.DisableButtons = true;
     this._clueService.SubmitActivePlayerResponse({
       SessionId: this.SessionId,
@@ -101,37 +91,19 @@ export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {
       Pass: true
     })
       .then(response => {
-      if (!response.success) {
-        this.ErrorMessage = response.errorCode;
-      }
-    })
+        this.HandleResponse(response);
+      })
       .catch(() => this.HandleGenericError())
       .finally(() => this.DisableButtons = false);
   }
 
-  private setupConnection() {
-    this._hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
-      .build();
-    this._hubConnection.on("roundOutcomeAvailable", () => {
-      this.CloseConnection();
-      this._router.navigate([
-        PlayerStatusRoutesMap.ActivePlayerOutcome, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
-    });
-    this._hubConnection.on("activePlayerResponseVoteRequired", () => {
-      this.CloseConnection();
-      this._router.navigate([
-        PlayerStatusRoutesMap.ActivePlayerWaitingForOutcomeVotes, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
-    });
-    this._hubConnection.start().catch(err => console.error(err));
-  }
-  CloseConnection() {
-    if (this._hubConnection) {
-      this._hubConnection.off("roundOutcomeAvailable");
-      this._hubConnection.off("activePlayerResponseVoteRequired");
-
-      this._hubConnection.stop();
-      this._hubConnection = null;
+  HandleResponse(response: GenericResponseBase): Promise<GenericResponseBase> {
+    if (!response.success) {
+      this.ErrorMessage = response.errorCode;
     }
+    else {
+      return this._clueListComponent.ValidateStatus();
+    }
+    return Promise.resolve(response);
   }
 }

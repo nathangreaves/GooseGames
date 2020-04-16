@@ -8,7 +8,7 @@ import { PlayerStatus, PlayerStatusRoutesMap } from '../../../models/justone/pla
 import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus';
 import { GenericResponseBase, GenericResponse } from '../../../models/genericresponse';
 import { JustOneClueService } from '../../../services/justone/clue';
-import { PlayerClue, SubmitClueVotesRequest } from '../../../models/justone/clue';
+import { PlayerClue, SubmitClueVotesRequest, PlayerCluesResponse } from '../../../models/justone/clue';
 import { PlayerNumberCss } from '../../../services/justone/ui'
 
 @Component({
@@ -30,6 +30,7 @@ export class JustOnePassivePlayerOutcomeVoteComponent implements IPlayerSessionC
   ActivePlayerName: string;
   ActivePlayerNumber: number;
   ResponseWord: string;
+  WordToGuess: string;
 
   _responseId: string;
 
@@ -84,16 +85,16 @@ export class JustOnePassivePlayerOutcomeVoteComponent implements IPlayerSessionC
       .catch(() => this.HandleGenericError());
   }
 
-  load(): Promise<void | GenericResponse<PlayerClue>> {
+  load(): Promise<void | GenericResponse<PlayerCluesResponse>> {
 
     return this._clueService.GetActivePlayerResponse(this)
       .then(response => {
         if (response.success) {
-          this.ActivePlayerName = response.data.playerName;
-          this.ActivePlayerNumber = response.data.playerNumber;
-          this.ResponseWord = response.data.response;
-
-          this._responseId = response.data.responseId;
+          this.ActivePlayerName = response.data.activePlayerName;
+          this.ActivePlayerNumber = response.data.activePlayerNumber;
+          this.WordToGuess = response.data.wordToGuess;
+          this.ResponseWord = response.data.responses[0].response;
+          this._responseId = response.data.responses[0].responseId;
         }
         else {
           this.ErrorMessage = response.errorCode;

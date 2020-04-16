@@ -7,6 +7,7 @@ using Models.Requests.JustOne;
 using Models.Requests.JustOne.Response;
 using Models.Responses;
 using Models.Responses.JustOne;
+using Models.Responses.JustOne.PlayerStatus;
 using Models.Responses.JustOne.Response;
 using RepositoryInterface.JustOne;
 using System;
@@ -26,10 +27,10 @@ namespace GooseGames.Services.JustOne
         private readonly PlayerHubContext _playerHub;
         private readonly RequestLogger<PlayerResponseService> _logger;
 
-        public PlayerResponseService(RoundService roundService, 
+        public PlayerResponseService(RoundService roundService,
             IPlayerRepository playerRepository,
-            IPlayerStatusRepository playerStatusRepository, 
-            IResponseRepository responseRepository, 
+            IPlayerStatusRepository playerStatusRepository,
+            IResponseRepository responseRepository,
             IResponseVoteRepository responseVoteRepository,
             PlayerHubContext playerHub, RequestLogger<PlayerResponseService> logger)
         {
@@ -52,13 +53,13 @@ namespace GooseGames.Services.JustOne
             _logger.LogTrace("Getting responses");
             var responsesDictionary = (await _responseRepository.FilterAsync(r => r.RoundId == round.Id)).ToDictionary(r => r.PlayerId, r => r);
 
-            _logger.LogTrace("Getting players");           
+            _logger.LogTrace("Getting players");
             var players = await _playerRepository
                 .FilterAsync(player => player.SessionId == request.SessionId);
 
             _logger.LogTrace("Getting players except active player");
             var playersExceptActivePlayer = players.Where(p => p.Id != round.ActivePlayerId);
-            
+
             _logger.LogTrace("Getting active player details");
             var activePlayer = players.Single(p => p.Id == round.ActivePlayerId.Value);
 
@@ -90,7 +91,7 @@ namespace GooseGames.Services.JustOne
             });
         }
 
-        internal async Task<GenericResponse<PlayerResponse>> GetActivePlayerResponseAsync(PlayerSessionRequest request)
+        internal async Task<GenericResponse<PlayerResponses>> GetActivePlayerResponseAsync(PlayerSessionRequest request)
         {
             _logger.LogTrace("Getting active player response for current round", request);
 
@@ -104,13 +105,22 @@ namespace GooseGames.Services.JustOne
             var activePlayer = await _playerRepository
                 .GetAsync(round.ActivePlayerId.Value);
 
-            return GenericResponse<PlayerResponse>.Ok(new PlayerResponse
+            return GenericResponse<PlayerResponses>.Ok(new PlayerResponses
             {
-                ResponseId = activePlayerResponse.Id,
-                PlayerId = activePlayer.Id,
-                PlayerName = activePlayer.Name,
-                PlayerNumber = activePlayer.PlayerNumber,
-                Response = activePlayerResponse.Word
+                ActivePlayerName = activePlayer.Name,
+                ActivePlayerNumber = activePlayer.PlayerNumber,
+                WordToGuess = round.WordToGuess,
+                Responses = new List<PlayerResponse> 
+                { 
+                    new PlayerResponse
+                    {
+                        ResponseId = activePlayerResponse.Id,
+                        PlayerId = activePlayer.Id,
+                        PlayerName = activePlayer.Name,
+                        PlayerNumber = activePlayer.PlayerNumber,
+                        Response = activePlayerResponse.Word
+                    }
+                }
             });
         }
 
@@ -168,7 +178,7 @@ namespace GooseGames.Services.JustOne
                 });
 
                 _logger.LogTrace($"Inserting response votes");
-                await _responseVoteRepository.InsertRangeAsync(responseVotes);       
+                await _responseVoteRepository.InsertRangeAsync(responseVotes);
             }
             else
             {
@@ -207,7 +217,7 @@ namespace GooseGames.Services.JustOne
             };
 
             _logger.LogTrace($"Inserting response");
-            await _responseRepository.InsertAsync(response);            
+            await _responseRepository.InsertAsync(response);
 
             _logger.LogTrace($"Progressing round");
             await _roundService.ProgressRoundAsync(round);
@@ -236,7 +246,7 @@ namespace GooseGames.Services.JustOne
             {
                 _logger.LogTrace($"Voted: Fail");
             }
-            
+
             _logger.LogTrace($"Updating status of player");
             await _playerStatusRepository.UpdateStatusAsync(request.PlayerId, PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes);
 

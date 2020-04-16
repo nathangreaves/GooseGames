@@ -40,9 +40,9 @@ export class JustOneClueService {
     return this._http.post<GenericResponseBase>(this._baseUrl + 'JustOnePlayerResponse/SubmitActivePlayerResponseVote', request).toPromise();
   }
 
-  public GetActivePlayerResponse(request: IPlayerSession): Promise<GenericResponse<PlayerClue>> {
+  public GetActivePlayerResponse(request: IPlayerSession): Promise<GenericResponse<PlayerCluesResponse>> {
     request = ConvertToPlayerSessionRequest(request);
     var parameters = Object.keys(request).map(key => key + '=' + request[key]).join('&');
-    return this._http.get<GenericResponse<PlayerClue>>(this._baseUrl + `JustOnePlayerResponse/ActivePlayerResponse?${parameters}`).toPromise();
+    return this._http.get<GenericResponse<PlayerCluesResponse>>(this._baseUrl + `JustOnePlayerResponse/ActivePlayerResponse?${parameters}`).toPromise();
   }
 }

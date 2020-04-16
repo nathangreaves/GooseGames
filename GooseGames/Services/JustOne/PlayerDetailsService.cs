@@ -69,9 +69,13 @@ namespace GooseGames.Services.JustOne
 
             player.Name = request.PlayerName;
 
-            _logger.LogTrace("Getting player number");
-            int countOfNamedPlayers = await _playerRepository.CountAsync(p => p.SessionId == request.SessionId && p.Name != null);
-            player.PlayerNumber = countOfNamedPlayers + 1;
+            if (player.PlayerNumber == 0)
+            {
+                _logger.LogTrace("Getting player number");
+                int nextPlayerNumber = await _playerRepository.GetNextPlayerNumberAsync(request.SessionId);
+                _logger.LogTrace($"Player number = {nextPlayerNumber}");
+                player.PlayerNumber = nextPlayerNumber;
+            }
 
             _logger.LogTrace("Updating player details");
             await _playerRepository.UpdateAsync(player);

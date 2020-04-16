@@ -37,8 +37,6 @@ export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
 
     this.hide();
   }
-  preValidate(): void {
-  }
   getPlayerStatus(): PlayerStatus {
     return PlayerStatus.PassivePlayerClueVote;
   }
