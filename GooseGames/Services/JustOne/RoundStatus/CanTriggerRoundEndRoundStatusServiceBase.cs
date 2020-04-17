@@ -42,10 +42,18 @@ namespace GooseGames.Services.JustOne.RoundStatus
                 score = score + roundsRemoved;
             }
 
+            var sessionEnded = (await _roundRepository.CountAsync(r => r.Status == RoundStatusEnum.New && r.SessionId == round.SessionId)) <= 0;
+
             if (score != 0)
             {
                 var session = await _sessionRepository.GetAsync(round.SessionId);
                 session.Score = session.Score + score;
+
+                if (sessionEnded)
+                {
+                    session.StatusId = SessionStatusEnum.Complete;
+                }
+
                 await _sessionRepository.UpdateAsync(session);
             }
 
