@@ -394,7 +394,7 @@ namespace GooseGames.Services.JustOne
             "Tool",
             "String",
             "Australia",
-            "Casle",
+            "Castle",
             "Guard",
             "Sheep",
             "Puppet",

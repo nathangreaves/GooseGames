@@ -47,5 +47,17 @@ namespace Entities.JustOne.Enums
         {
             return s_Instances[guid];
         }
+
+        public static string TryGetDescription(Guid guid)
+        {
+            try
+            {
+                return GetDescription(guid);
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
     }
 }

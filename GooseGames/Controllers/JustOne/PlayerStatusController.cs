@@ -174,7 +174,7 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace("Received request", request);
+                _logger.LogTrace($"Received request status: {lobbyStatus} = {PlayerStatusEnum.TryGetDescription(lobbyStatus)}", request);
 
                 var result = await _playerStatusService.ValidatePlayerStatusAsync(request, lobbyStatus);
 
