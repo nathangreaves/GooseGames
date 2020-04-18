@@ -120,6 +120,12 @@ namespace GooseGames.Controllers.JustOne
         {
             return await ValidateStatus(request, PlayerStatusEnum.ActivePlayerOutcome);
         }
+        [HttpGet]
+        [ActionName(nameof(PlayerStatusEnum.Rejoining))]
+        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateRejoiningAsync([FromQuery]PlayerSessionRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatusEnum.Rejoining);
+        }
 
 
         [HttpPost]

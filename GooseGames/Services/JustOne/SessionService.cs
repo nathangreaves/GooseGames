@@ -135,9 +135,16 @@ namespace GooseGames.Services.JustOne
 
             await Task.Delay(TimeSpan.FromSeconds(2));
 
+            await CleanUpExpiredSessions(request.SessionId);
+
             await _roundService.PrepareRoundsAsync(request.SessionId);
 
             return GenericResponse<bool>.Ok(true);
+        }
+
+        private async Task CleanUpExpiredSessions(Guid sessionId)
+        {
+            await _sessionRepository.AbandonSessionsOlderThan(sessionId, DateTime.UtcNow.AddDays(1));
         }
 
         private async Task<bool> ValidateMinimumNumberOfPlayersAsync(Guid sessionId)

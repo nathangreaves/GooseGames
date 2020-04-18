@@ -17,14 +17,17 @@ namespace GooseGames.Services.JustOne
     {
         private readonly IPlayerStatusRepository _playerStatusRepository;
         private readonly RoundService _roundService;
+        private readonly ISessionRepository _sessionRepository;
         private readonly RequestLogger<PlayerDetailsService> _logger;
 
         public PlayerStatusService(IPlayerStatusRepository playerStatusRepository,
             RoundService roundService,
+            ISessionRepository sessionRepository,
             RequestLogger<PlayerDetailsService> logger)
         {
             _playerStatusRepository = playerStatusRepository;
             _roundService = roundService;
+            _sessionRepository = sessionRepository;
             _logger = logger;
         }
 
@@ -32,6 +35,12 @@ namespace GooseGames.Services.JustOne
         {
             var playerStatus = await _playerStatusRepository.SingleOrDefaultAsync(p => p.PlayerId == request.PlayerId);
             if (playerStatus == null)
+            {
+                return NewResponse.Error<PlayerStatusValidationResponse>("You are not part of this session");
+            }
+
+            var session = await _sessionRepository.GetAsync(request.SessionId);
+            if (session == null || (session.StatusId != SessionStatusEnum.InProgress && session.StatusId != SessionStatusEnum.New))
             {
                 return NewResponse.Error<PlayerStatusValidationResponse>("You are not part of this session");
             }

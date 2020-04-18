@@ -15,6 +15,7 @@ import { TristateSwitch } from '../assets/tristate-switch.component'
 import { JustOneLandingComponent } from './justone/landing.component';
 import { JustOneNavbarHeaderComponent } from './justone/navbarheader.component';
 import { JustOneDeclarationComponent } from './justone/declaration.component';
+import { JustOneRejoinComponent } from './justone/rejoin.component';
 
 import { JustOneNewPlayerDetailsComponent } from './justone/newplayerdetails.component';
 import { JustOneSessionLobbyComponent } from './justone/sessionlobby.component';
@@ -48,6 +49,7 @@ import { NavbarHeaderDirective } from './nav-menu/navbar-header-directive';
     JustOneLandingComponent,
     JustOneNavbarHeaderComponent,
     JustOneDeclarationComponent,
+    JustOneRejoinComponent,
 
     TristateSwitch,
 
@@ -80,7 +82,8 @@ import { NavbarHeaderDirective } from './nav-menu/navbar-header-directive';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'justone', component: JustOneLandingComponent },
 
-      { path: "justone/declaration", component: JustOneDeclarationComponent },
+      { path: "justone/disclaimer", component: JustOneDeclarationComponent },
+      { path: "justone/rejoin", component: JustOneRejoinComponent },
       { path: "justone/newplayer", component: JustOneNewPlayerDetailsComponent },
       { path: "justone/sessionlobby", component: JustOneSessionLobbyComponent },
       { path: "justone/waitingforgame", component: JustOneRoundWaitingComponent },

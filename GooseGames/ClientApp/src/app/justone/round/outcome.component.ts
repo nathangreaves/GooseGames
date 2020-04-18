@@ -15,6 +15,7 @@ import { NavbarHeaderEnum } from '../../nav-menu/navbar-header';
 import { JustOneClueListComponentBase, JustOneClueListComponent } from './cluelist.component';
 import { PlayerCluesResponse, PlayerClue } from '../../../models/justone/clue';
 import { JustOneClueService } from '../../../services/justone/clue';
+import { JustOneLocalStorage } from '../../../services/justone/localstorage';
 
 export abstract class JustOneRoundOutcomeComponentBase extends JustOneClueListComponentBase {
 
@@ -27,6 +28,7 @@ export abstract class JustOneRoundOutcomeComponentBase extends JustOneClueListCo
   _navbarService: NavbarService;
   _clueService: JustOneClueService;
   _clueListComponent: JustOneClueListComponent;
+  _justOneLocalStorage: JustOneLocalStorage;
 
   SessionId: string;
   PlayerId: string;
@@ -35,7 +37,13 @@ export abstract class JustOneRoundOutcomeComponentBase extends JustOneClueListCo
 
   RoundOutcome: RoundOutcomeResponse;
 
-  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, clueService: JustOneClueService, router: Router, activatedRoute: ActivatedRoute) {
+  constructor(playerStatusService: JustOnePlayerStatusService,
+    roundService: JustOneRoundService,
+    navbarService: NavbarService,
+    clueService: JustOneClueService,
+    justOneLocalStorage: JustOneLocalStorage,
+    router: Router,
+    activatedRoute: ActivatedRoute) {
 
     super(activatedRoute);
 
@@ -44,6 +52,8 @@ export abstract class JustOneRoundOutcomeComponentBase extends JustOneClueListCo
     this._roundService = roundService;
     this._navbarService = navbarService;
     this._clueService = clueService;
+    this._justOneLocalStorage = justOneLocalStorage;
+
     this.SessionId = activatedRoute.snapshot.params.SessionId;
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;
 
@@ -126,6 +136,10 @@ export abstract class JustOneRoundOutcomeComponentBase extends JustOneClueListCo
 
           if (this.RoundOutcome.gameEnded) {
             this._navbarService.setReadOnly(false);
+            this._justOneLocalStorage.ClearPlayerDetails();
+          }
+          else {
+            this._justOneLocalStorage.CachePlayerDetails(this);
           }
           this.updateCurrentRoundInformation();
         }
@@ -161,8 +175,9 @@ export abstract class JustOneRoundOutcomeComponentBase extends JustOneClueListCo
 })
 export class JustOneActivePlayerRoundOutcomeComponent extends JustOneRoundOutcomeComponentBase {  
 
-  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, clueService: JustOneClueService, router: Router, activatedRoute: ActivatedRoute) {
-    super(playerStatusService, roundService, navbarService, clueService, router, activatedRoute);
+  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, clueService: JustOneClueService,
+    justOneLocalStorage: JustOneLocalStorage, router: Router, activatedRoute: ActivatedRoute) {
+    super(playerStatusService, roundService, navbarService, clueService, justOneLocalStorage, router, activatedRoute);
   }
   getPlayerStatus(): PlayerStatus {
     return PlayerStatus.ActivePlayerOutcome;
@@ -179,8 +194,9 @@ export class JustOneActivePlayerRoundOutcomeComponent extends JustOneRoundOutcom
 })
 export class JustOnePassivePlayerRoundOutcomeComponent extends JustOneRoundOutcomeComponentBase {
 
-  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, clueService: JustOneClueService, router: Router, activatedRoute: ActivatedRoute) {
-    super(playerStatusService, roundService, navbarService, clueService, router, activatedRoute);
+  constructor(playerStatusService: JustOnePlayerStatusService, roundService: JustOneRoundService, navbarService: NavbarService, clueService: JustOneClueService,
+    justOneLocalStorage: JustOneLocalStorage, router: Router, activatedRoute: ActivatedRoute) {
+    super(playerStatusService, roundService, navbarService, clueService, justOneLocalStorage, router, activatedRoute);
   }
   getPlayerStatus(): PlayerStatus {
     return PlayerStatus.PassivePlayerOutcome;

@@ -1,3 +1,6 @@
+<div *ngIf="CanRejoin">
+  <button class="btn btn-primary" style="margin-bottom: 10px;" [disabled]="DisableButtons" (click)="RejoinExistingGame()">Rejoin Existing Game</button>
+</div>
 <div>
   Enter a game identifier:
 </div>
@@ -10,15 +13,17 @@
 <div>
   <button class="btn btn-primary" [disabled]="DisableButtons" (click)="StartNewGame(password.value)">Start New Game</button>
 </div>
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>
 <div>
   <br />
-  <span>To create a new game, enter a word to identify your game
-  <br/>(i.e. <span style="font-weight: bold">DirdlimNosbod</span> or <span style="font-weight: bold">COVID19</span>)
-  <br />then press <span style="font-weight: bold">Start New Game</span>.
-  <br/>Share this identifier with your friends!</span>
+  <span>
+    To create a new game, enter a word to identify your game
+    <br />(i.e. <span style="font-weight: bold">DirdlimNosbod</span> or <span style="font-weight: bold">COVID19</span>)
+    <br />then press <span style="font-weight: bold">Start New Game</span>.
+    <br />Share this identifier with your friends!
+  </span>
   <br />
   <br />
   <span>To join a game, enter the game identifier that you've been given and press <span style="font-weight: bold">Join Game</span>!</span>
   <br />
 </div>
-<div *ngIf="ErrorMessage"  class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

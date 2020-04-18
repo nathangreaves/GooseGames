@@ -16,7 +16,9 @@ export enum PlayerStatus {
   ActivePlayerWaitingForVotes,
   ActivePlayerGuess,
   ActivePlayerWaitingForOutcomeVotes,
-  ActivePlayerOutcome
+  ActivePlayerOutcome,
+
+  Rejoining = -1
 }
 //These should be the same as the required ActionName in PlayerStatusController
 //Also these should be the same as the PlayerStatus values in PlayerStatusEnum in the Entities solution

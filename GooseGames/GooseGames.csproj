@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -41,6 +41,7 @@
     <None Remove="ClientApp\src\app\justone\navbarheader.component.css" />
     <None Remove="ClientApp\src\app\justone\navbarheader.component.ts" />
     <None Remove="ClientApp\src\app\justone\newplayerdetails.component.ts" />
+    <None Remove="ClientApp\src\app\justone\rejoin.component.ts" />
     <None Remove="ClientApp\src\app\justone\round\activeplayerguess.component.ts" />
     <None Remove="ClientApp\src\app\justone\round\activeplayerwaitingforclues.component.ts" />
     <None Remove="ClientApp\src\app\justone\round\activeplayerwaitingforcluevote.component.ts" />
@@ -69,6 +70,7 @@
     <None Remove="ClientApp\src\models\justone\round.ts" />
     <None Remove="ClientApp\src\models\justone\session.ts" />
     <None Remove="ClientApp\src\services\justone\clue.ts" />
+    <None Remove="ClientApp\src\services\justone\localstorage.ts" />
     <None Remove="ClientApp\src\services\justone\playerdetails.ts" />
     <None Remove="ClientApp\src\services\justone\playerstatus.ts" />
     <None Remove="ClientApp\src\services\justone\round.ts" />
@@ -95,6 +97,7 @@
     <TypeScriptCompile Include="ClientApp\src\app\justone\landing.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\navbarheader.component.css" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\newplayerdetails.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\justone\rejoin.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\round\activeplayerguess.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\round\activeplayerwaitingforcluevote.component.ts">
       <SubType>Code</SubType>
@@ -125,6 +128,7 @@
     <TypeScriptCompile Include="ClientApp\src\models\justone\round.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\justone\session.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\clue.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\justone\localstorage.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\round.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\playerdetails.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\playerstatus.ts" />

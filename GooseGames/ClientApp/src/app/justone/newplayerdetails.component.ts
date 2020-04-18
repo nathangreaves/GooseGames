@@ -6,6 +6,7 @@ import { PlayerDetails, UpdatePlayerDetailsRequest } from '../../models/justone/
 import { IPlayerSessionComponent } from '../../models/justone/session'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { PlayerStatus, PlayerStatusValidationResponse } from '../../models/justone/playerstatus';
+import { JustOneLocalStorage } from '../../services/justone/localstorage';
 
 @Component({
   selector: 'app-just-one-newplayerdetails-component',
@@ -16,6 +17,7 @@ export class JustOneNewPlayerDetailsComponent implements IPlayerSessionComponent
 
   private _playerDetailsService: JustOnePlayerDetailsService;
   private _playerStatusService: JustOnePlayerStatusService;
+  private _justOneLocalStorage: JustOneLocalStorage;
   private _router: Router;
 
   SessionId: string;
@@ -23,9 +25,11 @@ export class JustOneNewPlayerDetailsComponent implements IPlayerSessionComponent
   ErrorMessage: string;
   Loading: boolean = true;
 
-  constructor(playerDetailsService: JustOnePlayerDetailsService, playerStatusService: JustOnePlayerStatusService, router: Router, activatedRoute: ActivatedRoute) {
+  constructor(playerDetailsService: JustOnePlayerDetailsService, playerStatusService: JustOnePlayerStatusService, justOneLocalStorage: JustOneLocalStorage,
+    router: Router, activatedRoute: ActivatedRoute) {
     this._playerDetailsService = playerDetailsService;
     this._playerStatusService = playerStatusService;
+    this._justOneLocalStorage = justOneLocalStorage;
     this._router = router;
 
     this.SessionId = activatedRoute.snapshot.params.SessionId;
@@ -56,6 +60,8 @@ export class JustOneNewPlayerDetailsComponent implements IPlayerSessionComponent
       })
       .then(data => {
         if (data.success) {
+
+          this._justOneLocalStorage.CachePlayerDetails(this);
           this._router.navigate(['/justone/sessionlobby', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
         }
         else {

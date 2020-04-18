@@ -10,5 +10,6 @@ namespace RepositoryInterface.JustOne
 {
     public interface ISessionRepository : ICommonRepository<Session>
     {
+        Task AbandonSessionsOlderThan(Guid excludeSessionId, DateTime createdBeforeUtc);
     }
 }

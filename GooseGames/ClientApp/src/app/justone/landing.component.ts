@@ -5,6 +5,7 @@ import { GenericResponse } from '../../models/genericresponse'
 import { SessionLandingResponse } from '../../models/justone/session'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { NavbarService } from '../../services/navbar';
+import { JustOneLocalStorage } from '../../services/justone/localstorage';
 
 @Component({
   selector: 'app-just-one-landing-component',
@@ -14,19 +15,26 @@ import { NavbarService } from '../../services/navbar';
 export class JustOneLandingComponent {
 
   _sessionService: JustOneSessionService;
+  _justOneLocalStorage: JustOneLocalStorage;
   _router: Router;
   _navbarService: NavbarService;
 
   ErrorMessage: string;
   DisableButtons: boolean;
+  CanRejoin: boolean = false;
 
-  constructor(sessionService: JustOneSessionService, navbarService: NavbarService, router: Router) {
+  constructor(sessionService: JustOneSessionService, justOneLocalStorage: JustOneLocalStorage, navbarService: NavbarService, router: Router) {
     this._sessionService = sessionService;
     this._navbarService = navbarService;
+    this._justOneLocalStorage = justOneLocalStorage;
     this._router = router;
 
     this._navbarService.setAreaTitle("Just One");
     localStorage.removeItem('just-one-navbar-round-info');
+
+    if (this._justOneLocalStorage.GetPlayerDetails()) {
+      this.CanRejoin = true;
+    }
   }
 
 
@@ -38,7 +46,7 @@ export class JustOneLandingComponent {
       return;
     }
 
-    this.DisableButtons = true;
+    this.DisableButtons = true;    
     this._sessionService.CreateGame({ password: password })
       .then(data => this.handleResponse(data))
       .catch(data => this.genericError())
@@ -61,13 +69,17 @@ export class JustOneLandingComponent {
       .finally(() => this.DisableButtons = false);
   }
 
+  public RejoinExistingGame() {
+    this._router.navigate(['/justone/rejoin']);
+  }
+
   private handleResponse(data: GenericResponse<SessionLandingResponse>) {
     if (data.success === true) {
       this.clearMessage();
 
       this._navbarService.setReadOnly(true);
 
-      this._router.navigate(['/justone/declaration', { SessionId: data.data.sessionId, PlayerId: data.data.playerId }]);
+      this._router.navigate(['/justone/disclaimer', { SessionId: data.data.sessionId, PlayerId: data.data.playerId }]);
     }
     else {
       //Stay on page and display error

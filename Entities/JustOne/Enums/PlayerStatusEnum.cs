@@ -24,6 +24,8 @@ namespace Entities.JustOne.Enums
         public static readonly Guid ActivePlayerWaitingForOutcomeVotes = new Guid("cc955a44-fa89-442f-ac80-f092f376a589");
         public static readonly Guid ActivePlayerOutcome = new Guid("ffcc0414-f358-4314-beb8-0b5aa97d8aed");
 
+        public static readonly Guid Rejoining = new Guid();
+
         private static readonly Dictionary<Guid, string> s_Instances = new Dictionary<Guid, string>
         {
             { New, nameof(New) },
@@ -41,7 +43,9 @@ namespace Entities.JustOne.Enums
             { ActivePlayerWaitingForVotes, nameof(ActivePlayerWaitingForVotes) },
             { ActivePlayerGuess, nameof(ActivePlayerGuess) },
             { ActivePlayerWaitingForOutcomeVotes, nameof(ActivePlayerWaitingForOutcomeVotes) },
-            { ActivePlayerOutcome, nameof(ActivePlayerOutcome) }
+            { ActivePlayerOutcome, nameof(ActivePlayerOutcome) },
+
+            { Rejoining, nameof(Rejoining) }
         };
         public static string GetDescription(Guid guid)
         {
