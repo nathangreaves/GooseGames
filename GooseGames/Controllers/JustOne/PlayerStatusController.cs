@@ -180,11 +180,11 @@ namespace GooseGames.Controllers.JustOne
         {
             try
             {
-                _logger.LogTrace($"Received request status: {lobbyStatus} = {PlayerStatusEnum.TryGetDescription(lobbyStatus)}", request);
+                _logger.LogInformation($"Received request status: {lobbyStatus} = {PlayerStatusEnum.TryGetDescription(lobbyStatus)}", request);
 
                 var result = await _playerStatusService.ValidatePlayerStatusAsync(request, lobbyStatus);
 
-                _logger.LogTrace("Returned result", result);
+                _logger.LogInformation("Returned result", result);
                 return result;
             }
             catch (Exception e)

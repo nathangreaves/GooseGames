@@ -40,9 +40,14 @@ namespace GooseGames.Services.JustOne
             }
 
             var session = await _sessionRepository.GetAsync(request.SessionId);
-            if (session == null || (session.StatusId != SessionStatusEnum.InProgress && session.StatusId != SessionStatusEnum.New))
+            if (session == null)
             {
                 return NewResponse.Error<PlayerStatusValidationResponse>("You are not part of this session");
+            }
+
+            if (session.StatusId == SessionStatusEnum.Abandoned)
+            {
+                return NewResponse.Error<PlayerStatusValidationResponse>("This session was abandoned");
             }
 
             var response = new PlayerStatusValidationResponse
