@@ -144,7 +144,7 @@ namespace GooseGames.Services.JustOne
 
         private async Task CleanUpExpiredSessions(Guid sessionId)
         {
-            await _sessionRepository.AbandonSessionsOlderThanAsync(sessionId, DateTime.UtcNow.AddDays(1));
+            await _sessionRepository.AbandonSessionsOlderThanAsync(sessionId, DateTime.UtcNow.AddDays(-1));
         }
 
         private async Task<bool> ValidateMinimumNumberOfPlayersAsync(Guid sessionId)
