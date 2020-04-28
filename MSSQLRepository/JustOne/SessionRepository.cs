@@ -26,7 +26,7 @@ namespace MSSQLRepository.JustOne
         {
         }
 
-        public async Task AbandonSessionsOlderThan(Guid excludeSessionId, DateTime createdBeforeUtc)
+        public async Task AbandonSessionsOlderThanAsync(Guid excludeSessionId, DateTime createdBeforeUtc)
         {
             var sessionsToRemove = await Context.Sessions.Where(x => x.Id != excludeSessionId
             && (x.StatusId == SessionStatusEnum.InProgress || x.StatusId == SessionStatusEnum.New)
