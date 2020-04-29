@@ -40,6 +40,11 @@ export class JustOneWaitingForRoundComponent extends JustOnePlayerWaitingCompone
   }
 
   SetupHubConnection(hubConnection: signalR.HubConnection) {
+
+    hubConnection.on("playerReadyForRound", (playerId :string) => {
+      this._playerWaitingComponent.PlayerHasTakenAction(playerId);
+    });
+
     hubConnection.on("beginRoundPassivePlayer", () => {
       this._playerWaitingComponent.CloseHubConnection();
       this._router.navigate([PlayerStatusRoutesMap.PassivePlayerClue, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
@@ -51,6 +56,7 @@ export class JustOneWaitingForRoundComponent extends JustOnePlayerWaitingCompone
   }
 
   OnCloseHubConnection(hubConnection: signalR.HubConnection) {
+    hubConnection.off("playerReadyForRound");
     hubConnection.off("beginRoundPassivePlayer");
     hubConnection.off("beginRoundActivePlayer");
   }

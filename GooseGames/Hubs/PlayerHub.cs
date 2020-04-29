@@ -83,6 +83,12 @@ namespace GooseGames.Hubs
             await _hub.Clients.Client(activePlayerConnectionId).SendAsync("beginRoundActivePlayer");
         }
 
+        public async Task SendPlayerReadyForRoundAsync(Guid sessionId, Guid playerId)
+        {
+            _logger.LogInformation($"Sending playerReadyForRound: to {sessionId} :: {playerId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerReadyForRound", playerId);
+        }
+
         public async Task SendClueSubmittedAsync(Guid sessionId, Guid playerId)
         {
             _logger.LogInformation($"Sending clueSubmitted: to {sessionId} :: {playerId}");

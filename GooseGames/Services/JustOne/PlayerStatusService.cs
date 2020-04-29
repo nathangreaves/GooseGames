@@ -1,5 +1,6 @@
 ﻿using Entities.JustOne;
 using Entities.JustOne.Enums;
+using GooseGames.Hubs;
 using GooseGames.Logging;
 using Models.Requests.JustOne;
 using Models.Requests.JustOne.Round;
@@ -18,16 +19,19 @@ namespace GooseGames.Services.JustOne
         private readonly IPlayerStatusRepository _playerStatusRepository;
         private readonly RoundService _roundService;
         private readonly ISessionRepository _sessionRepository;
+        private readonly PlayerHubContext _playerHubContext;
         private readonly RequestLogger<PlayerDetailsService> _logger;
 
         public PlayerStatusService(IPlayerStatusRepository playerStatusRepository,
             RoundService roundService,
             ISessionRepository sessionRepository,
+            PlayerHubContext playerHubContext,
             RequestLogger<PlayerDetailsService> logger)
         {
             _playerStatusRepository = playerStatusRepository;
             _roundService = roundService;
             _sessionRepository = sessionRepository;
+            _playerHubContext = playerHubContext;
             _logger = logger;
         }
 
@@ -74,6 +78,8 @@ namespace GooseGames.Services.JustOne
         internal async Task UpdatePlayerStatusToRoundWaitingAsync(PlayerSessionRoundRequest request)
         {
             await UpdatePlayerStatusAsync(request.PlayerId, PlayerStatusEnum.RoundWaiting);
+
+            await _playerHubContext.SendPlayerReadyForRoundAsync(request.SessionId, request.PlayerId);
 
             await _roundService.ProgressRoundAsync(request.RoundId);
         }
