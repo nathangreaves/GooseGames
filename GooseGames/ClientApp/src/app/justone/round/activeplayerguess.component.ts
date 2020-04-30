@@ -13,7 +13,7 @@ import { PlayerCluesResponse } from '../../../models/justone/clue';
 @Component({
   selector: 'app-just-one-activeplayerguess-component',
   templateUrl: './activeplayerguess.component.html',
-  styleUrls: ['./activeplayerguess.component.css']
+  styleUrls: ['./activeplayerguess.component.css', './cluelist.component.css']
 })
 
 export class JustOneActivePlayerGuess extends JustOneClueListComponentBase {

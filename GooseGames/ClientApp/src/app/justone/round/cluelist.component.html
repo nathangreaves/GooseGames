@@ -3,12 +3,24 @@
   <div class="container clue-list-container">
     <div class="row clue-list-row" *ngFor="let clue of Clues;">
 
-      <div class="col-4 col-sm-3 col-md-3 clue-list-word-wrap clue-list-column">
+      <div
+           class="clue-list-word-wrap clue-list-column col-4"
+           [ngClass]="{
+            'col-sm-3 col-md-3' : !ReadOnly,
+            'col-sm-5 col-md-5' : ReadOnly
+           }"
+           >
         <span class="player-name-cell just-one-apply-player-color"
               [ngClass]="PlayerNumberCss.GetClass(clue.playerNumber)">{{clue.playerName}}</span>
       </div>
 
-      <div class="col-4 col-sm-6 col-md-3 clue-list-word-wrap clue-list-column">
+      <div
+           class="clue-list-word-wrap clue-list-column col-sm-6"
+           [ngClass]="{
+            'col-4 col-md-3' : !ReadOnly,
+            'col-7 col-md-6' : ReadOnly
+           }"
+           >
         <span class="clue-word clue-list-word-wrap" [ngClass]="{
                   'clue-invalid' : clue.responseInvalid,
                   'clue-valid' : !clue.responseInvalid
@@ -17,7 +29,12 @@
         </span>
       </div>
 
-      <div *ngIf="!ReadOnly" class="col-4 col-sm-3 clue-list-column clue-list-switch">
+      <div *ngIf="!ReadOnly"
+           class="clue-list-column clue-list-switch"
+           [ngClass]="{
+            'col-4 col-sm-3' : !ReadOnly,
+            'col-1' : ReadOnly
+           }">
         <tristate-switch [TristateSwitchHandler]="ValiditySwitchHandler(clue)">
         </tristate-switch>
       </div>
