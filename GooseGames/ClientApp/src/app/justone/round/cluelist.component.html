@@ -1,25 +1,29 @@
 <div>
-  <table class="player-table">
-    <tr *ngFor="let clue of Clues;">
-      <td class="player-name-cell just-one-apply-player-color"
-          [ngClass]="PlayerNumberCss.GetClass(clue.playerNumber)">
-        {{clue.playerName}}
-      </td>
-      <td>
-        <span class="clue-word" [ngClass]="{
-              'clue-invalid' : clue.responseInvalid,
-              'clue-valid' : !clue.responseInvalid
-            }">
+
+  <div class="container clue-list-container">
+    <div class="row clue-list-row" *ngFor="let clue of Clues;">
+
+      <div class="col-4 col-sm-3 col-md-3 clue-list-word-wrap clue-list-column">
+        <span class="player-name-cell just-one-apply-player-color"
+              [ngClass]="PlayerNumberCss.GetClass(clue.playerNumber)">{{clue.playerName}}</span>
+      </div>
+
+      <div class="col-4 col-sm-6 col-md-3 clue-list-word-wrap clue-list-column">
+        <span class="clue-word clue-list-word-wrap" [ngClass]="{
+                  'clue-invalid' : clue.responseInvalid,
+                  'clue-valid' : !clue.responseInvalid
+                }">
           {{clue.response}}
         </span>
-      </td>
-      <td>
+      </div>
 
-      <tristate-switch *ngIf="!ReadOnly"                         
-                        [TristateSwitchHandler]="ValiditySwitchHandler(clue)" 
-                       >
+      <div *ngIf="!ReadOnly" class="col-4 col-sm-3 clue-list-column clue-list-switch">
+        <tristate-switch [TristateSwitchHandler]="ValiditySwitchHandler(clue)">
         </tristate-switch>
-      </td>
-    </tr>
-  </table>
-</div>
+      </div>
+
+
+    </div>
+  </div>
+
+ </div>

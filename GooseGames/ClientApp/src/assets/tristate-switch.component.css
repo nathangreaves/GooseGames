@@ -1,14 +1,21 @@
 .tristate-switch {
-  margin-left: 1em;
-  margin-right: 1em;
+
 }
 
-.btn:focus, .btn:active:focus, .btn.active:focus {
-  outline: none;
-  outline-style: none;
-  box-shadow: none;
-  box-shadow: none;
+.tristate-switch td{
+    padding: 1px;
 }
+
+  .tristate-switch td.disabled {
+    padding: 0;
+  }
+
+  .tristate-switch .btn:focus, .tristate-switch .btn:active:focus, .tristate-switch .btn.active:focus {
+    outline: none;
+    outline-style: none;
+    box-shadow: none;
+    box-shadow: none;
+  }
 
 
 .tristate-switch .btn.tristate-unselected:disabled {
@@ -19,26 +26,27 @@
 }
 
 .tristate-switch div {
-  display: inline-block;
-  width: 50%;
-}
-.tristate-switch div.disabled {
-  width: 0%;
-}
-.tristate-switch div.tristate {
-  width: 33.3%;
-}
-.tristate-switch .btn {
-  height: 100%;
-  width: 96%;
-  text-align: center;
+  /*display: inline-block;*/
+  width: 40px;
 }
 
-.tristate-switch .btn.tristate {
+  .tristate-switch div.disabled {
+    width: 0%;
+  }
+/*.tristate-switch div.tristate {
+  width: 33.3%;
+}*/
+.tristate-switch .btn {
   height: 100%;
-  border: 1px;
   text-align: center;
+  width: 40px;
 }
+
+  .tristate-switch .btn.tristate {
+    height: 100%;
+    border: 1px;
+    text-align: center;
+  }
 
   .tristate-switch .btn.tristate-unselected:disabled {
     width: 0;
@@ -48,9 +56,10 @@
     background-color: none;
     color: none;
   }
-  .tristate-switch .btn.tristate-unselected:disabled i {
-    opacity: 0;
-  }
+
+    .tristate-switch .btn.tristate-unselected:disabled i {
+      opacity: 0;
+    }
 
   .tristate-switch .btn i {
     display: inline-block;
