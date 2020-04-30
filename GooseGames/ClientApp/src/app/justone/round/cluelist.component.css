@@ -1,72 +1,3 @@
-/*
-
-  .clue-word.clue-invalid {
-    text-decoration: line-through;
-    color: lightgray;
-  }
-
-  .clue-word.clue-valid {
-  }
-
-.clue-word-cell {
-  word-wrap: break-word;
-}
-
-.player-name-cell{
-    word-wrap: normal;
-}
-
-.player-table {
-    overflow-wrap: break-word;
-  word-wrap: break-word;
-}*/
-
-
-/*.clue-list-table{
-    margin: 0px;
-    padding: 0px;
-}
-.clue-list-table .clue-col {
-  padding-right: 5px;
-  padding-left: 0px;
-}
-
-.clue-list-row {
-  display: flex;
-  flex-direction: row;
-  margin: 0px;
-  padding: 0px;
-}
-
-.clue-col-name{
-    width: 33%;
-}
-
-.clue-col-response{
-    width: 66%
-}
-
-.clue-list-content {
-  width: 70%;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  margin: 0px;
-  padding: 0px;
-}*/
-
-/*.clue-list-content div {
-  max-width: 33%;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-}*/
-
-/*.clue-list-switch {
-  min-width: 100px;
-  width: 30%;
-}*/
-
-/*.player-table td {
-}*/
 
 .clue-word.clue-invalid {
   text-decoration: line-through;
@@ -88,11 +19,14 @@
     padding-right: 0px;
 }
 
-.clue-list-word-wrap {
-  /*overflow-wrap: break-word;*/
+.clue-list-word-wrap {  
   word-break: break-word;
 }
 
 .clue-list-row{
     margin-bottom: 10px;
+}
+
+.clue-list-wrap-row{
+
 }
