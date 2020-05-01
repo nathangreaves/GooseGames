@@ -40,6 +40,9 @@ import { JustOneClueListComponent } from './justone/round/cluelist.component';
 import { NavbarHeaderDirective } from './nav-menu/navbar-header-directive';
 
 
+import { FujiDemoComponent } from './fujiflush/demo.component'
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -72,7 +75,10 @@ import { NavbarHeaderDirective } from './nav-menu/navbar-header-directive';
     JustOneWaitingForRoundComponent,
 
     JustOnePlayerWaitingComponent,
-    JustOneClueListComponent
+    JustOneClueListComponent,
+
+
+    FujiDemoComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -81,6 +87,7 @@ import { NavbarHeaderDirective } from './nav-menu/navbar-header-directive';
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'justone', component: JustOneLandingComponent },
+      { path: 'fujiflush', component: FujiDemoComponent },
 
       { path: "justone/disclaimer", component: JustOneDeclarationComponent },
       { path: "justone/rejoin", component: JustOneRejoinComponent },

@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\src\app\fujiflush\demo.component.ts" />
     <None Remove="ClientApp\src\app\justone\declaration.component.ts" />
     <None Remove="ClientApp\src\app\justone\landing.component.ts" />
     <None Remove="ClientApp\src\app\justone\navbarheader.component.css" />
@@ -92,6 +93,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\fujiflush\demo.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\declaration.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\navbarheader.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\landing.component.ts" />

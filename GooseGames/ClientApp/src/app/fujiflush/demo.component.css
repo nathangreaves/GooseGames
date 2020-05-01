@@ -1,0 +1,223 @@
+/*.cont {
+  background: #ddd;
+  width: 90%;
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 3em;
+  box-sizing: border-box;
+}*/
+
+.player-box{
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+    border-style: solid;
+    border-color: black;
+    border-width: 2px;
+    border-radius: 10px;
+    padding: 0.2em;
+}
+
+.player-box.current-player{
+    background: lightgray;
+}
+
+.player-box.current-player .player-name {
+    font-weight: bold;
+}
+
+.player-name-container {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.player-name {
+    word-break: break-word;
+}
+
+.hand {
+  display: flex;
+  flex-direction: row;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.play-area {  
+  display: flex;
+  flex-direction: row;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+
+.game-card {
+  background: #fff;
+  width: 1.408em;
+  height: 2em;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 4px;
+  border-color: #000;
+  text-align: center;
+}
+
+.game-card-number {
+  text-align: center;
+  font-size: 1.3em;
+  text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+}
+
+
+.card-played {
+}
+
+
+.card-in-hand:not(:first-child) {
+  margin-left: -0.5em;
+}
+
+/* #ebe09d */
+
+.card-in-hand {
+  background: rgba(88,120,34,1);
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, rgba(88,120,34,1) 54%);
+}
+
+.card-transparent {
+  background: transparent;
+  border-style: none;
+}
+
+
+
+.personal-play-area{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.personal-hand {
+  background: lightgray;
+  padding: 1em;
+  display: flex;
+  flex-direction: row;
+}
+
+.personal-hand-card {
+  margin: 0.1em;
+  height: 5em;
+  width: 3.52em;
+}
+
+.personal-hand-card .game-card-number{
+    font-size: 2.3em;
+}
+
+.personal-hand-card:not(:first-child) {
+    margin-left: -0.4em;
+}
+
+.personal-hand-card-selected {
+  margin-left: 0em;
+  margin-top: -2em;
+}
+
+.card-2 {
+  background: #066561;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #066561 80%);
+}
+
+.card-3 {
+  background: #417899;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #417899 80%);
+}
+
+.card-4 {
+  background: #0977a7;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #0977a7 80%);
+}
+
+.card-5 {
+  background: #475798;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #475798 80%);
+}
+
+.card-6 {
+  background: #3f2866;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #3f2866 80%);
+}
+
+
+.card-7 {
+  background: #6f1e53;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #6f1e53 80%);
+}
+
+/* colours taken from this website https://cf.geekdo-images.com/medium/img/1hDmGmPEEP67cK2AmV603RBQGx8=/fit-in/500x500/filters:no_upscale()/pic3280032.jpg */
+/* using https://imagecolorpicker.com/en/*/
+.card-8 {
+  background: #931b52;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #931b52 80%);
+}
+
+.card-9 {
+  background: #ae1b49;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #ae1b49 80%);
+}
+
+.card-10 {
+  background: #dd1250;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #dd1250 80%);
+}
+
+.card-11 {
+  background: #da1426;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #da1426 80%);
+}
+
+.card-12 {
+  background: #dc1f1e;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #dc1f1e 80%);
+}
+
+.card-13 {
+  background: #e14121;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #e14121 80%);
+}
+
+.card-14 {
+  background: #c35418;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #c35418 80%);
+}
+
+.card-15 {
+  background: #bb7811;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #bb7811 80%);
+}
+
+.card-16 {
+  background: #dab72b;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #dab72b 80%);
+}
+
+.card-17 {
+  background: #ada425;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #ada425 80%);
+}
+
+.card-18 {
+  background: #777f1d;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #777f1d 80%);
+}
+
+.card-19 {
+  background: #375418;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #375418 80%);
+}
+
+.card-20 {
+  background: #145227;
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, #145227 80%);
+}
+
