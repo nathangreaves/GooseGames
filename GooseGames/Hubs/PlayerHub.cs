@@ -94,6 +94,13 @@ namespace GooseGames.Hubs
             _logger.LogInformation($"Sending clueSubmitted: to {sessionId} :: {playerId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("clueSubmitted", playerId);
         }
+
+        public async Task SendClueRevokedAsync(Guid sessionId, Guid playerId)
+        {
+            _logger.LogInformation($"Sending clueRevoked: to {sessionId} :: {playerId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("clueRevoked", playerId);
+        }
+
         public async Task SendAllCluesSubmittedAsync(Guid sessionId)
         {
             _logger.LogInformation($"Sending allCluesSubmitted: to {sessionId}");
@@ -109,6 +116,13 @@ namespace GooseGames.Hubs
             _logger.LogInformation($"Sending allClueVotesSubmitted: to {sessionId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("allClueVotesSubmitted");
         }
+
+        public async Task SendClueVoteRevokedAsync(Guid sessionId, Guid playerId)
+        {
+            _logger.LogInformation($"Sending clueVoteRevoked: to {sessionId} :: {playerId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("clueVoteRevoked", playerId);
+        }
+
         public async Task SendRoundOutcomeAvailableAsync(Guid sessionId)
         {
             _logger.LogInformation($"Sending roundOutcomeAvailable: to {sessionId}");
@@ -119,11 +133,18 @@ namespace GooseGames.Hubs
             _logger.LogInformation($"Sending activePlayerResponseVoteRequired: to {sessionId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("activePlayerResponseVoteRequired");
         }
+
         public async Task SendResponseVoteSubmittedAsync(Guid sessionId, Guid playerId)
         {
             _logger.LogInformation($"Sending responseVoteSubmitted: to {sessionId} :: {playerId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("responseVoteSubmitted", playerId);
         }
+        public async Task SendResponseVoteRevokedAsync(Guid sessionId, Guid playerId)
+        {
+            _logger.LogInformation($"Sending responseVoteRevoked: to {sessionId} :: {playerId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("responseVoteRevoked", playerId);
+        }
+
         public async Task SendAllResponseVotesSubmittedAsync(Guid sessionId)
         {
             _logger.LogInformation($"Sending allResponseVotesSubmitted: to {sessionId}");

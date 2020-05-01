@@ -130,12 +130,6 @@ namespace GooseGames.Services.JustOne
             _logger.LogTrace($"Getting current round");
             var round = await _roundService.GetCurrentRoundAsync(request);
 
-            if (await PlayerHasAlreadySubmittedResponse(request, round))
-            {
-                _logger.LogWarning($"Active player tried to submit response for round {round.Id}:{round.WordToGuess} more than once", request);
-                return GenericResponseBase.Error("Already submitted a guess for current round. Please refresh your page");
-            }
-
             _logger.LogTrace($"Preparing response");
             var response = new Response
             {
@@ -144,6 +138,9 @@ namespace GooseGames.Services.JustOne
                 Status = ResponseStatusEnum.New,
                 Word = request.ResponseWord
             };
+
+            _logger.LogTrace($"Deleting player response");
+            await _responseRepository.DeleteForPlayerAsync(round.Id, request.PlayerId);
 
             _logger.LogTrace($"Inserting response");
             await _responseRepository.InsertAsync(response);
@@ -165,6 +162,9 @@ namespace GooseGames.Services.JustOne
             _logger.LogTrace($"Submitting response vote", request);
             _logger.LogTrace($"Getting current round");
             var round = await _roundService.GetCurrentRoundAsync(request);
+
+            _logger.LogTrace($"Deleting existing player response votes for round");
+            await _responseVoteRepository.DeleteForPlayerAsync(round.Id, request.PlayerId);
 
             if (request.ValidResponses.Any())
             {
@@ -230,6 +230,9 @@ namespace GooseGames.Services.JustOne
             _logger.LogTrace($"Submitting active player response vote", request);
             _logger.LogTrace($"Getting current round");
             var round = await _roundService.GetCurrentRoundAsync(request);
+
+            _logger.LogTrace($"Deleting existing player outcome response votes for round");
+            await _responseVoteRepository.DeleteForPlayerAsync(round.Id, request.PlayerId);
 
             var responseVote = request.ValidResponses.SingleOrDefault();
             if (responseVote != null && responseVote != default(Guid))

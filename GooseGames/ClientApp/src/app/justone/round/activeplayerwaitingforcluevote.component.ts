@@ -41,7 +41,10 @@ export class JustOneActivePlayerWaitingForClueVoteComponent extends JustOnePlaye
 
   SetupHubConnection(hubConnection: signalR.HubConnection) {
     hubConnection.on("clueVoteSubmitted", (playerId: string) => {
-      this._playerWaitingComponent.PlayerHasTakenAction(playerId);
+      this._playerWaitingComponent.PlayerHasTakenAction(playerId, true);
+    });
+    hubConnection.on("clueVoteRevoked", (playerId: string) => {
+      this._playerWaitingComponent.PlayerHasTakenAction(playerId, false);
     });
     hubConnection.on("allClueVotesSubmitted", () => {
       this._playerWaitingComponent.CloseHubConnection();
@@ -51,6 +54,7 @@ export class JustOneActivePlayerWaitingForClueVoteComponent extends JustOnePlaye
   }
   OnCloseHubConnection(connection: signalR.HubConnection) {
     connection.off("clueVoteSubmitted");
+    connection.off("clueVoteRevoked");
     connection.off("allClueVotesSubmitted");
   }
 }  

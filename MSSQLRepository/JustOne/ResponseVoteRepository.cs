@@ -45,5 +45,39 @@ namespace MSSQLRepository.JustOne
 
             return responseDictionary;
         }
+
+
+        public async Task DeleteForPlayerAsync(Guid roundId, Guid playerId)
+        {
+            var responses = await Context.Responses                
+                .Where(r => r.RoundId == roundId)
+                .SelectMany(r => r.ResponseVotes)
+                .Where(r => r.PlayerId == playerId)
+                .ToListAsync();
+
+            if (responses != null && responses.Any())
+            {
+                foreach (var response in responses)
+                {
+                    await DeleteAsync(response);
+                }
+            }
+        }
+
+        public async Task DeleteActivePlayerResponseVoteForPlayerAsync(Guid roundId, Guid playerId)
+        {
+            var activePlayerId = await Context.Rounds.Where(r => r.Id == roundId).Select(x => x.ActivePlayerId).SingleAsync();
+
+            var response = await Context.Responses
+                .Where(response => response.RoundId == roundId && response.PlayerId == activePlayerId)
+                .SelectMany(r => r.ResponseVotes)
+                .Where(responseVote => responseVote.PlayerId == playerId)
+                .SingleOrDefaultAsync();
+
+            if (response != null)
+            {
+                await DeleteAsync(response);
+            }
+        }
     }
 }

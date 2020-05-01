@@ -7,6 +7,7 @@ import { PlayerAction } from '../../../models/justone/playeractions'
 import { JustOnePlayerWaitingComponentBase, JustOnePlayerWaitingComponent } from './playerwaiting.component';
 import { JustOneRoundService } from '../../../services/justone/round';
 import { GenericResponse } from '../../../models/genericresponse';
+import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus';
 
 export abstract class JustOnePlayerWaitingForOutcomeVoteComponentBase extends JustOnePlayerWaitingComponentBase {
 
@@ -40,7 +41,10 @@ export abstract class JustOnePlayerWaitingForOutcomeVoteComponentBase extends Ju
 
   SetupHubConnection(hubConnection: signalR.HubConnection) {
     hubConnection.on("responseVoteSubmitted", (playerId: string) => {
-      this._playerWaitingComponent.PlayerHasTakenAction(playerId);
+      this._playerWaitingComponent.PlayerHasTakenAction(playerId, true);
+    });
+    hubConnection.on("responseVoteRevoked", (playerId: string) => {
+      this._playerWaitingComponent.PlayerHasTakenAction(playerId, false);
     });
     hubConnection.on("roundOutcomeAvailable", () => {
       this._playerWaitingComponent.CloseHubConnection();
@@ -53,6 +57,7 @@ export abstract class JustOnePlayerWaitingForOutcomeVoteComponentBase extends Ju
   }
   OnCloseHubConnection(hubConnection: signalR.HubConnection) {
     hubConnection.off("responseVoteSubmitted");
+    hubConnection.off("responseVoteRevoked");
     hubConnection.off("roundOutcomeAvailable");
   }
 }  
@@ -63,12 +68,42 @@ export abstract class JustOnePlayerWaitingForOutcomeVoteComponentBase extends Ju
   styleUrls: ['../sessionlobby.component.css']
 })
 export class JustOnePassivePlayerWaitingForOutcomeVoteComponent extends JustOnePlayerWaitingForOutcomeVoteComponentBase {
+
+  _playerStatusService: JustOnePlayerStatusService;
+
+  DisableButtons: boolean = true;
+
   GetPlayerStatus(): PlayerStatus { return PlayerStatus.PassivePlayerWaitingForOutcomeVotes; }
   getRoundOutcomePlayerStatus(): PlayerStatus { return PlayerStatus.PassivePlayerOutcome; }
   isActivePlayer(): boolean { return false; }
 
-  constructor(router: Router, activatedRoute: ActivatedRoute, playerActionsService: JustOneRoundService) {
+  constructor(router: Router, activatedRoute: ActivatedRoute, playerActionsService: JustOneRoundService, playerStatusService: JustOnePlayerStatusService) {
     super(router, activatedRoute, playerActionsService);
+    this._playerStatusService = playerStatusService;
+  }
+
+  LoadContent(): Promise<any> {
+    this.DisableButtons = false;
+    return Promise.resolve();
+  }
+
+  Undo(): void {
+    this.DisableButtons = true;
+    this._playerStatusService.SetPassivePlayerOutcomeVote(this)
+      .then(response => {
+        if (response.success) {
+          this._playerWaitingComponent.CloseHubConnection();
+          this._router.navigate([
+            PlayerStatusRoutesMap.PassivePlayerClue, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+        }
+        else {
+          this.ErrorMessage = response.errorCode;
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        this.HandleGenericError();
+      });
   }
 }
 

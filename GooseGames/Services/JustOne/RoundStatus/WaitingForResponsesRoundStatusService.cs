@@ -16,7 +16,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
         private readonly IResponseRepository _responseRepository;
         private readonly IRoundRepository _roundRepository;
         private readonly IPlayerStatusRepository _playerStatusRepository;
-        private readonly IPlayerRepository _playerRepository;
+        private readonly PlayerStatusQueryService _playerStatusQueryService;
         private readonly PlayerHubContext _playerHub;
         private readonly RequestLogger<WaitingForResponsesRoundStatusService> _logger;
 
@@ -26,14 +26,14 @@ namespace GooseGames.Services.JustOne.RoundStatus
             IResponseRepository responseRepository, 
             IRoundRepository roundRepository, 
             IPlayerStatusRepository playerStatusRepository,
-            IPlayerRepository playerRepository,
+            PlayerStatusQueryService playerStatusQueryService,
             PlayerHubContext playerHub,
             RequestLogger<WaitingForResponsesRoundStatusService> logger)
         {
             _responseRepository = responseRepository;
             _roundRepository = roundRepository;
             _playerStatusRepository = playerStatusRepository;
-            _playerRepository = playerRepository;
+            _playerStatusQueryService = playerStatusQueryService;
             _playerHub = playerHub;
             _logger = logger;
         }
@@ -43,7 +43,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
             _logger.LogTrace("Checking all players have responded for round", round);
 
             //Have all players given responses?
-            if (await _responseRepository.AllPlayersHaveResponded(round))
+            if (await AllPlayersHaveResponded(round))
             {
                 _logger.LogTrace("All players have responded");
 
@@ -53,6 +53,11 @@ namespace GooseGames.Services.JustOne.RoundStatus
             {
                 _logger.LogTrace("Not all players have responded");
             }
+        }
+
+        private async Task<bool> AllPlayersHaveResponded(Round round)
+        {
+            return await _playerStatusQueryService.AllPlayersMatchStatus(round.SessionId, PlayerStatusEnum.PassivePlayerWaitingForClues, round.ActivePlayerId);
         }
 
         private async Task TransitionRoundStatusAsync(Round round)

@@ -174,6 +174,74 @@ namespace GooseGames.Controllers.JustOne
             }
         }
 
+        [HttpPost]
+        [ActionName(nameof(PlayerStatusEnum.PassivePlayerClue))]
+        public async Task<GenericResponse<bool>> SetPassivePlayerClueAsync(PlayerSessionRoundRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                await _playerStatusService.UpdatePlayerStatusToPassivePlayerClueAsync(request);
+
+                var result = NewResponse.Ok(true);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [ActionName(nameof(PlayerStatusEnum.PassivePlayerClueVote))]
+        public async Task<GenericResponse<bool>> SetPassivePlayerClueVoteAsync(PlayerSessionRoundRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                await _playerStatusService.UpdatePlayerStatusToPassivePlayerClueVoteAsync(request);
+
+                var result = NewResponse.Ok(true);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [ActionName(nameof(PlayerStatusEnum.PassivePlayerOutcomeVote))]
+        public async Task<GenericResponse<bool>> SetPassivePlayerOutcomeVoteAsync(PlayerSessionRoundRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                await _playerStatusService.UpdatePlayerStatusToPassivePlayerOutcomeVoteAsync(request);
+
+                var result = NewResponse.Ok(true);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
+            }
+        }
 
 
         private async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateStatus(PlayerSessionRequest request, Guid lobbyStatus)

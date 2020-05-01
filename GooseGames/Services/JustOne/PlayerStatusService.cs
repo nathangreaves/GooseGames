@@ -19,18 +19,21 @@ namespace GooseGames.Services.JustOne
         private readonly IPlayerStatusRepository _playerStatusRepository;
         private readonly RoundService _roundService;
         private readonly ISessionRepository _sessionRepository;
+        private readonly PlayerStatusQueryService _playerStatusQueryService;
         private readonly PlayerHubContext _playerHubContext;
         private readonly RequestLogger<PlayerDetailsService> _logger;
 
         public PlayerStatusService(IPlayerStatusRepository playerStatusRepository,
             RoundService roundService,
             ISessionRepository sessionRepository,
+            PlayerStatusQueryService playerStatusQueryService,
             PlayerHubContext playerHubContext,
             RequestLogger<PlayerDetailsService> logger)
         {
             _playerStatusRepository = playerStatusRepository;
             _roundService = roundService;
             _sessionRepository = sessionRepository;
+            _playerStatusQueryService = playerStatusQueryService;
             _playerHubContext = playerHubContext;
             _logger = logger;
         }
@@ -82,6 +85,51 @@ namespace GooseGames.Services.JustOne
             await _playerHubContext.SendPlayerReadyForRoundAsync(request.SessionId, request.PlayerId);
 
             await _roundService.ProgressRoundAsync(request.RoundId);
+        }
+
+        internal async Task<GenericResponseBase> UpdatePlayerStatusToPassivePlayerClueAsync(PlayerSessionRequest request)
+        {
+            var currentRound = await _roundService.GetCurrentRoundAsync(request);
+
+            if (await _playerStatusQueryService.AllPlayersMatchStatus(request.SessionId, PlayerStatusEnum.PassivePlayerWaitingForClues, currentRound.ActivePlayerId))
+            {
+                return GenericResponseBase.Error("Unable to undo as all players have now finished");
+            }
+            await UpdatePlayerStatusAsync(request.PlayerId, PlayerStatusEnum.PassivePlayerClue);
+
+            await _playerHubContext.SendClueRevokedAsync(request.SessionId, request.PlayerId);
+
+            return GenericResponseBase.Ok();
+        }
+
+        internal async Task<GenericResponseBase> UpdatePlayerStatusToPassivePlayerClueVoteAsync(PlayerSessionRoundRequest request)
+        {
+            var currentRound = await _roundService.GetCurrentRoundAsync(request);
+
+            if (await _playerStatusQueryService.AllPlayersMatchStatus(request.SessionId, PlayerStatusEnum.PassivePlayerWaitingForClueVotes, currentRound.ActivePlayerId))
+            {
+                return GenericResponseBase.Error("Unable to undo as all players have now finished");
+            }
+            await UpdatePlayerStatusAsync(request.PlayerId, PlayerStatusEnum.PassivePlayerClueVote);
+
+            await _playerHubContext.SendClueVoteRevokedAsync(request.SessionId, request.PlayerId);
+
+            return GenericResponseBase.Ok();
+        }
+
+        internal async Task<GenericResponseBase> UpdatePlayerStatusToPassivePlayerOutcomeVoteAsync(PlayerSessionRoundRequest request)
+        {
+            var currentRound = await _roundService.GetCurrentRoundAsync(request);
+
+            if (await _playerStatusQueryService.AllPlayersMatchStatus(request.SessionId, PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes, currentRound.ActivePlayerId))
+            {
+                return GenericResponseBase.Error("Unable to undo as all players have now finished");
+            }
+            await UpdatePlayerStatusAsync(request.PlayerId, PlayerStatusEnum.PassivePlayerOutcomeVote);
+
+            await _playerHubContext.SendResponseVoteRevokedAsync(request.SessionId, request.PlayerId);
+
+            return GenericResponseBase.Ok();
         }
     }
 }

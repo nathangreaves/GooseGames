@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { GenericResponse } from '../../models/genericresponse';
-import { IPlayerSession, IPlayerSessionComponent } from '../../models/justone/session'
+import { IPlayerSession, IPlayerSessionComponent, PlayerSessionRequest, ConvertToPlayerSessionRequest } from '../../models/justone/session'
 import { PlayerStatus, PlayerStatusValidationResponse, PlayerStatusRoutesMap } from '../../models/justone/playerstatus';
 import { Router } from '@angular/router';
 import { PlayerSessionRoundRequest } from '../../models/justone/round';
@@ -62,6 +62,18 @@ export class JustOnePlayerStatusService {
 
   public SetRoundWaiting(request: PlayerSessionRoundRequest): Promise<GenericResponse<boolean>> {
     return this._http.post<GenericResponse<boolean>>(this._baseUrl + `JustOnePlayerStatus/${PlayerStatus[PlayerStatus.RoundWaiting]}`, request).toPromise();
+  }
+
+  public SetPassivePlayerClue(request: IPlayerSession): Promise<GenericResponse<boolean>> {
+    return this._http.post<GenericResponse<boolean>>(this._baseUrl + `JustOnePlayerStatus/${PlayerStatus[PlayerStatus.PassivePlayerClue]}`, ConvertToPlayerSessionRequest(request)).toPromise();
+  }
+
+  public SetPassivePlayerClueVote(request: IPlayerSession): Promise<GenericResponse<boolean>> {
+    return this._http.post<GenericResponse<boolean>>(this._baseUrl + `JustOnePlayerStatus/${PlayerStatus[PlayerStatus.PassivePlayerClueVote]}`, ConvertToPlayerSessionRequest(request)).toPromise();
+  }
+
+  public SetPassivePlayerOutcomeVote(request: IPlayerSession): Promise<GenericResponse<boolean>> {
+    return this._http.post<GenericResponse<boolean>>(this._baseUrl + `JustOnePlayerStatus/${PlayerStatus[PlayerStatus.PassivePlayerOutcomeVote]}`, ConvertToPlayerSessionRequest(request)).toPromise();
   }
 
   public Set(playerId: string, playerStatus: PlayerStatus): Promise<GenericResponse<boolean>> {

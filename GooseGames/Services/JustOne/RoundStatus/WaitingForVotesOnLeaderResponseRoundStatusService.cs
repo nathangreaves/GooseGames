@@ -15,10 +15,8 @@ namespace GooseGames.Services.JustOne.RoundStatus
     {
         private readonly IResponseRepository _responseRepository;
         private readonly IResponseVoteRepository _responseVoteRepository;
-        private readonly IRoundRepository _roundRepository;
-        private readonly IPlayerStatusRepository _playerStatusRepository;
         private readonly IPlayerRepository _playerRepository;
-        private readonly PlayerHubContext _playerHub;
+        private readonly PlayerStatusQueryService _playerStatusQueryService;
         private readonly RequestLogger<WaitingForVotesOnLeaderResponseRoundStatusService> _logger;
 
         public override RoundStatusEnum RoundStatus => RoundStatusEnum.WaitingForVotesOnLeaderResponse;
@@ -30,16 +28,15 @@ namespace GooseGames.Services.JustOne.RoundStatus
             ISessionRepository sessionRepository,
             IPlayerStatusRepository playerStatusRepository,
             IPlayerRepository playerRepository,
+            PlayerStatusQueryService playerStatusQueryService,
             PlayerHubContext playerHub,
             RequestLogger<WaitingForVotesOnLeaderResponseRoundStatusService> logger) : base(roundRepository,
                 sessionRepository, playerStatusRepository, playerHub)
         {
             _responseRepository = responseRepository;
             _responseVoteRepository = responseVoteRepository;
-            _roundRepository = roundRepository;
-            _playerStatusRepository = playerStatusRepository;
             _playerRepository = playerRepository;
-            _playerHub = playerHub;
+            _playerStatusQueryService = playerStatusQueryService;            
             _logger = logger;
         }
 
@@ -59,18 +56,8 @@ namespace GooseGames.Services.JustOne.RoundStatus
         }
 
         private async Task<bool> PlayersHaveAllVoted(Round round)
-        {
-            var playerStatus = PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes;
-
-            _logger.LogTrace("Getting players for session");
-            var playersExceptActivePlayer = await _playerRepository.FilterAsync(p => p.SessionId == round.SessionId && p.Id != round.ActivePlayerId);
-            var playerIds = playersExceptActivePlayer.Select(player => player.Id).ToList();
-
-            _logger.LogTrace("Getting player status");
-            var playersThatHaveVotedCount = await _playerStatusRepository.CountAsync(p => playerIds.Contains(p.PlayerId) && p.Status == playerStatus);
-
-            _logger.LogTrace($"Players that have voted = {playersThatHaveVotedCount}, players to vote = {playersExceptActivePlayer.Count}");
-            return playersThatHaveVotedCount == playersExceptActivePlayer.Count;
+        {            
+            return await _playerStatusQueryService.AllPlayersMatchStatus(round.SessionId, PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes, round.ActivePlayerId);
         }
 
         private async Task TransitionRoundStatusAsync(Round round)

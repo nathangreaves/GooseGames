@@ -42,7 +42,7 @@ export class JustOneWaitingForRoundComponent extends JustOnePlayerWaitingCompone
   SetupHubConnection(hubConnection: signalR.HubConnection) {
 
     hubConnection.on("playerReadyForRound", (playerId :string) => {
-      this._playerWaitingComponent.PlayerHasTakenAction(playerId);
+      this._playerWaitingComponent.PlayerHasTakenAction(playerId, true);
     });
 
     hubConnection.on("beginRoundPassivePlayer", () => {

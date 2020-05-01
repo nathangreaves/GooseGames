@@ -1,6 +1,5 @@
 using GooseGames.Hubs;
 using GooseGames.Logging;
-using GooseGames.Services.JustOne.RoundStatus;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -48,11 +47,12 @@ namespace GooseGames
             services.AddScoped<Services.JustOne.PlayerActionInformationService>();
             services.AddScoped<Services.JustOne.PrepareNextRoundService>();
             services.AddScoped<Services.JustOne.RoundStatus.NewRoundStatusService>();
+            services.AddScoped<Services.JustOne.PlayerStatusQueryService>();
 
             services.AddScoped<PlayerHubContext>();
 
-            services.AddTransient<RoundServiceProvider>();
-            AddKeyedServices<IRoundStatusKeyedService>(services);
+            services.AddTransient<Services.JustOne.RoundStatus.RoundServiceProvider>();
+            AddKeyedServices<Services.JustOne.RoundStatus.IRoundStatusKeyedService>(services);
         }
 
         private void AddKeyedServices<T>(IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Transient)

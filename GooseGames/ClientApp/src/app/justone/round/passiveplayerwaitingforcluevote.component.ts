@@ -7,6 +7,7 @@ import { PlayerAction } from '../../../models/justone/playeractions'
 import { JustOnePlayerWaitingComponentBase, JustOnePlayerWaitingComponent } from './playerwaiting.component';
 import { JustOneRoundService } from '../../../services/justone/round';
 import { GenericResponse } from '../../../models/genericresponse';
+import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus';
 
 @Component({
   selector: 'app-just-one-passiveplayerwaitingforcluevote-component',
@@ -17,11 +18,15 @@ export class JustOnePassivePlayerWaitingForClueVoteComponent extends JustOnePlay
 
   _playerWaitingComponent: JustOnePlayerWaitingComponent;
   _playerActionsService: JustOneRoundService;
+  _playerStatusService: JustOnePlayerStatusService;
   _router: Router;
 
-  constructor(router: Router, activatedRoute: ActivatedRoute, playerActionsService: JustOneRoundService) {
+  DisableButtons: boolean = true;
+
+  constructor(router: Router, activatedRoute: ActivatedRoute, playerActionsService: JustOneRoundService, playerStatusService: JustOnePlayerStatusService) {
     super(activatedRoute);
     this._playerActionsService = playerActionsService;
+    this._playerStatusService = playerStatusService;
     this._router = router;
   }
 
@@ -36,12 +41,35 @@ export class JustOnePassivePlayerWaitingForClueVoteComponent extends JustOnePlay
   }
 
   LoadContent(): Promise<any> {
+    this.DisableButtons = false;
     return Promise.resolve();
+  }
+
+  Undo(): void {
+    this.DisableButtons = true;
+    this._playerStatusService.SetPassivePlayerClueVote(this)
+      .then(response => {
+        if (response.success) {
+          this._playerWaitingComponent.CloseHubConnection();
+          this._router.navigate([
+            PlayerStatusRoutesMap.PassivePlayerClueVote, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+        }
+        else {
+          this.ErrorMessage = response.errorCode;
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        this.HandleGenericError();
+      });      
   }
 
   SetupHubConnection(hubConnection: signalR.HubConnection) {
     hubConnection.on("clueVoteSubmitted", (playerId: string) => {
-      this._playerWaitingComponent.PlayerHasTakenAction(playerId);
+      this._playerWaitingComponent.PlayerHasTakenAction(playerId, true);
+    });
+    hubConnection.on("clueVoteRevoked", (playerId: string) => {
+      this._playerWaitingComponent.PlayerHasTakenAction(playerId, false);
     });
     hubConnection.on("allClueVotesSubmitted", () => {
       this._playerWaitingComponent.CloseHubConnection();
@@ -51,6 +79,7 @@ export class JustOnePassivePlayerWaitingForClueVoteComponent extends JustOnePlay
   }
   OnCloseHubConnection(hubConnection: signalR.HubConnection) {
     hubConnection.off("clueVoteSubmitted");
+    hubConnection.off("clueVoteRevoked");
     hubConnection.off("allClueVotesSubmitted");
   }
 

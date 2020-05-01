@@ -3,7 +3,7 @@
 </div>
 <div>
   <div *ngIf="!Loading">
-    <p>Here are your clues</p>
+    <span>Here are your clues:</span>
   </div>
   <app-just-one-cluelist-component [clueListComponent]="this"></app-just-one-cluelist-component>
   <div class="active-player-guess-submission" *ngIf="!Loading">

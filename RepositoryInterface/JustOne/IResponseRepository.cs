@@ -9,5 +9,6 @@ namespace RepositoryInterface.JustOne
     public interface IResponseRepository : ICommonRepository<Response>
     {
         Task<bool> AllPlayersHaveResponded(Round round);
+        Task DeleteForPlayerAsync(Guid roundId, Guid playerId);
     }
 }

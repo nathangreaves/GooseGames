@@ -11,21 +11,18 @@ namespace GooseGames.Services.JustOne.RoundStatus
 {
     public class LeaderResponseResolvedRoundStatusService : RoundStatusKeyedServiceBase
     {
-        private readonly IPlayerRepository _playerRepository;
-        private readonly IPlayerStatusRepository _playerStatusRepository;
+        private readonly PlayerStatusQueryService _playerStatusQueryService;
         private readonly PrepareNextRoundService _roundService;
         private readonly NewRoundStatusService _newRoundStatusService;
         private readonly RequestLogger<LeaderResponseResolvedRoundStatusService> _logger;
 
         public LeaderResponseResolvedRoundStatusService(
-            IPlayerRepository playerRepository,
-            IPlayerStatusRepository playerStatusRepository,
+            PlayerStatusQueryService playerStatusQueryService,
             PrepareNextRoundService roundService,
             NewRoundStatusService newRoundStatusService,
             RequestLogger<LeaderResponseResolvedRoundStatusService> logger)
         {
-            _playerRepository = playerRepository;
-            _playerStatusRepository = playerStatusRepository;
+            _playerStatusQueryService = playerStatusQueryService;
             _roundService = roundService;
             _newRoundStatusService = newRoundStatusService;
             _logger = logger;
@@ -36,7 +33,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
         public override async Task ConditionallyTransitionRoundStatusAsync(Round round)
         {
             _logger.LogTrace("Checking all players are ready for next round", round);
-            if (await AllPlayersReady(round))
+            if (await AllPlayersReady(round.SessionId))
             {
                 _logger.LogTrace("All players are ready for next round", round);
                 await TransitionRoundStatusAsync(round);
@@ -54,19 +51,9 @@ namespace GooseGames.Services.JustOne.RoundStatus
             await _newRoundStatusService.ConditionallyTransitionRoundStatusAsync(newRound);
         }
 
-        private async Task<bool> AllPlayersReady(Round round)
+        private async Task<bool> AllPlayersReady(Guid sessionId)
         {
-            var playerStatus = PlayerStatusEnum.RoundWaiting;
-
-            _logger.LogTrace("Getting players for session");
-            var playersExceptActivePlayer = await _playerRepository.FilterAsync(p => p.SessionId == round.SessionId);
-            var playerIds = playersExceptActivePlayer.Select(player => player.Id).ToList();
-
-            _logger.LogTrace("Getting player status");
-            var playersThatHaveVotedCount = await _playerStatusRepository.CountAsync(p => playerIds.Contains(p.PlayerId) && p.Status == playerStatus);
-
-            _logger.LogTrace($"Players that have voted = {playersThatHaveVotedCount}, players to vote = {playersExceptActivePlayer.Count}");
-            return playersThatHaveVotedCount == playersExceptActivePlayer.Count;
+            return await _playerStatusQueryService.AllPlayersMatchStatus(sessionId, PlayerStatusEnum.RoundWaiting);
         }
     }
 }

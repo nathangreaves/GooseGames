@@ -7,5 +7,7 @@
   </div>
   <app-just-one-playerwaiting-component [playerWaitingComponent]="this"></app-just-one-playerwaiting-component>
 </div>
-
+<div *ngIf="!Loading">
+  <button [disabled]="DisableButtons" class="btn btn-primary" (click)="Undo()">Undo</button>
+</div>
 <div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

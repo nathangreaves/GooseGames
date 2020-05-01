@@ -1,6 +1,9 @@
 
-.clue-word.clue-invalid {
+.clue-invalid {
   text-decoration: line-through;
+}
+
+.clue-word.clue-invalid {
   color: lightgray;
 }
 

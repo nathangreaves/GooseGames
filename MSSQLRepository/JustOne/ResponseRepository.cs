@@ -37,5 +37,17 @@ namespace MSSQLRepository.JustOne
 
             return countOfPlayersThatHaveNoResponse == 0;
         }
+
+        public async Task DeleteForPlayerAsync(Guid roundId, Guid playerId)
+        {
+            var response = await Context.Responses
+                .Where(r => r.RoundId == roundId && r.PlayerId == playerId)
+                .SingleOrDefaultAsync();
+
+            if (response != null)
+            {
+                await DeleteAsync(response);
+            }
+        }
     }
 }

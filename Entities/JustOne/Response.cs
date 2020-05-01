@@ -20,5 +20,6 @@ namespace Entities.JustOne
         public Guid RoundId { get; set; }
         public string Word { get; set; }
         public ResponseStatusEnum Status { get; set; }
+        public ICollection<ResponseVote> ResponseVotes { get; set; }
     }
 }

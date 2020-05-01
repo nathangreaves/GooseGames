@@ -177,11 +177,11 @@ export class JustOnePlayerWaitingComponent implements OnInit {
       }).hasTakenAction = true;
     }
   }
-  PlayerHasTakenAction(playerId: string) {
+  PlayerHasTakenAction(playerId: string, hasTakenAction: boolean) {
     if (playerId) {
       _.find(this.Players, p => {
         return p.id == playerId;
-      }).hasTakenAction = true;
+      }).hasTakenAction = hasTakenAction;
     }
   }
 }

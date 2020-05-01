@@ -14,7 +14,7 @@ namespace GooseGames
     {
         public static void Main(string[] args)
         {
-            //to test on mobile devices, in CMD -> run iisexpress-proxy 62598 to 81
+            //to test on mobile devices, in CMD -> iisexpress-proxy https://localhost:44339 to 81
 
             // NLog: setup the logger first to catch all errors
             var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
