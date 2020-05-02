@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import * as _ from 'lodash';
 import { JustOneRoundService } from '../../../services/justone/round'
-import { PlayerDetails, UpdatePlayerDetailsRequest } from '../../../models/justone/player'
+import { PlayerDetails, UpdatePlayerDetailsRequest } from '../../../models/player'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus'
 import { PlayerStatus, PlayerStatusRoutesMap } from '../../../models/justone/playerstatus'

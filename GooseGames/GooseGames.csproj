@@ -36,7 +36,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="ClientApp\src\app\fujiflush\demo.component.ts" />
+    <None Remove="ClientApp\src\app\fujiflush\disclaimer.component.ts" />
+    <None Remove="ClientApp\src\app\fujiflush\landing.component.ts" />
+    <None Remove="ClientApp\src\app\fujiflush\newplayerdetails.component.ts" />
+    <None Remove="ClientApp\src\app\fujiflush\session.component.ts" />
+    <None Remove="ClientApp\src\app\fujiflush\sessionlobby.component.ts" />
+    <None Remove="ClientApp\src\app\fujiflush\waiting.component.ts" />
     <None Remove="ClientApp\src\app\justone\declaration.component.ts" />
     <None Remove="ClientApp\src\app\justone\landing.component.ts" />
     <None Remove="ClientApp\src\app\justone\navbarheader.component.css" />
@@ -74,6 +79,9 @@
     <None Remove="ClientApp\src\models\justone\playerstatus.ts" />
     <None Remove="ClientApp\src\models\justone\round.ts" />
     <None Remove="ClientApp\src\models\justone\session.ts" />
+    <None Remove="ClientApp\src\services\fujiflush\localstorage.ts" />
+    <None Remove="ClientApp\src\services\fujiflush\playerdetails.ts" />
+    <None Remove="ClientApp\src\services\fujiflush\session.ts" />
     <None Remove="ClientApp\src\services\justone\clue.ts" />
     <None Remove="ClientApp\src\services\justone\localstorage.ts" />
     <None Remove="ClientApp\src\services\justone\playerdetails.ts" />
@@ -97,7 +105,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Include="ClientApp\src\app\fujiflush\demo.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\fujiflush\disclaimer.component.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\app\fujiflush\newplayerdetails.component.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\app\fujiflush\session.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\fujiflush\landing.component.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\app\fujiflush\sessionlobby.component.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\app\fujiflush\waiting.component.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\app\justone\declaration.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\navbarheader.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\landing.component.ts" />
@@ -129,10 +152,19 @@
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\card.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\hand.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\player.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\fujiflush\localstorage.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\services\fujiflush\playerdetails.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\services\fujiflush\session.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\ui.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\genericresponse.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\justone\clue.ts" />
-    <TypeScriptCompile Include="ClientApp\src\models\justone\player.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\player.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\justone\playeractions.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\justone\playerstatus.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\justone\round.ts" />

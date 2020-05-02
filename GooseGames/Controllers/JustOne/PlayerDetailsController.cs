@@ -9,8 +9,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.Requests.JustOne;
 using Models.Requests.JustOne.PlayerDetails;
+using Models.Requests.PlayerDetails;
 using Models.Responses;
 using Models.Responses.JustOne.PlayerDetails;
+using Models.Responses.PlayerDetails;
 
 namespace GooseGames.Controllers.JustOne
 {

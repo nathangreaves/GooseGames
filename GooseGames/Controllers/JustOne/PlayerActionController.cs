@@ -6,7 +6,7 @@ using GooseGames.Logging;
 using GooseGames.Services.JustOne;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Models.Requests.JustOne;
+using Models.Requests;
 using Models.Responses;
 using Models.Responses.JustOne;
 

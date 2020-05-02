@@ -1,0 +1,40 @@
+<div class="loading" *ngIf="Loading && !ErrorMessage">
+  I am loading...
+</div>
+<div *ngIf="!Loading">
+
+  <div class="lobby-header" *ngIf="SessionMaster && Players.length >= 4">
+    Waiting for you to start game
+  </div>
+  <div class="lobby-header" *ngIf="SessionMaster && Players.length < 4">
+    Waiting for at least 3 players before you can start game
+  </div>
+  <div class="lobby-header" *ngIf="SessionMaster">
+    Your game's identifier is <span style="font-weight: bold">{{Password}}</span>
+  </div>
+
+  <div class="lobby-header" *ngIf="!SessionMaster && Players.length >= 4">
+    Waiting for <span>{{SessionMasterName}}</span> to start game
+  </div>
+  <div class="lobby-header" *ngIf="!SessionMaster && Players.length < 4">
+    Waiting for enough players before <span>{{SessionMasterName}}</span> can start game
+  </div>
+
+  <div>
+    <table class="player-table">
+      <tr *ngFor="let player of Players;" [ngClass]="{'new-player' : player.playerNumber == 0}">
+        <td class="player-number-cell">{{player.playerNumber}}</td>
+        <td class="player-name-cell">
+          {{player.playerName}}
+        </td>
+        <td><button [disabled]="DisableButtons" *ngIf="SessionMaster && player.id != PlayerId" class="btn btn-primary" (click)="KickPlayer(player.id)">Kick</button></td>
+      </tr>
+    </table>
+  </div>
+
+  <div *ngIf="SessionMaster">
+    <button [disabled]="DisableButtons || Players.length < 3" class="btn btn-primary" (click)="StartGame()">Start Game</button>
+  </div>
+
+</div>
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

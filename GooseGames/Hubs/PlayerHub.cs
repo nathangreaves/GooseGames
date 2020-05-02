@@ -1,7 +1,7 @@
 ﻿using GooseGames.Logging;
 using GooseGames.Services.JustOne;
 using Microsoft.AspNetCore.SignalR;
-using Models.Responses.JustOne.PlayerDetails;
+using Models.Responses.PlayerDetails;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

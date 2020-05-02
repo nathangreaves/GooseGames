@@ -2,7 +2,7 @@
 using GooseGames.Hubs;
 using GooseGames.Logging;
 using Microsoft.AspNetCore.SignalR;
-using Models.Requests.JustOne;
+using Models.Requests;
 using Models.Responses;
 using Models.Responses.JustOne;
 using RepositoryInterface.JustOne;

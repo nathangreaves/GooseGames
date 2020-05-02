@@ -1,0 +1,23 @@
+.player-table {
+  /*padding-right: 15px;*/
+}
+
+  .player-table td {
+    padding-right: 15px;
+  }
+
+  .player-table .player-name-cell{
+      font-weight: bold;
+  }
+  
+  tr.new-player td {
+    color: lightgray;
+  }
+
+  .player-table response-given {
+
+  }
+
+  .player-table waiting-for-response{
+
+  }

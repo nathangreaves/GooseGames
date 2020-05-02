@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { JustOnePlayerDetailsService } from '../../services/justone/playerdetails'
 import { JustOneSessionService } from '../../services/justone/session'
 import { GenericResponse } from '../../models/genericresponse'
-import { PlayerDetails, UpdatePlayerDetailsRequest, PlayerDetailsResponse } from '../../models/justone/player'
+import { PlayerDetails, UpdatePlayerDetailsRequest, PlayerDetailsResponse } from '../../models/player'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import * as signalR from "@microsoft/signalr";
 import { JustOnePlayerStatusService } from '../../services/justone/playerstatus'

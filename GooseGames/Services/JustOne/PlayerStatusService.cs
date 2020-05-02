@@ -2,7 +2,7 @@
 using Entities.JustOne.Enums;
 using GooseGames.Hubs;
 using GooseGames.Logging;
-using Models.Requests.JustOne;
+using Models.Requests;
 using Models.Requests.JustOne.Round;
 using Models.Responses;
 using Models.Responses.JustOne.PlayerStatus;

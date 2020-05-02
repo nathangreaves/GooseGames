@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using GooseGames.Logging;
 using GooseGames.Services.JustOne;
 using Microsoft.AspNetCore.Mvc;
-using Models.Requests.JustOne;
+using Models.Requests;
 using Models.Requests.JustOne.Response;
 using Models.Responses;
 using Models.Responses.JustOne;

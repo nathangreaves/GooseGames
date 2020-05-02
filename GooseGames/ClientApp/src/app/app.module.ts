@@ -40,7 +40,12 @@ import { JustOneClueListComponent } from './justone/round/cluelist.component';
 import { NavbarHeaderDirective } from './nav-menu/navbar-header-directive';
 
 
-import { FujiDemoComponent } from './fujiflush/demo.component'
+import { FujiSessionComponent } from './fujiflush/session.component'
+import { FujiLandingComponent } from './fujiflush/landing.component';
+import { FujiDisclaimerComponent } from './fujiflush/disclaimer.component';
+import { FujiNewPlayerDetailsComponent } from './fujiflush/newplayerdetails.component';
+import { FujiSessionLobbyComponent } from './fujiflush/sessionlobby.component';
+import { FujiWaitingComponent } from './fujiflush/waiting.component';
 
 
 @NgModule({
@@ -49,12 +54,13 @@ import { FujiDemoComponent } from './fujiflush/demo.component'
     NavMenuComponent,
     NavbarHeaderDirective,
     HomeComponent,
-    JustOneLandingComponent,
     JustOneNavbarHeaderComponent,
+    TristateSwitch,
+
+    JustOneLandingComponent,
     JustOneDeclarationComponent,
     JustOneRejoinComponent,
 
-    TristateSwitch,
 
     JustOneNewPlayerDetailsComponent,
     JustOneSessionLobbyComponent,
@@ -77,8 +83,12 @@ import { FujiDemoComponent } from './fujiflush/demo.component'
     JustOnePlayerWaitingComponent,
     JustOneClueListComponent,
 
-
-    FujiDemoComponent
+    FujiLandingComponent,
+    FujiDisclaimerComponent,
+    FujiNewPlayerDetailsComponent,
+    FujiSessionLobbyComponent,
+    FujiWaitingComponent,
+    FujiSessionComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -87,7 +97,7 @@ import { FujiDemoComponent } from './fujiflush/demo.component'
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'justone', component: JustOneLandingComponent },
-      { path: 'fujiflush', component: FujiDemoComponent },
+      { path: 'fujiflush', component: FujiLandingComponent },
 
       { path: "justone/disclaimer", component: JustOneDeclarationComponent },
       { path: "justone/rejoin", component: JustOneRejoinComponent },
@@ -110,7 +120,13 @@ import { FujiDemoComponent } from './fujiflush/demo.component'
       { path: "justone/round/activeplayerwaitingforcluevotes", component: JustOneActivePlayerWaitingForClueVoteComponent },
       { path: "justone/round/activeplayerguess", component: JustOneActivePlayerGuess },
       { path: "justone/round/activeplayerwaitingforoutcomevotes", component: JustOneActivePlayerWaitingForOutcomeVoteComponent },
-      { path: "justone/round/activeplayeroutcome", component: JustOneActivePlayerRoundOutcomeComponent }
+      { path: "justone/round/activeplayeroutcome", component: JustOneActivePlayerRoundOutcomeComponent },
+
+      { path: 'fujiflush/disclaimer', component: FujiDisclaimerComponent },
+      { path: 'fujiflush/newplayer', component: FujiNewPlayerDetailsComponent },
+      { path: 'fujiflush/sessionlobby', component: FujiSessionLobbyComponent },
+      { path: 'fujiflush/waiting', component: FujiWaitingComponent },
+      { path: 'fujiflush/session', component: FujiSessionComponent },
     ])
   ],
   entryComponents: [

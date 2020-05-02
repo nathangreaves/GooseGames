@@ -3,7 +3,7 @@ using Entities.JustOne.Enums;
 using GooseGames.Hubs;
 using GooseGames.Logging;
 using Microsoft.AspNetCore.SignalR;
-using Models.Requests.JustOne;
+using Models.Requests;
 using Models.Requests.JustOne.Response;
 using Models.Responses;
 using Models.Responses.JustOne;

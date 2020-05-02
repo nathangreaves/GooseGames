@@ -49,7 +49,13 @@ namespace GooseGames
             services.AddScoped<Services.JustOne.RoundStatus.NewRoundStatusService>();
             services.AddScoped<Services.JustOne.PlayerStatusQueryService>();
 
+            services.AddScoped<Services.Fuji.SessionService>();
+            services.AddScoped<Services.Fuji.PlayerDetailsService>();
+            services.AddScoped<Services.Fuji.CardService>();
+            services.AddScoped<Services.Fuji.HandService>();
+
             services.AddScoped<PlayerHubContext>();
+            services.AddScoped<FujiHubContext>();
 
             services.AddTransient<Services.JustOne.RoundStatus.RoundServiceProvider>();
             AddKeyedServices<Services.JustOne.RoundStatus.IRoundStatusKeyedService>(services);
@@ -93,6 +99,7 @@ namespace GooseGames
                     pattern: "{controller}/{action=Index}/{id?}");
 
                 endpoints.MapHub<PlayerHub>("/lobbyhub");
+                endpoints.MapHub<FujiHub>("/fujihub");
             });
 
             app.UseSpa(spa =>

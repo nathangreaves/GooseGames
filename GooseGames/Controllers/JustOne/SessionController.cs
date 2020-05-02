@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Models.Requests.JustOne;
 using Models.Responses;
-using Models.Responses.JustOne;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +9,9 @@ using Microsoft.Extensions.Logging;
 using NLog;
 using GooseGames.Extensions;
 using GooseGames.Logging;
+using Models.Requests;
+using Models.Requests.Sessions;
+using Models.Responses.Sessions;
 
 namespace GooseGames.Controllers.JustOne
 {

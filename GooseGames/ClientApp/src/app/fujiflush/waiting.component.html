@@ -1,0 +1,11 @@
+<div class="loading" *ngIf="Loading && !ErrorMessage">
+  I am loading...
+</div>
+<div *ngIf="!Loading">
+  <div>
+    <p>Setting up the game...</p>
+    <p>FUJI FLUSH moment please</p>
+  </div>
+</div>
+
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>
