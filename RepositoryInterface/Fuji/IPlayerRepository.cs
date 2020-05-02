@@ -10,5 +10,6 @@ namespace RepositoryInterface.Fuji
     {
         Task DeleteUnreadyPlayersAsync(Guid sessionId);
         Task<int> GetNextPlayerNumberAsync(Guid sessionId);
+        Task<List<Player>> GetForSessionIncludePlayedCardsAsync(Guid sessionId);
     }
 }

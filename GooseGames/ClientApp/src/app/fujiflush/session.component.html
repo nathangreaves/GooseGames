@@ -1,4 +1,7 @@
-<div class="fuji-main">
+<div class="fuji-loading" *ngIf="Loading">
+  Loading...
+</div>
+<div class="fuji-main" *ngIf="!Loading">
   <div class="container players-area">
 
 
@@ -14,7 +17,6 @@
       <div class="hand col-4">
 
         <div class="game-card card-in-hand" *ngFor="let card of player.hand.cards">
-
         </div>
 
       </div>
@@ -57,9 +59,10 @@
                [ngClass]="{
                 'personal-hand-card-selected' : card.selected
                }"
-               (click)="CardSelected(card)">
+               >
             <div class="game-card personal-hand-card"
-                 [ngClass]="CardNumberCss.ResolveCardClass(card.faceValue)">
+                 [ngClass]="CardNumberCss.ResolveCardClass(card.faceValue)"
+                 (click)="CardSelected(card)">
               <span class="game-card-number">{{card.faceValue}}</span>
             </div>
           </div>

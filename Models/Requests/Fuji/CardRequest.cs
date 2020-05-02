@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Models.Requests.Fuji
 {
-    public class PlayCardRequest : PlayerSessionRequest
+    public class CardRequest
     {
         public Guid CardId { get; set; }
     }

@@ -6,6 +6,7 @@ using Models.Requests;
 using Models.Requests.Sessions;
 using Models.Responses;
 using Models.Responses.Fuji;
+using Models.Responses.Fuji.Hands;
 using Models.Responses.PlayerDetails;
 using Models.Responses.Sessions;
 using RepositoryInterface.Fuji;
@@ -21,19 +22,25 @@ namespace GooseGames.Services.Fuji
     {
         private readonly ISessionRepository _sessionRepository;
         private readonly IPlayerRepository _playerRepository;
+        private readonly DeckService _deckService;
+        private readonly CardService _cardService;
         private readonly FujiHubContext _fujiHubContext;
         private readonly RequestLogger<SessionService> _logger;
 
-        private const int MinNumberOfPlayersPerSession = 4;
+        private const int MinNumberOfPlayersPerSession = 3;
         private const int MaxNumberOfPlayersPerSession = 8;
 
         public SessionService(ISessionRepository sessionRepository,
             IPlayerRepository playerRepository,
+            DeckService deckService,
+            CardService cardService,
             FujiHubContext fujiHubContext,
             RequestLogger<SessionService> logger)
         {
             _sessionRepository = sessionRepository;
             _playerRepository = playerRepository;
+            _deckService = deckService;
+            _cardService = cardService;
             _fujiHubContext = fujiHubContext;
             _logger = logger;
         }
@@ -158,6 +165,10 @@ namespace GooseGames.Services.Fuji
             _logger.LogTrace("Fetching session");
             var session = await _sessionRepository.GetAsync(request.SessionId);
             session.StatusId = SessionStatusEnum.InProgress;
+            var players = await _playerRepository.FilterAsync(p => p.SessionId == request.SessionId && p.PlayerNumber > 0);
+
+            var random = new Random();
+            session.ActivePlayerId = players.Skip(random.Next(0, players.Count - 1)).Take(1).First().Id;
 
             _logger.LogTrace("Marking session in progress");
             await _sessionRepository.UpdateAsync(session);
@@ -175,17 +186,42 @@ namespace GooseGames.Services.Fuji
 
             await CleanUpExpiredSessions(request.SessionId);
 
-            //TODO: Prepare Deck
-            //await _roundService.PrepareRoundsAsync(request.SessionId);
+            await _deckService.PrepareDeckAsync(request.SessionId);
 
             await _fujiHubContext.SendBeginSessionAsync(request.SessionId);
 
             return GenericResponse<bool>.Ok(true);
         }
 
-        internal Task<GenericResponse<SessionResponse>> GetAsync(PlayerSessionRequest request)
+        internal async Task<GenericResponse<SessionResponse>> GetAsync(PlayerSessionRequest request)
         {
-            throw new NotImplementedException();
+            var session = await _sessionRepository.GetAsync(request.SessionId);
+
+            var players = await _playerRepository.GetForSessionIncludePlayedCardsAsync(session.Id);
+
+            var cards = await _deckService.GetHandCardsForSessionAsync(request.SessionId);
+
+            var cardCombinedValues = _cardService.GetCardCombinedValues(players);
+
+            return GenericResponse<SessionResponse>.Ok(new SessionResponse 
+            { 
+                Players = players.Select(p => new Models.Responses.Fuji.Players.Player 
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    PlayerNumber = p.PlayerNumber,
+                    PlayedCard = p.PlayedCard != null ? new Models.Responses.Fuji.Cards.PlayedCard 
+                    {
+                        FaceValue = p.PlayedCard.FaceValue,
+                        CombinedValue = cardCombinedValues[p.PlayedCard.FaceValue]
+                    } : null,
+                    Hand = new ConcealedHand 
+                    {
+                        NumberOfCards = cards.Where(c => c.PlayerId == p.Id).Count()
+                    },
+                    IsActivePlayer = session.ActivePlayerId == p.Id
+                })
+            });
         }
 
         internal async Task<Session> GetSessionAsync(Guid sessionId)

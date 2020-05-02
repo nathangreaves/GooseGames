@@ -1,5 +1,6 @@
 ﻿using GooseGames.Logging;
 using Microsoft.AspNetCore.SignalR;
+using Models.HubMessages.Fuji;
 using Models.Responses.PlayerDetails;
 using System;
 using System.Collections.Generic;
@@ -67,6 +68,7 @@ namespace GooseGames.Hubs
             _logger.LogInformation($"Sending playerRemoved: to {sessionId} :: {playerId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerRemoved", playerId);
         }
+
         public async Task SendStartingSessionAsync(Guid sessionId)
         {
             _logger.LogInformation($"Sending startingSession: to {sessionId}");
@@ -77,6 +79,18 @@ namespace GooseGames.Hubs
         {
             _logger.LogInformation($"Sending beginSession: to {sessionId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("beginSession");
+        }
+
+        internal async Task UpdateSessionAsync(Guid sessionId, FujiUpdate fujiUpdate)
+        {
+            _logger.LogInformation($"Sending updateSession: to {sessionId}", fujiUpdate);
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("updateSession", fujiUpdate);
+        }
+
+        internal async Task SendPlayerVictoryAsync(Guid sessionId, Guid playerId)
+        {
+            _logger.LogInformation($"Sending playerVictory: to {sessionId} :: {playerId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerVictory", playerId);
         }
     }
 }

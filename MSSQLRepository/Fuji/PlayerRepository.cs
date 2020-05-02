@@ -57,9 +57,14 @@ namespace MSSQLRepository.Fuji
             var reservedPlayerNumbers = await Context.Players
                 .Where(p => p.SessionId == sessionId && p.PlayerNumber != 0)
                 .Select(x => x.PlayerNumber)
-                .OrderBy(x => x).ToListAsync();
+                .OrderBy(x => x).ToListAsync().ConfigureAwait(false);
 
             return comparisonList.First(c => !reservedPlayerNumbers.Contains(c));
+        }
+
+        public async Task<List<Player>> GetForSessionIncludePlayedCardsAsync(Guid sessionId)
+        {
+            return await Context.Players.Include(p => p.PlayedCard).Where(p => p.SessionId == sessionId).ToListAsync().ConfigureAwait(false);
         }
     }
 }

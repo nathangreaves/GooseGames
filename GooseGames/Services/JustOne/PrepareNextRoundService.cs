@@ -81,7 +81,6 @@ namespace GooseGames.Services.JustOne
             }
             var indexOfPrevious = orderedList.IndexOf(previousActivePlayer);
             return orderedList[indexOfPrevious + 1];
-
         }
     }
 }

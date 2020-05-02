@@ -3,6 +3,7 @@ using GooseGames.Services.Fuji;
 using Microsoft.AspNetCore.Mvc;
 using Models.Requests.Fuji;
 using Models.Responses;
+using Models.Responses.Fuji.Cards;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,27 @@ namespace GooseGames.Controllers.Fuji
         {
             _cardService = cardService;
             _logger = logger;
+        }
+
+        [HttpGet]
+        public async Task<GenericResponse<Card>> GetAsync([FromQuery] CardRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _cardService.GetHandCardAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponse<Card>.Error($"Unknown Error {errorGuid}");
+            }
         }
 
         [HttpPost]
@@ -44,6 +66,27 @@ namespace GooseGames.Controllers.Fuji
                 return GenericResponseBase.Error($"Unknown Error {errorGuid}");
             }
 
+        }
+
+        [HttpDelete]
+        public async Task<GenericResponseBase> DeleteAsync([FromQuery]CardRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _cardService.DiscardHandCardAsync(request.CardId);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponse<Card>.Error($"Unknown Error {errorGuid}");
+            }
         }
     }
 }

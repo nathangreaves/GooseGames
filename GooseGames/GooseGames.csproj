@@ -71,6 +71,7 @@
     <None Remove="ClientApp\src\models\fujiflush\card.ts" />
     <None Remove="ClientApp\src\models\fujiflush\hand.ts" />
     <None Remove="ClientApp\src\models\fujiflush\player.ts" />
+    <None Remove="ClientApp\src\models\fujiflush\session.ts" />
     <None Remove="ClientApp\src\models\fujiflush\ui.ts" />
     <None Remove="ClientApp\src\models\genericresponse.ts" />
     <None Remove="ClientApp\src\models\justone\clue.ts" />
@@ -79,6 +80,7 @@
     <None Remove="ClientApp\src\models\justone\playerstatus.ts" />
     <None Remove="ClientApp\src\models\justone\round.ts" />
     <None Remove="ClientApp\src\models\justone\session.ts" />
+    <None Remove="ClientApp\src\services\fujiflush\hand.ts" />
     <None Remove="ClientApp\src\services\fujiflush\localstorage.ts" />
     <None Remove="ClientApp\src\services\fujiflush\playerdetails.ts" />
     <None Remove="ClientApp\src\services\fujiflush\session.ts" />
@@ -152,6 +154,8 @@
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\card.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\hand.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\player.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\fujiflush\session.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\fujiflush\hand.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\localstorage.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>

@@ -29,14 +29,14 @@ namespace MSSQLRepository.Fuji
         {
             var sessionsToRemove = await Context.Sessions.Where(x => x.Id != excludeSessionId
             && (x.StatusId == SessionStatusEnum.InProgress || x.StatusId == SessionStatusEnum.New)
-            && x.CreatedUtc < createdBeforeUtc).ToListAsync();
+            && x.CreatedUtc < createdBeforeUtc).ToListAsync().ConfigureAwait(false);
 
             if (sessionsToRemove.Any())
             {
                 foreach (var sessionToRemove in sessionsToRemove)
                 {
                     sessionToRemove.StatusId = SessionStatusEnum.Abandoned;
-                    await UpdateAsync(sessionToRemove);
+                    await UpdateAsync(sessionToRemove).ConfigureAwait(false);
                 }
             }
         }

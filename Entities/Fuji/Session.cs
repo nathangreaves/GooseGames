@@ -16,7 +16,8 @@ namespace Entities.Fuji
         public SessionStatusEnum StatusId { get; set; }        
         public Guid? SessionMasterId { get; set; }
         public Player SessionMaster { get; set; }
-        public int Score { get; set; }
+        public Guid? ActivePlayerId { get; set; }
+        public Player ActivePlayer { get; set; }
         public ICollection<DeckCard> DeckCards { get; set; }
         public ICollection<DiscardedCard> DiscardedCards { get; set; }
     }

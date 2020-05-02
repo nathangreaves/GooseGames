@@ -3,20 +3,20 @@
 </div>
 <div *ngIf="!Loading">
 
-  <div class="lobby-header" *ngIf="SessionMaster && Players.length >= 4">
+  <div class="lobby-header" *ngIf="SessionMaster && Players.length >= 3">
     Waiting for you to start game
   </div>
-  <div class="lobby-header" *ngIf="SessionMaster && Players.length < 4">
+  <div class="lobby-header" *ngIf="SessionMaster && Players.length < 3">
     Waiting for at least 3 players before you can start game
   </div>
   <div class="lobby-header" *ngIf="SessionMaster">
     Your game's identifier is <span style="font-weight: bold">{{Password}}</span>
   </div>
 
-  <div class="lobby-header" *ngIf="!SessionMaster && Players.length >= 4">
+  <div class="lobby-header" *ngIf="!SessionMaster && Players.length >= 3">
     Waiting for <span>{{SessionMasterName}}</span> to start game
   </div>
-  <div class="lobby-header" *ngIf="!SessionMaster && Players.length < 4">
+  <div class="lobby-header" *ngIf="!SessionMaster && Players.length < 3">
     Waiting for enough players before <span>{{SessionMasterName}}</span> can start game
   </div>
 
