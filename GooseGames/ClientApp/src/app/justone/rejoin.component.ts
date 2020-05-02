@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import * as _ from 'lodash';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import { IPlayerSessionComponent } from '../../models/justone/session';
+import { IPlayerSessionComponent } from '../../models/session';
 import { PlayerStatus } from '../../models/justone/playerstatus';
 import { JustOnePlayerStatusService } from '../../services/justone/playerstatus';
 import { GenericResponseBase } from '../../models/genericresponse';

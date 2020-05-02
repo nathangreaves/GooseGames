@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import * as _ from 'lodash';
 import { JustOneSessionService } from '../../services/justone/session'
 import { GenericResponse } from '../../models/genericresponse'
-import { SessionLandingResponse } from '../../models/justone/session'
+import { SessionLandingResponse } from '../../models/session'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { NavbarService } from '../../services/navbar';
 import { JustOneLocalStorage } from '../../services/justone/localstorage';

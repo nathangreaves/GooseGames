@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { GenericResponse, GenericResponseBase } from '../../models/genericresponse';
 import { PlayerAction, PassivePlayerRoundInformationResponse } from '../../models/justone/playeractions';
-import { IPlayerSession, ConvertToPlayerSessionRequest, PlayerSessionRequest } from '../../models/justone/session';
+import { IPlayerSession, ConvertToPlayerSessionRequest, PlayerSessionRequest } from '../../models/session';
 import { RoundOutcomeResponse, RoundInformationResponse } from '../../models/justone/round';
 
 @Injectable({

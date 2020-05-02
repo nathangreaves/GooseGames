@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { GenericResponse } from '../../models/genericresponse';
-import { SessionLandingRequest, SessionLandingResponse, IPlayerSession } from '../../models/justone/session';
+import { SessionLandingRequest, SessionLandingResponse, IPlayerSession } from '../../models/session';
 
 @Injectable({
   providedIn: 'root',

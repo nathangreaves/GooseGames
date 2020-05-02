@@ -1,4 +1,4 @@
-import { PlayerSessionRequest } from "./session";
+import { PlayerSessionRequest } from "../session";
 
 export class SubmitClueRequest {
   PlayerId: string;

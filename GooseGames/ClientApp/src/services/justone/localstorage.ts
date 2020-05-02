@@ -1,4 +1,4 @@
-import { IPlayerSession } from "../../models/justone/session";
+import { IPlayerSession } from "../../models/session";
 import { Injectable } from "@angular/core";
 
 @Injectable({

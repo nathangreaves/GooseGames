@@ -8,7 +8,7 @@ import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import * as signalR from "@microsoft/signalr";
 import { JustOnePlayerStatusService } from '../../services/justone/playerstatus'
 import { PlayerStatus } from '../../models/justone/playerstatus'
-import { IPlayerSessionComponent } from '../../models/justone/session';
+import { IPlayerSessionComponent } from '../../models/session';
 import { PlayerNumberCss } from '../../services/justone/ui'
 
 @Component({

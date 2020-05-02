@@ -5,7 +5,7 @@ import { PlayerDetails, UpdatePlayerDetailsRequest } from '../../../models/justo
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus'
 import { PlayerStatus, PlayerStatusRoutesMap } from '../../../models/justone/playerstatus'
-import { IPlayerSessionComponent } from '../../../models/justone/session';
+import { IPlayerSessionComponent } from '../../../models/session';
 import { GenericResponse } from '../../../models/genericresponse';
 import { JustOneClueService } from '../../../services/justone/clue';
 import { PlayerNumberCss } from '../../../services/justone/ui'

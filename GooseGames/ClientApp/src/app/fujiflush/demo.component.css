@@ -8,23 +8,46 @@
   box-sizing: border-box;
 }*/
 
-.player-box{
-    margin-top: 0.2em;
-    margin-bottom: 0.2em;
-    border-style: solid;
-    border-color: black;
-    border-width: 2px;
-    border-radius: 10px;
-    padding: 0.2em;
+.game-card {
+  background: #fff;
+  width: 1.5em;
+  height: 2em;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 4px;
+  border-color: #000;
+  text-align: center;
+  box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
 }
 
-.player-box.current-player{
-    background: lightgray;
+.player-box {
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+  border-style: solid;
+  border-color: black;
+  border-width: 0.1em;
+  border-radius: 10px;
+  padding: 0.2em;
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
+  background: #fcfcf7;
 }
 
-.player-box.current-player .player-name {
-    font-weight: bold;
-}
+  .player-box.fuji-current-player {
+    /*background: rgba(235,224,157,1)*/;
+  }
+
+    .player-box.fuji-current-player .player-name {
+      font-weight: bold;
+    }
+
+  .player-box.fuji-active-player {
+    box-shadow: inset 0px 0px 4px 4px rgba(88,120,34,1);
+    border-color: transparent;
+    border-width: 0px;
+    padding-top: 0.4em;
+    padding-bottom: 0.4em;
+  }
 
 .player-name-container {
   padding-left: 5px;
@@ -32,38 +55,61 @@
 }
 
 .player-name {
-    word-break: break-word;
+  word-break: break-word;
+  vertical-align: middle;
 }
 
 .hand {
   display: flex;
   flex-direction: row;
   padding-left: 5px;
-  padding-right: 5px;
+  padding-right: 5px;  
+  align-items: center;
 }
 
-.play-area {  
+.card-in-hand {
+  background: rgba(88,120,34,1);
+  background: radial-gradient(circle, rgba(235,224,157,1) 0%, rgba(88,120,34,1) 54%);  
+}
+
+.card-transparent {
+  background: transparent;
+  box-shadow: none;
+  border-style: none;
+  width: 1em;
+  text-align: center;
+}
+
+.play-area {
   display: flex;
   flex-direction: row;
   padding-left: 5px;
   padding-right: 5px;
+  align-items: center;
 }
 
+.filler{
+    height: 112px;
+}
 
-.game-card {
-  background: #fff;
-  width: 1.408em;
-  height: 2em;
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 4px;
-  border-color: #000;
-  text-align: center;
+.fuji-combined-card-container {
+  display: flex;
+  flex-direction: row;
+}
+
+div.remove-ws {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .game-card-number {
-  text-align: center;
-  font-size: 1.3em;
+  font-size: 1.2em;
   text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
 }
 
@@ -78,146 +124,142 @@
 
 /* #ebe09d */
 
-.card-in-hand {
-  background: rgba(88,120,34,1);
-  background: radial-gradient(circle, rgba(235,224,157,1) 0%, rgba(88,120,34,1) 54%);
+
+.players-area {
+    margin: 0;
 }
 
-.card-transparent {
-  background: transparent;
-  border-style: none;
-}
-
-
-
-.personal-play-area{
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
+.personal-play-area {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 112px;
+  border-top: 1px solid gray;
 }
 
 .personal-hand {
-  background: lightgray;
+  background: #fcfcf7;
   padding: 1em;
   display: flex;
   flex-direction: row;
+  justify-content: center;
 }
 
 .personal-hand-card {
-  margin: 0.1em;
   height: 5em;
   width: 3.52em;
+  box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.5);
 }
 
-.personal-hand-card .game-card-number{
+  .personal-hand-card .game-card-number {
     font-size: 2.3em;
-}
+  }
 
-.personal-hand-card:not(:first-child) {
-    margin-left: -0.4em;
+.personal-hand-card-container:not(:first-child) {
+  margin-left: -0.4em;
 }
 
 .personal-hand-card-selected {
   margin-left: 0em;
   margin-top: -2em;
+  z-index: 1;
 }
 
-.card-2 {
+.fuji-card-2 {
   background: #066561;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #066561 80%);
 }
 
-.card-3 {
+.fuji-card-3 {
   background: #417899;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #417899 80%);
 }
 
-.card-4 {
+.fuji-card-4 {
   background: #0977a7;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #0977a7 80%);
 }
 
-.card-5 {
+.fuji-card-5 {
   background: #475798;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #475798 80%);
 }
 
-.card-6 {
+.fuji-card-6 {
   background: #3f2866;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #3f2866 80%);
 }
 
 
-.card-7 {
+.fuji-card-7 {
   background: #6f1e53;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #6f1e53 80%);
 }
 
 /* colours taken from this website https://cf.geekdo-images.com/medium/img/1hDmGmPEEP67cK2AmV603RBQGx8=/fit-in/500x500/filters:no_upscale()/pic3280032.jpg */
 /* using https://imagecolorpicker.com/en/*/
-.card-8 {
+.fuji-card-8 {
   background: #931b52;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #931b52 80%);
 }
 
-.card-9 {
+.fuji-card-9 {
   background: #ae1b49;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #ae1b49 80%);
 }
 
-.card-10 {
+.fuji-card-10 {
   background: #dd1250;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #dd1250 80%);
 }
 
-.card-11 {
+.fuji-card-11 {
   background: #da1426;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #da1426 80%);
 }
 
-.card-12 {
+.fuji-card-12 {
   background: #dc1f1e;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #dc1f1e 80%);
 }
 
-.card-13 {
+.fuji-card-13 {
   background: #e14121;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #e14121 80%);
 }
 
-.card-14 {
+.fuji-card-14 {
   background: #c35418;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #c35418 80%);
 }
 
-.card-15 {
+.fuji-card-15 {
   background: #bb7811;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #bb7811 80%);
 }
 
-.card-16 {
+.fuji-card-16 {
   background: #dab72b;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #dab72b 80%);
 }
 
-.card-17 {
+.fuji-card-17 {
   background: #ada425;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #ada425 80%);
 }
 
-.card-18 {
+.fuji-card-18 {
   background: #777f1d;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #777f1d 80%);
 }
 
-.card-19 {
+.fuji-card-19 {
   background: #375418;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #375418 80%);
 }
 
-.card-20 {
+.fuji-card-20 {
   background: #145227;
   background: radial-gradient(circle, rgba(235,224,157,1) 0%, #145227 80%);
 }
-

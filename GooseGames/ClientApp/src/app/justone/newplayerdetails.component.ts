@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { JustOnePlayerDetailsService } from '../../services/justone/playerdetails'
 import { JustOnePlayerStatusService } from '../../services/justone/playerstatus'
 import { PlayerDetails, UpdatePlayerDetailsRequest } from '../../models/justone/player'
-import { IPlayerSessionComponent } from '../../models/justone/session'
+import { IPlayerSessionComponent } from '../../models/session'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { PlayerStatus, PlayerStatusValidationResponse } from '../../models/justone/playerstatus';
 import { JustOneLocalStorage } from '../../services/justone/localstorage';

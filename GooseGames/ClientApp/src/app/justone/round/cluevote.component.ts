@@ -4,7 +4,7 @@ import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus';
 import { PlayerStatus, PlayerStatusRoutesMap } from '../../../models/justone/playerstatus';
 import { JustOneClueService } from '../../../services/justone/clue';
-import { IPlayerSessionComponent } from '../../../models/justone/session';
+import { IPlayerSessionComponent } from '../../../models/session';
 import { PlayerClue, PlayerCluesResponse } from '../../../models/justone/clue';
 import { JustOneClueListComponentBase, JustOneClueListComponent } from './cluelist.component';
 import { GenericResponse, GenericResponseBase } from '../../../models/genericresponse';

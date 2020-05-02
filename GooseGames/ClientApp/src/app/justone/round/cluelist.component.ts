@@ -3,7 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus'
 import { PlayerStatus } from '../../../models/justone/playerstatus'
-import { IPlayerSessionComponent } from '../../../models/justone/session';
+import { IPlayerSessionComponent } from '../../../models/session';
 import { GenericResponse, GenericResponseBase } from '../../../models/genericresponse';
 import { PlayerCluesResponse, PlayerClue } from '../../../models/justone/clue';
 import { PlayerNumberCss } from '../../../services/justone/ui'

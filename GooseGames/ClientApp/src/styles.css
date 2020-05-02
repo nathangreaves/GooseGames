@@ -53,3 +53,11 @@ code {
 .just-one-player-7.just-one-apply-player-color {
   color: black;
 }
+
+.gg-app-container {  
+  height: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}

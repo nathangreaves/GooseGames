@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { GenericResponse } from '../../models/genericresponse';
-import { IPlayerSession, IPlayerSessionComponent, PlayerSessionRequest, ConvertToPlayerSessionRequest } from '../../models/justone/session'
+import { IPlayerSession, IPlayerSessionComponent, PlayerSessionRequest, ConvertToPlayerSessionRequest } from '../../models/session'
 import { PlayerStatus, PlayerStatusValidationResponse, PlayerStatusRoutesMap } from '../../models/justone/playerstatus';
 import { Router } from '@angular/router';
 import { PlayerSessionRoundRequest } from '../../models/justone/round';

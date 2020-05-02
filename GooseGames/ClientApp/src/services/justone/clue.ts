@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { GenericResponse, GenericResponseBase } from '../../models/genericresponse';
-import { IPlayerSession, ConvertToPlayerSessionRequest } from '../../models/justone/session';
+import { IPlayerSession, ConvertToPlayerSessionRequest } from '../../models/session';
 import { SubmitClueRequest, SubmitClueVotesRequest, PlayerClue, PlayerCluesResponse, SubmitActivePlayerResponseRequest } from '../../models/justone/clue';
 
 @Injectable({

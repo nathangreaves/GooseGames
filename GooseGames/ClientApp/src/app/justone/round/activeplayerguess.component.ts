@@ -4,7 +4,7 @@ import * as signalR from "@microsoft/signalr";
 import { Router, ActivatedRoute } from '@angular/router';
 import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus'
 import { PlayerStatus, PlayerStatusRoutesMap } from '../../../models/justone/playerstatus'
-import { IPlayerSessionComponent } from '../../../models/justone/session';
+import { IPlayerSessionComponent } from '../../../models/session';
 import { JustOneClueService } from '../../../services/justone/clue';
 import { JustOneClueListComponentBase, JustOneClueListComponent } from './cluelist.component';
 import { GenericResponse, GenericResponseBase } from '../../../models/genericresponse';
