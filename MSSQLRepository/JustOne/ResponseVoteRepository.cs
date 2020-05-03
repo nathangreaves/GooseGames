@@ -50,6 +50,7 @@ namespace MSSQLRepository.JustOne
         public async Task DeleteForPlayerAsync(Guid roundId, Guid playerId)
         {
             var responses = await Context.Responses                
+                .Include(r => r.ResponseVotes)
                 .Where(r => r.RoundId == roundId)
                 .SelectMany(r => r.ResponseVotes)
                 .Where(r => r.PlayerId == playerId)

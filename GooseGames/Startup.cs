@@ -53,6 +53,7 @@ namespace GooseGames
             services.AddScoped<Services.Fuji.PlayerDetailsService>();
             services.AddScoped<Services.Fuji.DeckService>();
             services.AddScoped<Services.Fuji.HandService>();
+            services.AddScoped<Services.Fuji.CardService>();
 
             services.AddScoped<PlayerHubContext>();
             services.AddScoped<FujiHubContext>();

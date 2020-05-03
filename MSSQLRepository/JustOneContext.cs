@@ -8,7 +8,7 @@ namespace MSSQLRepository
 {
     public class JustOneContext : DbContext
     {
-        public JustOneContext(DbContextOptions options)
+        public JustOneContext(DbContextOptions<JustOneContext> options)
                : base(options)
         {
         }
@@ -28,6 +28,8 @@ namespace MSSQLRepository
 
             modelBuilder.Entity<Response>().HasOne(s => s.Player).WithMany(p => p.Responses).HasForeignKey(r => r.PlayerId).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<Response>().HasOne(s => s.Round).WithMany(r => r.Responses).HasForeignKey(r => r.RoundId).OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Response>().HasMany(s => s.ResponseVotes).WithOne(r => r.Response).HasForeignKey(r => r.ResponseId).OnDelete(DeleteBehavior.NoAction);
         }
 
         public DbSet<Session> Sessions { get; set; }

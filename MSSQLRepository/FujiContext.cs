@@ -9,7 +9,7 @@ namespace MSSQLRepository
 {
     public class FujiContext : DbContext
     {
-        public FujiContext(DbContextOptions options)
+        public FujiContext(DbContextOptions<FujiContext> options)
                : base(options)
         {
         }
