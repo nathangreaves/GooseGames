@@ -27,7 +27,7 @@ namespace GooseGames.Services.Fuji
         private readonly FujiHubContext _fujiHubContext;
         private readonly RequestLogger<SessionService> _logger;
 
-        private const int MinNumberOfPlayersPerSession = 3;
+        private const int MinNumberOfPlayersPerSession = 2;
         private const int MaxNumberOfPlayersPerSession = 8;
 
         public SessionService(ISessionRepository sessionRepository,
@@ -141,6 +141,53 @@ namespace GooseGames.Services.Fuji
             });
         }
 
+        internal async Task<IEnumerable<JoinSessionResponse>> CreateTestSessionAsync()
+        {
+            var password = Guid.NewGuid().ToString();
+            var sessionResponse = await CreateSessionAsync(new NewSessionRequest { Password = password });
+            var masterPlayerId = sessionResponse.Data.PlayerId;
+            var sessionId = sessionResponse.Data.SessionId;
+
+            var masterPlayer = await _playerRepository.GetAsync(masterPlayerId);
+            masterPlayer.Name = "Player 1";
+            masterPlayer.PlayerNumber = 1;
+            await _playerRepository.UpdateAsync(masterPlayer);
+
+            var player2 = new Player 
+            {
+                SessionId = sessionId,
+                Name = "Player 2",
+                PlayerNumber = 2
+            };
+
+            var player3 = new Player
+            {
+                SessionId = sessionId,
+                Name = "Player 3",
+                PlayerNumber = 3
+            };
+
+            await _playerRepository.InsertAsync(player2);
+            await _playerRepository.InsertAsync(player3);
+
+            var session = await _sessionRepository.GetAsync(sessionId);
+            session.StatusId = SessionStatusEnum.InProgress;
+            session.ActivePlayerId = masterPlayerId;
+
+            await _sessionRepository.UpdateAsync(session);
+
+            await _deckService.PrepareDeckAsync(sessionId, testSession: true);
+
+            return new[] 
+            { 
+                new JoinSessionResponse { PlayerId = masterPlayer.Id, SessionId = sessionId } ,
+
+                new JoinSessionResponse { PlayerId = player2.Id, SessionId = sessionId },
+
+                new JoinSessionResponse { PlayerId = player3.Id, SessionId = sessionId }
+            };
+        }
+
         internal async Task<GenericResponseBase> StartSessionAsync(PlayerSessionRequest request)
         {
             _logger.LogTrace("Starting session", request);
@@ -175,9 +222,6 @@ namespace GooseGames.Services.Fuji
 
             _logger.LogTrace("Removing unready players");
             await _playerRepository.DeleteUnreadyPlayersAsync(request.SessionId);
-
-            //_logger.LogTrace("Updating all players to RoundWaiting status");
-            //await _playerStatusService.UpdateAllPlayersForSessionAsync(request.SessionId, PlayerStatusEnum.RoundWaiting);
 
             _logger.LogTrace("Sending update to clients");
             await _fujiHubContext.SendStartingSessionAsync(request.SessionId);
@@ -217,7 +261,7 @@ namespace GooseGames.Services.Fuji
                     } : null,
                     Hand = new ConcealedHand 
                     {
-                        NumberOfCards = cards.Where(c => c.PlayerId == p.Id).Count()
+                        NumberOfCards = cards.Where(c => c.PlayerId == p.Id && (p.PlayedCardId == null || p.PlayedCardId != c.Id)).Count()
                     },
                     IsActivePlayer = session.ActivePlayerId == p.Id
                 })

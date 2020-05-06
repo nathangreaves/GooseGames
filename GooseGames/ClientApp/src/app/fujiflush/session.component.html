@@ -1,9 +1,29 @@
 <div class="fuji-loading" *ngIf="Loading">
   Loading...
 </div>
-<div class="fuji-main" *ngIf="!Loading">
+<div class="fuji-winners" *ngIf="WinningPlayers && WinningPlayers.length > 0">
+  <div class="container">
+    <div class="row" *ngFor="let winningPlayer of WinningPlayers">
+      <div class="col-2"></div>
+      <div class="col-8 fuji-winner-text" >
+        <span class="player-name">{{winningPlayer.name}}</span>
+      </div>
+      <div class="col-2"></div>
+    </div>
+  </div>
+  <div class="row" *ngIf="WinningPlayers.length == 1">
+    <div class="col-2"></div>
+    <div class="col-8 fuji-winner-text">is the winner!</div>
+    <div class="col-2"></div>
+  </div>
+  <div class="row" *ngIf="WinningPlayers.length > 1">
+    <div class="col-2"></div>
+    <div class="col-8 fuji-winner-text">is the winner!</div>
+    <div class="col-2"></div>
+  </div>  
+</div>
+<div class="fuji-main" *ngIf="!Loading && (!WinningPlayers || WinningPlayers.length <= 0)">
   <div class="container players-area">
-
 
     <div class="row player-box" *ngFor="let player of Players;" [ngClass]="{
        'fuji-active-player' : player.isActivePlayer,
@@ -16,22 +36,23 @@
 
       <div class="hand col-4">
 
-        <div class="game-card card-in-hand" *ngFor="let card of player.hand.cards">
+        <div class="game-card card-in-hand" *ngFor="let card of player.hand.cards" @handCardEnter>
         </div>
 
       </div>
 
+      <!--*ngIf="player.playedCard && !player.playedCard.flushed && !player.playedCard.pushed" @playedCardAreaLeave-->
+      <div class="play-area col-4">
 
-      <div class="play-area col-4" *ngIf="player.playedCard">
-
-        <div class="game-card card-played" *ngIf="player.playedCard" [ngClass]="CardNumberCss.ResolveCardClass(player.playedCard.faceValue)">
+        <div class="game-card card-played" *ngIf="player.playedCard" [ngClass]="CardNumberCss.ResolveCardClass(player.playedCard.faceValue)"
+             [@playedCardLeave]="player.playedCard.flushed ? 'flushed' : player.playedCard.pushed ? 'pushed' : 'normal'">
           <span class="game-card-number">{{player.playedCard.faceValue}}</span>
         </div>
 
-        <div *ngIf="player.playedCard.combinedValue" class="fuji-combined-card-container remove-ws">
+        <div *ngIf="player.playedCard && !player.playedCard.pushed && !player.playedCard.flushed && player.playedCard.combinedValue && player.playedCard.combinedValue > player.playedCard.faceValue" class="fuji-combined-card-container remove-ws" @combinedValueEnter>
           <div class="game-card card-played card-transparent"><span>=</span></div>
 
-          <div class="game-card card-played" [ngClass]="CardNumberCss.ResolveCardClass(player.playedCard.combinedValue)">
+          <div class="game-card card-played" [ngClass]="CardNumberCss.ResolveCardClass(player.playedCard.combinedValue)" [@playedCardIncrement]="player.playedCard.combinedValue">
             <span class="game-card-number">{{player.playedCard.combinedValue}}</span>
           </div>
 
@@ -46,15 +67,27 @@
 
   </div>
 
+  <div class="active-player-played-card-area" @activePlayerPlayedCardTrigger *ngIf="ActivePlayerPlayedCardAnimation">
+    <div class="player-box">
+      <div class="player-name-container">
+        <span class="player-name">{{ActivePlayerPlayedCardAnimation.playerName}}:</span>
+      </div>
+      <div class="game-card card-played active-player-played-card" [ngClass]="CardNumberCss.ResolveCardClass(ActivePlayerPlayedCardAnimation.faceValue)">
+        <span class="game-card-number">{{ActivePlayerPlayedCardAnimation.faceValue}}</span>
+      </div>
+    </div>
+  </div>
+
   <div class="personal-play-area">
 
     <div class="container">
       <div class="row">
-        <div class="col-sm-1 col-md-3"></div>
+        <div class="col col-sm-1 col-md-3"></div>
 
         <div class="personal-hand col-12 col-sm-10 col-md-6">
 
           <div *ngFor="let card of Player.hand.cards;"
+               @handCardEnter
                class="personal-hand-card-container"
                [ngClass]="{
                 'personal-hand-card-selected' : card.selected
@@ -70,7 +103,7 @@
 
         </div>
 
-        <div class="col-sm-1 col-md-3"></div>
+        <div class="col col-sm-1 col-md-3"></div>
       </div>
     </div>
   </div>

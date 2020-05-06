@@ -7,5 +7,6 @@ namespace Models.HubMessages.Fuji
     public class ActivePlayerUpdate
     {
         public Guid ActivePlayerId { get; set; }
+        public List<PlayerDiscardUpdate> DiscardedCards { get; set; }
     }
 }

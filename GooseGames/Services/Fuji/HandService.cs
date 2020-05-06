@@ -13,18 +13,23 @@ namespace GooseGames.Services.Fuji
     public class HandService
     {
         private readonly IHandCardRepository _handCardRepository;
+        private readonly IPlayerRepository _playerRepository;
         private readonly RequestLogger<HandService> _logger;
 
         public HandService(IHandCardRepository handCardRepository,
+            IPlayerRepository playerRepository,
             RequestLogger<HandService> logger)
         {
             _handCardRepository = handCardRepository;
+            _playerRepository = playerRepository;
             _logger = logger;
         }
 
         internal async Task<GenericResponse<PlayerHand>> GetPlayerHandAsync(PlayerSessionRequest request)
         {
-            var cards = await _handCardRepository.FilterAsync(c => c.SessionId == request.SessionId && c.PlayerId == request.PlayerId);
+            var playedCardId = await _playerRepository.GetPropertyAsync(request.PlayerId, p => p.PlayedCardId);
+
+            var cards = await _handCardRepository.FilterAsync(c => c.SessionId == request.SessionId && c.PlayerId == request.PlayerId && (playedCardId == null || playedCardId != c.Id));
 
             return GenericResponse<PlayerHand>.Ok(new PlayerHand 
             {

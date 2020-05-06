@@ -41,4 +41,8 @@ export class FujiSessionService {
     var parameters = Object.keys(request).map(key => key + '=' + request[key]).join('&');
     return this._http.get<GenericResponse<FujiSession>>(this._baseUrl + `FujiSession?${parameters}`).toPromise();
   }
+
+  public CreateTestSession(): Promise<GenericResponse<SessionLandingResponse[]>> {
+    return this._http.post<GenericResponse<SessionLandingResponse[]>>(this._baseUrl + 'FujiSession/createtestsession', {}).toPromise();
+  }
 }

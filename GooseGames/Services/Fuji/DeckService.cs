@@ -36,8 +36,9 @@ namespace GooseGames.Services.Fuji
             { 20, 1 }
         };
 
-        private static Dictionary<int, int> s_PlayerCountStartingHandSizes = new Dictionary<int, int> 
+        private static Dictionary<int, int> s_PlayerCountStartingHandSizes = new Dictionary<int, int>
         {
+            { 2, 6 },
             { 3, 6 },
             { 4, 6 },
             { 5, 6 },
@@ -63,7 +64,7 @@ namespace GooseGames.Services.Fuji
             _logger = logger;
         }
 
-        internal async Task<GenericResponseBase> PrepareDeckAsync(Guid sessionId)
+        internal async Task<GenericResponseBase> PrepareDeckAsync(Guid sessionId, bool testSession = false)
         {
             List<DeckCard> deckCards = CreateNewDeck(sessionId);
 
@@ -75,8 +76,22 @@ namespace GooseGames.Services.Fuji
                 List<HandCard> handCard = new List<HandCard>();
                 for (int i = 0; i < cardsPerPlayer; i++)
                 {
-                    var card = deckCards[0];
-                    deckCards.RemoveAt(0);
+                    int deckIndex = 0;                    
+                    if (testSession)
+                    {
+                        //In a test session, deal everyone at least 1 copy of 2 & 3
+                        if (i == 0)
+                        {
+                            deckIndex = deckCards.FindIndex(0, x => x.FaceValue == 2);
+                        }
+                        else if (i == 1)
+                        {
+                            deckIndex = deckCards.FindIndex(0, x => x.FaceValue == 3);
+                        }
+                    }
+
+                    var card = deckCards[deckIndex];
+                    deckCards.RemoveAt(deckIndex);
 
                     handCard.Add(DealToPlayer(card, player));
                 }

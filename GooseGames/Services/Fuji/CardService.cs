@@ -58,29 +58,29 @@ namespace GooseGames.Services.Fuji
             var session = await _sessionRepository.GetAsync(request.SessionId);
             if (session == null)
             {
-
+                return GenericResponseBase.Error("Could not get session");
             }
 
             var players = await _playerRepository.GetForSessionIncludePlayedCardsAsync(request.SessionId);
-            if (players != null)
+            if (players == null)
             {
-
+                return GenericResponseBase.Error("Could not get players for session");
             }
 
             var currentPlayer = players.SingleOrDefault(p => p.Id == request.PlayerId);
             if (currentPlayer == null)
             {
-
+                return GenericResponseBase.Error("Could not get player");
             }
 
             var playedCard = await _handCardRepository.GetAsync(request.CardId);
             if (playedCard == null)
             {
-
+                return GenericResponseBase.Error("Could not get card");
             }
             if (playedCard.PlayerId != currentPlayer.Id)
             {
-
+                return GenericResponseBase.Error("Card did not match player");
             }
 
             currentPlayer.PlayedCard = playedCard;
@@ -89,13 +89,49 @@ namespace GooseGames.Services.Fuji
 
             var activePlayer = await GetNextActivePlayerAsync(request.SessionId, currentPlayer.Id);
             session.ActivePlayerId = activePlayer.Id;
-            await _sessionRepository.UpdateAsync(session);
-            fujiUpdate.ActivePlayerUpdate = new ActivePlayerUpdate
+            var activePlayerUpdate = new ActivePlayerUpdate
             {
-                ActivePlayerId = activePlayer.Id
+                ActivePlayerId = activePlayer.Id,
+                DiscardedCards = new List<PlayerDiscardUpdate>()
+            };
+            var gameVictoryUpdate = new GameVictoryUpdate
+            {
+                WinningPlayers = new List<Guid>()
             };
 
-            await _fujiHubContext.UpdateSessionAsync(session.Id, fujiUpdate);
+            if (activePlayer.PlayedCard != null)
+            {
+                var faceValue = activePlayer.PlayedCard.FaceValue;
+                foreach (var player in players.Where(p => p.PlayedCard != null && p.PlayedCard.FaceValue == faceValue))
+                {
+                    await _deckService.DiscardCardAsync(player.PlayedCard);
+
+                    player.PlayedCardId = null;
+                    await _playerRepository.UpdateAsync(player);
+
+                    var playerCards = await _handCardRepository.CountAsync(c => c.PlayerId == player.Id);
+
+                    activePlayerUpdate.DiscardedCards.Add(new PlayerDiscardUpdate 
+                    {
+                        PlayerId = player.Id
+                    });
+
+                    if (playerCards == 0)
+                    {
+                        gameVictoryUpdate.WinningPlayers.Add(player.Id);
+                    }
+                }
+            }
+
+            fujiUpdate.ActivePlayerUpdate = activePlayerUpdate;
+            if (gameVictoryUpdate.WinningPlayers.Any())
+            {                
+                session.StatusId = Entities.Fuji.Enums.SessionStatusEnum.Complete;
+                fujiUpdate.GameVictoryUpdate = gameVictoryUpdate;
+            }
+            await _sessionRepository.UpdateAsync(session);
+
+            await _fujiHubContext.SendUpdateSessionAsync(session.Id, fujiUpdate);
 
             return GenericResponseBase.Ok();
         }
@@ -152,7 +188,7 @@ namespace GooseGames.Services.Fuji
                         CombinedValue = currentPlayerCombinedCardValue
                     }
                 },
-                DicardedCards = new List<PlayerDiscardUpdate>(),
+                DiscardedCards = new List<PlayerDiscardUpdate>(),
                 NewDraws = new List<PlayerDrawUpdate>()
             };
 
@@ -174,7 +210,7 @@ namespace GooseGames.Services.Fuji
                 else if (playerCombinedValue < currentPlayerCombinedCardValue)
                 {
                     //This player must discard and redraw!
-                    fujiUpdate.DicardedCards.Add(new PlayerDiscardUpdate
+                    fujiUpdate.DiscardedCards.Add(new PlayerDiscardUpdate
                     {
                         PlayerId = player.Id
                     });

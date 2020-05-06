@@ -81,7 +81,7 @@ namespace GooseGames.Hubs
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("beginSession");
         }
 
-        internal async Task UpdateSessionAsync(Guid sessionId, FujiUpdate fujiUpdate)
+        internal async Task SendUpdateSessionAsync(Guid sessionId, FujiUpdate fujiUpdate)
         {
             _logger.LogInformation($"Sending updateSession: to {sessionId}", fujiUpdate);
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("updateSession", fujiUpdate);

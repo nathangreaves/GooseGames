@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { NavbarService } from '../services/navbar';
 
@@ -46,6 +47,7 @@ import { FujiDisclaimerComponent } from './fujiflush/disclaimer.component';
 import { FujiNewPlayerDetailsComponent } from './fujiflush/newplayerdetails.component';
 import { FujiSessionLobbyComponent } from './fujiflush/sessionlobby.component';
 import { FujiWaitingComponent } from './fujiflush/waiting.component';
+import { FujiTestSessionComponent } from './fujiflush/testsession.component';
 
 
 @NgModule({
@@ -83,6 +85,7 @@ import { FujiWaitingComponent } from './fujiflush/waiting.component';
     JustOnePlayerWaitingComponent,
     JustOneClueListComponent,
 
+    FujiTestSessionComponent,
     FujiLandingComponent,
     FujiDisclaimerComponent,
     FujiNewPlayerDetailsComponent,
@@ -92,6 +95,7 @@ import { FujiWaitingComponent } from './fujiflush/waiting.component';
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
+    BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot([
@@ -122,6 +126,7 @@ import { FujiWaitingComponent } from './fujiflush/waiting.component';
       { path: "justone/round/activeplayerwaitingforoutcomevotes", component: JustOneActivePlayerWaitingForOutcomeVoteComponent },
       { path: "justone/round/activeplayeroutcome", component: JustOneActivePlayerRoundOutcomeComponent },
 
+      { path: 'fujiflush/test', component: FujiTestSessionComponent },
       { path: 'fujiflush/disclaimer', component: FujiDisclaimerComponent },
       { path: 'fujiflush/newplayer', component: FujiNewPlayerDetailsComponent },
       { path: 'fujiflush/sessionlobby', component: FujiSessionLobbyComponent },

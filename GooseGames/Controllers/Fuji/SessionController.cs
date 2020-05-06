@@ -21,6 +21,7 @@ namespace GooseGames.Controllers.Fuji
         private readonly RequestLogger<FujiSessionController> _logger;
 
         public FujiSessionController(SessionService sessionService,
+            PlayerDetailsService playerDetailsService,
             RequestLogger<FujiSessionController> logger)
         {
             _sessionService = sessionService;
@@ -109,6 +110,29 @@ namespace GooseGames.Controllers.Fuji
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
                 return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [Route("CreateTestSession")]
+        public async Task<GenericResponse<IEnumerable<JoinSessionResponse>>> CreateTestSessionAsync()
+        {
+            try
+            {
+                _logger.LogInformation("Received request");
+
+                string sessionPassword = Guid.NewGuid().ToString();
+                var result = await _sessionService.CreateTestSessionAsync();
+                
+                _logger.LogInformation("Returned result");
+
+                return GenericResponse<IEnumerable<JoinSessionResponse>>.Ok(result);
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e);
+                return GenericResponse<IEnumerable<JoinSessionResponse>>.Error($"Unknown Error {errorGuid}");
             }
         }
     }

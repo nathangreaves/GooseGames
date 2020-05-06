@@ -41,6 +41,7 @@
     <None Remove="ClientApp\src\app\fujiflush\newplayerdetails.component.ts" />
     <None Remove="ClientApp\src\app\fujiflush\session.component.ts" />
     <None Remove="ClientApp\src\app\fujiflush\sessionlobby.component.ts" />
+    <None Remove="ClientApp\src\app\fujiflush\testsession.component.ts" />
     <None Remove="ClientApp\src\app\fujiflush\waiting.component.ts" />
     <None Remove="ClientApp\src\app\justone\declaration.component.ts" />
     <None Remove="ClientApp\src\app\justone\landing.component.ts" />
@@ -69,6 +70,7 @@
     <None Remove="ClientApp\src\app\nav-menu\navbar-header.ts" />
     <None Remove="ClientApp\src\assets\tristate-switch.component.ts" />
     <None Remove="ClientApp\src\models\fujiflush\card.ts" />
+    <None Remove="ClientApp\src\models\fujiflush\fujiupdate.ts" />
     <None Remove="ClientApp\src\models\fujiflush\hand.ts" />
     <None Remove="ClientApp\src\models\fujiflush\player.ts" />
     <None Remove="ClientApp\src\models\fujiflush\session.ts" />
@@ -80,6 +82,7 @@
     <None Remove="ClientApp\src\models\justone\playerstatus.ts" />
     <None Remove="ClientApp\src\models\justone\round.ts" />
     <None Remove="ClientApp\src\models\justone\session.ts" />
+    <None Remove="ClientApp\src\services\fujiflush\card.ts" />
     <None Remove="ClientApp\src\services\fujiflush\hand.ts" />
     <None Remove="ClientApp\src\services\fujiflush\localstorage.ts" />
     <None Remove="ClientApp\src\services\fujiflush\playerdetails.ts" />
@@ -120,6 +123,7 @@
     <TypeScriptCompile Include="ClientApp\src\app\fujiflush\sessionlobby.component.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\app\fujiflush\testsession.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\fujiflush\waiting.component.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
@@ -152,9 +156,11 @@
     <TypeScriptCompile Include="ClientApp\src\app\nav-menu\navbar-header.ts" />
     <TypeScriptCompile Include="ClientApp\src\assets\tristate-switch.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\card.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\fujiflush\fujiupdate.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\hand.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\player.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\session.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\fujiflush\card.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\hand.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\localstorage.ts">
       <SubType>Code</SubType>

@@ -3,20 +3,20 @@
 </div>
 <div *ngIf="!Loading">
 
-  <div class="lobby-header" *ngIf="SessionMaster && Players.length >= 3">
+  <div class="lobby-header" *ngIf="SessionMaster && Players.length >= MinPlayers">
     Waiting for you to start game
   </div>
-  <div class="lobby-header" *ngIf="SessionMaster && Players.length < 3">
-    Waiting for at least 3 players before you can start game
+  <div class="lobby-header" *ngIf="SessionMaster && Players.length < MinPlayers">
+    Waiting for at least {{MinPlayers}} players before you can start game
   </div>
   <div class="lobby-header" *ngIf="SessionMaster">
     Your game's identifier is <span style="font-weight: bold">{{Password}}</span>
   </div>
 
-  <div class="lobby-header" *ngIf="!SessionMaster && Players.length >= 3">
+  <div class="lobby-header" *ngIf="!SessionMaster && Players.length >= MinPlayers">
     Waiting for <span>{{SessionMasterName}}</span> to start game
   </div>
-  <div class="lobby-header" *ngIf="!SessionMaster && Players.length < 3">
+  <div class="lobby-header" *ngIf="!SessionMaster && Players.length < MinPlayers">
     Waiting for enough players before <span>{{SessionMasterName}}</span> can start game
   </div>
 
@@ -33,7 +33,7 @@
   </div>
 
   <div *ngIf="SessionMaster">
-    <button [disabled]="DisableButtons || Players.length < 3" class="btn btn-primary" (click)="StartGame()">Start Game</button>
+    <button [disabled]="DisableButtons || Players.length < MinPlayers" class="btn btn-primary" (click)="StartGame()">Start Game</button>
   </div>
 
 </div>

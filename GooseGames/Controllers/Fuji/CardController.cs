@@ -68,6 +68,7 @@ namespace GooseGames.Controllers.Fuji
 
         }
 
+        //TODO: Check if redundant
         [HttpDelete]
         public async Task<GenericResponseBase> DeleteAsync([FromQuery]CardRequest request)
         {

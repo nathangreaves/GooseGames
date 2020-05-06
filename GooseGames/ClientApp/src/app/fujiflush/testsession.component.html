@@ -1,0 +1,39 @@
+
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>
+
+<button (click)="Go()" class="btn btn-primary">Go</button>
+
+<div>
+  <ul>
+    <li *ngFor="let response of Responses">
+      <a [routerLink]="['/fujiflush/session', {SessionId: response.sessionId, PlayerId: response.playerId}]">Load Session</a>
+    </li>
+  </ul>
+</div>
+
+
+<button (click)="Add()" class="btn btn-primary">Add</button>
+<button (click)="Subtract()" class="btn btn-primary">Subtract</button>
+
+<div class="fuji-main">
+  <div class="container players-area">
+    <div class="row player-box">
+      <div class="play-area col-4" *ngIf="playedCard">
+
+        <div class="game-card card-played" *ngIf="playedCard" [ngClass]="CardNumberCss.ResolveCardClass(playedCard.faceValue)">
+          <span class="game-card-number">{{playedCard.faceValue}}</span>
+        </div>
+
+        <div *ngIf="playedCard.combinedValue && playedCard.combinedValue > playedCard.faceValue" class="fuji-combined-card-container remove-ws" @combinedValueEnter>
+          <div class="game-card card-played card-transparent"><span>=</span></div>
+
+          <div class="game-card card-played" [ngClass]="CardNumberCss.ResolveCardClass(playedCard.combinedValue)" [@playedCardIncrement]="playedCard.combinedValue">
+            <span class="game-card-number">{{playedCard.combinedValue}}</span>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
