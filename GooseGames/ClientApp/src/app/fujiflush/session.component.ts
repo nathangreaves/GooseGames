@@ -6,14 +6,11 @@ import {
   style,
   animate,
   transition,
-  sequence,
-  group,
-  query,
-  animateChild
+  sequence
   // ...
 } from '@angular/animations';
 import { FujiPlayer } from "../../models/fujiflush/player";
-import { FujiConcealedHand, FujiHand, FujiPlayerHand } from "../../models/fujiflush/hand";
+import { FujiConcealedHand, FujiPlayerHand } from "../../models/fujiflush/hand";
 import { FujiPlayedCard, FujiCard, FujiHandCard, ActivePlayerPlayedCardAnimation } from "../../models/fujiflush/card";
 import * as _ from "lodash";
 import { CardNumberCss } from '../../services/fujiflush/ui'
@@ -24,6 +21,7 @@ import { GenericResponseBase } from "../../models/genericresponse";
 import * as signalR from "@microsoft/signalr";
 import { FujiCardService } from "../../services/fujiflush/card";
 import { FujiUpdate } from "../../models/fujiflush/fujiupdate";
+import { NavbarService } from "../../services/navbar";
 
 @Component({
   selector: 'app-fujiflush-session-component',
@@ -38,19 +36,10 @@ import { FujiUpdate } from "../../models/fujiflush/fujiupdate";
           animate("0.5s", style({ opacity: 1 })),
           animate("1s", style({ opacity: 1 })),
           animate("0.5s", style({ opacity: 0 })),
-          style({ opacity: 0 })          
+          style({ opacity: 0 })
         ])
       ])
-    ]),    
-    //trigger('playedCardAreaLeave', [
-    //  state("*", style({ opacity: "*" })),
-    //  transition(':leave', [        
-    //    group([
-    //      query("@*", [animateChild()], { optional: true }),
-    //      animate("8s", style({ opacity: 0 }))         
-    //    ])
-    //  ])
-    //]),
+    ]),
     trigger('playedCardLeave', [
       state("*", style({ opacity: "*" })),
       state("pushed", style({ opacity: 0 })),
@@ -60,8 +49,8 @@ import { FujiUpdate } from "../../models/fujiflush/fujiupdate";
         style({ opacity: 0 }),
         sequence([
           style({ opacity: "*" }),
-          animate("2s", style({ transform: 'rotate(-720deg) scale(0)', opacity: 0 })),  
-          style({ opacity: 0 })          
+          animate("2s", style({ transform: 'rotate(-720deg) scale(0)', opacity: 0 })),
+          style({ opacity: 0 })
         ])
       ]),
       transition('normal => pushed', [
@@ -70,7 +59,7 @@ import { FujiUpdate } from "../../models/fujiflush/fujiupdate";
           style({ opacity: "*" }),
           animate("100ms", style({ transform: 'scale(0.7)', opacity: "*" })),
           animate("400ms", style({ transform: 'scale(1.4)', opacity: 0 })),
-          style({ opacity: 0 })          
+          style({ opacity: 0 })
         ])
       ])
     ]),
@@ -112,18 +101,12 @@ import { FujiUpdate } from "../../models/fujiflush/fujiupdate";
     ])
   ]
 })
-
-//transition(":leave", [
-//  style({ transform: "scaleY(1)", height: "*" }),
-//  query("@*", [animateChild()], { optional: true }),
-//  animate(transformTiming, style({ transform: "scaleY(0)", height: "0" }))
-//])
-
 export class FujiSessionComponent implements IPlayerSession {
 
   _sessionService: FujiSessionService;
   _handService: FujiHandService;
   _cardService: FujiCardService;
+  _navbarService: NavbarService;
 
   _hubConnection: signalR.HubConnection;
 
@@ -143,11 +126,12 @@ export class FujiSessionComponent implements IPlayerSession {
 
   CardNumberCss = CardNumberCss;
 
-  constructor(sessionService: FujiSessionService, handService: FujiHandService, cardService: FujiCardService, activatedRoute: ActivatedRoute) {
+  constructor(sessionService: FujiSessionService, handService: FujiHandService, cardService: FujiCardService, navbarService: NavbarService, activatedRoute: ActivatedRoute) {
 
     this._sessionService = sessionService;
     this._handService = handService;
     this._cardService = cardService;
+    this._navbarService = navbarService;
 
     this.SessionId = activatedRoute.snapshot.params.SessionId.toLowerCase();
     this.PlayerId = activatedRoute.snapshot.params.PlayerId.toLowerCase();
@@ -179,7 +163,9 @@ export class FujiSessionComponent implements IPlayerSession {
 
   PlayCard(card: FujiHandCard) {
 
-    //TODO: Disable playing of card.
+    if (!this.Player.isActivePlayer || this.Animating) {
+      return;
+    }
 
     var hand = this.Player.hand as FujiPlayerHand;
     _.remove(hand.cards, c => c.id == card.id);
@@ -193,12 +179,15 @@ export class FujiSessionComponent implements IPlayerSession {
     return this._sessionService.GetSession(this)
       .then(response => {
         if (response.success) {
+
+          this._navbarService.setReadOnly(true);
+
           var loadedPlayers = response.data.players
           this.setupConcealedHands(loadedPlayers);
 
           var winningPlayers = _.filter(loadedPlayers, p => p.hand.numberOfCards == 0 && !p.playedCard);
           if (winningPlayers && winningPlayers.length > 0) {
-            this.WinningPlayers = winningPlayers;
+            this.SetWinners(winningPlayers);
           }
 
           this.Players = loadedPlayers;
@@ -213,13 +202,14 @@ export class FujiSessionComponent implements IPlayerSession {
       })
   }
 
+  private SetWinners(winningPlayers: FujiPlayer[]) {
+    this.WinningPlayers = winningPlayers;
+    this._navbarService.setReadOnly(false);
+  }
+
   load() {
 
     this.Loading = true;
-
-    //TODO: Subscribe to hub events
-    // updateSession
-    // playerVictory
 
     this.setupConnection()
       .then(() => {
@@ -251,22 +241,25 @@ export class FujiSessionComponent implements IPlayerSession {
       this.handleGenericError("connection closed");
     });
 
-    //TODO: Do nice things with the fujiUpdate response
     this._hubConnection.on("updateSession", (fujiUpdate: FujiUpdate) => {
 
       this.updateSession(fujiUpdate);
 
-      //this.loadSession()
-      //  .then(data => {
-      //    if (data.success) {
-      //      this.Loading = false;
-      //    }
-      //  })
-      //  .catch(err => {
-      //    this.handleGenericError(err);
-      //  })
     });
     return this._hubConnection.start().catch(err => console.error(err));
+  }
+
+  reloadSession() {
+    this.Loading = true;
+      this.loadSession()
+        .then(data => {
+          if (data.success) {
+            this.Loading = false;
+          }
+        })
+        .catch(err => {
+          this.handleGenericError(err);
+        })
   }
 
   updateSession(fujiUpdate: FujiUpdate) {
@@ -299,31 +292,18 @@ export class FujiSessionComponent implements IPlayerSession {
         })
           .then(() => {
 
-            var count = 0;
             _.each(fujiUpdate.playedCards, playedCard => {
-              count++;
               var matchingPlayer = _.find(this.Players, player => player.id == playedCard.playerId);
 
-              //TODO: Animate :increment on playedCard.combinedValue
               matchingPlayer.playedCard.combinedValue = playedCard.combinedValue;
             });
-
-            //TODO: set to same as :increment animation duration
-            var duration = 0;
-
-            //return new Promise(function (resolve) {
-            //  setTimeout(resolve, duration * count);
-            //});
 
             return Promise.resolve(null);
           })
           .then(() => {
-            var count = 0;
             _.each(fujiUpdate.discardedCards, discardedCard => {
-              count++;
               var matchingPlayer = _.find(this.Players, player => player.id == discardedCard.playerId);
 
-              //TODO: Animate :leave on playedCard              
               matchingPlayer.playedCard.flushed = true;
             });
 
@@ -332,9 +312,7 @@ export class FujiSessionComponent implements IPlayerSession {
           .then(() => {
 
             var myNewCard = null;
-            var count = 0;
             _.each(fujiUpdate.newDraws, newCard => {
-              count++;
               var matchingPlayer = _.find(this.Players, player => player.id == newCard.playerId);
               matchingPlayer.hand.numberOfCards += 1;
 
@@ -346,7 +324,6 @@ export class FujiSessionComponent implements IPlayerSession {
                 concealedHand.cards.push(<FujiCard>{});
               }
 
-              //TODO: Animate :enter on hand card
             });
 
             if (myNewCard) {
@@ -375,15 +352,13 @@ export class FujiSessionComponent implements IPlayerSession {
 
             if (fujiUpdate.activePlayerUpdate.discardedCards) {
               return new Promise(function (resolve) {
-                setTimeout(resolve, 1000)
+                setTimeout(resolve, 500)
               });
             }
             return Promise.resolve();
           })
           .then(() => {
-            var count = 0;
             _.each(fujiUpdate.activePlayerUpdate.discardedCards, discardedCard => {
-              count++;
               var matchingPlayer = _.find(this.Players, player => player.id == discardedCard.playerId);
 
               matchingPlayer.playedCard.pushed = true;
@@ -400,11 +375,12 @@ export class FujiSessionComponent implements IPlayerSession {
             if (fujiUpdate.gameVictoryUpdate && fujiUpdate.gameVictoryUpdate.winningPlayers && fujiUpdate.gameVictoryUpdate.winningPlayers.length) {
 
               var winningPlayers = _.filter(this.Players, p => !!_.find(fujiUpdate.gameVictoryUpdate.winningPlayers, winningPlayer => p.id == winningPlayer));
-              this.WinningPlayers = winningPlayers;
+              this.SetWinners(winningPlayers);
             }
           })
           .catch(e => {
             this.handleGenericError(e);
+            this.reloadSession();
           })
           .finally(() => {
             this.Animating = false;
@@ -412,15 +388,15 @@ export class FujiSessionComponent implements IPlayerSession {
       }
     } catch (e) {
       this.handleGenericError(e);
+      this.reloadSession();
       this.Animating = false;
     }
 
   }
 
-  LoadNewCard(newCardId: string): Promise<any> {    
+  LoadNewCard(newCardId: string): Promise<any> {
 
-    return this._cardService.GetCard(newCardId).then(response =>
-    {
+    return this._cardService.GetCard(newCardId).then(response => {
       if (response.success) {
         var hand = this.Player.hand as FujiPlayerHand;
         hand.cards.push(response.data);

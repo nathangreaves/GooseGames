@@ -1,11 +1,12 @@
 <div class="fuji-loading" *ngIf="Loading">
   Loading...
 </div>
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>
 <div class="fuji-winners" *ngIf="WinningPlayers && WinningPlayers.length > 0">
   <div class="container">
     <div class="row" *ngFor="let winningPlayer of WinningPlayers">
       <div class="col-2"></div>
-      <div class="col-8 fuji-winner-text" >
+      <div class="col-8 fuji-winner-text">
         <span class="player-name">{{winningPlayer.name}}</span>
       </div>
       <div class="col-2"></div>
@@ -20,7 +21,7 @@
     <div class="col-2"></div>
     <div class="col-8 fuji-winner-text">is the winner!</div>
     <div class="col-2"></div>
-  </div>  
+  </div>
 </div>
 <div class="fuji-main" *ngIf="!Loading && (!WinningPlayers || WinningPlayers.length <= 0)">
   <div class="container players-area">
@@ -91,8 +92,7 @@
                class="personal-hand-card-container"
                [ngClass]="{
                 'personal-hand-card-selected' : card.selected
-               }"
-               >
+               }">
             <div class="game-card personal-hand-card"
                  [ngClass]="CardNumberCss.ResolveCardClass(card.faceValue)"
                  (click)="CardSelected(card)">
