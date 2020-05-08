@@ -25,7 +25,7 @@ export class FujiSessionLobbyComponent implements IPlayerSessionComponent {
   PlayerId: string;
   ErrorMessage: string;
 
-  MinPlayers: number = 2;
+  MinPlayers: number = 3;
 
   public Loading: boolean;
   public SessionMaster: boolean;
