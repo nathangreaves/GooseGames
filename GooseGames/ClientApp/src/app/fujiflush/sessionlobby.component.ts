@@ -48,16 +48,9 @@ export class FujiSessionLobbyComponent implements IPlayerSessionComponent {
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;
 
     this.setupConnection();
-
-    this.Validate()
-      .then(() => this.load());
+    this.load();
   }
 
-  private Validate(): Promise<any> {
-    return Promise.resolve(null);
-    //TODO: Some player validation here
-    //return this._playerStatusService.Validate(this, PlayerStatus.InLobby, () => { this.CloseConnection(); });
-  }
 
   public StartGame() {
     if (_.find(this.Players, p => p.playerNumber == 0)) {
@@ -119,7 +112,7 @@ export class FujiSessionLobbyComponent implements IPlayerSessionComponent {
       .build();
 
     this._hubConnection.onreconnected(() => {
-      this.Validate();
+
     });
     this._hubConnection.onclose(() => {
       this.HandleGenericError();
@@ -143,6 +136,10 @@ export class FujiSessionLobbyComponent implements IPlayerSessionComponent {
     this._hubConnection.on("startingSession", () => {
       this.CloseConnection();
       this._router.navigate(['/fujiflush/waiting', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+    });
+    this._hubConnection.on("beginSession", () => {
+      this.CloseConnection();
+      this._router.navigate(['/fujiflush/session', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
     return this._hubConnection.start().catch(err => console.error(err));
   }
