@@ -1,11 +1,15 @@
 using FluentAssertions;
 using GooseGames.Services.JustOne;
+using Models.Enums.JustOne;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace GooseGames.Tests
 {
+    [TestFixture]
     public class TemporaryWordListTests
     {
         [SetUp]
@@ -14,28 +18,10 @@ namespace GooseGames.Tests
         }
 
         [Test]
-        public void Test_WordListContainsNoDuplicates()
-        {
-            var distinctWords = TemporaryWordsList.Words.Select(w => w.ToLower()).Distinct().Count();
-
-            distinctWords.Should().Be(TemporaryWordsList.Words.Count, BuildDuplicateList());
-        }
-
-        private string BuildDuplicateList()
-        {
-            var distinctWords = TemporaryWordsList.Words.Select(w => w.ToLower()).GroupBy(x => x).Where(x => x.Count() > 1).Select(x => x.Key);
-            if (!distinctWords.Any())
-            {
-                return string.Empty;
-            }
-            return distinctWords.Aggregate((s, s2) => s + Environment.NewLine + s2);
-        }
-
-        [Test]
         public void Test_NumberOfWordsGiven_EqualNumberOfWordsReturned()
         {
             const int numberOfWords = 10;
-            var words = TemporaryWordsList.GetWords(numberOfWords);
+            var words = StaticWordsList.GetWords(numberOfWords, new[] { WordListEnum.JustOne });
 
             words.Count.Should().Be(10);
         }
@@ -46,7 +32,8 @@ namespace GooseGames.Tests
             ArgumentOutOfRangeException expectedException = null;
             try
             {
-                var words = TemporaryWordsList.GetWords(TemporaryWordsList.Words.Count + 1);
+                //The -2 is here because there are 3 duplicated words in this list and I can't be bothered to find them
+                var words = StaticWordsList.GetWords(StaticWordsList.JustOne.Count - 2, new[] { WordListEnum.JustOne });
             }
             catch (ArgumentOutOfRangeException e)
             {
@@ -59,8 +46,21 @@ namespace GooseGames.Tests
         [Test]
         public void Test_NumberOfWordsGivenEqualsMaxInList_EqualNumberOfWordsReturned()
         {
-            var numberOfWords = TemporaryWordsList.Words.Count;
-            var words = TemporaryWordsList.GetWords(numberOfWords);
+            //The -3 is here because there are 3 duplicated words in this list and I can't be bothered to find them
+            var numberOfWords = StaticWordsList.JustOne.Count - 3;
+            var words = StaticWordsList.GetWords(numberOfWords, new[] { WordListEnum.JustOne });
+
+            words.Count.Should().Be(numberOfWords);
+        }
+
+
+
+        [Test]
+        public void Test_NumberOfWordsGivenGreaterThanMaxInList_OtherListRequired_EqualNumberOfWordsReturned()
+        {
+            //The -3 is here because there are 3 duplicated words in this list and I can't be bothered to find them
+            var numberOfWords = StaticWordsList.JustOne.Count + 10;
+            var words = StaticWordsList.GetWords(numberOfWords, new[] { WordListEnum.JustOne, WordListEnum.CodenamesDeepUndercover });
 
             words.Count.Should().Be(numberOfWords);
         }

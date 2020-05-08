@@ -82,6 +82,7 @@
     <None Remove="ClientApp\src\models\justone\playerstatus.ts" />
     <None Remove="ClientApp\src\models\justone\round.ts" />
     <None Remove="ClientApp\src\models\justone\session.ts" />
+    <None Remove="ClientApp\src\models\justone\wordlistenum.ts" />
     <None Remove="ClientApp\src\services\fujiflush\card.ts" />
     <None Remove="ClientApp\src\services\fujiflush\hand.ts" />
     <None Remove="ClientApp\src\services\fujiflush\localstorage.ts" />
@@ -93,6 +94,7 @@
     <None Remove="ClientApp\src\services\justone\playerstatus.ts" />
     <None Remove="ClientApp\src\services\justone\round.ts" />
     <None Remove="ClientApp\src\services\justone\ui.ts" />
+    <None Remove="ClientApp\src\services\localstorage.ts" />
     <None Remove="ClientApp\src\services\navbar.ts" />
     <None Remove="ClientApp\src\services\session.ts" />
     <None Remove="ClientApp\tsconfig.json" />
@@ -160,6 +162,7 @@
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\hand.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\player.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\session.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\justone\wordlistenum.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\card.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\hand.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\localstorage.ts">
@@ -186,6 +189,7 @@
     <TypeScriptCompile Include="ClientApp\src\services\justone\playerstatus.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\session.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\ui.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\localstorage.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\navbar.ts" />
   </ItemGroup>
 

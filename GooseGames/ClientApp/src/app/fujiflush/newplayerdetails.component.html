@@ -1,17 +1,15 @@
 <div class="loading" *ngIf="Loading && !ErrorMessage">
   I am loading...
 </div>
-<div *ngIf="!Loading">
+<form *ngIf="!Loading">
   <div>
     <span>Please enter your name</span>
   </div>
   <div>
-    <input #playerName />
+    <input [(ngModel)]="PlayerName"  name="playername"/>
   </div>
   <div>
-    <button class="btn btn-primary" (click)="SubmitPlayerDetails({
-   playerName: playerName.value
-   })">Enter Game</button>
+    <button class="btn btn-primary" type="submit" (click)="SubmitPlayerDetails()">Enter Game</button>
   </div>
-</div>
+</form>
 <div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

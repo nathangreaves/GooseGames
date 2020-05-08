@@ -2,6 +2,7 @@
 using Entities.JustOne.Enums;
 using GooseGames.Logging;
 using GooseGames.Services.JustOne.RoundStatus;
+using Models.Enums.JustOne;
 using Models.Requests;
 using Models.Requests.JustOne.Round;
 using Models.Responses;
@@ -108,7 +109,7 @@ namespace GooseGames.Services.JustOne
             return GenericResponse<RoundOutcomeResponse>.Ok(outcome);
         }
 
-        internal async Task PrepareRoundsAsync(Guid sessionId)
+        internal async Task PrepareRoundsAsync(Guid sessionId, IEnumerable<WordListEnum> includedWordLists)
         {
             _logger.LogTrace("Preparing Round", sessionId);
 
@@ -116,7 +117,7 @@ namespace GooseGames.Services.JustOne
 
             _logger.LogTrace("Found session");
 
-            var words = GetWords(session, DefaultNumberOfRounds);
+            var words = GetWords(DefaultNumberOfRounds, includedWordLists);
 
             var rounds = words.Select(word => 
             {
@@ -149,9 +150,9 @@ namespace GooseGames.Services.JustOne
             await roundStatusService.ConditionallyTransitionRoundStatusAsync(round);
         }
 
-        public List<string> GetWords(Session session, int numberOfWords)
+        public List<string> GetWords(int numberOfWords, IEnumerable<WordListEnum> includedWordLists)
         {
-            return TemporaryWordsList.GetWords(numberOfWords);
+            return StaticWordsList.GetWords(numberOfWords, includedWordLists);
         }
 
         internal async Task<Round> GetCurrentRoundAsync(PlayerSessionRequest request)

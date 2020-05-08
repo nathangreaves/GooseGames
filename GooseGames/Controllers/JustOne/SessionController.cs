@@ -12,6 +12,7 @@ using GooseGames.Logging;
 using Models.Requests;
 using Models.Requests.Sessions;
 using Models.Responses.Sessions;
+using Models.Requests.JustOne;
 
 namespace GooseGames.Controllers.JustOne
 {
@@ -72,7 +73,7 @@ namespace GooseGames.Controllers.JustOne
 
         [HttpPost]
         [Route("StartSession")]
-        public async Task<GenericResponse<bool>> StartSessionAsync(PlayerSessionRequest request)
+        public async Task<GenericResponse<bool>> StartSessionAsync(StartSessionRequest request)
         {
             try
             {

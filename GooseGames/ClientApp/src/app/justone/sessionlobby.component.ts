@@ -10,6 +10,7 @@ import { JustOnePlayerStatusService } from '../../services/justone/playerstatus'
 import { PlayerStatus } from '../../models/justone/playerstatus'
 import { IPlayerSessionComponent } from '../../models/session';
 import { PlayerNumberCss } from '../../services/justone/ui'
+import { WordListCheckboxListItem, JustOneWordList } from '../../models/justone/wordlistenum';
 
 @Component({
   selector: 'app-just-one-sessionlobby-component',
@@ -37,7 +38,9 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
   public SessionMasterPlayerNumber: number;
   public Password: string;
   public Players: PlayerDetailsResponse[];
+  public AvailableWordLists: WordListCheckboxListItem[];
 
+  MinPlayers: number = 3;
 
   DisableButtons: boolean;
 
@@ -67,9 +70,13 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
       this.ErrorMessage = "Not all players are ready";
       return;
     }
+    if (!_.find(this.AvailableWordLists, p => p.Checked)) {
+      this.ErrorMessage = "Please select at least one word list";
+      return;
+    }
 
     this.DisableButtons = true;
-    this._sessionService.StartSession(this)
+    this._sessionService.StartSession(this, _.filter(this.AvailableWordLists, w => w.Checked).map(w => w.WordList))
       .then(response => {
         if (!response.success) {
           this.ErrorMessage = response.errorCode;
@@ -107,6 +114,30 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
           _.forEach(this.Players, player => {
             this.setDefaultNewPlayerName(player);
           });
+
+          this.AvailableWordLists = [
+            <WordListCheckboxListItem>{
+              Name: "Just One",
+              Checked: true,
+              WordList: JustOneWordList.JustOne
+            },
+            <WordListCheckboxListItem>{
+              Name: "Codenames",
+              Checked: true,
+              WordList: JustOneWordList.Codenames
+            },
+            <WordListCheckboxListItem>{
+              Name: "Codenames Duet",
+              Checked: true,
+              WordList: JustOneWordList.CodenamesDuet
+            },
+            <WordListCheckboxListItem>{
+              Name: "Codenames Rude Words 😲",
+              Checked: false,
+              WordList: JustOneWordList.CodenamesDeepUndercover
+            }
+          ];
+
           this.Loading = false;
         }
         else {

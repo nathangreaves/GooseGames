@@ -22,9 +22,11 @@ export class FujiNewPlayerDetailsComponent implements IPlayerSessionComponent {
   ErrorMessage: string;
   Loading: boolean = true;
 
+  PlayerName: string;
+
   constructor(playerDetailsService: FujiPlayerDetailsService, fujiLocalStorage: FujiLocalStorage,
     router: Router, activatedRoute: ActivatedRoute) {
-    this._playerDetailsService = playerDetailsService;    
+    this._playerDetailsService = playerDetailsService;
     this._fujiLocalStorage = fujiLocalStorage;
     this._router = router;
 
@@ -38,20 +40,26 @@ export class FujiNewPlayerDetailsComponent implements IPlayerSessionComponent {
     //      this.Loading = false;
     //    }
     //  });
-          this.Loading = false;
+
+    this.PlayerName = this._fujiLocalStorage.GetPlayerName();
+
+    this.Loading = false;
   }
 
-  public SubmitPlayerDetails(playerDetails: PlayerDetails) {
+  public SubmitPlayerDetails() {
 
-    var playerDetailsRequest = <UpdatePlayerDetailsRequest>playerDetails;
-    playerDetailsRequest.sessionId = this.SessionId;
-    playerDetailsRequest.playerId = this.PlayerId;
+    var playerDetailsRequest = <UpdatePlayerDetailsRequest>
+      {
+        playerName: this.PlayerName,
+        sessionId: this.SessionId,
+        playerId: this.PlayerId
+      };
 
     this._playerDetailsService.UpdatePlayerDetails(playerDetailsRequest)
       .then(data => {
         if (data.success) {
 
-          this._fujiLocalStorage.CachePlayerDetails(this);
+          this._fujiLocalStorage.CachePlayerDetails(this, this.PlayerName);
           this._router.navigate(['/fujiflush/sessionlobby', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
         }
         else {

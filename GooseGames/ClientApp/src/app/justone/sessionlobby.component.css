@@ -21,3 +21,26 @@
   .player-table waiting-for-response{
 
   }
+
+
+.just-one-config-area{
+    margin-top: 1em;
+}
+
+.word-list-item {
+  margin-bottom: 0.5em;
+}
+.cb-wordlist{
+
+}
+
+.cb-wordlist-label {
+
+}
+
+
+.wordlist-header{
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    font-size: 0.8em;
+}

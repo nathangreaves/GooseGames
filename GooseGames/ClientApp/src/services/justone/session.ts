@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { GenericResponse } from '../../models/genericresponse';
 import { SessionLandingRequest, SessionLandingResponse, IPlayerSession } from '../../models/session';
+import { JustOneWordList } from '../../models/justone/wordlistenum';
 
 @Injectable({
   providedIn: 'root',
@@ -26,12 +27,14 @@ export class JustOneSessionService {
     return this._http.patch<GenericResponse<SessionLandingResponse>>(this._baseUrl + 'JustOneSession', request).toPromise();
   }
 
-  public StartSession(request: IPlayerSession): Promise<GenericResponse<boolean>> {
+  public StartSession(request: IPlayerSession, wordLists: JustOneWordList[]): Promise<GenericResponse<boolean>> {
 
-    var request = <IPlayerSession>{
+    var newRequest = <any>(<IPlayerSession>{
       SessionId: request.SessionId,
       PlayerId: request.PlayerId
-    }
-    return this._http.post<GenericResponse<boolean>>(this._baseUrl + 'JustOneSession/startsession', request).toPromise();
+    })
+    newRequest.IncludedWordLists = wordLists;
+
+    return this._http.post<GenericResponse<boolean>>(this._baseUrl + 'JustOneSession/startsession', newRequest).toPromise();
   }
 }

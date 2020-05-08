@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Models.Enums.JustOne
+{
+    public enum WordListEnum
+    {
+        JustOne = 1,
+        Codenames = 2,
+        CodenamesDuet = 3,
+        CodenamesDeepUndercover = 4,
+    }
+}

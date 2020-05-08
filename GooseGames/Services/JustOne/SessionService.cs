@@ -4,6 +4,7 @@ using GooseGames.Hubs;
 using GooseGames.Logging;
 using Microsoft.AspNetCore.SignalR;
 using Models.Requests;
+using Models.Requests.JustOne;
 using Models.Requests.Sessions;
 using Models.Responses;
 using Models.Responses.PlayerDetails;
@@ -97,7 +98,7 @@ namespace GooseGames.Services.JustOne
             });
         }
 
-        internal async Task<GenericResponse<bool>> StartSessionAsync(PlayerSessionRequest request)
+        internal async Task<GenericResponse<bool>> StartSessionAsync(StartSessionRequest request)
         {
             _logger.LogTrace("Starting session", request);
 
@@ -138,7 +139,7 @@ namespace GooseGames.Services.JustOne
 
             await CleanUpExpiredSessions(request.SessionId);
 
-            await _roundService.PrepareRoundsAsync(request.SessionId);
+            await _roundService.PrepareRoundsAsync(request.SessionId, request.IncludedWordLists);
 
             return GenericResponse<bool>.Ok(true);
         }

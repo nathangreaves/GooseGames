@@ -25,6 +25,8 @@ export class JustOneNewPlayerDetailsComponent implements IPlayerSessionComponent
   ErrorMessage: string;
   Loading: boolean = true;
 
+  PlayerName: string;
+
   constructor(playerDetailsService: JustOnePlayerDetailsService, playerStatusService: JustOnePlayerStatusService, justOneLocalStorage: JustOneLocalStorage,
     router: Router, activatedRoute: ActivatedRoute) {
     this._playerDetailsService = playerDetailsService;
@@ -35,6 +37,8 @@ export class JustOneNewPlayerDetailsComponent implements IPlayerSessionComponent
     this.SessionId = activatedRoute.snapshot.params.SessionId;
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;
 
+    this.PlayerName = this._justOneLocalStorage.GetPlayerName();
+
     this._playerStatusService.Validate(this, PlayerStatus.New, () => { })
       .then(data => {
         if (data.success) {
@@ -43,11 +47,14 @@ export class JustOneNewPlayerDetailsComponent implements IPlayerSessionComponent
       });
   }
 
-  public SubmitPlayerDetails(playerDetails: PlayerDetails) {
+  public SubmitPlayerDetails() {
 
-    var playerDetailsRequest = <UpdatePlayerDetailsRequest>playerDetails;
-    playerDetailsRequest.sessionId = this.SessionId;
-    playerDetailsRequest.playerId = this.PlayerId;
+    var playerDetailsRequest = <UpdatePlayerDetailsRequest>
+      {
+        playerName: this.PlayerName,
+        sessionId: this.SessionId,
+        playerId: this.PlayerId
+      };
 
     this._playerDetailsService.UpdatePlayerDetails(playerDetailsRequest)
       .then(data => {
@@ -61,7 +68,7 @@ export class JustOneNewPlayerDetailsComponent implements IPlayerSessionComponent
       .then(data => {
         if (data.success) {
 
-          this._justOneLocalStorage.CachePlayerDetails(this);
+          this._justOneLocalStorage.CachePlayerDetails(this, this.PlayerName);
           this._router.navigate(['/justone/sessionlobby', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
         }
         else {
