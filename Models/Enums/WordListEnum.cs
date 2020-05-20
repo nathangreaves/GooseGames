@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Models.Enums.JustOne
+namespace Models.Enums
 {
     public enum WordListEnum
     {

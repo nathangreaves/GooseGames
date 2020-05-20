@@ -1,0 +1,171 @@
+.options {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.word-list {
+}
+
+.word-list-row {
+}
+
+.word-col {
+  padding: 0.2em;
+}
+
+.word-box {
+  min-height: 2.5em;
+  font-size: 2em;
+  font-weight: bold;
+  border: 1px solid black;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.word-box.normal-mode {
+  font-size: 1em;
+  padding: 0;
+}
+
+.word-col.normal-mode {
+  padding-right: 1em;
+  font-size: 1em;
+}
+
+.spymaster-hidden-word {
+}
+
+.hidden-word {
+}
+
+.spymaster-revealed {
+}
+
+.revealed-word {
+}
+
+.blue-word.hidden-word {
+  color: rgba(52, 161, 235, 1);
+}
+
+.red-word.hidden-word {
+  color: rgba(186, 19, 19, 1);
+}
+
+.blue-word.revealed-word {
+  background: rgba(52, 161, 235, 1);
+  color: rgba(255, 255, 255, 1);
+}
+
+.red-word.revealed-word {
+  background: rgba(186, 19, 19, 1);
+  color: rgba(255, 255, 255, 1);
+}
+
+
+@keyframes bomb-revealed {
+  0% {
+    background-color: black;
+    color: white;
+  }
+
+  50% {
+    background-color: white;
+    color: black;
+  }
+
+  100% {
+    background-color: black;
+    color: white;
+  }
+}
+.red-word {
+}
+
+.neutral-word.revealed-word {
+  background: rgba(176, 131, 48, 1);
+  color: rgba(255, 255, 255, 1);
+}
+
+.bomb-word.hidden-word {
+  color: rgba(255, 255, 255, 1);
+  background: rgba(0, 0, 0, 1);
+}
+.bomb-word.revealed-word {
+  color: rgba(255, 255, 255, 1);
+  background: rgba(0, 0, 0, 1);
+  animation-name: bomb-revealed;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+
+.word {
+}
+
+.filler {
+  height: 5em;
+}
+
+.codenames-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 5em;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  border-top: 1px solid black;
+}
+.game-victory{
+    text-align: center;
+}
+
+  .game-victory div {
+    text-align: center;
+    font-weight: bold;
+  }
+
+.team-box {
+  text-align: center;
+  background: white;
+  border: 2px solid black;
+  padding: 0.3em;
+  border-radius: 5px;
+  font-size: 1.2em;
+}
+
+  .team-box.red {
+    color: rgba(186, 19, 19, 1);
+  }
+
+    .team-box.red.red-turn {
+      font-weight: bold;
+      color: rgba(255, 255, 255, 1);
+      background: rgba(186, 19, 19, 1);
+    }
+
+  .team-box.blue {
+    color: rgba(52, 161, 235, 1);
+  }
+
+    .team-box.blue.blue-turn {
+      font-weight: bold;
+      color: rgba(255, 255, 255, 1);
+      background: rgba(52, 161, 235, 1);
+    }
+
+.footer-button-box {
+  text-align: center;
+}
+
+.codenames-footer.blue-turn {
+  background: rgba(52, 161, 235, 1)
+}
+
+.codenames-footer.red-turn {
+  background: rgba(186, 19, 19, 1)
+}

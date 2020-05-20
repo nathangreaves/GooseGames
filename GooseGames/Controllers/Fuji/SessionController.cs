@@ -21,7 +21,6 @@ namespace GooseGames.Controllers.Fuji
         private readonly RequestLogger<FujiSessionController> _logger;
 
         public FujiSessionController(SessionService sessionService,
-            PlayerDetailsService playerDetailsService,
             RequestLogger<FujiSessionController> logger)
         {
             _sessionService = sessionService;

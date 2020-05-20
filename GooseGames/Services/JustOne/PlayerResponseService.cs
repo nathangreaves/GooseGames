@@ -2,12 +2,9 @@
 using Entities.JustOne.Enums;
 using GooseGames.Hubs;
 using GooseGames.Logging;
-using Microsoft.AspNetCore.SignalR;
 using Models.Requests;
 using Models.Requests.JustOne.Response;
 using Models.Responses;
-using Models.Responses.JustOne;
-using Models.Responses.JustOne.PlayerStatus;
 using Models.Responses.JustOne.Response;
 using RepositoryInterface.JustOne;
 using System;

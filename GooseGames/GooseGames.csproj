@@ -36,6 +36,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\src\app\codenames\landing.component.ts" />
+    <None Remove="ClientApp\src\app\codenames\session.component.ts" />
     <None Remove="ClientApp\src\app\fujiflush\disclaimer.component.ts" />
     <None Remove="ClientApp\src\app\fujiflush\landing.component.ts" />
     <None Remove="ClientApp\src\app\fujiflush\newplayerdetails.component.ts" />
@@ -112,6 +114,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\codenames\landing.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\codenames\session.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\fujiflush\disclaimer.component.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>

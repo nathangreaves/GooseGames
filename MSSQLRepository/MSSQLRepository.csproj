@@ -7,6 +7,12 @@
   <ItemGroup>
     <Compile Remove="Migrations\Fuji\20200502140450_FujiInitial.cs" />
     <Compile Remove="Migrations\Fuji\20200502140450_FujiInitial.Designer.cs" />
+    <Compile Remove="Migrations\Werewords\20200516095155_WerewordsEntities.cs" />
+    <Compile Remove="Migrations\Werewords\20200516095155_WerewordsEntities.Designer.cs" />
+    <Compile Remove="Migrations\Werewords\20200516095402_WerewordsEntities.cs" />
+    <Compile Remove="Migrations\Werewords\20200516095402_WerewordsEntities.Designer.cs" />
+    <Compile Remove="Migrations\Werewords\20200516095502_WerewordsEntities.cs" />
+    <Compile Remove="Migrations\Werewords\20200516095502_WerewordsEntities.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

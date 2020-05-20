@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="HubMessages\Werewords\" />
     <Folder Include="Requests\JustOne\PlayerStatus\" />
   </ItemGroup>
 

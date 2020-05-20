@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
+using MSSQLRepository.Contexts;
 
 namespace MSSQLRepository
 {
@@ -28,6 +29,13 @@ namespace MSSQLRepository
                 .UseSqlServer(configuration["ConnectionStrings:MSSQL"])
             );
 
+            services.AddDbContext<CodenamesContext>(options => options
+                .UseSqlServer(configuration["ConnectionStrings:MSSQL"])
+            );
+
+            services.AddDbContext<WerewordsContext>(options => options
+                .UseSqlServer(configuration["ConnectionStrings:MSSQL"])
+            );
 
             services.AddScoped<RepositoryInterface.JustOne.ISessionRepository, JustOne.SessionRepository>();
             services.AddScoped<RepositoryInterface.JustOne.IPlayerRepository, JustOne.PlayerRepository>();
@@ -36,12 +44,19 @@ namespace MSSQLRepository
             services.AddScoped<RepositoryInterface.JustOne.IPlayerStatusRepository, JustOne.PlayerStatusRepository>();
             services.AddScoped<RepositoryInterface.JustOne.IResponseVoteRepository, JustOne.ResponseVoteRepository>();
 
-
             services.AddScoped<RepositoryInterface.Fuji.ISessionRepository, Fuji.SessionRepository>();
             services.AddScoped<RepositoryInterface.Fuji.IPlayerRepository, Fuji.PlayerRepository>();
             services.AddScoped<RepositoryInterface.Fuji.IHandCardRepository, Fuji.HandCardRepository>();
             services.AddScoped<RepositoryInterface.Fuji.IDeckCardRepository, Fuji.DeckCardRepository>();
             services.AddScoped<RepositoryInterface.Fuji.IDiscardedCardRepository, Fuji.DiscardedCardRepository>();
+
+            services.AddScoped<RepositoryInterface.Codenames.ICodenamesRepository, Codenames.CodenamesRepository>();
+
+            services.AddScoped<RepositoryInterface.Werewords.ISessionRepository, Werewords.SessionRepository>();
+            services.AddScoped<RepositoryInterface.Werewords.IPlayerRepository, Werewords.PlayerRepository>();
+            services.AddScoped<RepositoryInterface.Werewords.IRoundRepository, Werewords.RoundRepository>();
+            services.AddScoped<RepositoryInterface.Werewords.IPlayerRoundInformationRepository, Werewords.PlayerRoundInformationRepository>();
+            services.AddScoped<RepositoryInterface.Werewords.IPlayerVoteRepository, Werewords.PlayerVoteRepository>();
         }
     }
 }

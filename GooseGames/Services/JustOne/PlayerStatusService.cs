@@ -5,7 +5,7 @@ using GooseGames.Logging;
 using Models.Requests;
 using Models.Requests.JustOne.Round;
 using Models.Responses;
-using Models.Responses.JustOne.PlayerStatus;
+using Models.Responses.PlayerStatus;
 using RepositoryInterface.JustOne;
 using System;
 using System.Collections.Generic;

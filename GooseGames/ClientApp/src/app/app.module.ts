@@ -49,6 +49,9 @@ import { FujiSessionLobbyComponent } from './fujiflush/sessionlobby.component';
 import { FujiWaitingComponent } from './fujiflush/waiting.component';
 import { FujiTestSessionComponent } from './fujiflush/testsession.component';
 
+import { CodenamesLandingComponent } from './codenames/landing.component';
+import { BigCodenamesSessionComponent, NormalCodenamesSessionComponent } from './codenames/session.component';
+
 
 @NgModule({
   declarations: [
@@ -91,7 +94,11 @@ import { FujiTestSessionComponent } from './fujiflush/testsession.component';
     FujiNewPlayerDetailsComponent,
     FujiSessionLobbyComponent,
     FujiWaitingComponent,
-    FujiSessionComponent
+    FujiSessionComponent,
+
+    CodenamesLandingComponent,
+    BigCodenamesSessionComponent,
+    NormalCodenamesSessionComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -102,6 +109,7 @@ import { FujiTestSessionComponent } from './fujiflush/testsession.component';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'justone', component: JustOneLandingComponent },
       { path: 'fujiflush', component: FujiLandingComponent },
+      { path: 'codenames', component: CodenamesLandingComponent },
 
       { path: "justone/disclaimer", component: JustOneDeclarationComponent },
       { path: "justone/rejoin", component: JustOneRejoinComponent },
@@ -132,6 +140,9 @@ import { FujiTestSessionComponent } from './fujiflush/testsession.component';
       { path: 'fujiflush/sessionlobby', component: FujiSessionLobbyComponent },
       { path: 'fujiflush/waiting', component: FujiWaitingComponent },
       { path: 'fujiflush/session', component: FujiSessionComponent },
+
+      { path: 'codenames/:id', component: NormalCodenamesSessionComponent },
+      { path: 'codenames/big/:id', component: BigCodenamesSessionComponent },
     ])
   ],
   entryComponents: [

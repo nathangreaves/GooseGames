@@ -1,4 +1,4 @@
-﻿using Models.Enums.JustOne;
+﻿using Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text;

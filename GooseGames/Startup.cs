@@ -55,8 +55,17 @@ namespace GooseGames
             services.AddScoped<Services.Fuji.HandService>();
             services.AddScoped<Services.Fuji.CardService>();
 
+            services.AddScoped<Services.Codenames.CodenamesService>();
+
+            services.AddScoped<Services.Werewords.PlayerService>();
+            services.AddScoped<Services.Werewords.PlayerStatusService>();
+            services.AddScoped<Services.Werewords.SessionService>();
+            services.AddScoped<Services.Werewords.RoundService>();
+
             services.AddScoped<PlayerHubContext>();
             services.AddScoped<FujiHubContext>();
+            services.AddScoped<CodenamesHubContext>();
+            services.AddScoped<WerewordsHubContext>();
 
             services.AddTransient<Services.JustOne.RoundStatus.RoundServiceProvider>();
             AddKeyedServices<Services.JustOne.RoundStatus.IRoundStatusKeyedService>(services);
@@ -101,6 +110,8 @@ namespace GooseGames
 
                 endpoints.MapHub<PlayerHub>("/lobbyhub");
                 endpoints.MapHub<FujiHub>("/fujihub");
+                endpoints.MapHub<CodenamesHub>("/codenameshub");
+                endpoints.MapHub<WerewordsHub>("/werewordshub");
             });
 
             app.UseSpa(spa =>

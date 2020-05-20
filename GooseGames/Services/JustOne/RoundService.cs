@@ -2,7 +2,7 @@
 using Entities.JustOne.Enums;
 using GooseGames.Logging;
 using GooseGames.Services.JustOne.RoundStatus;
-using Models.Enums.JustOne;
+using Models.Enums;
 using Models.Requests;
 using Models.Requests.JustOne.Round;
 using Models.Responses;

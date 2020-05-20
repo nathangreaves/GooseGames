@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Models.Responses.JustOne.PlayerStatus
+namespace Models.Responses.PlayerStatus
 {
     public class PlayerStatusValidationResponse
     {

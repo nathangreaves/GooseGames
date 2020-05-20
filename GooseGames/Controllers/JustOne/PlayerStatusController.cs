@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Models.Requests;
 using Models.Requests.JustOne.Round;
 using Models.Responses;
-using Models.Responses.JustOne.PlayerStatus;
+using Models.Responses.PlayerStatus;
 using System;
 using System.Threading.Tasks;
 

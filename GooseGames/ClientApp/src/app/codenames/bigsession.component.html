@@ -1,0 +1,71 @@
+<div class="options">
+  <div class="row">
+    <div class="col-6 footer-button-box">
+      <button class="btn btn-primary" (click)="Spymaster = !Spymaster">Spymaster</button>
+    </div>
+    <div class="col-6 footer-button-box">
+      <button class="btn btn-primary" (click)="RefreshWords()">New Words</button>
+    </div>
+  </div>
+</div>
+<div class="word-list container">
+  <div class="word-list-row row">
+    <div *ngFor="let word of Session.words" class="col-12 col-sm-6 word-col">
+      <div class="word-box" [ngClass]="{
+           'hidden-word' : !word.revealed,
+           'revealed-word' : word.revealed,
+           'spymaster-word' : Spymaster,
+           'blue-word' : (word.revealed || Spymaster) && word.wordType == 1,
+           'red-word' : (word.revealed || Spymaster) && word.wordType == 2,
+           'neutral-word' : (word.revealed || Spymaster) && word.wordType == 3,
+           'bomb-word' : (word.revealed || Spymaster) && word.wordType == 4
+           }" (click)="GuessWord(word)">
+        <span class="word">{{word.word}}</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="options">
+  <div class="row">
+    <div class="col-6 footer-button-box">
+      <button class="btn btn-primary" (click)="Spymaster = !Spymaster">Spymaster</button>
+    </div>
+    <div class="col-6 footer-button-box">
+      <button class="btn btn-primary" (click)="RefreshWords()">New Words</button>
+    </div>
+  </div>
+</div>
+<div class="filler"></div>
+<div class="codenames-footer">
+
+  <div class="container">
+    <div class="row game-victory" *ngIf="Session.gameOver">
+      <div class="col-12" *ngIf="!!Session.blueVictory">Blue wins</div>
+      <div class="col-12" *ngIf="!!!Session.blueVictory">Red wins</div>
+    </div>
+    <div class="row">
+      <div class="col-1">
+
+      </div>
+      <div class="col-4 team-box blue" [ngClass]="{
+           'blue-turn' : Session.blueTurn
+           }"
+           (click)="PassToBlue()">
+        <div>Blue: {{Session.blueWordsRemaining}}</div>
+      </div>
+      <div class="col-2">
+
+      </div>
+      <div class="col-4 team-box red" [ngClass]="{
+           'red-turn' : !Session.blueTurn
+           }"
+           (click)="PassToRed()">
+        <div>Red: {{Session.redWordsRemaining}}</div>
+      </div>
+      <div class="col-1">
+
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,10 +1,9 @@
-﻿using Models.Enums.JustOne;
+﻿using Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace GooseGames.Services.JustOne
+namespace GooseGames.Services
 {
     public static class StaticWordsList
     {
@@ -1598,7 +1597,6 @@ namespace GooseGames.Services.JustOne
             "Safe",
             "Sack",
             "Rug",
-            "Roach",
             "Red",
             "Rave",
             "Queer",

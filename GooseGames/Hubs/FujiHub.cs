@@ -15,7 +15,6 @@ namespace GooseGames.Hubs
 
         public FujiHub(RequestLogger<FujiHub> logger)
         {
-            //_playerDetailsService = playerDetailsService;
             _logger = logger;
         }
 
@@ -24,8 +23,6 @@ namespace GooseGames.Hubs
             var playerId = Context.GetHttpContext().Request.Query["playerId"].FirstOrDefault();
             var sessionId = Context.GetHttpContext().Request.Query["sessionId"].FirstOrDefault();
             var connectionId = Context.ConnectionId;
-
-            //await _playerDetailsService.UpdateSignalRConnectionIdAsync(playerId, connectionId);
 
             await Groups.AddToGroupAsync(connectionId, sessionId);
 

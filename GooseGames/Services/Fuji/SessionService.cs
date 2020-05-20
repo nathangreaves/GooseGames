@@ -249,7 +249,7 @@ namespace GooseGames.Services.Fuji
 
             return GenericResponse<SessionResponse>.Ok(new SessionResponse 
             { 
-                Players = players.Select(p => new Models.Responses.Fuji.Players.Player 
+                Players = players.OrderBy(p => p.PlayerNumber).Select(p => new Models.Responses.Fuji.Players.Player 
                 {
                     Id = p.Id,
                     Name = p.Name,
