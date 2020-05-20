@@ -61,6 +61,8 @@ namespace GooseGames
             services.AddScoped<Services.Werewords.PlayerStatusService>();
             services.AddScoped<Services.Werewords.SessionService>();
             services.AddScoped<Services.Werewords.RoundService>();
+            services.AddScoped<Services.Werewords.ProgressRoundService>();
+
 
             services.AddScoped<PlayerHubContext>();
             services.AddScoped<FujiHubContext>();

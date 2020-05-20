@@ -24,7 +24,7 @@ export class NavMenuComponent implements OnInit {
   ngOnInit(): void {
     var navbarComponent = this.NavbarService.getNavbarComponent();
     this.setNavbarHeader(navbarComponent);
-    }
+  }
 
   setNavbarHeader(navbarComponent: NavbarHeader) {
 

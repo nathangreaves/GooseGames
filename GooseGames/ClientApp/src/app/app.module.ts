@@ -53,6 +53,12 @@ import { CodenamesLandingComponent } from './codenames/landing.component';
 import { BigCodenamesSessionComponent, NormalCodenamesSessionComponent } from './codenames/session.component';
 
 
+import { WerewordsComponent } from './werewords/werewords.component';
+import { WerewordsNightSecretRoleComponent } from './werewords/night-secret-role.component';
+import { WerewordsContentDirective } from '../models/werewords/content';
+import { WerewordsNightSecretWordComponent } from './werewords/night-secret-word.component';
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -98,7 +104,13 @@ import { BigCodenamesSessionComponent, NormalCodenamesSessionComponent } from '.
 
     CodenamesLandingComponent,
     BigCodenamesSessionComponent,
-    NormalCodenamesSessionComponent
+    NormalCodenamesSessionComponent,
+
+    WerewordsComponent,
+    WerewordsContentDirective,
+
+    WerewordsNightSecretRoleComponent,
+    WerewordsNightSecretWordComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -110,6 +122,7 @@ import { BigCodenamesSessionComponent, NormalCodenamesSessionComponent } from '.
       { path: 'justone', component: JustOneLandingComponent },
       { path: 'fujiflush', component: FujiLandingComponent },
       { path: 'codenames', component: CodenamesLandingComponent },
+      { path: 'werewords', component: WerewordsComponent },
 
       { path: "justone/disclaimer", component: JustOneDeclarationComponent },
       { path: "justone/rejoin", component: JustOneRejoinComponent },
@@ -146,7 +159,10 @@ import { BigCodenamesSessionComponent, NormalCodenamesSessionComponent } from '.
     ])
   ],
   entryComponents: [
-    JustOneNavbarHeaderComponent
+    JustOneNavbarHeaderComponent,
+
+    WerewordsNightSecretRoleComponent,
+    WerewordsNightSecretWordComponent
   ],
   providers: [
     NavbarService

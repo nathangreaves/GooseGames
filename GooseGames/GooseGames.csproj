@@ -70,6 +70,9 @@
     <None Remove="ClientApp\src\app\nav-menu\navbar-header-content.ts" />
     <None Remove="ClientApp\src\app\nav-menu\navbar-header-directive.ts" />
     <None Remove="ClientApp\src\app\nav-menu\navbar-header.ts" />
+    <None Remove="ClientApp\src\app\night-secret-role.component.ts" />
+    <None Remove="ClientApp\src\app\werewords\night-secret-word.component.ts" />
+    <None Remove="ClientApp\src\app\werewords\werewords.component.ts" />
     <None Remove="ClientApp\src\assets\tristate-switch.component.ts" />
     <None Remove="ClientApp\src\models\fujiflush\card.ts" />
     <None Remove="ClientApp\src\models\fujiflush\fujiupdate.ts" />
@@ -85,6 +88,8 @@
     <None Remove="ClientApp\src\models\justone\round.ts" />
     <None Remove="ClientApp\src\models\justone\session.ts" />
     <None Remove="ClientApp\src\models\justone\wordlistenum.ts" />
+    <None Remove="ClientApp\src\models\werewords\content.ts" />
+    <None Remove="ClientApp\src\models\werewords\registered-content.ts" />
     <None Remove="ClientApp\src\services\fujiflush\card.ts" />
     <None Remove="ClientApp\src\services\fujiflush\hand.ts" />
     <None Remove="ClientApp\src\services\fujiflush\localstorage.ts" />
@@ -160,6 +165,11 @@
     <TypeScriptCompile Include="ClientApp\src\app\nav-menu\navbar-header-content.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\nav-menu\navbar-header-directive.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\nav-menu\navbar-header.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\werewords\night-secret-word.component.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\app\werewords\night-secret-role.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\werewords\werewords.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\assets\tristate-switch.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\card.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\fujiupdate.ts" />
@@ -167,6 +177,8 @@
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\player.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\session.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\justone\wordlistenum.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\werewords\content.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\werewords\registered-content.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\card.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\hand.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\localstorage.ts">
@@ -195,6 +207,10 @@
     <TypeScriptCompile Include="ClientApp\src\services\justone\ui.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\localstorage.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\navbar.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ClientApp\src\services\werewords\" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
