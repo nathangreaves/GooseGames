@@ -35,3 +35,8 @@ export class GetPlayerDetailsResponse {
   password: string;
   players: PlayerDetailsResponse[]
 }
+
+export class PlayerStatusValidationResponse {
+  statusCorrect: boolean;
+  requiredStatus: string;
+}

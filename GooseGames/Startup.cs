@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -36,9 +37,11 @@ namespace GooseGames
            
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped(typeof(RequestLogger<>));
+            services.AddSingleton<IMemoryCache, MemoryCache>();
 
             MSSQLRepository.RepositoryConfiguration.ConfigureServices(services, Configuration);
 
+            //Just One
             services.AddScoped<Services.JustOne.SessionService>();
             services.AddScoped<Services.JustOne.PlayerDetailsService>();
             services.AddScoped<Services.JustOne.PlayerStatusService>();
@@ -49,28 +52,35 @@ namespace GooseGames
             services.AddScoped<Services.JustOne.RoundStatus.NewRoundStatusService>();
             services.AddScoped<Services.JustOne.PlayerStatusQueryService>();
 
+            services.AddTransient<Services.JustOne.RoundStatus.RoundServiceProvider>();
+            AddKeyedServices<Services.JustOne.RoundStatus.IRoundStatusKeyedService>(services);
+
+            //Fuji Flush
             services.AddScoped<Services.Fuji.SessionService>();
             services.AddScoped<Services.Fuji.PlayerDetailsService>();
             services.AddScoped<Services.Fuji.DeckService>();
             services.AddScoped<Services.Fuji.HandService>();
             services.AddScoped<Services.Fuji.CardService>();
 
+            //Codenames
             services.AddScoped<Services.Codenames.CodenamesService>();
 
+            //Werewords
             services.AddScoped<Services.Werewords.PlayerService>();
             services.AddScoped<Services.Werewords.PlayerStatusService>();
             services.AddScoped<Services.Werewords.SessionService>();
             services.AddScoped<Services.Werewords.RoundService>();
             services.AddScoped<Services.Werewords.ProgressRoundService>();
+            services.AddScoped<Services.Werewords.PlayerRoundInformationService>();
 
+            services.AddTransient<Services.Werewords.PlayerStatus.PlayerStatusKeyedServiceProvider>();
+            AddKeyedServices<Services.Werewords.PlayerStatus.IPlayerStatusKeyedService>(services);
 
+            //Hub Contexts
             services.AddScoped<PlayerHubContext>();
             services.AddScoped<FujiHubContext>();
             services.AddScoped<CodenamesHubContext>();
             services.AddScoped<WerewordsHubContext>();
-
-            services.AddTransient<Services.JustOne.RoundStatus.RoundServiceProvider>();
-            AddKeyedServices<Services.JustOne.RoundStatus.IRoundStatusKeyedService>(services);
         }
 
         private void AddKeyedServices<T>(IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Transient)

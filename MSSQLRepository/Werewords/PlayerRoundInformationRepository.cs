@@ -28,5 +28,24 @@ namespace MSSQLRepository.Werewords
                 .ToListAsync()
                 .ConfigureAwait(false);
         }
+
+
+        public async Task<PlayerRoundInformation> GetMayorAsync(Guid roundId)
+        {
+            return await Context.PlayerRoundInformation
+                .Include(p => p.Player)
+                .Where(p => p.RoundId == roundId && p.IsMayor)                
+                .SingleOrDefaultAsync()
+                .ConfigureAwait(false);
+        }
+
+        public async Task<PlayerRoundInformation> GetForPlayerAndRoundAsync(Guid roundId, Guid playerId)
+        {
+            return await Context.PlayerRoundInformation
+                .Include(p => p.Player)
+                .Where(p => p.RoundId == roundId && p.PlayerId == playerId)
+                .SingleOrDefaultAsync()
+                .ConfigureAwait(false);
+        }
     }
 }

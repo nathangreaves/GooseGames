@@ -46,8 +46,4 @@ export class PlayerStatusRoutesMaps {
 };
 export const PlayerStatusRoutesMap = new PlayerStatusRoutesMaps();
 
-export class PlayerStatusValidationResponse {
-  statusCorrect: boolean;
-  requiredStatus: string;
-}
 

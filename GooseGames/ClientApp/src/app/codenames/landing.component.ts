@@ -20,6 +20,6 @@ export class CodenamesLandingComponent {
   }
 
   Go() {
-    this._router.navigate(['/fujiflush/session', this.GameIdentifier]);
+    this._router.navigate(['/codenames/session', this.GameIdentifier]);
   }
 }

@@ -70,7 +70,7 @@ namespace GooseGames.Services.Werewords
             {
                 MayorName = mayorName,
                 MayorPlayerId = mayorId.Value,
-                Role = (SecretRole)(int)playerInformation.SecretRole
+                SecretRole = (SecretRole)(int)playerInformation.SecretRole
             });
         }
     }

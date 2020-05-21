@@ -137,7 +137,7 @@ namespace GooseGames.Controllers.Werewords
 
         [HttpPost]
         [ActionName(nameof(PlayerStatusEnum.InLobby))]
-        public async Task<GenericResponse<bool>> SetLobbyAsync(PlayerIdRequest request)
+        public async Task<GenericResponseBase> SetLobbyAsync(PlayerIdRequest request)
         {
             try
             {
@@ -145,7 +145,26 @@ namespace GooseGames.Controllers.Werewords
 
                 await _playerStatusService.UpdatePlayerToStatusAsync(request.PlayerId, PlayerStatusEnum.InLobby);
 
-                var result = NewResponse.Ok(true);
+                _logger.LogInformation("Returned result");
+                return GenericResponseBase.Ok();
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [ActionName("TransitionNight")]
+        public async Task<GenericResponse<string>> TransitionNightAsync(PlayerSessionRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _playerStatusService.TransitionNightAsync(request);
 
                 _logger.LogInformation("Returned result", result);
                 return result;
@@ -154,7 +173,7 @@ namespace GooseGames.Controllers.Werewords
             {
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
+                return GenericResponse<string>.Error($"Unknown Error {errorGuid}");
             }
         }
 

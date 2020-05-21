@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import * as _ from 'lodash';
-import { WerewordsContentEnum, WerewordsComponentBase } from '../../models/werewords/content';
+import { WerewordsPlayerStatus, WerewordsComponentBase } from '../../../models/werewords/content';
 
 @Component({
   selector: 'app-werewords-night-secret-word-component',
@@ -15,6 +15,6 @@ export class WerewordsNightSecretWordComponent extends WerewordsComponentBase {
   }
 
   ChangePage() {
-    this.Route(WerewordsContentEnum.NightSecretRole);
+
   }
 }

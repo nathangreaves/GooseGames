@@ -30,7 +30,20 @@ namespace Entities.Werewords.Enums
             { New, nameof(New) },
             { InLobby, nameof(InLobby) },
             { RoundWaiting, nameof(RoundWaiting) },
-
+            { NightRevealSecretRole, nameof(NightRevealSecretRole) },
+            { NightWaitingForPlayersToCheckRole, nameof(NightWaitingForPlayersToCheckRole) },
+            { NightMayorPickSecretWord, nameof(NightMayorPickSecretWord) },
+            { NightWaitingForMayor, nameof(NightWaitingForMayor) },
+            { NightSecretWord, nameof(NightSecretWord) },
+            { NightWaitingToWake, nameof(NightWaitingToWake) },
+            { DayMayor, nameof(DayMayor) },
+            { DayPassive, nameof(DayPassive) },
+            { DayActive, nameof(DayActive) },
+            { DayWaitingForVotes, nameof(DayWaitingForVotes) },
+            { DayVotingOnWerewolves, nameof(DayVotingOnWerewolves) },
+            { DayVotingOnSeer, nameof(DayVotingOnSeer) },
+            { DayOutcome, nameof(DayOutcome) },
+            { WaitingForNextRound, nameof(WaitingForNextRound) },
             { Rejoining, nameof(Rejoining) }
         };
         public static string GetDescription(Guid guid)

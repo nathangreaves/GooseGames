@@ -1,6 +1,8 @@
 ﻿using GooseGames.Logging;
 using GooseGames.Services.Werewords;
 using Microsoft.AspNetCore.Mvc;
+using Models.Requests;
+using Models.Requests.Werewords;
 using Models.Responses;
 using Models.Responses.Werewords;
 using System;
@@ -26,13 +28,13 @@ namespace GooseGames.Controllers.Werewords
 
         [HttpGet]
         [Route("Words")]
-        public GenericResponse<WordChoiceResponse> GetWords()
+        public GenericResponse<IEnumerable<string>> GetWords([FromQuery]PlayerSessionRequest request)
         {
             try
             {
-                _logger.LogInformation("Received request");
+                _logger.LogInformation("Received request", request);
 
-                var result = _roundService.GetWordChoiceAsync();
+                var result = _roundService.GetWordChoiceAsync(request);
 
                 _logger.LogInformation("Returned result", result);
 
@@ -42,7 +44,29 @@ namespace GooseGames.Controllers.Werewords
             {
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e);
-                return GenericResponse<WordChoiceResponse>.Error($"Unknown Error {errorGuid}");
+                return GenericResponse<IEnumerable<string>>.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [Route("Word")]
+        public async Task<GenericResponseBase> PostWordAsync(WordChoiceRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _roundService.PostWordAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e);
+                return GenericResponse<IEnumerable<string>>.Error($"Unknown Error {errorGuid}");
             }
         }
     }

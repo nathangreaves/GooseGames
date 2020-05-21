@@ -111,27 +111,26 @@ namespace GooseGames.Controllers.Werewords
             }
         }
 
-        //[HttpPost]
-        //[Route("CreateTestSession")]
-        //public async Task<GenericResponse<IEnumerable<JoinSessionResponse>>> CreateTestSessionAsync()
-        //{
-        //    try
-        //    {
-        //        _logger.LogInformation("Received request");
+        [HttpPost]
+        [Route("CreateTestSession")]
+        public async Task<GenericResponse<IEnumerable<JoinSessionResponse>>> CreateTestSessionAsync(NewSessionRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request");
 
-        //        string sessionPassword = Guid.NewGuid().ToString();
-        //        var result = await _sessionService.CreateTestSessionAsync();
+                var result = await _sessionService.CreateTestSessionAsync(request);
 
-        //        _logger.LogInformation("Returned result");
+                _logger.LogInformation("Returned result");
 
-        //        return GenericResponse<IEnumerable<JoinSessionResponse>>.Ok(result);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        var errorGuid = Guid.NewGuid();
-        //        _logger.LogError($"Unknown Error {errorGuid}", e);
-        //        return GenericResponse<IEnumerable<JoinSessionResponse>>.Error($"Unknown Error {errorGuid}");
-        //    }
-        //}
+                return GenericResponse<IEnumerable<JoinSessionResponse>>.Ok(result);
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e);
+                return GenericResponse<IEnumerable<JoinSessionResponse>>.Error($"Unknown Error {errorGuid} : {e.Message}");
+            }
+        }
     }    
 }

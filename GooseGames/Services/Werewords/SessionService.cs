@@ -136,6 +136,69 @@ namespace GooseGames.Services.Werewords
             return GenericResponse<bool>.Ok(true);
         }
 
+        internal async Task<IEnumerable<JoinSessionResponse>> CreateTestSessionAsync(NewSessionRequest request)
+        {
+            var sessionResponse = await CreateSessionAsync(request);
+            if (!sessionResponse.Success)
+            {
+                throw new Exception(sessionResponse.ErrorCode);
+            }
+            var masterPlayerId = sessionResponse.Data.PlayerId;
+            var sessionId = sessionResponse.Data.SessionId;
+
+            var masterPlayer = await _playerRepository.GetAsync(masterPlayerId);
+            masterPlayer.Name = "Player 1";
+            masterPlayer.PlayerNumber = 1;
+            await _playerRepository.UpdateAsync(masterPlayer);
+
+            var player2 = new Player
+            {
+                SessionId = sessionId,
+                Name = "Player 2",
+                PlayerNumber = 2
+            };
+
+            var player3 = new Player
+            {
+                SessionId = sessionId,
+                Name = "Player 3",
+                PlayerNumber = 3
+            };
+
+            var player4 = new Player
+            {
+                SessionId = sessionId,
+                Name = "Player 4",
+                PlayerNumber = 4
+            };
+
+            await _playerRepository.InsertAsync(player2);
+            await _playerRepository.InsertAsync(player3);
+            await _playerRepository.InsertAsync(player4);
+
+            var session = await _sessionRepository.GetAsync(sessionId);
+            session.StatusId = SessionStatusEnum.InProgress;
+            
+            await _sessionRepository.UpdateAsync(session);
+
+            _logger.LogTrace("Updating all players to RoundWaiting status");
+            await _playerStatusService.UpdateAllPlayersForSessionAsync(session.Id, PlayerStatusEnum.RoundWaiting);
+
+            await _roundService.CreateNewRoundAsync(session);
+
+            return new[]
+            {
+                new JoinSessionResponse { PlayerId = masterPlayer.Id, SessionId = sessionId } ,
+
+                new JoinSessionResponse { PlayerId = player2.Id, SessionId = sessionId },
+
+                new JoinSessionResponse { PlayerId = player3.Id, SessionId = sessionId },
+
+                new JoinSessionResponse { PlayerId = player4.Id, SessionId = sessionId }
+            };
+        }
+
+
         private async Task CleanUpExpiredSessions(Guid sessionId)
         {
             await _sessionRepository.AbandonSessionsOlderThanAsync(sessionId, DateTime.UtcNow.AddDays(-1));

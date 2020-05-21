@@ -2,13 +2,14 @@ import * as _ from 'lodash';
 import { Component, Input, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus'
-import { PlayerStatus, PlayerStatusValidationResponse } from '../../../models/justone/playerstatus'
+import { PlayerStatus } from '../../../models/justone/playerstatus'
 import { IPlayerSessionComponent } from '../../../models/session';
 import { PlayerAction } from '../../../models/justone/playeractions';
 import { GenericResponse } from '../../../models/genericresponse';
 import { PlayerNumberCss } from '../../../services/justone/ui'
 import * as signalR from '@microsoft/signalr';
 import { connect } from 'tls';
+import { PlayerStatusValidationResponse } from '../../../models/player';
 
 export interface IJustOnePlayerWaitingComponent extends IPlayerSessionComponent {
 

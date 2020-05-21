@@ -3,6 +3,7 @@ using Entities.Werewords.Enums;
 using GooseGames.Hubs;
 using GooseGames.Logging;
 using GooseGames.Services;
+using Microsoft.Extensions.Caching.Memory;
 using Models.Enums;
 using Models.Requests;
 using Models.Requests.Werewords;
@@ -27,6 +28,7 @@ namespace GooseGames.Services.Werewords
         private readonly PlayerStatusService _playerStatusService;
         private readonly WerewordsHubContext _werewordsHubContext;
         private readonly RequestLogger<RoundService> _logger;
+        private readonly IMemoryCache _memoryCache;
         private static readonly Random s_Random = new Random();
 
         private const int DefaultRoundLength = 4;
@@ -37,7 +39,8 @@ namespace GooseGames.Services.Werewords
             IPlayerRoundInformationRepository playerRoundInformationRepository,
             PlayerStatusService playerStatusService,
             WerewordsHubContext werewordsHubContext,
-            RequestLogger<RoundService> logger)
+            RequestLogger<RoundService> logger,
+            IMemoryCache memoryCache)
         {
             _roundRepository = roundRepository;
             _playerRepository = playerRepository;
@@ -46,6 +49,7 @@ namespace GooseGames.Services.Werewords
             _playerStatusService = playerStatusService;
             _werewordsHubContext = werewordsHubContext;
             _logger = logger;
+            _memoryCache = memoryCache;
         }
 
         internal async Task CreateNewRoundAsync(Session session)
@@ -82,14 +86,25 @@ namespace GooseGames.Services.Werewords
                 });
             }
 
+            await _playerStatusService.UpdateAllPlayersForSessionAsync(session.Id, PlayerStatusEnum.NightRevealSecretRole);
+
             await _werewordsHubContext.SendSecretRoleAsync(session.Id);
         }
 
-        internal GenericResponse<WordChoiceResponse> GetWordChoiceAsync()
+        internal GenericResponse<IEnumerable<string>> GetWordChoiceAsync(PlayerSessionRequest request)
         {
+            string cacheKey = $"{request.SessionId}_{request.PlayerId}";
+            var cachedWords = _memoryCache.Get<List<string>>(cacheKey);
+            if (cachedWords != null)
+            {
+                return GenericResponse<IEnumerable<string>>.Ok(cachedWords);
+            }
+
             var words = StaticWordsList.GetWords(3, new[] { WordListEnum.JustOne, WordListEnum.Codenames, WordListEnum.CodenamesDuet });
 
-            return GenericResponse<WordChoiceResponse>.Ok(new WordChoiceResponse { Words = words });
+            _memoryCache.Set(cacheKey, words, DateTimeOffset.UtcNow.AddMinutes(2));
+
+            return GenericResponse<IEnumerable<string>>.Ok(words);
         }
 
         internal async Task<GenericResponseBase> PostWordAsync(WordChoiceRequest request)
@@ -121,10 +136,12 @@ namespace GooseGames.Services.Werewords
             }
 
             round.SecretWord = request.Word;
+            round.Status = RoundStatusEnum.NightRevealSecretWord;
             
             await _roundRepository.UpdateAsync(round);
 
-            await _playerStatusService.UpdateAllPlayersForSessionAsync(session.Id, PlayerStatusEnum.NightSecretWord);
+            await _playerStatusService.ConditionallyUpdateAllPlayersForSessionAsync(session.Id, PlayerStatusEnum.NightWaitingForMayor, PlayerStatusEnum.NightSecretWord);
+            await _playerStatusService.UpdatePlayerToStatusAsync(request.PlayerId, PlayerStatusEnum.NightSecretWord);
 
             await _werewordsHubContext.SendSecretWordAsync(session.Id);
 

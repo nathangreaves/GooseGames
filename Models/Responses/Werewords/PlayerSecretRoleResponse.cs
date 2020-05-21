@@ -7,7 +7,7 @@ namespace Models.Responses.Werewords
 {
     public class PlayerSecretRoleResponse
     {
-        public SecretRole Role { get; set; }
+        public SecretRole SecretRole { get; set; }
         public Guid MayorPlayerId { get; set; }
         public string MayorName { get; set; }
     }
