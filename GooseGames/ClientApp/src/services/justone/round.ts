@@ -1,9 +1,10 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { GenericResponse, GenericResponseBase } from '../../models/genericresponse';
-import { PlayerAction, PassivePlayerRoundInformationResponse } from '../../models/justone/playeractions';
+import { PassivePlayerRoundInformationResponse } from '../../models/justone/playeractions';
 import { IPlayerSession, ConvertToPlayerSessionRequest, PlayerSessionRequest } from '../../models/session';
 import { RoundOutcomeResponse, RoundInformationResponse } from '../../models/justone/round';
+import { PlayerAction } from '../../models/player';
 
 @Injectable({
   providedIn: 'root',

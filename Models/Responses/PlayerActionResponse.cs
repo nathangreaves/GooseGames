@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Models.Responses.JustOne
+namespace Models.Responses
 {
     public class PlayerActionResponse
     {

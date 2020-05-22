@@ -10,6 +10,7 @@ using Models.Responses.Sessions;
 using RepositoryInterface.Werewords;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -138,6 +139,18 @@ namespace GooseGames.Services.Werewords
 
         internal async Task<IEnumerable<JoinSessionResponse>> CreateTestSessionAsync(NewSessionRequest request)
         {
+            var existingSession = await GetSessionFromPasswordAsync(request.Password);
+            if (existingSession != null)
+            {
+                var players = (await _playerRepository.FilterAsync(p => p.SessionId == existingSession.Id)).OrderBy(s => s.PlayerNumber);
+
+                return players.Select(p => new JoinSessionResponse 
+                {
+                    PlayerId = p.Id,
+                    SessionId = existingSession.Id
+                });
+            }
+
             var sessionResponse = await CreateSessionAsync(request);
             if (!sessionResponse.Success)
             {

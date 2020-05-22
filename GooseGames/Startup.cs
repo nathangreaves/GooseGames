@@ -72,6 +72,7 @@ namespace GooseGames
             services.AddScoped<Services.Werewords.RoundService>();
             services.AddScoped<Services.Werewords.ProgressRoundService>();
             services.AddScoped<Services.Werewords.PlayerRoundInformationService>();
+            services.AddScoped<Services.Werewords.PlayerActionInformationService>();
 
             services.AddTransient<Services.Werewords.PlayerStatus.PlayerStatusKeyedServiceProvider>();
             AddKeyedServices<Services.Werewords.PlayerStatus.IPlayerStatusKeyedService>(services);

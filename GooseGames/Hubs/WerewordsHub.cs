@@ -1,6 +1,9 @@
 ﻿using GooseGames.Logging;
 using Microsoft.AspNetCore.SignalR;
+using Models.Requests;
+using Models.Responses;
 using Models.Responses.PlayerDetails;
+using Models.Responses.Werewords.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,6 +84,48 @@ namespace GooseGames.Hubs
         {
             _logger.LogInformation($"Sending secretWord: to {sessionId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("secretWord");
+        }
+
+        internal async Task SendPlayerAwakeAsync(Guid sessionId, PlayerActionResponse playerActionResponse)
+        {
+            _logger.LogInformation($"Sending playerAwake: to {sessionId}", playerActionResponse);
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerAwake", playerActionResponse);
+        }
+
+        internal async Task SendDayBeginAsync(Guid sessionId)
+        {
+            _logger.LogInformation($"Sending dayBegin: to {sessionId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("dayBegin");
+        }
+
+        internal async Task SendPlayerResponseAsync(Guid sessionId, PlayerResponse playerResponse)
+        {
+            _logger.LogInformation($"Sending playerResponse: to {sessionId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerResponse", playerResponse);
+        }
+
+        internal async Task SendActivePlayerAsync(Guid sessionId, Guid playerId)
+        {
+            _logger.LogInformation($"Sending playerResponse: to {sessionId}", playerId);
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("activePlayer", playerId);
+        }
+
+        internal async Task SendVoteWerewolvesAsync(Guid sessionId, DateTime endTime)
+        {
+            _logger.LogInformation($"Sending voteWerewolves: to {sessionId}", endTime);
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("voteWerewolves", endTime);
+        }
+
+        internal async Task SendVoteSeerAsync(Guid sessionId, DateTime endTime, IEnumerable<Guid> werewolfPlayerIds)
+        {
+            _logger.LogInformation($"Sending voteSeer: to {sessionId}", new { endTime = endTime, werewolfPlayerIds = werewolfPlayerIds });
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("voteSeer", endTime, werewolfPlayerIds);
+        }
+
+        internal async Task SendStartTimerAsync(Guid sessionId, DateTime dateTime)
+        {
+            _logger.LogInformation($"Sending startTimer: to {sessionId}", dateTime);
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("startTimer", dateTime);
         }
     }
 }

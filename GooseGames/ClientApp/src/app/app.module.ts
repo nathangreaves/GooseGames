@@ -52,15 +52,17 @@ import { FujiTestSessionComponent } from './fujiflush/testsession.component';
 import { CodenamesLandingComponent } from './codenames/landing.component';
 import { BigCodenamesSessionComponent, NormalCodenamesSessionComponent } from './codenames/session.component';
 
-
 import { WerewordsComponent } from './werewords/werewords.component';
 import { WerewordsContentDirective } from '../models/werewords/content';
-
-import { WerewordsNightSecretWordComponent } from './werewords/night/night-secret-word.component';
-import { WerewordsNightSecretRoleComponent } from './werewords/night/night-secret-role.component';
+import { WerewordsWaitingForPlayerActionComponent } from './werewords/common/waitingforplayeraction';
 
 import { WerewordsTestSessionComponent } from './werewords/testsession.component';
+
+import { WerewordsNightSecretWordComponent } from './werewords/night/secret-word';
+import { WerewordsNightSecretRoleComponent } from './werewords/night/secret-role';
 import { WerewordsNightMayorSecretWordComponent } from './werewords/night/mayor-secret-word';
+import { WerewordsNightWakingComponent } from './werewords/night/waking';
+import { WerewordsDayComponent } from './werewords/day/day';
 
 
 @NgModule({
@@ -112,12 +114,15 @@ import { WerewordsNightMayorSecretWordComponent } from './werewords/night/mayor-
 
     WerewordsComponent,
     WerewordsContentDirective,
+    WerewordsWaitingForPlayerActionComponent,
 
     WerewordsTestSessionComponent,
 
     WerewordsNightSecretRoleComponent,
     WerewordsNightSecretWordComponent,
-    WerewordsNightMayorSecretWordComponent
+    WerewordsNightMayorSecretWordComponent,
+    WerewordsNightWakingComponent,
+    WerewordsDayComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -175,7 +180,9 @@ import { WerewordsNightMayorSecretWordComponent } from './werewords/night/mayor-
 
     WerewordsNightSecretRoleComponent,
     WerewordsNightSecretWordComponent,
-    WerewordsNightMayorSecretWordComponent
+    WerewordsNightMayorSecretWordComponent,
+    WerewordsNightWakingComponent,
+    WerewordsDayComponent
   ],
   providers: [
     NavbarService

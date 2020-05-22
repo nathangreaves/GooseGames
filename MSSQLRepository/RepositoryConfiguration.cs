@@ -57,6 +57,7 @@ namespace MSSQLRepository
             services.AddScoped<RepositoryInterface.Werewords.IRoundRepository, Werewords.RoundRepository>();
             services.AddScoped<RepositoryInterface.Werewords.IPlayerRoundInformationRepository, Werewords.PlayerRoundInformationRepository>();
             services.AddScoped<RepositoryInterface.Werewords.IPlayerVoteRepository, Werewords.PlayerVoteRepository>();
+            services.AddScoped<RepositoryInterface.Werewords.IPlayerResponseRepository, Werewords.PlayerResponseRepository>();
         }
     }
 }

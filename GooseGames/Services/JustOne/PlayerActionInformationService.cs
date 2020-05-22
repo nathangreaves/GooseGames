@@ -4,7 +4,6 @@ using GooseGames.Logging;
 using Microsoft.AspNetCore.SignalR;
 using Models.Requests;
 using Models.Responses;
-using Models.Responses.JustOne;
 using RepositoryInterface.JustOne;
 using System;
 using System.Collections.Generic;

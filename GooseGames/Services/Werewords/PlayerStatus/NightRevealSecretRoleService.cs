@@ -36,5 +36,20 @@ namespace GooseGames.Services.Werewords.PlayerStatus
 
             return PlayerStatusEnum.NightWaitingForMayor;
         }
+
+        internal override Task NotifyOtherPlayersAsync(Player player)
+        {
+            return Task.FromResult<object>(null);
+        }
+
+        internal override Task<bool> ShouldTransitionRoundAsync(Session session, PlayerRoundInformation playerRoundInformation)
+        {
+            return Task.FromResult(false);
+        }
+
+        internal override Task TransitionRoundAsync(Session session, PlayerRoundInformation playerRoundInformation)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

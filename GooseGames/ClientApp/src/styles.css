@@ -5,6 +5,14 @@ a {
   color: #0366d6;
 }
 
+html{
+    height: 100%
+}
+
+body{
+    height: 100%;
+}
+
 code {
   color: #e01a76;
 }

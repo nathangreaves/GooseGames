@@ -11,7 +11,7 @@ namespace GooseGames.Services.Werewords.PlayerStatus
 {
     public abstract class PlayerStatusKeyedServiceBase : IPlayerStatusKeyedService
     {
-        private readonly IPlayerRepository _playerRepository;
+        protected readonly IPlayerRepository _playerRepository;
 
         public abstract Guid PlayerStatus { get; }
 
@@ -29,9 +29,19 @@ namespace GooseGames.Services.Werewords.PlayerStatus
 
             await _playerRepository.UpdateAsync(player);
 
-            return GenericResponse<string>.Ok(PlayerStatusEnum.GetDescription(nextStatus));
+            await NotifyOtherPlayersAsync(player);
+
+            if (await ShouldTransitionRoundAsync(session, playerRoundInformation))
+            {
+                await TransitionRoundAsync(session, playerRoundInformation);                
+            }
+
+            return GenericResponse<string>.Ok(PlayerStatusEnum.GetDescription(playerRoundInformation.Player.Status));
         }
 
+        internal abstract Task TransitionRoundAsync(Session session, PlayerRoundInformation playerRoundInformation);
+        internal abstract Task<bool> ShouldTransitionRoundAsync(Session session, PlayerRoundInformation playerRoundInformation);
+        internal abstract Task NotifyOtherPlayersAsync(Player player);
         protected abstract Task<Guid> GetNextStatusAsync(Session session, PlayerRoundInformation playerRoundInformation);
     }
 }

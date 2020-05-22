@@ -16,10 +16,6 @@ namespace Entities.Werewords
         public Round Round { get; set; }
         public SecretRolesEnum SecretRole { get; set; }
         public bool IsMayor { get; set; }
-        public int Ticks { get; set; }
-        public int Crosses { get; set; }
-        public int QuestionMarks { get; set; }
-        public int SoClose { get; set; }
-        public int Correct { get; set; }
+        public ICollection<PlayerResponse> Responses { get; set; }
     }
 }

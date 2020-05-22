@@ -8,7 +8,8 @@ import * as signalR from "@microsoft/signalr";
 
 @Component({
   selector: 'app-werewords-component',
-  templateUrl: './werewords.component.html'
+  templateUrl: './werewords.component.html',
+  styleUrls: ['./werewords.css']
 })
 export class WerewordsComponent implements OnInit {
 

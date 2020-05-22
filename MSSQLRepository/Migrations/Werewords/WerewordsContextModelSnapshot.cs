@@ -54,20 +54,36 @@ namespace MSSQLRepository.Migrations.Werewords
                     b.ToTable("Players");
                 });
 
+            modelBuilder.Entity("Entities.Werewords.PlayerResponse", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PlayerRoundInformationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ResponseType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlayerRoundInformationId");
+
+                    b.ToTable("PlayerResponses");
+                });
+
             modelBuilder.Entity("Entities.Werewords.PlayerRoundInformation", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Correct")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Crosses")
-                        .HasColumnType("int");
 
                     b.Property<bool>("IsMayor")
                         .HasColumnType("bit");
@@ -75,19 +91,10 @@ namespace MSSQLRepository.Migrations.Werewords
                     b.Property<Guid>("PlayerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("QuestionMarks")
-                        .HasColumnType("int");
-
                     b.Property<Guid>("RoundId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("SecretRole")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SoClose")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Ticks")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -161,6 +168,12 @@ namespace MSSQLRepository.Migrations.Werewords
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<int>("VoteDurationSeconds")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("VoteStartedUtc")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("MayorId");
@@ -205,6 +218,15 @@ namespace MSSQLRepository.Migrations.Werewords
                     b.HasOne("Entities.Werewords.Session", "Session")
                         .WithMany("Players")
                         .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Entities.Werewords.PlayerResponse", b =>
+                {
+                    b.HasOne("Entities.Werewords.PlayerRoundInformation", "PlayerRoundInformation")
+                        .WithMany("Responses")
+                        .HasForeignKey("PlayerRoundInformationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

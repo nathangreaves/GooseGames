@@ -40,3 +40,10 @@ export class PlayerStatusValidationResponse {
   statusCorrect: boolean;
   requiredStatus: string;
 }
+
+export class PlayerAction {
+  id: string;
+  playerName: string;
+  playerNumber: number;
+  hasTakenAction: boolean;
+}

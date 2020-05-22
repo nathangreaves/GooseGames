@@ -1,0 +1,17 @@
+<div>
+  <table class="player-table">
+    <tr *ngFor="let player of Players;" [ngClass]="{'new-player' : player.playerNumber == 0}">
+      <td class="player-name-cell">
+        {{player.playerName}}
+      </td>
+      <td>
+        <span class="response-given" *ngIf="player.hasTakenAction">
+          Tick!
+        </span>
+        <span class="waiting-for-response" *ngIf="!player.hasTakenAction">
+          ...
+        </span>
+      </td>
+    </tr>
+  </table>
+</div>

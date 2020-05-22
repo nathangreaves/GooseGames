@@ -19,5 +19,7 @@ namespace Entities.Werewords
         public int RoundDurationMinutes { get; set; }
         public RoundStatusEnum Status { get; set; }
         public RoundOutcomeEnum Outcome { get; set; }
+        public DateTime VoteStartedUtc { get; set; }
+        public int VoteDurationSeconds { get; set; }
     }
 }

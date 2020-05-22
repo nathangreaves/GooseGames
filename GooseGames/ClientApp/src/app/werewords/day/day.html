@@ -1,0 +1,125 @@
+<div>
+  <div *ngIf="RoundStarted || Voting" class="werewords-timer">
+    <span>{{TimeMinutes}}</span>
+    <span>:</span>
+    <span>{{TimeSeconds}}</span>
+  </div>
+  <div *ngIf="!RoundStarted && IsMayor && !Voting">
+    <button class="btn btn-primary" (click)="Start()">Start</button>
+  </div>
+  <div class="werewords-day-container container">
+    <div class="row werewords-day-row row" *ngFor="let player of Players;" [ngClass]="{
+             'werewords-active-player' : player.active
+           }">
+      <div class="container">
+        <div class="row werewords-day-player-row">
+          <div class="col-6 col-sm-5 col-md-4 werewords-day-player-name"
+               [ngClass]="{
+             'werewords-active-player' : player.active
+           }">
+            {{player.name}}
+          </div>
+          <div class="col-6 col-sm-7 col-md-8 werewords-responses-container">
+            <div *ngFor="let response of player.responses" class="werewords-response-container">
+              <div class="player-response-icon-host"
+                   [ngClass]="{
+                   'werewords-tick' : response.responseType === TickResponseType,                   
+                    'werewords-cross' : response.responseType === CrossResponseType,                   
+                    'werewords-question' : response.responseType === QuestionMarkResponseType,                   
+                    'werewords-soclose' : response.responseType === SoCloseResponseType,                   
+                    'werewords-wayoff' : response.responseType === WayOffResponseType,                   
+                    'werewords-correct' : response.responseType === CorrectResponseType
+                   }">
+                <i class="fas" [ngClass]="{
+                    'fa-check' : response.responseType === TickResponseType,                   
+                    'fa-times' : response.responseType === CrossResponseType,                   
+                    'fa-question' : response.responseType === QuestionMarkResponseType,                   
+                    'fa-exclamation' : response.responseType === SoCloseResponseType,                   
+                    'fa-minus-circle' : response.responseType === WayOffResponseType,                   
+                    'fa-star' : response.responseType === CorrectResponseType
+                   }"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="werewords-mayor-player-panel-row row" *ngIf="IsMayor && player.active && RoundStarted">
+          <div class="col-12 werewords-mayor-player-panel-row-col">
+
+            <div class="container">
+              <div class="row">
+                <div class="col-2 mayor-panel-button-host">
+                  <div>
+                    <button class="btn mayor-circle-button werewords-tick"
+                            (click)="Tick(player)"
+                            [disabled]="DisableButtons"
+                            >
+                      <i class="fas fa-check"></i>
+                    </button>
+                  </div>
+                  <span class="button-description">Yes</span>
+                </div>
+                <div class="col-2 mayor-panel-button-host">
+                  <div>
+                    <button class="btn mayor-circle-button werewords-cross"
+                            (click)="Cross(player)"
+                            [disabled]="DisableButtons">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                  <span class="button-description">No</span>
+                </div>
+                <div class="col-2 mayor-panel-button-host">
+                  <div>
+                    <button class="btn mayor-circle-button werewords-question"
+                            (click)="Question(player)"
+                            [disabled]="DisableButtons">
+                      <i class="fas fa-question"></i>
+                    </button>
+                  </div>
+                  <span class="button-description">Maybe</span>
+                </div>
+                <div class="col-2 mayor-panel-button-host">
+                  <div>
+                    <button class="btn mayor-circle-button werewords-soclose"
+                            (click)="SoClose(player)"
+                            [disabled]="DisableButtons">
+                      <i class="fas fa-exclamation"></i>
+                    </button>
+                  </div>
+                  <span class="button-description">So Close</span>
+                </div>
+                <div class="col-2 mayor-panel-button-host">
+                  <div>
+                    <button class="btn mayor-circle-button werewords-wayoff"
+                            (click)="WayOff(player)"
+                            [disabled]="DisableButtons">
+                      <i class="fas fa-minus-circle"></i>
+                    </button>
+                  </div>
+                  <span class="button-description">Way Off</span>
+                </div>
+                <div class="col-2 mayor-panel-button-host">
+                  <div>
+                    <button class="btn mayor-circle-button werewords-correct"
+                            (click)="Correct(player)"
+                            [disabled]="DisableButtons">
+                      <i class="fas fa-star"></i>
+                    </button>
+                  </div>
+                  <span class="button-description">CORRECT!</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="werewords-filler">
+
+  </div>
+
+
+</div>

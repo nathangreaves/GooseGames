@@ -8,7 +8,7 @@ import { WerewordsPlayerStatusService } from '../../../services/werewords/player
 
 @Component({
   selector: 'app-werewords-night-secret-role-component',
-  templateUrl: './night-secret-role.component.html'
+  templateUrl: './secret-role.html'
 })
 export class WerewordsNightSecretRoleComponent extends WerewordsComponentBase implements OnInit, OnDestroy {
   SecretRole: SecretRole;

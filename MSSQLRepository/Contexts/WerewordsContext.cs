@@ -28,6 +28,8 @@ namespace MSSQLRepository.Contexts
 
             modelBuilder.Entity<PlayerVote>().HasOne(s => s.Player).WithMany().HasForeignKey(s => s.PlayerId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<PlayerRoundInformation>().HasMany(s => s.Responses).WithOne(r => r.PlayerRoundInformation).HasForeignKey(s => s.PlayerRoundInformationId);
         }
 
         public DbSet<Session> Sessions { get; set; }
@@ -35,5 +37,6 @@ namespace MSSQLRepository.Contexts
         public DbSet<Round> Rounds { get; set; }
         public DbSet<PlayerRoundInformation> PlayerRoundInformation { get; set; }
         public DbSet<PlayerVote> PlayerVotes { get; set; }
+        public DbSet<PlayerResponse> PlayerResponses { get; set; }
     }
 }

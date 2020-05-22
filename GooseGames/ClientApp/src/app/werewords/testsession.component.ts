@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import * as _ from 'lodash';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { SessionLandingResponse } from '../../models/session';
 import { WerewordsSessionService } from '../../services/werewords/session';
 

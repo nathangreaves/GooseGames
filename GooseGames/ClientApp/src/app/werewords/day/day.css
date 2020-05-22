@@ -1,0 +1,178 @@
+
+
+.werewords-timer {
+    display: flex;
+    flex-direction: row;
+    justify-content:center;
+}
+
+  .werewords-timer span {
+    text-align: center;
+    font-weight: bold;
+    font-size: 2em;
+  }
+
+.werewords-day-container{
+
+}
+
+.werewords-day-row {
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 5px;
+  border-color: black;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  padding: 0.2em;
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
+}
+
+
+  .werewords-day-row.werewords-active-player {
+    box-shadow: inset 0px 0px 4px 4px #302824;
+    border-color: transparent;
+    border-width: 0px;
+    padding-top: 0.4em;
+    padding-bottom: 0.4em;
+  }
+
+.werewords-day-player-row{
+    align-content: center;
+}
+
+.werewords-responses-container {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  flex-wrap: wrap;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.werewords-response-container {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  margin-top: 1px;
+  margin-bottom: 1px;
+  margin-right: 2px;
+}
+
+.werewords-day-player-name{
+    padding-left: 5px;
+}
+
+.werewords-mayor-player-panel-row{
+
+}
+
+.werewords-day-player-name.werewords-active-player {
+  font-weight: bold;
+}
+
+
+.werewords-filler{
+    height: 100%;
+}
+
+.werewords-mayor-player-panel-row-col{
+    padding: 0;
+}
+
+.mayor-circle-button {
+  border-radius: 50%;
+  border-width: 2px;
+  border-style: solid;
+  border-color: black;
+  width: 2.5em;
+  height: 2.5em;
+  text-align: center;
+  box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.75);
+}
+
+.player-response-icon-host {
+  border-radius: 50%;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+  width: 1em;
+  height: 1em;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.75);
+}
+
+
+.mayor-circle-button .fas {
+  font-size: 1.5em;
+  text-align: center;
+  color: white;
+  margin: 0;
+}
+
+.player-response-icon-host .fas {
+  font-size: 0.5em;
+  text-align: center;
+  color: white;
+  margin: 0;
+}
+
+  .mayor-circle-button .fas.fa-check {
+    margin-left: -0.2em;
+  }
+  .mayor-circle-button .fas.fa-times {
+    margin-left: -0.08em;
+  }
+  .mayor-circle-button .fas.fa-question {
+    margin-left: -0.15em;
+  }
+  .mayor-circle-button .fas.fa-minus-circle {
+      margin-left: -0.25em;
+  }
+  .mayor-circle-button .fas.fa-star {
+    margin-left: -0.3em;
+  }
+  .mayor-circle-button .fas.fa-star {
+    margin-left: -0.3em;
+  }
+
+
+.werewords-tick {
+  background: #6fb231;
+}
+.werewords-cross {
+  background: #d1442b;
+}
+.werewords-question {
+  background: #4e3bcb;
+}
+.werewords-soclose {
+  background: #c4e500;
+}
+.werewords-wayoff {
+  background: #734222;
+}
+.werewords-correct {
+  background:#f0cc00 
+}
+
+.button-description{
+    font-weight: bold;
+    font-size: 0.5em;
+    text-align: center;
+}
+
+.mayor-panel-button-host {
+  padding: 0;
+  padding-left: 5px;
+  padding-right: 5px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+}

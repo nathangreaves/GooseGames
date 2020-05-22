@@ -4,7 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus'
 import { PlayerStatus } from '../../../models/justone/playerstatus'
 import { IPlayerSessionComponent } from '../../../models/session';
-import { PlayerAction } from '../../../models/justone/playeractions';
+import { PlayerAction } from '../../../models/player';
 import { GenericResponse } from '../../../models/genericresponse';
 import { PlayerNumberCss } from '../../../services/justone/ui'
 import * as signalR from '@microsoft/signalr';

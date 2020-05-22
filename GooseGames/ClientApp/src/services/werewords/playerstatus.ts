@@ -1,9 +1,9 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { GenericResponse } from '../../models/genericresponse';
-import { IPlayerSession } from '../../models/session'
+import { IPlayerSession, ConvertToPlayerSessionRequest } from '../../models/session'
 import { WerewordsPlayerStatus, IWerewordsComponentBase } from '../../models/werewords/content';
-import { PlayerStatusValidationResponse } from '../../models/player';
+import { PlayerStatusValidationResponse, PlayerAction } from '../../models/player';
 
 @Injectable({
   providedIn: 'root',
@@ -64,6 +64,13 @@ export class WerewordsPlayerStatusService {
         data: response.success ? WerewordsPlayerStatus[response.data] : null
       };
     });
+  }
+
+
+  public GetAwakePlayers(request: IPlayerSession): Promise<GenericResponse<PlayerAction[]>> {
+    request = ConvertToPlayerSessionRequest(request);
+    var parameters = Object.keys(request).map(key => key + '=' + request[key]).join('&');
+    return this._http.get<GenericResponse<PlayerAction[]>>(this._baseUrl + `WerewordsPlayerAction/PlayersAwake?${parameters}`).toPromise();
   }
 
   //public SetRoundWaiting(request: PlayerSessionRoundRequest): Promise<GenericResponse<boolean>> {

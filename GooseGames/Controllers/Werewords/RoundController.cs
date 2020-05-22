@@ -5,6 +5,7 @@ using Models.Requests;
 using Models.Requests.Werewords;
 using Models.Responses;
 using Models.Responses.Werewords;
+using Models.Responses.Werewords.Round;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,8 +49,30 @@ namespace GooseGames.Controllers.Werewords
             }
         }
 
+        [HttpGet]
+        [Route("SecretWord")]
+        public async Task<GenericResponse<SecretWordResponse>> GetSecretWordAsync([FromQuery]PlayerSessionRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _roundService.GetSecretWordAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e);
+                return GenericResponse<SecretWordResponse>.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
         [HttpPost]
-        [Route("Word")]
+        [Route("SecretWord")]
         public async Task<GenericResponseBase> PostWordAsync(WordChoiceRequest request)
         {
             try
@@ -66,7 +89,72 @@ namespace GooseGames.Controllers.Werewords
             {
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e);
-                return GenericResponse<IEnumerable<string>>.Error($"Unknown Error {errorGuid}");
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpGet]
+        [Route("Day")]
+        public async Task<GenericResponse<DayResponse>> GetDayAsync([FromQuery]PlayerSessionRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _roundService.GetDayAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponse<DayResponse>.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [Route("PlayerResponse")]
+        public async Task<GenericResponseBase> PostWordAsync(SubmitPlayerResponseRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _roundService.SubmitPlayerResponseAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [Route("Start")]
+        public async Task<GenericResponseBase> StartAsync(SubmitPlayerResponseRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _roundService.StartAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
             }
         }
     }

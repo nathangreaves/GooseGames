@@ -23,6 +23,7 @@ namespace MSSQLRepository.Werewords
         {
             return await Context.PlayerRoundInformation
                 .Include(p => p.Player)
+                .Include(p => p.Responses)
                 .Where(p => p.RoundId == roundId)
                 .OrderBy(p => p.Player.PlayerNumber)
                 .ToListAsync()
