@@ -26,17 +26,12 @@ export class WerewordsLobbyComponent extends WerewordsComponentBase implements O
   DisableButtons: boolean;
     StatusText: string;
 
-  constructor(private _sessionService: WerewordsSessionService, router: Router, activatedRoute: ActivatedRoute) {
+  constructor(private _sessionService: WerewordsSessionService, private _router: Router, activatedRoute: ActivatedRoute) {
     super();
 
     this.Loading = true;
 
   }
-  ngOnDestroy(): void {
-
-
-
-    }
   ngOnInit(): void {
 
     this.HubConnection.on("playerAdded", (player: PlayerDetailsResponse) => {
@@ -53,6 +48,11 @@ export class WerewordsLobbyComponent extends WerewordsComponentBase implements O
       if (this.Players && this.Players.length > 0) {
         _.remove(this.Players, p => p.id === playerId);
       }
+
+      if (playerId == this.PlayerId) {
+        this.SetSessionData(null, null, null);
+        this._router.navigate(['/werewords'], { replaceUrl: true });
+      }
     });
     this.HubConnection.on("startingSession", () => {
       this.StatusText = "Setting up the game...";
@@ -64,8 +64,24 @@ export class WerewordsLobbyComponent extends WerewordsComponentBase implements O
 
 
     this.load();
-    }
+  }
+  ngOnDestroy(): void {
 
+    this.CloseConnection();
+
+  }
+
+
+  CloseConnection() {
+    var connection = this.HubConnection;
+    if (connection) {
+      connection.off("playerAdded");
+      connection.off("playerDetailsUpdated");
+      connection.off("playerRemoved");
+      connection.off("startingSession");
+      connection.off("secretRole");
+    }
+  }
 
   public StartGame() {
 
@@ -125,17 +141,6 @@ export class WerewordsLobbyComponent extends WerewordsComponentBase implements O
       .catch((err) => this.HandleGenericError(err));
   }
 
-
-  CloseConnection() {
-    var connection = this.HubConnection;
-    if (connection) {
-      connection.off("playerAdded");
-      connection.off("playerDetailsUpdated");
-      connection.off("playerRemoved");
-      connection.off("startingSession");
-      connection.off("secretRole");
-    }
-  }
 
   private setDefaultNewPlayerName(player: PlayerDetailsResponse) {
     if (!player.playerName) {

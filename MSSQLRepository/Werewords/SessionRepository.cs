@@ -19,17 +19,35 @@ namespace MSSQLRepository.Werewords
         {
 
         }
-        public async Task AbandonSessionsOlderThanAsync(Guid excludeSessionId, DateTime createdBeforeUtc)
+        public async Task AbandonSessionsOlderThanAsync(string password, DateTime createdBeforeUtc)
         {
-            var sessionsToRemove = await Context.Sessions.Where(x => x.Id != excludeSessionId
-            && (x.StatusId == SessionStatusEnum.InProgress || x.StatusId == SessionStatusEnum.New)
-            && x.CreatedUtc < createdBeforeUtc).ToListAsync();
+            var sessionsToRemove = await Context.Sessions.Where(x => x.Password.ToLower() == password.ToLower()
+               && (x.StatusId == SessionStatusEnum.InProgress || x.StatusId == SessionStatusEnum.New)
+               && x.LastUpdatedUtc < createdBeforeUtc).ToListAsync();
 
             if (sessionsToRemove.Any())
             {
                 foreach (var sessionToRemove in sessionsToRemove)
                 {
                     sessionToRemove.StatusId = SessionStatusEnum.Abandoned;
+                    sessionToRemove.Password = Guid.NewGuid().ToString();
+                    await UpdateAsync(sessionToRemove);
+                }
+            }
+
+        }
+        public async Task AbandonSessionsOlderThanAsync(Guid excludeSessionId, DateTime createdBeforeUtc)
+        {
+            var sessionsToRemove = await Context.Sessions.Where(x => x.Id != excludeSessionId
+            && (x.StatusId == SessionStatusEnum.InProgress || x.StatusId == SessionStatusEnum.New)
+            && x.LastUpdatedUtc < createdBeforeUtc).ToListAsync();
+
+            if (sessionsToRemove.Any())
+            {
+                foreach (var sessionToRemove in sessionsToRemove)
+                {
+                    sessionToRemove.StatusId = SessionStatusEnum.Abandoned;
+                    sessionToRemove.Password = Guid.NewGuid().ToString();
                     await UpdateAsync(sessionToRemove);
                 }
             }

@@ -32,17 +32,24 @@ export class WerewordsLandingComponent extends WerewordsComponentBase {
     }
 
     this.DisableButtons = true;
-    this._sessionService.EnterGame({ password: password })
-      .then(data => this.handleResponse(data))
-      .catch(data => this.HandleGenericError(data))
-      .finally(() => this.DisableButtons = false);
+
+    if (this.ReadSessionData) {
+      this._router.navigate(['/werewords', this.SessionIdentifier]);
+    }
+    else {
+      this._sessionService.EnterGame({ password: password })
+        .then(data => this.handleResponse(data))
+        .catch(data => this.HandleGenericError(data))
+        .finally(() => this.DisableButtons = false);
+    }
+
   }
 
   private handleResponse(data: GenericResponse<SessionLandingResponse>) {
     if (data.success === true) {
       this.clearMessage();
 
-      this.SetSessionData(data.data.sessionId, data.data.playerId);
+      this.SetSessionData(data.data.sessionId, data.data.playerId, this.SessionIdentifier);
       this._router.navigate(['/werewords', this.SessionIdentifier]);
     }
     else {

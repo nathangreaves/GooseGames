@@ -6,10 +6,11 @@ using System.Text;
 
 namespace Entities.Werewords
 {
-    public class Session : IHasGuidId, IHasCreatedUtc
+    public class Session : IHasGuidId, IHasCreatedUtc, IHasLastUpdatedUtc
     {
         public Guid Id { get; set; }
         public DateTime CreatedUtc { get; set; }
+        public DateTime LastUpdatedUtc { get; set; }
         public string Password { get; set; }
         public ICollection<Player> Players { get; set; }
         public SessionStatusEnum StatusId { get; set; }

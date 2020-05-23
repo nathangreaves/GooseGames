@@ -9,5 +9,6 @@ namespace RepositoryInterface.Werewords
     public interface ISessionRepository : ICommonRepository<Session>
     {
         Task AbandonSessionsOlderThanAsync(Guid excludeSessionId, DateTime createdBeforeUtc);
+        Task AbandonSessionsOlderThanAsync(string password, DateTime createdBeforeUtc);
     }
 }

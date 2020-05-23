@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ComponentFactoryResolver } from '@angular/core';
+import { Component, OnInit, ViewChild, ComponentFactoryResolver, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import { IWerewordsComponent, WerewordsContent, WerewordsContentDirective, WerewordsPlayerStatus, WerewordsComponentBase, IWerewordsComponentBase } from '../../models/werewords/content';
 import { RegisteredContent } from '../../models/werewords/registered-content';
@@ -14,7 +14,7 @@ import { WerewordsSessionService } from '../../services/werewords/session';
   templateUrl: './werewords.component.html',
   styleUrls: ['./werewords.css']
 })
-export class WerewordsComponent implements OnInit {
+export class WerewordsComponent implements OnInit, OnDestroy {
 
   @ViewChild(WerewordsContentDirective, { static: true }) contentHost: WerewordsContentDirective;
   ComponentSet: boolean;
@@ -41,10 +41,9 @@ export class WerewordsComponent implements OnInit {
         this._sessionService.EnterGame({ password: this.GameIdentifier })
           .then(response => {
             if (response.success) {
-              this.SetSessionData(response.data.sessionId, response.data.playerId);
+              this.SetSessionData(response.data.sessionId, response.data.playerId, this.GameIdentifier);
 
-              this.setupConnection().then(() =>
-              {
+              this.setupConnection().then(() => {
                 this.route(WerewordsPlayerStatus.InLobby);
               });
             }
@@ -59,6 +58,14 @@ export class WerewordsComponent implements OnInit {
     this.navbarService.setAreaTitle("Werewords");
   }
 
+  ngOnDestroy(): void {
+    if (this._hubConnection) {
+      var oldConnection = this._hubConnection;
+      oldConnection.onclose(() => { });
+      oldConnection.stop();
+      this._hubConnection = null;
+    }
+  }
 
   constructor(private componentFactoryResolver: ComponentFactoryResolver,
     private playerStatusService: WerewordsPlayerStatusService,
@@ -74,26 +81,17 @@ export class WerewordsComponent implements OnInit {
     var urlSessionId = activatedRoute.snapshot.params.SessionId;
     var urlPlayerId = activatedRoute.snapshot.params.PlayerId;
 
-    if (urlSessionId && urlPlayerId) {
-      
-      this.SetSessionData(urlSessionId, urlPlayerId);
+    if (this.GameIdentifier && urlSessionId && urlPlayerId) {
+
+      this.SetSessionData(urlSessionId, urlPlayerId, this.GameIdentifier);
 
       this.router.navigate(['/werewords', this.GameIdentifier]);
     }
-    else {
-      const numberOfMillisecondsPerHour = 3600000;
-      var timeout = (new Date().getTime() + numberOfMillisecondsPerHour).toString();
-      var expiry = localStorage.getItem(`werewords_${this.GameIdentifier}_Timeout`);
+    else if (this.GameIdentifier) {
 
-      if (expiry && Number(expiry) > new Date().getTime()) {
+      var gameIdentifier = this.GameIdentifier;
 
-        this.SessionId = localStorage.getItem(`werewords_${this.GameIdentifier}_Session`);
-        this.PlayerId = localStorage.getItem(`werewords_${this.GameIdentifier}_Player`);
-
-        const numberOfMillisecondsPerHour = 3600000;
-        var timeout = (new Date().getTime() + numberOfMillisecondsPerHour).toString();
-        localStorage.setItem(`werewords_${this.GameIdentifier}_Timeout`, timeout);
-      }
+      this.ReadSessionData(gameIdentifier);
     }
   }
 
@@ -111,6 +109,32 @@ export class WerewordsComponent implements OnInit {
         if (response.success) {
           this.setContent(content, status);
         }
+        else
+          if (response.errorCode == "511c0fb3-7d49-4fdf-a1a7-b1281b5ada4b") {
+            //Has been previously booted from session, attempt rejoin.
+
+            if (this.GameIdentifier) {
+              this._sessionService.EnterGame({ password: this.GameIdentifier })
+                .then(response => {
+                  if (response.success) {
+                    this.SetSessionData(response.data.sessionId, response.data.playerId, this.GameIdentifier);
+
+                    this.setupConnection().then(() => {
+                      this.route(WerewordsPlayerStatus.InLobby);
+                    });
+                  }
+                  else {
+                    this.router.navigate(['/werewords'], { replaceUrl: true });
+                  }
+                })
+                .catch(data => this.HandleGenericError(data));
+            }
+          }
+          else if (response.errorCode == "a530d7fa-f842-492b-a0fc-6473af1c907a") {
+            this.SetSessionData(null, null, null);
+            this.router.navigate(['/werewords', this.GameIdentifier], { replaceUrl: true });
+          }
+
       });
   }
 
@@ -121,15 +145,49 @@ export class WerewordsComponent implements OnInit {
     this.setContent(content, status);
   }
 
-  SetSessionData = (sessionId: string, playerId: string) => {
-    this.SessionId = sessionId.toLowerCase();
-    this.PlayerId = playerId.toLowerCase();
+  SetSessionData = (sessionId: string, playerId: string, gameIdentifier: string) => {
 
-    localStorage.setItem(`werewords_${this.GameIdentifier}_Session`, this.SessionId);
-    localStorage.setItem(`werewords_${this.GameIdentifier}_Player`, this.PlayerId);
+
+    if (gameIdentifier) {
+      this.GameIdentifier = gameIdentifier.toLowerCase();
+    }
+
+    if (this.GameIdentifier && (!sessionId || !playerId)) {
+      localStorage.removeItem(`werewords_${this.GameIdentifier}_Session`);
+      localStorage.removeItem(`werewords_${this.GameIdentifier}_Player`);
+      localStorage.removeItem(`werewords_${this.GameIdentifier}_Timeout`);
+    }
+    else {
+      this.SessionId = sessionId.toLowerCase();
+      this.PlayerId = playerId.toLowerCase();
+
+      if (this.GameIdentifier) {
+        localStorage.setItem(`werewords_${this.GameIdentifier}_Session`, this.SessionId);
+        localStorage.setItem(`werewords_${this.GameIdentifier}_Player`, this.PlayerId);
+        const numberOfMillisecondsPerHour = 3600000;
+        var timeout = (new Date().getTime() + numberOfMillisecondsPerHour).toString();
+        localStorage.setItem(`werewords_${this.GameIdentifier}_Timeout`, timeout);
+      }
+    }
+  }
+
+  ReadSessionData = (gameIdentifier: string): boolean => {
     const numberOfMillisecondsPerHour = 3600000;
     var timeout = (new Date().getTime() + numberOfMillisecondsPerHour).toString();
-    localStorage.setItem(`werewords_${this.GameIdentifier}_Timeout`, timeout);
+    var expiry = localStorage.getItem(`werewords_${gameIdentifier}_Timeout`);
+    if (expiry && Number(expiry) > new Date().getTime()) {
+      this.SessionId = localStorage.getItem(`werewords_${gameIdentifier}_Session`);
+      this.PlayerId = localStorage.getItem(`werewords_${gameIdentifier}_Player`);
+
+      if (this.SessionId && this.PlayerId) {
+        const numberOfMillisecondsPerHour = 3600000;
+        var timeout = (new Date().getTime() + numberOfMillisecondsPerHour).toString();
+        localStorage.setItem(`werewords_${gameIdentifier}_Timeout`, timeout);
+
+        return true;
+      }
+    }
+    return false;
   }
 
   setContent(werewordsContent: WerewordsContent, status: WerewordsPlayerStatus) {
@@ -161,6 +219,7 @@ export class WerewordsComponent implements OnInit {
         (<IWerewordsComponent>componentRef.instance).CurrentStatus = status;
         (<IWerewordsComponent>componentRef.instance).HubConnection = this._hubConnection;
         (<IWerewordsComponent>componentRef.instance).SetSessionData = this.SetSessionData;
+        (<IWerewordsComponent>componentRef.instance).ReadSessionData = this.ReadSessionData;
       }
     }
 
@@ -168,6 +227,13 @@ export class WerewordsComponent implements OnInit {
   }
 
   private setupConnection(): Promise<any> {
+
+    if (this._hubConnection) {
+      var oldConnection = this._hubConnection;
+      oldConnection.onclose(() => { });
+      oldConnection.stop();
+    }
+
     this._hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`/werewordshub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
       .withAutomaticReconnect()

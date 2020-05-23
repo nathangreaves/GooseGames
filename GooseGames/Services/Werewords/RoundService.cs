@@ -544,7 +544,7 @@ namespace GooseGames.Services.Werewords
         {
             var votes = await _playerVoteRepository.FilterAsync(p => p.RoundId == round.Id);
             var groupedVotes = votes.GroupBy(x => x.VotedPlayerId);
-            var highestVotes = groupedVotes.OrderBy(g => g.Count()).Last();
+            var highestVotes = groupedVotes.OrderBy(g => g.Count()).LastOrDefault();
 
             var allWithHighestVotes = groupedVotes
                 .Where(x => x.Count() == highestVotes.Count())

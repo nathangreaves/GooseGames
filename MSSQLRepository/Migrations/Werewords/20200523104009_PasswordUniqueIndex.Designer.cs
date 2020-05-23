@@ -4,14 +4,16 @@ using MSSQLRepository.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MSSQLRepository.Migrations.Werewords
 {
     [DbContext(typeof(WerewordsContext))]
-    partial class WerewordsContextModelSnapshot : ModelSnapshot
+    [Migration("20200523104009_PasswordUniqueIndex")]
+    partial class PasswordUniqueIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,7 +43,7 @@ namespace MSSQLRepository.Migrations.Werewords
                     b.Property<int>("PlayerNumber")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("SessionId")
+                    b.Property<Guid>("SessionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("Status")
@@ -230,7 +232,9 @@ namespace MSSQLRepository.Migrations.Werewords
                 {
                     b.HasOne("Entities.Werewords.Session", "Session")
                         .WithMany("Players")
-                        .HasForeignKey("SessionId");
+                        .HasForeignKey("SessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Entities.Werewords.PlayerResponse", b =>

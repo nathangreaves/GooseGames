@@ -22,5 +22,7 @@ namespace RepositoryInterface
         Task<TProperty> GetPropertyAsync<TProperty>(Guid id, Expression<Func<T, TProperty>> select);
         Task<bool> SingleResultMatchesAsync(Guid id, Expression<Func<T, bool>> func);
         Task<int> CountAsync(Expression<Func<T, bool>> func);
+
+        void Detach(T entity);
     }
 }

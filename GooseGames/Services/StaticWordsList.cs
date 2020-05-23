@@ -1102,7 +1102,7 @@ namespace GooseGames.Services
             "Shell",
             "Peanut",
             "House",
-            "Univerity",
+            "University",
             "Camp",
             "Mohawk",
             "Anthem",

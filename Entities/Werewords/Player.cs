@@ -10,7 +10,7 @@ namespace Entities.Werewords
     {
         public Guid Id { get; set; }
         public DateTime CreatedUtc { get; set; }
-        public Guid SessionId { get; set; }
+        public Guid? SessionId { get; set; }
         public Session Session { get; set; }
         public int PlayerNumber { get; set; }
         public string Name { get; set; }

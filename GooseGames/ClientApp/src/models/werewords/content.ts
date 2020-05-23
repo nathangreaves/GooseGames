@@ -36,7 +36,8 @@ export enum WerewordsPlayerStatus {
 }
 
 type WerewordsRouter = (status: WerewordsPlayerStatus, validated: boolean) => void;
-type SetSessionData = (sessionId: string, playerId: string) => void;
+type SetSessionData = (sessionId: string, playerId: string, gameId: string) => void;
+type ReadSessionData = (gameId: string) => boolean;
 
 export interface IWerewordsComponentBase extends IPlayerSession {
 
@@ -56,6 +57,7 @@ export interface IWerewordsComponent extends IWerewordsComponentBase {
   CurrentStatus: WerewordsPlayerStatus;
   HubConnection: signalR.HubConnection;
   SetSessionData: SetSessionData;
+  ReadSessionData: ReadSessionData;
   //To hook this up, inherit from this interface, create a new enum value in WerewordsContentEnum
   //Then register your new component in module entryComponents in app.module.ts
   //Then add it to the collection RegisteredContent above
@@ -73,6 +75,7 @@ export class WerewordsComponentBase implements IWerewordsComponent {
   CurrentStatus: WerewordsPlayerStatus;
   HubConnection: signalR.HubConnection;
   SetSessionData: SetSessionData;
+  ReadSessionData: ReadSessionData;
 
   Route(status: WerewordsPlayerStatus) {
     this.router(status, false);

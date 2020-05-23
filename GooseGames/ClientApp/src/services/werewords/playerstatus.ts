@@ -39,7 +39,14 @@ export class WerewordsPlayerStatusService {
           }
         }
         else {
-          component.SetErrorMessage(response.errorCode);
+
+          if (response.errorCode == "511c0fb3-7d49-4fdf-a1a7-b1281b5ada4b" || response.errorCode == "a530d7fa-f842-492b-a0fc-6473af1c907a") {
+            //Has been previously booted from session, attempt rejoin.
+
+
+          }
+          else {
+            component.SetErrorMessage(response.errorCode); }
         }
         return response;
       })

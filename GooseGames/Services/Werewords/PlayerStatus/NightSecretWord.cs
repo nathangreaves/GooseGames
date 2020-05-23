@@ -35,7 +35,7 @@ namespace GooseGames.Services.Werewords.PlayerStatus
 
         internal override async Task NotifyOtherPlayersAsync(Player player)
         {
-            await _werewordsHubContext.SendPlayerAwakeAsync(player.SessionId, new PlayerActionResponse 
+            await _werewordsHubContext.SendPlayerAwakeAsync(player.SessionId.Value, new PlayerActionResponse 
             {
                 PlayerName = player.Name,
                 HasTakenAction = true,

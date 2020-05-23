@@ -49,6 +49,8 @@ namespace GooseGames.Services.Werewords
 
             var password = request.Password;
 
+            await CleanUpExpiredSessionsForPassword(request.Password);
+
             if (await SessionExistsForPasswordAsync(password))
             {
                 _logger.LogTrace("Session already exists");
@@ -56,7 +58,7 @@ namespace GooseGames.Services.Werewords
             }
             var dateTime = DateTime.UtcNow;
 
-            Player newPlayer = new Player 
+            Player newPlayer = new Player
             {
                 CreatedUtc = dateTime,
                 Status = PlayerStatusEnum.New
@@ -68,21 +70,41 @@ namespace GooseGames.Services.Werewords
                 Players = new List<Player>
                 {
                     newPlayer
-                }
+                },
+                LastUpdatedUtc = dateTime
             };
 
-            _logger.LogTrace($"Ok to insert session");
+            try
+            {
+                _logger.LogTrace($"Ok to insert session");
+                return await InsertSessionAsync(newPlayer, newSession);
+            }
+            catch (Exception firstException)
+            {
+                _sessionRepository.Detach(newSession);
+                _logger.LogError("Failed on first attempt inserting session", firstException);                
+                if (await SessionExistsForPasswordAsync(password))
+                {
+                    _logger.LogTrace("Session already exists");
+                    return await JoinSessionAsync(request);
+                }
+                throw;
+            }
+        }
 
+        private async Task<GenericResponse<JoinSessionResponse>> InsertSessionAsync(Player newPlayer, Session newSession)
+        {
             using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             {
                 _logger.LogTrace($"Inserting session");
+                                
                 await _sessionRepository.InsertAsync(newSession);
                 newSession.SessionMaster = newPlayer;
                 _logger.LogTrace($"Setting session master");
                 await _sessionRepository.UpdateAsync(newSession);
 
-                transaction.Complete();
-            }
+                transaction.Complete();                
+            }                       
 
             _logger.LogTrace($"Session inserted");
             return GenericResponse<JoinSessionResponse>.Ok(new JoinSessionResponse
@@ -172,12 +194,13 @@ namespace GooseGames.Services.Werewords
             await _playerRepository.UpdateAsync(player);
 
             _logger.LogTrace("Sending update to clients");
-            await _werewordsHubContext.SendPlayerDetailsUpdated(player.SessionId, new PlayerDetailsResponse
+            await _werewordsHubContext.SendPlayerDetailsUpdated(player.SessionId.Value, new PlayerDetailsResponse
             {
                 Id = player.Id,
                 PlayerName = player.Name,
                 PlayerNumber = player.PlayerNumber,
-                IsSessionMaster = false
+                IsSessionMaster = false,
+                Ready = true
             });
 
             _logger.LogTrace("Finished updating player details");
@@ -197,7 +220,7 @@ namespace GooseGames.Services.Werewords
 
             await _playerRepository.UpdateAsync(player);
 
-            await _werewordsHubContext.SendPlayerDetailsUpdated(player.SessionId, new PlayerDetailsResponse
+            await _werewordsHubContext.SendPlayerDetailsUpdated(player.SessionId.Value, new PlayerDetailsResponse
             {
                 Id = player.Id,
                 PlayerName = player.Name,
@@ -206,6 +229,11 @@ namespace GooseGames.Services.Werewords
             });
 
             return GenericResponseBase.Ok();
+        }
+
+        private async Task CleanUpExpiredSessionsForPassword(string password)
+        {
+            await _sessionRepository.AbandonSessionsOlderThanAsync(password, DateTime.UtcNow.AddMinutes(-30));
         }
 
         private async Task CleanUpExpiredSessions(Guid sessionId)
@@ -249,7 +277,7 @@ namespace GooseGames.Services.Werewords
             _logger.LogTrace($"Ok to insert player");
 
             Player newPlayer = new Player();          
-            newPlayer.Session = session;
+            newPlayer.SessionId = session.Id;
             newPlayer.Status = PlayerStatusEnum.New;
 
             await _playerRepository.InsertAsync(newPlayer);
@@ -257,7 +285,7 @@ namespace GooseGames.Services.Werewords
             _logger.LogTrace($"Player inserted");
 
             _logger.LogTrace("Sending update to clients");
-            await _werewordsHubContext.SendPlayerAdded(newPlayer.SessionId, new PlayerDetailsResponse
+            await _werewordsHubContext.SendPlayerAdded(newPlayer.SessionId.Value, new PlayerDetailsResponse
             {
                 Id = newPlayer.Id
             });
@@ -325,16 +353,17 @@ namespace GooseGames.Services.Werewords
             if (playerToDelete == null)
             {
                 _logger.LogWarning("Asked to delete player that didn't exist");
-                await _werewordsHubContext.SendPlayerRemoved(requestingPlayer.SessionId, request.PlayerToDeleteId);
+                await _werewordsHubContext.SendPlayerRemoved(requestingPlayer.SessionId.Value, request.PlayerToDeleteId);
                 return GenericResponseBase.Ok();
             }
 
-            var isSessionMaster = await ValidateSessionMasterAsync(playerToDelete.SessionId, request.SessionMasterId);
+            var isSessionMaster = await ValidateSessionMasterAsync(playerToDelete.SessionId.Value, request.SessionMasterId);
             if (isSessionMaster)
             {
-                await _playerRepository.DeleteAsync(playerToDelete);
+                playerToDelete.SessionId = null;
+                await _playerRepository.UpdateAsync(playerToDelete);
 
-                await _werewordsHubContext.SendPlayerRemoved(playerToDelete.SessionId, playerToDelete.Id);
+                await _werewordsHubContext.SendPlayerRemoved(requestingPlayer.SessionId.Value, playerToDelete.Id);
             }
 
             _logger.LogTrace("Deleted Player");

@@ -68,6 +68,11 @@ namespace MSSQLRepository
         public async Task InsertAsync(T entity)
         {
             entity.CreatedUtc = DateTime.UtcNow;
+            var lastUpdateEntity = entity as IHasLastUpdatedUtc;
+            if (lastUpdateEntity != null)
+            {
+                lastUpdateEntity.LastUpdatedUtc = DateTime.UtcNow;
+            }
 
             DbContext.Add(entity);
 
@@ -79,6 +84,11 @@ namespace MSSQLRepository
             foreach (var item in entities)
             {
                 item.CreatedUtc = DateTime.UtcNow;
+                var lastUpdateEntity = item as IHasLastUpdatedUtc;
+                if (lastUpdateEntity != null)
+                {
+                    lastUpdateEntity.LastUpdatedUtc = DateTime.UtcNow;
+                }
                 DbContext.Add(item);
             }
 
@@ -87,6 +97,12 @@ namespace MSSQLRepository
 
         public async Task UpdateAsync(T entity)
         {
+            var lastUpdateEntity = entity as IHasLastUpdatedUtc;
+            if (lastUpdateEntity != null)
+            {
+                lastUpdateEntity.LastUpdatedUtc = DateTime.UtcNow;
+            }
+
             DbContext.Update(entity);
 
             await DbContext.SaveChangesAsync().ConfigureAwait(false);
@@ -94,7 +110,16 @@ namespace MSSQLRepository
 
         public async Task UpdateRangeAsync(IEnumerable<T> entities)
         {
-            DbContext.UpdateRange(entities);
+            foreach (var entity in entities)
+            {
+                var lastUpdateEntity = entity as IHasLastUpdatedUtc;
+                if (lastUpdateEntity != null)
+                {
+                    lastUpdateEntity.LastUpdatedUtc = DateTime.UtcNow;
+                }
+
+                DbContext.Update(entity);
+            }
 
             await DbContext.SaveChangesAsync().ConfigureAwait(false);
         }
@@ -104,6 +129,11 @@ namespace MSSQLRepository
             DbContext.Remove(entity);
 
             await DbContext.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public virtual void Detach(T entity)
+        {
+            DbContext.Entry(entity).State = EntityState.Detached;
         }
     }
 }

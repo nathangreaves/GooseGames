@@ -80,7 +80,11 @@ namespace GooseGames.Services.Werewords
             var player = await _playerRepository.SingleOrDefaultAsync(p => p.Id == request.PlayerId);
             if (player == null)
             {
-                return NewResponse.Error<PlayerStatusValidationResponse>("You are not part of this session");
+                return GenericResponse<PlayerStatusValidationResponse>.Error("a530d7fa-f842-492b-a0fc-6473af1c907a");
+            }
+            if (player.SessionId == null)
+            {
+                return GenericResponse<PlayerStatusValidationResponse>.Error("511c0fb3-7d49-4fdf-a1a7-b1281b5ada4b");
             }
 
             var session = await _sessionRepository.GetAsync(request.SessionId);

@@ -19,6 +19,9 @@ namespace MSSQLRepository.Contexts
 
             modelBuilder.Entity<Session>().HasMany(s => s.Players).WithOne(s => s.Session).HasForeignKey(r => r.SessionId);
 
+            modelBuilder.Entity<Session>().HasIndex(u => u.Password)
+                .IsUnique();
+
             modelBuilder.Entity<Session>().HasOne(s => s.SessionMaster).WithMany().HasForeignKey(s => s.SessionMasterId);
             modelBuilder.Entity<Session>().HasOne(s => s.CurrentRound).WithMany().HasForeignKey(s => s.CurrentRoundId);
 
