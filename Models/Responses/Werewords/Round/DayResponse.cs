@@ -17,5 +17,7 @@ namespace Models.Responses.Werewords.Round
         public DateTime? EndTime { get; set; }
         public DateTime? VoteEndTime { get; set; }
         public SecretRole SecretRole { get; set; }
+        public bool SoCloseSpent { get; set; }
+        public bool WayOffSpent { get; set; }
     }
 }

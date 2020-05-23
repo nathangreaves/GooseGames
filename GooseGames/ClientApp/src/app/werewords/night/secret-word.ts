@@ -8,16 +8,18 @@ import { WerewordsPlayerStatusService } from '../../../services/werewords/player
 
 @Component({
   selector: 'app-werewords-night-secret-word-component',
-  templateUrl: './secret-word.html'
+  templateUrl: './secret-word.html',
+  styleUrls: ['./secret.css']
 })
 export class WerewordsNightSecretWordComponent extends WerewordsComponentBase implements OnInit {
   SecretRole: SecretRole;
   MayorName: string;
   MayorId: string;
   IsMayor: boolean;
-  DisableButtons: boolean = false;
+  DisableButtons: boolean = true;
   WaitingForMayor: boolean = false;
   SecretWord: string;
+  SecretWordHidden: boolean = true;
 
   constructor(private roundService: WerewordsRoundService, private playerStatusService: WerewordsPlayerStatusService) {
     super();
@@ -54,4 +56,13 @@ export class WerewordsNightSecretWordComponent extends WerewordsComponentBase im
     }));
 
   }
+  show() {
+    this.SecretWordHidden = false;
+    this.DisableButtons = false;
+  }
+
+  hide() {
+    this.SecretWordHidden = true;
+  }
+
 }

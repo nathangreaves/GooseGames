@@ -2,8 +2,10 @@
 using GooseGames.Services.Werewords;
 using Microsoft.AspNetCore.Mvc;
 using Models.Requests;
+using Models.Requests.PlayerDetails;
 using Models.Requests.Sessions;
 using Models.Responses;
+using Models.Responses.PlayerDetails;
 using Models.Responses.Sessions;
 using System;
 using System.Collections.Generic;
@@ -26,56 +28,14 @@ namespace GooseGames.Controllers.Werewords
             _logger = logger;
         }
 
-        //[HttpGet]
-        //public async Task<GenericResponse<SessionResponse>> GetAsync([FromQuery]PlayerSessionRequest request)
-        //{
-        //    try
-        //    {
-        //        _logger.LogInformation("Received request", request);
-
-        //        var result = await _sessionService.GetAsync(request);
-
-        //        _logger.LogInformation("Returned result", result);
-
-        //        return result;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        var errorGuid = Guid.NewGuid();
-        //        _logger.LogError($"Unknown Error {errorGuid}", e, request);
-        //        return GenericResponse<SessionResponse>.Error($"Unknown Error {errorGuid}");
-        //    }
-        //}
-
         [HttpPost]
-        public async Task<GenericResponse<NewSessionResponse>> PostAsync(NewSessionRequest request)
+        public async Task<GenericResponse<JoinSessionResponse>> PostAsync(JoinSessionRequest request)
         {
             try
             {
                 _logger.LogInformation("Received request", request);
 
-                var result = await _sessionService.CreateSessionAsync(request);
-
-                _logger.LogInformation("Returned result", result);
-
-                return result;
-            }
-            catch (Exception e)
-            {
-                var errorGuid = Guid.NewGuid();
-                _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return GenericResponse<NewSessionResponse>.Error($"Unknown Error {errorGuid}");
-            }
-        }
-
-        [HttpPatch]
-        public async Task<GenericResponse<JoinSessionResponse>> PatchAsync(JoinSessionRequest request)
-        {
-            try
-            {
-                _logger.LogInformation("Received request", request);
-
-                var result = await _sessionService.JoinSessionAsync(request);
+                var result = await _sessionService.CreateOrJoinSessionAsync(request);
 
                 _logger.LogInformation("Returned result", result);
 
@@ -113,7 +73,7 @@ namespace GooseGames.Controllers.Werewords
 
         [HttpPost]
         [Route("CreateTestSession")]
-        public async Task<GenericResponse<IEnumerable<JoinSessionResponse>>> CreateTestSessionAsync(NewSessionRequest request)
+        public async Task<GenericResponse<IEnumerable<JoinSessionResponse>>> CreateTestSessionAsync(JoinSessionRequest request)
         {
             try
             {
@@ -132,5 +92,92 @@ namespace GooseGames.Controllers.Werewords
                 return GenericResponse<IEnumerable<JoinSessionResponse>>.Error($"Unknown Error {errorGuid} : {e.Message}");
             }
         }
-    }    
+
+
+        [HttpPost]
+        [Route("UpdatePlayerDetails")]
+        public async Task<GenericResponseBase> UpdatePlayerDetailsAsync(UpdatePlayerDetailsRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _sessionService.UpdatePlayerDetailsAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpGet]
+        [Route("Lobby")]
+        public async Task<GenericResponse<GetPlayerDetailsResponse>> GetLobbyAsync([FromQuery]PlayerSessionRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _sessionService.GetPlayerDetailsAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponse<GetPlayerDetailsResponse>.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+
+        [HttpDelete]
+        [Route("KickPlayer")]
+        public async Task<GenericResponseBase> KickPlayerAsync([FromQuery]DeletePlayerRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _sessionService.DeletePlayerAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [Route("Again")]
+        public async Task<GenericResponseBase> AgainAsync(PlayerSessionRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _sessionService.AgainAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+    }
 }

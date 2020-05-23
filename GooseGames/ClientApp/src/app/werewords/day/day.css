@@ -12,8 +12,17 @@
     font-size: 2em;
   }
 
-.werewords-day-container{
 
+
+.werewords-current-player{
+    font-weight: bold;
+}
+.werewords-day-container {
+}
+
+
+.start-button-container{
+    text-align: center;
 }
 
 .werewords-day-row {
@@ -26,20 +35,29 @@
   padding: 0.2em;
   padding-top: 0.3em;
   padding-bottom: 0.3em;
+  width: 100%;
 }
 
 
   .werewords-day-row.werewords-active-player {
-    box-shadow: inset 0px 0px 4px 4px #302824;
+    box-shadow: inset 0px 0px 4px 4px rgba(88,120,34,1);
     border-color: transparent;
     border-width: 0px;
     padding-top: 0.4em;
     padding-bottom: 0.4em;
   }
 
-.werewords-day-player-row{
+  .werewords-day-row.werewords-voted-player {
+    box-shadow: inset 0px 0px 4px 4px maroon;
+    border-color: transparent;
+    border-width: 0px;
+    padding-top: 0.4em;
+    padding-bottom: 0.4em;
+  }
+
+  .werewords-day-player-row {
     align-content: center;
-}
+  }
 
 .werewords-responses-container {
   display: flex;
@@ -176,3 +194,62 @@
   justify-content: center;
   align-content: center;
 }
+
+
+.confirm-action {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(200, 200, 200, 0.8)
+}
+
+.confirm-action-box {
+  height: 25em;
+  width: 16em;
+  background: white;
+  border-width: 2px;
+  border-style: solid;
+  border-color: black;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.confirm-action-icon-host {
+  border-radius: 50%;
+  border-width: 2px;
+  border-style: solid;
+  border-color: black;
+  width: 4em;
+  height: 4em;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.75);
+}
+  .confirm-action-icon-host .fas {
+    font-size: 3em;
+    text-align: center;
+    color: white;
+    margin: 0;
+  }
+
+.confirm-action-box .button-description{
+    font-size: 1em;
+    margin-bottom: 2em;
+}
+
+.confirm-action-box .btn {
+  min-width: 8em;
+}
+

@@ -1,0 +1,58 @@
+<div *ngIf="ErrorMessage" class="alert alert-danger gg-error-message" role="alert">{{ErrorMessage}}</div>
+
+<div *ngIf="!Loading">
+  <div>
+    The secret word was
+  </div>
+  <div class="secret-word">
+    {{SecretWord}}
+  </div>
+
+  <div>
+    <div *ngIf="WerewolfVictory">
+      Victory for Team Werewolf!
+      <p>
+        <span *ngFor="let werewolf of Werewolves; let last = last; let i = index">
+          <span *ngIf="werewolf.isMayor">Mayor </span>
+          <span class="werewolf-name">{{werewolf.name}}</span>
+          <span *ngIf="!last"> and</span>
+        </span>
+        <span *ngIf="RoundOutcome === VillagersVotedWrong">
+          went undetected
+        </span>
+        <span *ngIf="RoundOutcome === WerewolvesVotedSeer">
+          correctly ousted <span *ngIf="Seer.isMayor">Mayor </span><span>{{Seer.name}}</span> as the Seer
+        </span>
+      </p>
+    </div>
+    <div *ngIf="VillagerVictory">
+      Victory for the Villagers!
+      <p *ngIf="RoundOutcome === WerewolvesVotedWrong">
+        <span *ngFor="let werewolf of Werewolves; let last = last; let i = index">
+          <span class="werewolf-name">{{werewolf.name}}</span>
+          <span *ngIf="!last"> and</span>
+        </span>
+        did not detect <span *ngIf="Seer.isMayor">Mayor </span><span>{{Seer.name}}</span> as the Seer
+      </p>
+      <p *ngIf="RoundOutcome === VillagersVotedWerewolf">
+        <span *ngFor="let werewolf of VotedWerewolves; let last = last; let i = index">
+          <span class="werewolf-name">{{werewolf.name}}</span>
+          <span *ngIf="!last"> and</span>
+        </span>
+        <span *ngIf="MultipleVotedWerewolves">
+          were correctly voted as Werewolves
+        </span>
+        <span *ngIf="!MultipleVotedWerewolves">
+          was correctly voted as a Werewolf
+        </span>
+      </p>
+    </div>
+  </div>
+
+  <div>
+    <button class="btn btn-primary" (click)="Again()">
+      Again!
+    </button>
+  </div>
+
+</div>

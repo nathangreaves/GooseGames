@@ -4,12 +4,12 @@ import { WerewordsPlayerStatus, WerewordsComponentBase } from '../../../models/w
 import { WerewordsRoundService } from '../../../services/werewords/round';
 import { GenericResponseBase, GenericResponse } from '../../../models/genericresponse';
 import { WerewordsPlayerStatusService } from '../../../services/werewords/playerstatus';
-import { PlayerRoundInformation, PlayerResponseType, PlayerResponse } from '../../../models/werewords/playerroundinformation';
+import { PlayerRoundInformation, PlayerResponseType, PlayerResponse, SecretRole } from '../../../models/werewords/playerroundinformation';
 
 @Component({
   selector: 'app-werewords-day-component',
   templateUrl: './day.html',
-  styleUrls: ['./day.css']
+  styleUrls: ['./day.css', '../common/werewords.common.css']
 })
 export class WerewordsDayComponent extends WerewordsComponentBase implements OnInit, OnDestroy {
   MayorName: string;
@@ -25,10 +25,29 @@ export class WerewordsDayComponent extends WerewordsComponentBase implements OnI
   SoCloseResponseType = PlayerResponseType.SoClose;
   WayOffResponseType = PlayerResponseType.WayOff;
   CorrectResponseType = PlayerResponseType.Correct;
+
+  DayMayorStatus = WerewordsPlayerStatus.DayMayor;
+  VotingOnSeerStatus = WerewordsPlayerStatus.DayVotingOnSeer;
+  VotingOnWerewolfStatus = WerewordsPlayerStatus.DayVotingOnWerewolves;
+
+  WerewolfSecretRole = SecretRole.Werewolf;
+
+  //NumberOfWerewolves = () => { return this.Werewolves().length }
+
+  Werewolves: PlayerRoundInformation[];
+  IsWerewolf: boolean;
+
   TimeMinutes: string;
   TimeSeconds: string;
   RoundStarted: boolean;
   Voting: boolean;
+  _timer: NodeJS.Timeout;
+  SecretWord: string;
+  ConfirmSoClose: boolean;
+  ConfirmWayOff: boolean;
+  ConfirmCorrect: boolean;
+  SoCloseSpent: boolean;
+  WayOffSpent: boolean;
 
   constructor(private roundService: WerewordsRoundService, private playerStatusService: WerewordsPlayerStatusService) {
     super();
@@ -51,19 +70,32 @@ export class WerewordsDayComponent extends WerewordsComponentBase implements OnI
 
       this.IsActive = player.id.toLowerCase() == this.PlayerId;
     });
-    this.HubConnection.on("voteWerewolves", (endTime: string) => {
+    this.HubConnection.on("voteWerewolves", (endTime: string, secretWord: string) => {
       this.Voting = true;
-      this.RoundStarted = false;
+      this.SecretWord = secretWord;
       this.startTimer(new Date(endTime));
+      this.revealMayor();
+      this.CurrentStatus = WerewordsPlayerStatus.DayVotingOnWerewolves;
     });
-    this.HubConnection.on("voteSeer", (endTime: string) => {
+    this.HubConnection.on("voteSeer", (endTime: string, werewolves: string[], secretWord: string) => {
       this.Voting = true;
-      this.RoundStarted = false;
+      this.SecretWord = secretWord;
       this.startTimer(new Date(endTime));
+
+      _.each(werewolves, w => {
+        var player = _.find(this.Players, p => p.id.toLowerCase() == w.toLowerCase());
+        player.secretRole = SecretRole.Werewolf;
+      });
+      this.revealMayor();
+      this.setWerewolves();
+      this.CurrentStatus = WerewordsPlayerStatus.DayVotingOnSeer;
     });
     this.HubConnection.on("startTimer", (endTime: string) => {
       this.RoundStarted = true;
       this.startTimer(new Date(endTime));
+    });
+    this.HubConnection.on("roundOutcome", () => {
+      this.Route(WerewordsPlayerStatus.DayOutcome);
     });
 
     this.load()
@@ -77,6 +109,7 @@ export class WerewordsDayComponent extends WerewordsComponentBase implements OnI
     this.HubConnection.off("voteWerewolves");
     this.HubConnection.off("voteSeer");
     this.HubConnection.off("startTimer");
+    this.HubConnection.off("roundOutcome");
   }
 
 
@@ -84,7 +117,8 @@ export class WerewordsDayComponent extends WerewordsComponentBase implements OnI
 
     var endTimeAsMilliseconds = endTime.getTime();
 
-    var timer = setInterval(() => {
+    clearInterval(this._timer);
+    this._timer = setInterval(() => {
 
       Date.now();
 
@@ -104,9 +138,44 @@ export class WerewordsDayComponent extends WerewordsComponentBase implements OnI
       else {
         this.TimeMinutes = "0";
         this.TimeSeconds = "00";
-        clearInterval(timer);
+
+        clearInterval(this._timer);
+        this.timerFinished();
       }
     }, 500);
+  }
+  timerFinished() {
+    if (this.CurrentStatus == WerewordsPlayerStatus.DayMayor) {
+
+    }
+    else if (this.CurrentStatus == WerewordsPlayerStatus.DayVotingOnSeer) {
+      this.Voting = false;
+    }
+    else if (this.CurrentStatus == WerewordsPlayerStatus.DayVotingOnWerewolves) {
+      this.Voting = false;
+    }
+
+    if (this.IsMayor) {
+      this.load();
+    }
+  }
+
+  setWerewolves() {
+    this.Werewolves = _.filter(this.Players, p => p.secretRole === SecretRole.Werewolf);
+    this.IsWerewolf = !!_.find(this.Players, p => p.id.toLowerCase() == this.PlayerId.toLowerCase() && p.secretRole === SecretRole.Werewolf);
+  }
+  revealMayor() {
+    var mayor = _.find(this.Players, p => p.isMayor);
+    mayor.isHidden = false;
+  }
+
+  hideMayor(players: PlayerRoundInformation[]) {
+    var mayor = _.find(players, p => p.isMayor);
+    mayor.isHidden = true;
+  }
+
+  activePlayer(): PlayerRoundInformation {
+    return _.find(this.Players, p => p.active);
   }
 
   load(): Promise<any> {
@@ -115,28 +184,56 @@ export class WerewordsDayComponent extends WerewordsComponentBase implements OnI
       this.MayorName = data.mayorName;
       this.MayorId = data.mayorPlayerId;
       this.IsMayor = data.mayorPlayerId.toLowerCase() == this.PlayerId.toLowerCase();
-      this.Players = data.players;
+      var players = data.players;
       this.IsActive = data.isActive;
+      this.SecretWord = data.secretWord
+      this.SoCloseSpent = data.soCloseSpent;
+      this.WayOffSpent = data.wayOffSpent;
 
       if (this.CurrentStatus == WerewordsPlayerStatus.DayVotingOnSeer) {
         this.Voting = true;
       }
-      if (this.CurrentStatus == WerewordsPlayerStatus.DayVotingOnWerewolves) {
+      else if (this.CurrentStatus == WerewordsPlayerStatus.DayVotingOnWerewolves) {
         this.Voting = true;
       }
-
+      else {
+        this.hideMayor(players);
+      }
+      this.Players = players;
       if (data.voteEndTime) {
         this.startTimer(new Date(data.voteEndTime));
+        this.RoundStarted = true;
       }
-      if (data.endTime) {
+      else if (data.endTime) {
         this.startTimer(new Date(data.endTime));
+        this.RoundStarted = true;
       }
+      this.setWerewolves();
 
       return Promise.resolve(<GenericResponseBase>{ success: true })
     }));
   }
 
+  VotePlayer(player: PlayerRoundInformation) {
 
+    if (!this.CanVote()) {
+      return;
+    }
+
+    _.each(this.Players, p => { p.isVoted = false; })
+
+    player.isVoted = true;
+
+    if (this.CurrentStatus === this.VotingOnSeerStatus) {
+      this.roundService.VoteAsSeer(this, player.id);
+    }
+    else if (this.CurrentStatus === this.VotingOnWerewolfStatus) {
+      this.roundService.VoteAsWerewolf(this, player.id);
+    }
+  }
+  CanVote() {
+    return this.Voting && ((this.CurrentStatus === this.VotingOnSeerStatus && this.IsWerewolf) || (this.CurrentStatus === this.VotingOnWerewolfStatus))
+  }
   Tick(player: PlayerRoundInformation) {
     this.SendResponse(player, PlayerResponseType.Tick);
   }
@@ -147,13 +244,43 @@ export class WerewordsDayComponent extends WerewordsComponentBase implements OnI
     this.SendResponse(player, PlayerResponseType.QuestionMark);
   }
   SoClose(player: PlayerRoundInformation) {
-    this.SendResponse(player, PlayerResponseType.SoClose);
+    this.ConfirmSoClose = true;
+  }
+  SoCloseConfirmed() {
+    this.SendResponse(this.activePlayer(), PlayerResponseType.SoClose);
   }
   WayOff(player: PlayerRoundInformation) {
-    this.SendResponse(player, PlayerResponseType.WayOff);
+    this.ConfirmWayOff = true;    
+  }
+  WayOffConfirmed() {
+    this.SendResponse(this.activePlayer(), PlayerResponseType.WayOff);
   }
   Correct(player: PlayerRoundInformation) {
-    this.SendResponse(player, PlayerResponseType.Correct);
+    this.ConfirmCorrect = true; 
+  }
+  CorrectConfirmed() {
+    this.SendResponse(this.activePlayer(), PlayerResponseType.Correct);
+  }
+  Confirm() {
+    if (this.ConfirmSoClose) {
+      this.SoCloseConfirmed();
+      this.SoCloseSpent = true;
+      this.CancelConfirm();
+    }
+    else if (this.ConfirmWayOff) {
+      this.WayOffConfirmed();
+      this.WayOffSpent = true;
+      this.CancelConfirm();
+    }
+    else if (this.ConfirmCorrect) {
+      this.CorrectConfirmed();
+      this.CancelConfirm();
+    }
+  }
+  CancelConfirm() {
+    this.ConfirmSoClose = false;
+    this.ConfirmWayOff = false;
+    this.ConfirmCorrect = false;
   }
   Start() {
     this.roundService.Start(this);

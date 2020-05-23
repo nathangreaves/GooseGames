@@ -74,6 +74,10 @@
     <None Remove="ClientApp\src\app\werewords\common\waitingforplayeraction.ts" />
     <None Remove="ClientApp\src\app\werewords\common\waitingforplayeractionbase.ts" />
     <None Remove="ClientApp\src\app\werewords\day\day.ts" />
+    <None Remove="ClientApp\src\app\werewords\day\outcome.ts" />
+    <None Remove="ClientApp\src\app\werewords\lobby\landing.ts" />
+    <None Remove="ClientApp\src\app\werewords\lobby\lobby.ts" />
+    <None Remove="ClientApp\src\app\werewords\lobby\newplayer.ts" />
     <None Remove="ClientApp\src\app\werewords\night-secret-word.component.ts" />
     <None Remove="ClientApp\src\app\werewords\night\mayor-secret-word.ts" />
     <None Remove="ClientApp\src\app\werewords\night\waking.ts" />
@@ -180,6 +184,10 @@
     <TypeScriptCompile Include="ClientApp\src\app\werewords\common\waitingforplayeraction.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\werewords\common\waitingforplayeractionbase.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\werewords\day\day.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\werewords\day\outcome.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\werewords\lobby\landing.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\werewords\lobby\lobby.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\werewords\lobby\newplayer.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\werewords\night\mayor-secret-word.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\werewords\night\secret-word.ts">
       <SubType>Code</SubType>

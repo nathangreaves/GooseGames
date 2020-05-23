@@ -1,4 +1,5 @@
-﻿using GooseGames.Logging;
+﻿using Entities.Werewords.Enums;
+using GooseGames.Logging;
 using GooseGames.Services.Werewords;
 using Microsoft.AspNetCore.Mvc;
 using Models.Requests;
@@ -138,7 +139,7 @@ namespace GooseGames.Controllers.Werewords
 
         [HttpPost]
         [Route("Start")]
-        public async Task<GenericResponseBase> StartAsync(SubmitPlayerResponseRequest request)
+        public async Task<GenericResponseBase> StartAsync(PlayerSessionRequest request)
         {
             try
             {
@@ -155,6 +156,71 @@ namespace GooseGames.Controllers.Werewords
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e);
                 return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [Route("VoteAsSeer")]
+        public async Task<GenericResponseBase> VoteAsSeerAsync(SubmitVoteRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _roundService.SubmitVoteAsync(request, PlayerVoteTypeEnum.Seer);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [Route("VoteAsWerewolf")]
+        public async Task<GenericResponseBase> VoteAsWerewolfAsync(SubmitVoteRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _roundService.SubmitVoteAsync(request, PlayerVoteTypeEnum.Werewolf);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpGet]
+        [Route("Outcome")]
+        public async Task<GenericResponse<RoundOutcomeResponse>> GetOutcomeAsync([FromQuery]PlayerSessionRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _roundService.GetOutcomeAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponse<RoundOutcomeResponse>.Error($"Unknown Error {errorGuid}");
             }
         }
     }

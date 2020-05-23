@@ -26,6 +26,7 @@ export class PlayerDetailsResponse {
   playerName: string;
   playerNumber: number;
   isSessionMaster: boolean;
+  ready: boolean;
 }
 
 export class GetPlayerDetailsResponse {

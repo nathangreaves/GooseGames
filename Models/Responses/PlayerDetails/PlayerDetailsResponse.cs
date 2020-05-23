@@ -10,5 +10,6 @@ namespace Models.Responses.PlayerDetails
         public string PlayerName { get; set; }
         public int PlayerNumber { get; set; }
         public bool IsSessionMaster { get; set; }
+        public bool Ready { get; set; }
     }
 }

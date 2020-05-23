@@ -5,6 +5,9 @@ import { RegisteredContent } from '../../models/werewords/registered-content';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WerewordsPlayerStatusService } from '../../services/werewords/playerstatus';
 import * as signalR from "@microsoft/signalr";
+import { NavbarService } from '../../services/navbar';
+import { WerewordsLandingComponent } from './lobby/landing';
+import { WerewordsSessionService } from '../../services/werewords/session';
 
 @Component({
   selector: 'app-werewords-component',
@@ -24,42 +27,58 @@ export class WerewordsComponent implements OnInit {
 
   ngOnInit(): void {
 
-    //this.setContent(contentComponent);
-
     if (this.SessionId && this.PlayerId) {
       this.setupConnection()
         .then(() => {
-          this.route(WerewordsPlayerStatus.NightRevealSecretRole);
+          this.route(WerewordsPlayerStatus.InLobby);
         });
     }
     else {
-      //TODO: Create or join session
+      if (!this.GameIdentifier) {
+        this.setContent(new WerewordsContent(null, WerewordsLandingComponent), null);
+      }
+      else {
+        this._sessionService.EnterGame({ password: this.GameIdentifier })
+          .then(response => {
+            if (response.success) {
+              this.SetSessionData(response.data.sessionId, response.data.playerId);
 
+              this.setupConnection().then(() =>
+              {
+                this.route(WerewordsPlayerStatus.InLobby);
+              });
+            }
+            else {
+              this.router.navigate(['/werewords'], { replaceUrl: true });
+            }
+          })
+          .catch(data => this.HandleGenericError(data));
+      }
     }
 
+    this.navbarService.setAreaTitle("Werewords");
   }
 
 
   constructor(private componentFactoryResolver: ComponentFactoryResolver,
     private playerStatusService: WerewordsPlayerStatusService,
+    private _sessionService: WerewordsSessionService,
+    private navbarService: NavbarService,
     activatedRoute: ActivatedRoute,
-    router: Router) {
+    private router: Router) {
 
-    this.GameIdentifier = activatedRoute.snapshot.params.id.toLowerCase();
+    this.GameIdentifier = activatedRoute.snapshot.params.id;
+    if (this.GameIdentifier) {
+      this.GameIdentifier = this.GameIdentifier.toLowerCase()
+    }
     var urlSessionId = activatedRoute.snapshot.params.SessionId;
     var urlPlayerId = activatedRoute.snapshot.params.PlayerId;
 
     if (urlSessionId && urlPlayerId) {
-      this.SessionId = urlSessionId.toLowerCase();
-      this.PlayerId = urlPlayerId.toLowerCase();
+      
+      this.SetSessionData(urlSessionId, urlPlayerId);
 
-      localStorage.setItem(`werewords_${this.GameIdentifier}_Session`, this.SessionId);
-      localStorage.setItem(`werewords_${this.GameIdentifier}_Player`, this.PlayerId);
-      const numberOfMillisecondsPerHour = 3600000;
-      var timeout = (new Date().getTime() + numberOfMillisecondsPerHour).toString();
-      localStorage.setItem(`werewords_${this.GameIdentifier}_Timeout`, timeout);
-
-      router.navigate(['/werewords', this.GameIdentifier]);
+      this.router.navigate(['/werewords', this.GameIdentifier]);
     }
     else {
       const numberOfMillisecondsPerHour = 3600000;
@@ -102,6 +121,17 @@ export class WerewordsComponent implements OnInit {
     this.setContent(content, status);
   }
 
+  SetSessionData = (sessionId: string, playerId: string) => {
+    this.SessionId = sessionId.toLowerCase();
+    this.PlayerId = playerId.toLowerCase();
+
+    localStorage.setItem(`werewords_${this.GameIdentifier}_Session`, this.SessionId);
+    localStorage.setItem(`werewords_${this.GameIdentifier}_Player`, this.PlayerId);
+    const numberOfMillisecondsPerHour = 3600000;
+    var timeout = (new Date().getTime() + numberOfMillisecondsPerHour).toString();
+    localStorage.setItem(`werewords_${this.GameIdentifier}_Timeout`, timeout);
+  }
+
   setContent(werewordsContent: WerewordsContent, status: WerewordsPlayerStatus) {
 
     const viewContainerRef = this.contentHost.viewContainerRef;
@@ -130,6 +160,7 @@ export class WerewordsComponent implements OnInit {
         (<IWerewordsComponent>componentRef.instance).PlayerId = this.PlayerId;
         (<IWerewordsComponent>componentRef.instance).CurrentStatus = status;
         (<IWerewordsComponent>componentRef.instance).HubConnection = this._hubConnection;
+        (<IWerewordsComponent>componentRef.instance).SetSessionData = this.SetSessionData;
       }
     }
 

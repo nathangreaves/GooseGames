@@ -63,6 +63,10 @@ import { WerewordsNightSecretRoleComponent } from './werewords/night/secret-role
 import { WerewordsNightMayorSecretWordComponent } from './werewords/night/mayor-secret-word';
 import { WerewordsNightWakingComponent } from './werewords/night/waking';
 import { WerewordsDayComponent } from './werewords/day/day';
+import { WerewordsDayOutcomeComponent } from './werewords/day/outcome';
+import { WerewordsLandingComponent } from './werewords/lobby/landing';
+import { WerewordsNewPlayerDetailsComponent } from './werewords/lobby/newplayer';
+import { WerewordsLobbyComponent } from './werewords/lobby/lobby';
 
 
 @NgModule({
@@ -116,13 +120,18 @@ import { WerewordsDayComponent } from './werewords/day/day';
     WerewordsContentDirective,
     WerewordsWaitingForPlayerActionComponent,
 
+    WerewordsLandingComponent,
+    WerewordsNewPlayerDetailsComponent,
+    WerewordsLobbyComponent,
+
     WerewordsTestSessionComponent,
 
     WerewordsNightSecretRoleComponent,
     WerewordsNightSecretWordComponent,
     WerewordsNightMayorSecretWordComponent,
     WerewordsNightWakingComponent,
-    WerewordsDayComponent
+    WerewordsDayComponent,
+    WerewordsDayOutcomeComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -182,7 +191,12 @@ import { WerewordsDayComponent } from './werewords/day/day';
     WerewordsNightSecretWordComponent,
     WerewordsNightMayorSecretWordComponent,
     WerewordsNightWakingComponent,
-    WerewordsDayComponent
+    WerewordsDayComponent,
+    WerewordsDayOutcomeComponent,
+
+    WerewordsLandingComponent,
+    WerewordsNewPlayerDetailsComponent,
+    WerewordsLobbyComponent
   ],
   providers: [
     NavbarService

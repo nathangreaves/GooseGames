@@ -110,22 +110,28 @@ namespace GooseGames.Hubs
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("activePlayer", playerId);
         }
 
-        internal async Task SendVoteWerewolvesAsync(Guid sessionId, DateTime endTime)
+        internal async Task SendVoteWerewolvesAsync(Guid sessionId, DateTime endTime, string secretWord)
         {
-            _logger.LogInformation($"Sending voteWerewolves: to {sessionId}", endTime);
-            await _hub.Clients.Group(sessionId.ToString()).SendAsync("voteWerewolves", endTime);
+            _logger.LogInformation($"Sending voteWerewolves: to {sessionId}", new { endTime = endTime, secretWord = secretWord });
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("voteWerewolves", endTime, secretWord);
         }
 
-        internal async Task SendVoteSeerAsync(Guid sessionId, DateTime endTime, IEnumerable<Guid> werewolfPlayerIds)
+        internal async Task SendVoteSeerAsync(Guid sessionId, DateTime endTime, IEnumerable<Guid> werewolfPlayerIds, string secretWord)
         {
-            _logger.LogInformation($"Sending voteSeer: to {sessionId}", new { endTime = endTime, werewolfPlayerIds = werewolfPlayerIds });
-            await _hub.Clients.Group(sessionId.ToString()).SendAsync("voteSeer", endTime, werewolfPlayerIds);
+            _logger.LogInformation($"Sending voteSeer: to {sessionId}", new { endTime = endTime, werewolfPlayerIds = werewolfPlayerIds, secretWord = secretWord });
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("voteSeer", endTime, werewolfPlayerIds, secretWord);
         }
 
         internal async Task SendStartTimerAsync(Guid sessionId, DateTime dateTime)
         {
             _logger.LogInformation($"Sending startTimer: to {sessionId}", dateTime);
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("startTimer", dateTime);
+        }
+
+        internal async Task SendRoundOutcomeAsync(Guid sessionId)
+        {
+            _logger.LogInformation($"Sending roundOutcome: to {sessionId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("roundOutcome");
         }
     }
 }

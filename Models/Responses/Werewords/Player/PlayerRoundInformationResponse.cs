@@ -12,5 +12,6 @@ namespace Models.Responses.Werewords.Player
         public bool Active { get; set; }
         public IEnumerable<PlayerResponse> Responses { get; set; }
         public SecretRole? SecretRole { get; set; }
+        public bool IsMayor { get; set; }
     }
 }

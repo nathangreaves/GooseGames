@@ -4,8 +4,14 @@ import { WerewordsNightSecretWordComponent } from "../../app/werewords/night/sec
 import { WerewordsNightMayorSecretWordComponent } from "../../app/werewords/night/mayor-secret-word";
 import { WerewordsNightWakingComponent } from "../../app/werewords/night/waking";
 import { WerewordsDayComponent } from "../../app/werewords/day/day";
+import { WerewordsDayOutcomeComponent } from "../../app/werewords/day/outcome";
+import { WerewordsNewPlayerDetailsComponent } from "../../app/werewords/lobby/newplayer";
+import { WerewordsLobbyComponent } from "../../app/werewords/lobby/lobby";
 
 export const RegisteredContent: WerewordsContent[] = [
+  new WerewordsContent(WerewordsPlayerStatus.New, WerewordsNewPlayerDetailsComponent),
+  new WerewordsContent(WerewordsPlayerStatus.InLobby, WerewordsLobbyComponent),
+
   new WerewordsContent(WerewordsPlayerStatus.NightRevealSecretRole, WerewordsNightSecretRoleComponent),
   new WerewordsContent(WerewordsPlayerStatus.NightWaitingForMayor, WerewordsNightSecretRoleComponent),
   new WerewordsContent(WerewordsPlayerStatus.NightSecretWord, WerewordsNightSecretWordComponent),
@@ -16,4 +22,5 @@ export const RegisteredContent: WerewordsContent[] = [
   new WerewordsContent(WerewordsPlayerStatus.DayMayor, WerewordsDayComponent),
   new WerewordsContent(WerewordsPlayerStatus.DayVotingOnSeer, WerewordsDayComponent),
   new WerewordsContent(WerewordsPlayerStatus.DayVotingOnWerewolves, WerewordsDayComponent),
+  new WerewordsContent(WerewordsPlayerStatus.DayOutcome, WerewordsDayOutcomeComponent),
 ];

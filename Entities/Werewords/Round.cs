@@ -21,5 +21,7 @@ namespace Entities.Werewords
         public RoundOutcomeEnum Outcome { get; set; }
         public DateTime VoteStartedUtc { get; set; }
         public int VoteDurationSeconds { get; set; }
+        public bool SoCloseSpent { get; set; }
+        public bool WayOffSpent { get; set; }
     }
 }

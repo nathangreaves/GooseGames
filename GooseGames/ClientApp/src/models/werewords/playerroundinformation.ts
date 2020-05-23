@@ -19,11 +19,23 @@ export class SecretWordResponse extends PlayerSecretRoleResponseBase {
   secretWord: string;
 }
 
+export class RoundOutcomePlayerInformation {
+  name: string;
+  id: string;
+  secretRole: SecretRole;
+  isMayor: boolean;
+  wasVoted: boolean;
+}
+
 export class PlayerRoundInformation {
   name: string;
   id: string;
   active: boolean;
   responses: PlayerResponse[];
+  secretRole: SecretRole;
+  isVoted: boolean;
+  isMayor: boolean;
+  isHidden: boolean;
 }
 
 export class PlayerResponse
@@ -45,4 +57,16 @@ export enum SecretRole {
   Villager = 1,
   Seer = 2,
   Werewolf = 3
+}
+
+export function GetSecretRoleDescription(secretRole: SecretRole): string {
+  if (secretRole === SecretRole.Villager) {
+    return "Villager";
+  }
+  else if (secretRole === SecretRole.Seer) {
+    return "Seer";
+  }
+  else if (secretRole === SecretRole.Werewolf) {
+    return "Werewolf";
+  }
 }

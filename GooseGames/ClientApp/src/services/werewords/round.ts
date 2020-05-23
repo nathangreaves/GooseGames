@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { GenericResponse, GenericResponseBase } from '../../models/genericresponse';
 import { PlayerSecretRoleResponse, SecretWordResponse, PlayerRoundInformation, PlayerResponseType } from '../../models/werewords/playerroundinformation';
 import { IPlayerSession, ConvertToPlayerSessionRequest } from '../../models/session';
-import { DayResponse } from '../../models/werewords/round';
+import { DayResponse, RoundOutcomeResponse } from '../../models/werewords/round';
 
 @Injectable({
   providedIn: 'root',
@@ -63,4 +63,24 @@ export class WerewordsRoundService {
     return this._http.post<GenericResponseBase>(this._baseUrl + 'WerewordsRound/Start', request).toPromise();
   }
 
+  VoteAsSeer(playerSession: IPlayerSession, nominatedPlayerId: string) {
+    var request = ConvertToPlayerSessionRequest(playerSession);
+    (<any>request).nominatedPlayerId = nominatedPlayerId;
+
+    return this._http.post<GenericResponseBase>(this._baseUrl + 'WerewordsRound/VoteAsSeer', request).toPromise();
+  }
+  VoteAsWerewolf(playerSession: IPlayerSession, nominatedPlayerId: string) {
+    var request = ConvertToPlayerSessionRequest(playerSession);
+    (<any>request).nominatedPlayerId = nominatedPlayerId;
+
+    return this._http.post<GenericResponseBase>(this._baseUrl + 'WerewordsRound/VoteAsWerewolf', request).toPromise();
+  }
+
+  GetOutcome(playerSession: IPlayerSession): Promise<GenericResponse<RoundOutcomeResponse>> {
+
+    var request = ConvertToPlayerSessionRequest(playerSession);
+    var parameters = Object.keys(request).map(key => key + '=' + request[key]).join('&');
+
+    return this._http.get<GenericResponse<RoundOutcomeResponse>>(this._baseUrl + `WerewordsRound/Outcome?${parameters}`).toPromise();
+  }
 }

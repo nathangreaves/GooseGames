@@ -9,5 +9,6 @@ namespace RepositoryInterface.Werewords
     public interface IPlayerRepository : ICommonRepository<Player>
     {
         Task DeleteUnreadyPlayersAsync(Guid sessionId);
+        Task<int> GetNextPlayerNumberAsync(Guid sessionId);
     }
 }
