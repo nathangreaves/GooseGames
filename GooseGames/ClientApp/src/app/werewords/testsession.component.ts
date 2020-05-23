@@ -20,6 +20,7 @@ export class WerewordsTestSessionComponent {
   PostedGameId: string;
   Responses: SessionLandingResponse[];
   _sessionService: WerewordsSessionService;
+  Loading: boolean;
 
   getRandomInt(max: number = 2147483648) {
   return Math.floor(Math.random() * Math.floor(max));
