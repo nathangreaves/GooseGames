@@ -1,0 +1,61 @@
+.gg-home-button {
+  height: 130px;
+  width: 130px;
+  background: #fcfcff;
+  border-style: solid;
+  border-width: 2px;
+  border-color: black;
+  border-radius: 5px;
+  margin-top: 1em;
+  text-align: left;
+  font-size: 16px;
+}
+
+.gg-mission-statement{
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.button-content-host{
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+}
+
+.game-name{
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.player-count{
+    font-size: 0.9em;
+}
+
+.filler{
+    height: 100%;
+}
+
+.beta-tag-host{
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.beta-tag {
+  font-size: 0.8em;
+  background: maroon;
+  border-radius: 4px;
+  color: white;
+  width: auto;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+
+.get-in-touch{
+    padding-top: 20px;
+    font-size: 0.8em;
+    margin-left: 15px;
+}

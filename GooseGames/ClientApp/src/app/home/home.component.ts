@@ -4,6 +4,7 @@ import { NavbarService } from '../../services/navbar';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
+  styleUrls: ['./home.css']
 })
 export class HomeComponent {
   _navbarService: NavbarService;
