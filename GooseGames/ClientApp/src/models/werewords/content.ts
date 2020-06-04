@@ -1,18 +1,8 @@
-import { Type } from '@angular/core';
-import { Directive, ViewContainerRef } from '@angular/core';
-import { IPlayerSession } from '../session';
-import { GenericResponse, GenericResponseBase } from '../genericresponse';
 
-@Directive({
-  selector: '[werewords-content]',
-})
-export class WerewordsContentDirective {
-  constructor(public viewContainerRef: ViewContainerRef) { }
-}
+import { IPlayerSession } from '../../models/session';
+import { GenericResponseBase, GenericResponse } from '../../models/genericresponse';
+import { WerewordsRouter, SetSessionData, ReadSessionData, GenericResponseHandler, GenericResponseBaseHandler } from '../../app/werewords/scaffolding/content';
 
-export class WerewordsContent {
-  constructor(public Key: WerewordsPlayerStatus, public component: Type<any>) { }
-}
 
 export enum WerewordsPlayerStatus {
   New,
@@ -35,9 +25,6 @@ export enum WerewordsPlayerStatus {
   Rejoining = -1
 }
 
-type WerewordsRouter = (status: WerewordsPlayerStatus, validated: boolean) => void;
-type SetSessionData = (sessionId: string, playerId: string, gameId: string) => void;
-type ReadSessionData = (gameId: string) => boolean;
 
 export interface IWerewordsComponentBase extends IPlayerSession {
 
@@ -62,9 +49,6 @@ export interface IWerewordsComponent extends IWerewordsComponentBase {
   //Then register your new component in module entryComponents in app.module.ts
   //Then add it to the collection RegisteredContent above
 }
-
-type GenericResponseHandler<T> = (data: T) => Promise<GenericResponseBase>;
-type GenericResponseBaseHandler = () => Promise<GenericResponseBase>;
 
 export class WerewordsComponentBase implements IWerewordsComponent {
   ErrorMessage: string;

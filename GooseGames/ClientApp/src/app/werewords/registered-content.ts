@@ -1,4 +1,3 @@
-import { WerewordsContent, WerewordsPlayerStatus } from "./content";
 import { WerewordsNightSecretRoleComponent } from "../../app/werewords/night/secret-role";
 import { WerewordsNightSecretWordComponent } from "../../app/werewords/night/secret-word";
 import { WerewordsNightMayorSecretWordComponent } from "../../app/werewords/night/mayor-secret-word";
@@ -7,6 +6,8 @@ import { WerewordsDayComponent } from "../../app/werewords/day/day";
 import { WerewordsDayOutcomeComponent } from "../../app/werewords/day/outcome";
 import { WerewordsNewPlayerDetailsComponent } from "../../app/werewords/lobby/newplayer";
 import { WerewordsLobbyComponent } from "../../app/werewords/lobby/lobby";
+import { WerewordsPlayerStatus } from "../../models/werewords/content";
+import { WerewordsContent } from "./scaffolding/content";
 
 export const RegisteredContent: WerewordsContent[] = [
   new WerewordsContent(WerewordsPlayerStatus.New, WerewordsNewPlayerDetailsComponent),

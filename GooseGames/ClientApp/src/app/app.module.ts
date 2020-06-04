@@ -47,27 +47,9 @@ import { FujiDisclaimerComponent } from './fujiflush/disclaimer.component';
 import { FujiNewPlayerDetailsComponent } from './fujiflush/newplayerdetails.component';
 import { FujiSessionLobbyComponent } from './fujiflush/sessionlobby.component';
 import { FujiWaitingComponent } from './fujiflush/waiting.component';
-import { FujiTestSessionComponent } from './fujiflush/testsession.component';
 
 import { CodenamesLandingComponent } from './codenames/landing.component';
 import { BigCodenamesSessionComponent, NormalCodenamesSessionComponent } from './codenames/session.component';
-
-import { WerewordsComponent } from './werewords/werewords.component';
-import { WerewordsContentDirective } from '../models/werewords/content';
-import { WerewordsWaitingForPlayerActionComponent } from './werewords/common/waitingforplayeraction';
-
-import { WerewordsTestSessionComponent } from './werewords/testsession.component';
-
-import { WerewordsNightSecretWordComponent } from './werewords/night/secret-word';
-import { WerewordsNightSecretRoleComponent } from './werewords/night/secret-role';
-import { WerewordsNightMayorSecretWordComponent } from './werewords/night/mayor-secret-word';
-import { WerewordsNightWakingComponent } from './werewords/night/waking';
-import { WerewordsDayComponent } from './werewords/day/day';
-import { WerewordsDayOutcomeComponent } from './werewords/day/outcome';
-import { WerewordsLandingComponent } from './werewords/lobby/landing';
-import { WerewordsNewPlayerDetailsComponent } from './werewords/lobby/newplayer';
-import { WerewordsLobbyComponent } from './werewords/lobby/lobby';
-
 
 @NgModule({
   declarations: [
@@ -104,7 +86,6 @@ import { WerewordsLobbyComponent } from './werewords/lobby/lobby';
     JustOnePlayerWaitingComponent,
     JustOneClueListComponent,
 
-    FujiTestSessionComponent,
     FujiLandingComponent,
     FujiDisclaimerComponent,
     FujiNewPlayerDetailsComponent,
@@ -116,22 +97,6 @@ import { WerewordsLobbyComponent } from './werewords/lobby/lobby';
     BigCodenamesSessionComponent,
     NormalCodenamesSessionComponent,
 
-    WerewordsComponent,
-    WerewordsContentDirective,
-    WerewordsWaitingForPlayerActionComponent,
-
-    WerewordsLandingComponent,
-    WerewordsNewPlayerDetailsComponent,
-    WerewordsLobbyComponent,
-
-    WerewordsTestSessionComponent,
-
-    WerewordsNightSecretRoleComponent,
-    WerewordsNightSecretWordComponent,
-    WerewordsNightMayorSecretWordComponent,
-    WerewordsNightWakingComponent,
-    WerewordsDayComponent,
-    WerewordsDayOutcomeComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -143,7 +108,7 @@ import { WerewordsLobbyComponent } from './werewords/lobby/lobby';
       { path: 'justone', component: JustOneLandingComponent },
       { path: 'fujiflush', component: FujiLandingComponent },
       { path: 'codenames', component: CodenamesLandingComponent },
-      { path: 'werewords', component: WerewordsComponent },
+      { path: 'werewords', loadChildren: () => import('./werewords/werewords.module').then(m => m.WerewordsModule) },
 
       { path: "justone/disclaimer", component: JustOneDeclarationComponent },
       { path: "justone/rejoin", component: JustOneRejoinComponent },
@@ -168,8 +133,6 @@ import { WerewordsLobbyComponent } from './werewords/lobby/lobby';
       { path: "justone/round/activeplayerwaitingforoutcomevotes", component: JustOneActivePlayerWaitingForOutcomeVoteComponent },
       { path: "justone/round/activeplayeroutcome", component: JustOneActivePlayerRoundOutcomeComponent },
 
-      { path: 'fujiflush/test', component: FujiTestSessionComponent },
-
       { path: 'fujiflush/disclaimer', component: FujiDisclaimerComponent },
       { path: 'fujiflush/newplayer', component: FujiNewPlayerDetailsComponent },
       { path: 'fujiflush/sessionlobby', component: FujiSessionLobbyComponent },
@@ -179,24 +142,11 @@ import { WerewordsLobbyComponent } from './werewords/lobby/lobby';
       { path: 'codenames/:id', component: NormalCodenamesSessionComponent },
       { path: 'codenames/big/:id', component: BigCodenamesSessionComponent },
 
-      { path: 'werewords/test', component: WerewordsTestSessionComponent },
-      { path: 'werewords/:id', component: WerewordsComponent },
 
     ])
   ],
   entryComponents: [
     JustOneNavbarHeaderComponent,
-
-    WerewordsNightSecretRoleComponent,
-    WerewordsNightSecretWordComponent,
-    WerewordsNightMayorSecretWordComponent,
-    WerewordsNightWakingComponent,
-    WerewordsDayComponent,
-    WerewordsDayOutcomeComponent,
-
-    WerewordsLandingComponent,
-    WerewordsNewPlayerDetailsComponent,
-    WerewordsLobbyComponent
   ],
   providers: [
     NavbarService

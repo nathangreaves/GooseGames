@@ -1,13 +1,14 @@
 import { Component, OnInit, ViewChild, ComponentFactoryResolver, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
-import { IWerewordsComponent, WerewordsContent, WerewordsContentDirective, WerewordsPlayerStatus, WerewordsComponentBase, IWerewordsComponentBase } from '../../models/werewords/content';
-import { RegisteredContent } from '../../models/werewords/registered-content';
+import { WerewordsContent, WerewordsContentDirective } from './scaffolding/content';
 import { ActivatedRoute, Router } from '@angular/router';
 import { WerewordsPlayerStatusService } from '../../services/werewords/playerstatus';
 import * as signalR from "@microsoft/signalr";
 import { NavbarService } from '../../services/navbar';
 import { WerewordsLandingComponent } from './lobby/landing';
 import { WerewordsSessionService } from '../../services/werewords/session';
+import { WerewordsPlayerStatus, IWerewordsComponentBase, IWerewordsComponent } from '../../models/werewords/content';
+import { RegisteredContent } from './registered-content';
 
 @Component({
   selector: 'app-werewords-component',

@@ -81,7 +81,8 @@
     <None Remove="ClientApp\src\app\werewords\night-secret-word.component.ts" />
     <None Remove="ClientApp\src\app\werewords\night\mayor-secret-word.ts" />
     <None Remove="ClientApp\src\app\werewords\night\waking.ts" />
-    <None Remove="ClientApp\src\app\werewords\testsession.component.ts" />
+    <None Remove="ClientApp\src\app\werewords\night\werewords.module.ts" />
+    <None Remove="ClientApp\src\app\werewords\scaffolding\content.ts" />
     <None Remove="ClientApp\src\app\werewords\werewords.component.ts" />
     <None Remove="ClientApp\src\assets\tristate-switch.component.ts" />
     <None Remove="ClientApp\src\models\fujiflush\card.ts" />
@@ -98,7 +99,6 @@
     <None Remove="ClientApp\src\models\justone\round.ts" />
     <None Remove="ClientApp\src\models\justone\session.ts" />
     <None Remove="ClientApp\src\models\justone\wordlistenum.ts" />
-    <None Remove="ClientApp\src\models\werewords\content.ts" />
     <None Remove="ClientApp\src\models\werewords\playerroundinformation.ts" />
     <None Remove="ClientApp\src\models\werewords\registered-content.ts" />
     <None Remove="ClientApp\src\models\werewords\round.ts" />
@@ -194,9 +194,8 @@
     </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\app\werewords\night\secret-role.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\werewords\night\waking.ts" />
-    <TypeScriptCompile Include="ClientApp\src\app\werewords\testsession.component.ts">
-      <SubType>Code</SubType>
-    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\app\werewords\scaffolding\content.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\werewords\werewords.module.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\werewords\werewords.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\assets\tristate-switch.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\card.ts" />
@@ -207,7 +206,7 @@
     <TypeScriptCompile Include="ClientApp\src\models\justone\wordlistenum.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\werewords\content.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\werewords\playerroundinformation.ts" />
-    <TypeScriptCompile Include="ClientApp\src\models\werewords\registered-content.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\werewords\registered-content.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\werewords\round.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\card.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\hand.ts" />
