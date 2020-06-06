@@ -9,7 +9,7 @@ namespace RepositoryInterface.Werewords
     public interface IPlayerRoundInformationRepository : ICommonRepository<PlayerRoundInformation>
     {
         Task<IEnumerable<PlayerRoundInformation>> GetForRoundAsync(Guid roundId);
-        Task<PlayerRoundInformation> GetMayorAsync(Guid roundId);
+        Task<Guid?> GetMayorAsync(Guid roundId);
         Task<PlayerRoundInformation> GetForPlayerAndRoundAsync(Guid roundId, Guid playerId);
     }
 }

@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Entities.Werewords.Enums
+namespace Entities.Global.Enums
 {
     public enum SessionStatusEnum
     {
-        New = 0,
+        Lobby = 0,
         InProgress = 1,
-        Complete = 2,
-        Abandoned = 3
+        Abandoned = 2
     }
 }

@@ -11,37 +11,36 @@ namespace GooseGames.Services.Werewords.PlayerStatus
 {
     public abstract class PlayerStatusKeyedServiceBase : IPlayerStatusKeyedService
     {
-        protected readonly IPlayerRepository _playerRepository;
+        protected readonly IPlayerRoundInformationRepository _playerRoundInformationRepository;
 
         public abstract Guid PlayerStatus { get; }
 
-        protected PlayerStatusKeyedServiceBase(IPlayerRepository playerRepository)
+        protected PlayerStatusKeyedServiceBase(IPlayerRoundInformationRepository playerRepository)
         {
-            _playerRepository = playerRepository;
+            _playerRoundInformationRepository = playerRepository;
         }
 
-        public async Task<GenericResponse<string>> TransitionPlayerStatus(Session session, PlayerRoundInformation playerRoundInformation)
+        public async Task<GenericResponse<string>> TransitionPlayerStatus(Guid roundId, PlayerRoundInformation playerRoundInformation)
         {
-            var nextStatus = await GetNextStatusAsync(session, playerRoundInformation);
+            var nextStatus = await GetNextStatusAsync(roundId, playerRoundInformation);
 
-            Player player = playerRoundInformation.Player;
-            player.Status = nextStatus;
+            playerRoundInformation.Status = nextStatus;
 
-            await _playerRepository.UpdateAsync(player);
+            await _playerRoundInformationRepository.UpdateAsync(playerRoundInformation);
 
-            await NotifyOtherPlayersAsync(player);
+            await NotifyOtherPlayersAsync(playerRoundInformation);
 
-            if (await ShouldTransitionRoundAsync(session, playerRoundInformation))
+            if (await ShouldTransitionRoundAsync(roundId, playerRoundInformation))
             {
-                await TransitionRoundAsync(session, playerRoundInformation);                
+                await TransitionRoundAsync(roundId, playerRoundInformation);                
             }
 
-            return GenericResponse<string>.Ok(PlayerStatusEnum.GetDescription(playerRoundInformation.Player.Status));
+            return GenericResponse<string>.Ok(PlayerStatusEnum.GetDescription(playerRoundInformation.Status));
         }
 
-        internal abstract Task TransitionRoundAsync(Session session, PlayerRoundInformation playerRoundInformation);
-        internal abstract Task<bool> ShouldTransitionRoundAsync(Session session, PlayerRoundInformation playerRoundInformation);
-        internal abstract Task NotifyOtherPlayersAsync(Player player);
-        protected abstract Task<Guid> GetNextStatusAsync(Session session, PlayerRoundInformation playerRoundInformation);
+        internal abstract Task TransitionRoundAsync(Guid roundId, PlayerRoundInformation playerRoundInformation);
+        internal abstract Task<bool> ShouldTransitionRoundAsync(Guid roundId, PlayerRoundInformation playerRoundInformation);
+        internal abstract Task NotifyOtherPlayersAsync(PlayerRoundInformation playerRoundInformation);
+        protected abstract Task<Guid> GetNextStatusAsync(Guid roundId, PlayerRoundInformation playerRoundInformation);
     }
 }

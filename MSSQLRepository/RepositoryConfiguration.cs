@@ -21,6 +21,10 @@ namespace MSSQLRepository
             //    Password = dbPassword
             //};
 
+            services.AddDbContext<GlobalContext>(options => options
+                .UseSqlServer(configuration["ConnectionStrings:MSSQL"])
+            );
+
             services.AddDbContext<JustOneContext>(options => options
                 .UseSqlServer(configuration["ConnectionStrings:MSSQL"])
             );
@@ -37,6 +41,9 @@ namespace MSSQLRepository
                 .UseSqlServer(configuration["ConnectionStrings:MSSQL"])
             );
 
+            services.AddScoped<RepositoryInterface.Global.ISessionRepository, Global.SessionRepository>();
+            services.AddScoped<RepositoryInterface.Global.IPlayerRepository, Global.PlayerRepository>();
+
             services.AddScoped<RepositoryInterface.JustOne.ISessionRepository, JustOne.SessionRepository>();
             services.AddScoped<RepositoryInterface.JustOne.IPlayerRepository, JustOne.PlayerRepository>();
             services.AddScoped<RepositoryInterface.JustOne.IRoundRepository, JustOne.RoundRepository>();
@@ -52,8 +59,6 @@ namespace MSSQLRepository
 
             services.AddScoped<RepositoryInterface.Codenames.ICodenamesRepository, Codenames.CodenamesRepository>();
 
-            services.AddScoped<RepositoryInterface.Werewords.ISessionRepository, Werewords.SessionRepository>();
-            services.AddScoped<RepositoryInterface.Werewords.IPlayerRepository, Werewords.PlayerRepository>();
             services.AddScoped<RepositoryInterface.Werewords.IRoundRepository, Werewords.RoundRepository>();
             services.AddScoped<RepositoryInterface.Werewords.IPlayerRoundInformationRepository, Werewords.PlayerRoundInformationRepository>();
             services.AddScoped<RepositoryInterface.Werewords.IPlayerVoteRepository, Werewords.PlayerVoteRepository>();

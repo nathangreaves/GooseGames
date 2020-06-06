@@ -134,28 +134,6 @@ namespace GooseGames.Controllers.Werewords
             return await ValidateStatus(request, PlayerStatusEnum.Rejoining);
         }
 
-
-        [HttpPost]
-        [ActionName(nameof(PlayerStatusEnum.InLobby))]
-        public async Task<GenericResponseBase> SetLobbyAsync(PlayerIdRequest request)
-        {
-            try
-            {
-                _logger.LogInformation("Received request", request);
-
-                await _playerStatusService.UpdatePlayerToStatusAsync(request.PlayerId, PlayerStatusEnum.InLobby);
-
-                _logger.LogInformation("Returned result");
-                return GenericResponseBase.Ok();
-            }
-            catch (Exception e)
-            {
-                var errorGuid = Guid.NewGuid();
-                _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
-            }
-        }
-
         [HttpPost]
         [ActionName("TransitionNight")]
         public async Task<GenericResponse<string>> TransitionNightAsync(PlayerSessionRequest request)
@@ -176,99 +154,6 @@ namespace GooseGames.Controllers.Werewords
                 return GenericResponse<string>.Error($"Unknown Error {errorGuid}");
             }
         }
-
-        //[HttpPost]
-        //[ActionName(nameof(PlayerStatusEnum.RoundWaiting))]
-        //public async Task<GenericResponse<bool>> SetWaitingAsync(PlayerSessionRoundRequest request)
-        //{
-        //    try
-        //    {
-        //        _logger.LogInformation("Received request", request);
-
-        //        await _playerStatusService.UpdatePlayerStatusToRoundWaitingAsync(request);
-
-        //        var result = NewResponse.Ok(true);
-
-        //        _logger.LogInformation("Returned result", result);
-        //        return result;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        var errorGuid = Guid.NewGuid();
-        //        _logger.LogError($"Unknown Error {errorGuid}", e, request);
-        //        return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
-        //    }
-        //}
-
-        [HttpPost]
-        [ActionName(nameof(PlayerStatusEnum.NightWaitingForPlayersToCheckRole))]
-        public async Task<GenericResponse<bool>> SetNightWaitingForPlayersToCheckRoleAsync(PlayerSessionRequest request)
-        {
-            try
-            {
-                _logger.LogInformation("Received request", request);
-
-                await _playerStatusService.UpdatePlayerToStatusAndProgressRoundAsync(request, PlayerStatusEnum.NightWaitingForPlayersToCheckRole);
-
-                var result = NewResponse.Ok(true);
-
-                _logger.LogInformation("Returned result", result);
-                return result;
-            }
-            catch (Exception e)
-            {
-                var errorGuid = Guid.NewGuid();
-                _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
-            }
-        }
-
-        [HttpPost]
-        [ActionName(nameof(PlayerStatusEnum.NightWaitingToWake))]
-        public async Task<GenericResponse<bool>> SetNightWaitingToWakeAsync(PlayerSessionRequest request)
-        {
-            try
-            {
-                _logger.LogInformation("Received request", request);
-
-                await _playerStatusService.UpdatePlayerToStatusAndProgressRoundAsync(request, PlayerStatusEnum.NightWaitingToWake);
-
-                var result = NewResponse.Ok(true);
-
-                _logger.LogInformation("Returned result", result);
-                return result;
-            }
-            catch (Exception e)
-            {
-                var errorGuid = Guid.NewGuid();
-                _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
-            }
-        }
-
-        [HttpPost]
-        [ActionName(nameof(PlayerStatusEnum.DayWaitingForVotes))]
-        public async Task<GenericResponse<bool>> SetPassivePlayerOutcomeVoteAsync(PlayerSessionRequest request)
-        {
-            try
-            {
-                _logger.LogInformation("Received request", request);
-
-                await _playerStatusService.UpdatePlayerToStatusAndProgressRoundAsync(request, PlayerStatusEnum.DayWaitingForVotes);
-
-                var result = NewResponse.Ok(true);
-
-                _logger.LogInformation("Returned result", result);
-                return result;
-            }
-            catch (Exception e)
-            {
-                var errorGuid = Guid.NewGuid();
-                _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
-            }
-        }
-
 
         private async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateStatus(PlayerSessionRequest request, Guid lobbyStatus)
         {

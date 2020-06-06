@@ -41,6 +41,11 @@ namespace GooseGames
 
             MSSQLRepository.RepositoryConfiguration.ConfigureServices(services, Configuration);
 
+            //Global
+            services.AddScoped<Services.Global.SessionService>();
+            services.AddScoped<Services.Global.PlayerService>();
+            services.AddScoped<Services.Global.GlobalPlayerStatusService>();
+
             //Just One
             services.AddScoped<Services.JustOne.SessionService>();
             services.AddScoped<Services.JustOne.PlayerDetailsService>();
@@ -68,9 +73,8 @@ namespace GooseGames
             //Werewords
             services.AddScoped<Services.Werewords.PlayerService>();
             services.AddScoped<Services.Werewords.PlayerStatusService>();
-            services.AddScoped<Services.Werewords.SessionService>();
+            services.AddScoped<Services.Werewords.LobbyService>();
             services.AddScoped<Services.Werewords.RoundService>();
-            services.AddScoped<Services.Werewords.ProgressRoundService>();
             services.AddScoped<Services.Werewords.PlayerRoundInformationService>();
             services.AddScoped<Services.Werewords.PlayerActionInformationService>();
 
@@ -78,6 +82,7 @@ namespace GooseGames
             AddKeyedServices<Services.Werewords.PlayerStatus.IPlayerStatusKeyedService>(services);
 
             //Hub Contexts
+            services.AddScoped<GlobalHubContext>();
             services.AddScoped<PlayerHubContext>();
             services.AddScoped<FujiHubContext>();
             services.AddScoped<CodenamesHubContext>();
@@ -121,6 +126,7 @@ namespace GooseGames
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
 
+                endpoints.MapHub<GlobalHub>("/globalhub");
                 endpoints.MapHub<PlayerHub>("/lobbyhub");
                 endpoints.MapHub<FujiHub>("/fujihub");
                 endpoints.MapHub<CodenamesHub>("/codenameshub");

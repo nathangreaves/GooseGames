@@ -5,13 +5,11 @@ import { SessionLandingResponse } from '../../../models/session'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { WerewordsComponentBase, WerewordsPlayerStatus } from '../../../models/werewords/content';
 import { WerewordsSessionService } from '../../../services/werewords/session';
-import { NavbarService } from '../../../services/navbar';
 
 @Component({
   selector: 'app-werewords-landing-component',
   templateUrl: './landing.html'
 })
-
 export class WerewordsLandingComponent extends WerewordsComponentBase {
 
   DisableButtons: boolean;

@@ -22,20 +22,18 @@ namespace MSSQLRepository.Werewords
         public async Task<IEnumerable<PlayerRoundInformation>> GetForRoundAsync(Guid roundId)
         {
             return await Context.PlayerRoundInformation
-                .Include(p => p.Player)
                 .Include(p => p.Responses)
                 .Where(p => p.RoundId == roundId)
-                .OrderBy(p => p.Player.PlayerNumber)
                 .ToListAsync()
                 .ConfigureAwait(false);
         }
 
 
-        public async Task<PlayerRoundInformation> GetMayorAsync(Guid roundId)
+        public async Task<Guid?> GetMayorAsync(Guid roundId)
         {
-            return await Context.PlayerRoundInformation
-                .Include(p => p.Player)
-                .Where(p => p.RoundId == roundId && p.IsMayor)                
+            return await Context.PlayerRoundInformation                
+                .Where(p => p.RoundId == roundId && p.IsMayor)   
+                .Select(p => p.PlayerId)
                 .SingleOrDefaultAsync()
                 .ConfigureAwait(false);
         }
@@ -43,7 +41,6 @@ namespace MSSQLRepository.Werewords
         public async Task<PlayerRoundInformation> GetForPlayerAndRoundAsync(Guid roundId, Guid playerId)
         {
             return await Context.PlayerRoundInformation
-                .Include(p => p.Player)
                 .Where(p => p.RoundId == roundId && p.PlayerId == playerId)
                 .SingleOrDefaultAsync()
                 .ConfigureAwait(false);

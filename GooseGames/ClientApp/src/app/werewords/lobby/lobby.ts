@@ -11,7 +11,6 @@ import { WerewordsSessionService } from '../../../services/werewords/session';
   templateUrl: './lobby.html',
   styleUrls: ['./lobby.css'],
 })
-
 export class WerewordsLobbyComponent extends WerewordsComponentBase implements OnInit, OnDestroy {
 
   MinPlayers: number = 4;
@@ -25,6 +24,7 @@ export class WerewordsLobbyComponent extends WerewordsComponentBase implements O
 
   DisableButtons: boolean;
     StatusText: string;
+    _globalHubConnection: signalR.HubConnection;
 
   constructor(private _sessionService: WerewordsSessionService, private _router: Router, activatedRoute: ActivatedRoute) {
     super();
@@ -34,26 +34,6 @@ export class WerewordsLobbyComponent extends WerewordsComponentBase implements O
   }
   ngOnInit(): void {
 
-    this.HubConnection.on("playerAdded", (player: PlayerDetailsResponse) => {
-      this.setDefaultNewPlayerName(player);
-      this.Players.push(player);
-    });
-    this.HubConnection.on("playerDetailsUpdated", (player: PlayerDetailsResponse) => {
-      if (this.Players && this.Players.length > 0) {
-        var index = _.findIndex(this.Players, p => p.id == player.id);
-        this.Players.splice(index, 1, player);
-      }
-    });
-    this.HubConnection.on("playerRemoved", (playerId: string) => {
-      if (this.Players && this.Players.length > 0) {
-        _.remove(this.Players, p => p.id === playerId);
-      }
-
-      if (playerId == this.PlayerId) {
-        this.SetSessionData(null, null, null);
-        this._router.navigate(['/werewords'], { replaceUrl: true });
-      }
-    });
     this.HubConnection.on("startingSession", () => {
       this.StatusText = "Setting up the game...";
     });
@@ -62,9 +42,56 @@ export class WerewordsLobbyComponent extends WerewordsComponentBase implements O
       this.Route(WerewordsPlayerStatus.NightRevealSecretRole);
     });
 
+    this.setupConnection().then(() => {
 
-    this.load();
+      this._globalHubConnection.on("playerAdded", (player: PlayerDetailsResponse) => {
+        this.setDefaultNewPlayerName(player);
+        this.Players.push(player);
+      });
+      this._globalHubConnection.on("playerDetailsUpdated", (player: PlayerDetailsResponse) => {
+        if (this.Players && this.Players.length > 0) {
+          var index = _.findIndex(this.Players, p => p.id == player.id);
+          this.Players.splice(index, 1, player);
+        }
+      });
+      this._globalHubConnection.on("playerRemoved", (playerId: string) => {
+        if (this.Players && this.Players.length > 0) {
+          _.remove(this.Players, p => p.id === playerId);
+        }
+
+        if (playerId == this.PlayerId) {
+          this.SetSessionData(null, null, null);
+          this._router.navigate(['/werewords'], { replaceUrl: true });
+        }
+      });
+
+      this.load();
+    });
   }
+
+  private setupConnection(): Promise<any> {
+
+    if (this._globalHubConnection) {
+      var oldConnection = this._globalHubConnection;
+      oldConnection.onclose(() => { });
+      oldConnection.stop();
+    }
+
+    this._globalHubConnection = new signalR.HubConnectionBuilder()
+      .withUrl(`/globalhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
+      .withAutomaticReconnect()
+      .build();
+
+    this._globalHubConnection.onreconnected(() => {
+      //this.Validate();
+    });
+    this._globalHubConnection.onclose(() => {
+      this.HandleGenericError("connection closed");
+    });
+
+    return this._globalHubConnection.start().catch(err => console.error(err));
+  }
+
   ngOnDestroy(): void {
 
     this.CloseConnection();
@@ -75,11 +102,15 @@ export class WerewordsLobbyComponent extends WerewordsComponentBase implements O
   CloseConnection() {
     var connection = this.HubConnection;
     if (connection) {
-      connection.off("playerAdded");
-      connection.off("playerDetailsUpdated");
-      connection.off("playerRemoved");
       connection.off("startingSession");
       connection.off("secretRole");
+    }
+
+    var globalConnection = this._globalHubConnection;
+    if (globalConnection) {
+      globalConnection.off("playerAdded");
+      globalConnection.off("playerDetailsUpdated");
+      globalConnection.off("playerRemoved");
     }
   }
 
