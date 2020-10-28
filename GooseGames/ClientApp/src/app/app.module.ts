@@ -95,8 +95,7 @@ import { BigCodenamesSessionComponent, NormalCodenamesSessionComponent } from '.
 
     CodenamesLandingComponent,
     BigCodenamesSessionComponent,
-    NormalCodenamesSessionComponent,
-
+    NormalCodenamesSessionComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -151,6 +150,8 @@ import { BigCodenamesSessionComponent, NormalCodenamesSessionComponent } from '.
   providers: [
     NavbarService
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  exports: [
+  ]
 })
 export class AppModule { }

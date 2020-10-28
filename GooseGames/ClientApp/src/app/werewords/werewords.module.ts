@@ -17,6 +17,8 @@ import { WerewordsLandingComponent } from './lobby/landing';
 import { WerewordsNewPlayerDetailsComponent } from './lobby/newplayer';
 import { WerewordsLobbyComponent } from './lobby/lobby';
 import { WerewordsContentDirective } from './scaffolding/content';
+import { GlobalLobbyHubComponent } from '../components/lobby/hub';
+import { LobbyComponent } from '../components/lobby/lobby';
 
 
 const routes: Routes = [
@@ -39,12 +41,15 @@ const routes: Routes = [
     WerewordsNightMayorSecretWordComponent,
     WerewordsNightWakingComponent,
     WerewordsDayComponent,
-    WerewordsDayOutcomeComponent
+    WerewordsDayOutcomeComponent,
+
+    GlobalLobbyHubComponent,
+    LobbyComponent
   ],
   imports: [
     RouterModule.forChild(routes),
     CommonModule,
-    FormsModule
+    FormsModule,
   ],
   exports: [
     RouterModule

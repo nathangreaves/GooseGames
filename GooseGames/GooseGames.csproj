@@ -38,6 +38,8 @@
   <ItemGroup>
     <None Remove="ClientApp\src\app\codenames\landing.component.ts" />
     <None Remove="ClientApp\src\app\codenames\session.component.ts" />
+    <None Remove="ClientApp\src\app\components\hub.ts" />
+    <None Remove="ClientApp\src\app\components\lobby.ts" />
     <None Remove="ClientApp\src\app\fujiflush\disclaimer.component.ts" />
     <None Remove="ClientApp\src\app\fujiflush\landing.component.ts" />
     <None Remove="ClientApp\src\app\fujiflush\newplayerdetails.component.ts" />
@@ -137,6 +139,8 @@
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\src\app\codenames\landing.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\codenames\session.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\components\lobby\hub.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\components\lobby\lobby.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\fujiflush\disclaimer.component.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
@@ -236,6 +240,7 @@
     <TypeScriptCompile Include="ClientApp\src\services\justone\ui.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\localstorage.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\navbar.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\session.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\werewords\playerroundinformation.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\werewords\playerstatus.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\werewords\round.ts" />
