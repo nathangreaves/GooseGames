@@ -38,6 +38,10 @@ export class GlobalSessionService {
     return this._http.put<GenericResponseBase>(this._baseUrl + 'GlobalPlayer', request).toPromise();
   }
 
+  public unreadyPlayer(request: IPlayerSession): Promise<GenericResponseBase> {
+    return this._http.put<GenericResponseBase>(this._baseUrl + 'GlobalPlayer/Unready', ConvertToPlayerSessionRequest(request)).toPromise();
+  }
+
   public again(request: IPlayerSession): Promise<GenericResponseBase> {
     var request = ConvertToPlayerSessionRequest(request);
     return this._http.post<GenericResponseBase>(this._baseUrl + 'GlobalPlayer/Again', request).toPromise();

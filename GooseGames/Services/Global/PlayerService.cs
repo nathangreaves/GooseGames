@@ -113,6 +113,13 @@ namespace GooseGames.Services.Global
             return GenericResponse<GetPlayerDetailsResponse>.Ok(response);
         }
 
+        internal async Task<Dictionary<Guid, Player>> GetPlayersAsync(IEnumerable<Guid> playerIds)
+        {
+            var hashset = new HashSet<Guid>(playerIds);
+
+            return (await _playerRepository.FilterAsync(p => hashset.Contains(p.Id))).ToDictionary(p => p.Id, p => p);
+        }
+
         internal async Task<List<Player>> GetForSessionAsync(Guid sessionId)
         {
             return await _playerRepository.FilterAsync(p => p.SessionId == sessionId);
@@ -151,6 +158,47 @@ namespace GooseGames.Services.Global
             _logger.LogTrace("Updating player details");
             await _playerRepository.UpdateAsync(player);
 
+            await SendPlayerDetailsUpdate(player);
+
+            _logger.LogTrace("Finished updating player details");
+
+            return GenericResponseBase.Ok();
+        }
+
+        internal async Task<GenericResponseBase> UnreadyPlayerAsync(PlayerSessionRequest request)
+        {
+            _logger.LogTrace("Starting update of player details");
+
+            if (!(await ValidateSessionStatusAsync(request.SessionId, SessionStatusEnum.Lobby)))
+            {
+                _logger.LogWarning("Unable to find session. Either it is not in lobby or doesn't exist.");
+
+                return GenericResponseBase.Error("Unable to find session. Either it started without you or doesn't exist");
+            }
+
+
+            var player = await _playerRepository.GetAsync(request.PlayerId);
+            if (player == null)
+            {
+                _logger.LogWarning("Unable to find player.");
+
+                return GenericResponseBase.Error("Unable to find player.");
+            }
+
+            player.Status = PlayerStatusEnum.Lobby;
+
+            _logger.LogTrace("Updating player details");
+            await _playerRepository.UpdateAsync(player);
+
+            await SendPlayerDetailsUpdate(player);
+
+            _logger.LogTrace("Finished updating player details");
+
+            return GenericResponseBase.Ok();
+        }
+
+        private async Task SendPlayerDetailsUpdate(Player player)
+        {
             _logger.LogTrace("Sending update to clients");
             await _globalHubContext.SendPlayerDetailsUpdated(player.SessionId.Value, new PlayerDetailsResponse
             {
@@ -158,12 +206,8 @@ namespace GooseGames.Services.Global
                 PlayerName = player.Name,
                 PlayerNumber = player.PlayerNumber,
                 IsSessionMaster = false,
-                Ready = true
+                Ready = player.Status == PlayerStatusEnum.Ready
             });
-
-            _logger.LogTrace("Finished updating player details");
-
-            return GenericResponseBase.Ok();
         }
 
         private async Task<GenericResponseBase> ValidatePlayerDetailsAsync(UpdatePlayerDetailsRequest request)
@@ -222,7 +266,7 @@ namespace GooseGames.Services.Global
             return await _playerRepository.GetPropertyDictionaryAsync(playerIds, p => p.PlayerNumber);
         }
 
-        internal async Task<Guid> GetNextActivePlayerAsync(Guid sessionId, Guid currentActivePlayerId, Func<Player, bool> excludePlayer = null)
+        internal async Task<Guid> GetNextActivePlayerAsync(Guid sessionId, Guid? currentActivePlayerId, Func<Player, bool> excludePlayer = null)
         {
             var players = await GetForSessionAsync(sessionId);
 
@@ -253,12 +297,17 @@ namespace GooseGames.Services.Global
             return GenericResponseBase.Ok();
         }
 
-        private static Guid GetNextActivePlayer(IEnumerable<Player> players, Guid currentActivePlayerId, Func<Player, bool> excludePlayer)
+        private static Guid GetNextActivePlayer(IEnumerable<Player> players, Guid? currentActivePlayerId, Func<Player, bool> excludePlayer)
         {
+            //TODO: Could we not just remove the exluded players from this list rather than using recursion below?
             var orderedPlayerList = players.OrderBy(x => x.PlayerNumber).ToList();
 
             Player nextActivePlayer = null;
-            if (orderedPlayerList.Last().Id == currentActivePlayerId)
+            if (currentActivePlayerId == null)
+            {
+                nextActivePlayer = orderedPlayerList[new Random().Next(orderedPlayerList.Count)];
+            }
+            else if (orderedPlayerList.Last().Id == currentActivePlayerId)
             {
                 nextActivePlayer = orderedPlayerList.First();
             }

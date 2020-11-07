@@ -552,6 +552,34 @@ GO
 
 IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20200606093652_GlobalEntities')
 BEGIN
+    DELETE FROM Werewords.PlayerVotes
+END;
+
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20200606093652_GlobalEntities')
+BEGIN
+    DELETE FROM Werewords.PlayerResponses
+END;
+
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20200606093652_GlobalEntities')
+BEGIN
+    DELETE FROM Werewords.PlayerRoundInformation
+END;
+
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20200606093652_GlobalEntities')
+BEGIN
+    DELETE FROM Werewords.Rounds
+END;
+
+GO
+
+IF NOT EXISTS(SELECT * FROM [__EFMigrationsHistory] WHERE [MigrationId] = N'20200606093652_GlobalEntities')
+BEGIN
     ALTER TABLE [Werewords].[PlayerRoundInformation] ADD [Description] nvarchar(max) NULL;
 END;
 

@@ -51,6 +51,11 @@ namespace GooseGames.Services.Global
                 return GenericResponse<PlayerStatusEnum>.Error("This session was abandoned");
             }
 
+            if (session.Game.HasValue && session.Game.Value != game)
+            {
+                return GenericResponse<PlayerStatusEnum>.Error("This session is in progress with a different game");
+            }
+
             return GenericResponse<PlayerStatusEnum>.Ok(player.Status);
         }
     }

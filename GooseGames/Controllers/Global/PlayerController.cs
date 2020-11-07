@@ -48,6 +48,28 @@ namespace GooseGames.Controllers.Global
         }
 
         [HttpPut]
+        [Route("Unready")]
+        public async Task<GenericResponseBase> UnreadyPlayerAsync(PlayerSessionRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _playerService.UnreadyPlayerAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPut]
         public async Task<GenericResponseBase> UpdatePlayerDetailsAsync(UpdatePlayerDetailsRequest request)
         {
             try

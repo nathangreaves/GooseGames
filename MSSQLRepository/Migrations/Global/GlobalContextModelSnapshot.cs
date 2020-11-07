@@ -60,7 +60,7 @@ namespace MSSQLRepository.Migrations.Global
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Game")
+                    b.Property<int?>("Game")
                         .HasColumnType("int");
 
                     b.Property<Guid?>("GameSessionId")

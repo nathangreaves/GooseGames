@@ -12,8 +12,8 @@ namespace Entities.JustOne
 
         public Guid Id { get; set; }
         public DateTime CreatedUtc { get; set; }
+        public Guid GameId { get; set; }
         public Guid PlayerId { get; set; }
-        public Player Player { get; set; }
         public Guid Status 
         { 
             get 
@@ -27,7 +27,7 @@ namespace Entities.JustOne
             } 
         }
         public string Description { get; set; }
-
+        public string ConnectionId { get; set; }
         public PlayerStatus()
         {
             Id = Guid.NewGuid();

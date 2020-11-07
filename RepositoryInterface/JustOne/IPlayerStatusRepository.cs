@@ -8,8 +8,8 @@ namespace RepositoryInterface.JustOne
 {
     public interface IPlayerStatusRepository : ICommonRepository<PlayerStatus>
     {
-        Task UpdatePlayerStatusesForSession(Guid sessionId, Guid sessionStatus, Guid? sessionMasterStatus = null);
+        Task UpdatePlayerStatusesForGame(Guid gameId, Guid sessionStatus);
         Task UpdatePlayerStatusesForRoundAsync(Guid roundId, Guid playerStatus, Guid? activePlayerStatus = null);
-        Task UpdateStatusAsync(Guid playerId, Guid playerStatus);
+        Task UpdateStatusAsync(Guid playerId, Guid gameId, Guid playerStatus);
     }
 }

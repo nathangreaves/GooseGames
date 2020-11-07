@@ -8,6 +8,7 @@ namespace Entities.Global.Enums
     {
         Lobby = 0,
         InProgress = 1,
-        Abandoned = 2
+        Abandoned = 2,
+        GameEnded = 3,
     }
 }

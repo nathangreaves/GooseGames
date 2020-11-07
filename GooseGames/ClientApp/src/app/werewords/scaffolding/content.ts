@@ -16,6 +16,6 @@ export class WerewordsContent {
 
 export type WerewordsRouter = (status: WerewordsPlayerStatus, validated: boolean) => void;
 export type SetSessionData = (sessionId: string, playerId: string, gameId: string) => void;
-export type ReadSessionData = (gameId: string) => boolean;
+export type ReadSessionData = (gameIdentifier: string) => boolean;
 export type GenericResponseHandler<T> = (data: T) => Promise<GenericResponseBase>;
 export type GenericResponseBaseHandler = () => Promise<GenericResponseBase>;

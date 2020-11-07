@@ -41,6 +41,13 @@ namespace GooseGames.Services.Global
             return await _sessionRepository.GetAsync(sessionId);
         }
 
+        internal async Task<Guid?> GetGameIdAsync(Guid sessionId, GameEnum game)
+        {
+            var session = await _sessionRepository.GetAsync(sessionId);
+
+            return session != null && session.Game == game ? session.GameSessionId : (Guid?)null;
+        }
+
         public async Task<GenericResponse<JoinSessionResponse>> CreateOrJoinSessionAsync(JoinSessionRequest request)
         {
             _logger.LogTrace($"Starting session creation");

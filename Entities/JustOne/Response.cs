@@ -14,7 +14,6 @@ namespace Entities.JustOne
         }
         public Guid Id { get; set; }
         public DateTime CreatedUtc { get; set; }
-        public Player Player { get; set; }
         public Guid PlayerId { get; set; }
         public Round Round { get; set; }
         public Guid RoundId { get; set; }

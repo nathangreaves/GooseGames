@@ -8,8 +8,7 @@ using Entities.JustOne;
 
 namespace RepositoryInterface.JustOne
 {
-    public interface ISessionRepository : ICommonRepository<Session>
+    public interface IGameRepository : ICommonRepository<Game>
     {
-        Task AbandonSessionsOlderThanAsync(Guid excludeSessionId, DateTime createdBeforeUtc);
     }
 }

@@ -5,6 +5,7 @@ import { PlayerDetails, UpdatePlayerDetailsRequest } from '../../models/player'
 import { IPlayerSessionComponent } from '../../models/session'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { FujiLocalStorage } from '../../services/fujiflush/localstorage';
+import { GlobalSessionService } from '../../services/session';
 
 @Component({
   selector: 'app-fuji-newplayerdetails-component',
@@ -13,7 +14,6 @@ import { FujiLocalStorage } from '../../services/fujiflush/localstorage';
 
 export class FujiNewPlayerDetailsComponent implements IPlayerSessionComponent {
 
-  private _playerDetailsService: FujiPlayerDetailsService;
   private _fujiLocalStorage: FujiLocalStorage;
   private _router: Router;
 
@@ -24,9 +24,8 @@ export class FujiNewPlayerDetailsComponent implements IPlayerSessionComponent {
 
   PlayerName: string;
 
-  constructor(playerDetailsService: FujiPlayerDetailsService, fujiLocalStorage: FujiLocalStorage,
+  constructor(private playerDetailsService: GlobalSessionService, fujiLocalStorage: FujiLocalStorage,
     router: Router, activatedRoute: ActivatedRoute) {
-    this._playerDetailsService = playerDetailsService;
     this._fujiLocalStorage = fujiLocalStorage;
     this._router = router;
 
@@ -55,7 +54,7 @@ export class FujiNewPlayerDetailsComponent implements IPlayerSessionComponent {
         playerId: this.PlayerId
       };
 
-    this._playerDetailsService.UpdatePlayerDetails(playerDetailsRequest)
+    this.playerDetailsService.updatePlayerDetails(playerDetailsRequest)
       .then(data => {
         if (data.success) {
 

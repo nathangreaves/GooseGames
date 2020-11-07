@@ -15,7 +15,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
     {
         private readonly IResponseRepository _responseRepository;
         private readonly IResponseVoteRepository _responseVoteRepository;
-        private readonly IPlayerRepository _playerRepository;
+        
         private readonly PlayerStatusQueryService _playerStatusQueryService;
         private readonly RequestLogger<WaitingForVotesOnLeaderResponseRoundStatusService> _logger;
 
@@ -25,17 +25,16 @@ namespace GooseGames.Services.JustOne.RoundStatus
             IResponseRepository responseRepository,
             IResponseVoteRepository responseVoteRepository,
             IRoundRepository roundRepository,
-            ISessionRepository sessionRepository,
-            IPlayerStatusRepository playerStatusRepository,
-            IPlayerRepository playerRepository,
+            IGameRepository gameRepository,
+            Global.SessionService sessionService,
+            IPlayerStatusRepository playerStatusRepository,            
             PlayerStatusQueryService playerStatusQueryService,
-            PlayerHubContext playerHub,
+            JustOneHubContext playerHub,
             RequestLogger<WaitingForVotesOnLeaderResponseRoundStatusService> logger) : base(roundRepository,
-                sessionRepository, playerStatusRepository, playerHub)
+                gameRepository, sessionService, playerStatusRepository, playerHub)
         {
             _responseRepository = responseRepository;
-            _responseVoteRepository = responseVoteRepository;
-            _playerRepository = playerRepository;
+            _responseVoteRepository = responseVoteRepository;            
             _playerStatusQueryService = playerStatusQueryService;            
             _logger = logger;
         }
@@ -57,7 +56,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
 
         private async Task<bool> PlayersHaveAllVoted(Round round)
         {            
-            return await _playerStatusQueryService.AllPlayersMatchStatus(round.SessionId, PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes, round.ActivePlayerId);
+            return await _playerStatusQueryService.AllPlayersMatchStatusForGameAsync(round.GameId, PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes, round.ActivePlayerId);
         }
 
         private async Task TransitionRoundStatusAsync(Round round)
@@ -99,7 +98,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
         private async Task UpdateResponseStatusAsync(Round round, Response response)
         {
             _logger.LogTrace("Getting number of players for voting");
-            var numberOfPlayers = (await _playerRepository.CountAsync(p => p.SessionId == round.SessionId)) - 1;
+            var numberOfPlayers = (await _playerStatusRepository.CountAsync(p => p.GameId == round.GameId)) - 1;
             _logger.LogTrace($"Getting number of players for voting = {numberOfPlayers}");
             var numberOfVotesRequiredForValid = Math.Ceiling((double)numberOfPlayers / 2);
             _logger.LogTrace($"Number of votes required = {numberOfVotesRequiredForValid}");

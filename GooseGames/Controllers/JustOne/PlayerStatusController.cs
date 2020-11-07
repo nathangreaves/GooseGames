@@ -18,24 +18,35 @@ namespace GooseGames.Controllers.JustOne
         private readonly PlayerStatusService _playerStatusService;
         private readonly RequestLogger<JustOnePlayerStatusController> _logger;
 
-        public JustOnePlayerStatusController(PlayerStatusService playerStatusService, RequestLogger<JustOnePlayerStatusController> logger)
+        public JustOnePlayerStatusController(PlayerStatusService playerStatusService, 
+            RequestLogger<JustOnePlayerStatusController> logger)
         {
             _playerStatusService = playerStatusService;
             _logger = logger;
         }
 
         [HttpGet]
-        [ActionName(nameof(PlayerStatusEnum.New))]
-        public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateNewAsync([FromQuery] PlayerSessionRequest request)
-        {
-            return await ValidateStatus(request, PlayerStatusEnum.New);
-        }
-        [HttpGet]
         [ActionName(nameof(PlayerStatusEnum.InLobby))]
         public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateLobbyAsync([FromQuery]PlayerSessionRequest request)
         {
-            return await ValidateStatus(request, PlayerStatusEnum.InLobby);
+            try
+            {
+                _logger.LogInformation($"Received lobby status", request);
+
+                var result = await _playerStatusService.ValidateGlobalPlayerStatusLobbyAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+
+                return GenericResponse<PlayerStatusValidationResponse>.Error($"Unknown Error {errorGuid}");
+            }
         }
+
         [HttpGet]
         [ActionName(nameof(PlayerStatusEnum.RoundWaiting))]
         public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateWaitingAsync([FromQuery]PlayerSessionRequest request)
@@ -130,15 +141,15 @@ namespace GooseGames.Controllers.JustOne
 
         [HttpPost]
         [ActionName(nameof(PlayerStatusEnum.InLobby))]
-        public async Task<GenericResponse<bool>> SetLobbyAsync(PlayerIdRequest request)
+        public async Task<GenericResponseBase> SetLobbyAsync(PlayerSessionRequest request)
         {
             try
             {
                 _logger.LogInformation("Received request", request);
 
-                await _playerStatusService.UpdatePlayerStatusAsync(request.PlayerId, PlayerStatusEnum.InLobby);
+                await _playerStatusService.SetLobbyAsync(request);
 
-                var result = NewResponse.Ok(true);
+                var result = GenericResponseBase.Ok();
 
                 _logger.LogInformation("Returned result", result);
                 return result;
@@ -147,13 +158,13 @@ namespace GooseGames.Controllers.JustOne
             {
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
             }
         }
 
         [HttpPost]
         [ActionName(nameof(PlayerStatusEnum.RoundWaiting))]
-        public async Task<GenericResponse<bool>> SetWaitingAsync(PlayerSessionRoundRequest request)
+        public async Task<GenericResponseBase> SetWaitingAsync(PlayerSessionRoundRequest request)
         {
             try
             {
@@ -161,7 +172,7 @@ namespace GooseGames.Controllers.JustOne
 
                 await _playerStatusService.UpdatePlayerStatusToRoundWaitingAsync(request);
 
-                var result = NewResponse.Ok(true);
+                var result = GenericResponseBase.Ok();
 
                 _logger.LogInformation("Returned result", result);
                 return result;
@@ -170,13 +181,13 @@ namespace GooseGames.Controllers.JustOne
             {
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
             }
         }
 
         [HttpPost]
         [ActionName(nameof(PlayerStatusEnum.PassivePlayerClue))]
-        public async Task<GenericResponse<bool>> SetPassivePlayerClueAsync(PlayerSessionRoundRequest request)
+        public async Task<GenericResponseBase> SetPassivePlayerClueAsync(PlayerSessionRoundRequest request)
         {
             try
             {
@@ -184,7 +195,7 @@ namespace GooseGames.Controllers.JustOne
 
                 await _playerStatusService.UpdatePlayerStatusToPassivePlayerClueAsync(request);
 
-                var result = NewResponse.Ok(true);
+                var result = GenericResponseBase.Ok();
 
                 _logger.LogInformation("Returned result", result);
                 return result;
@@ -193,13 +204,13 @@ namespace GooseGames.Controllers.JustOne
             {
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
             }
         }
 
         [HttpPost]
         [ActionName(nameof(PlayerStatusEnum.PassivePlayerClueVote))]
-        public async Task<GenericResponse<bool>> SetPassivePlayerClueVoteAsync(PlayerSessionRoundRequest request)
+        public async Task<GenericResponseBase> SetPassivePlayerClueVoteAsync(PlayerSessionRoundRequest request)
         {
             try
             {
@@ -207,7 +218,7 @@ namespace GooseGames.Controllers.JustOne
 
                 await _playerStatusService.UpdatePlayerStatusToPassivePlayerClueVoteAsync(request);
 
-                var result = NewResponse.Ok(true);
+                var result = GenericResponseBase.Ok();
 
                 _logger.LogInformation("Returned result", result);
                 return result;
@@ -216,13 +227,13 @@ namespace GooseGames.Controllers.JustOne
             {
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
             }
         }
 
         [HttpPost]
         [ActionName(nameof(PlayerStatusEnum.PassivePlayerOutcomeVote))]
-        public async Task<GenericResponse<bool>> SetPassivePlayerOutcomeVoteAsync(PlayerSessionRoundRequest request)
+        public async Task<GenericResponseBase> SetPassivePlayerOutcomeVoteAsync(PlayerSessionRoundRequest request)
         {
             try
             {
@@ -230,7 +241,7 @@ namespace GooseGames.Controllers.JustOne
 
                 await _playerStatusService.UpdatePlayerStatusToPassivePlayerOutcomeVoteAsync(request);
 
-                var result = NewResponse.Ok(true);
+                var result = GenericResponseBase.Ok();
 
                 _logger.LogInformation("Returned result", result);
                 return result;
@@ -239,10 +250,9 @@ namespace GooseGames.Controllers.JustOne
             {
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
             }
         }
-
 
         private async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateStatus(PlayerSessionRequest request, Guid lobbyStatus)
         {
@@ -259,8 +269,10 @@ namespace GooseGames.Controllers.JustOne
             {
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return NewResponse.Error<PlayerStatusValidationResponse>($"Unknown Error {errorGuid}");
+                return GenericResponse<PlayerStatusValidationResponse>.Error($"Unknown Error {errorGuid}");
             }
         }
+
+
     }
 }

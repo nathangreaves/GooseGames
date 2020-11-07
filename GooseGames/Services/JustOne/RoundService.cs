@@ -1,6 +1,7 @@
 ﻿using Entities.JustOne;
 using Entities.JustOne.Enums;
 using GooseGames.Logging;
+using GooseGames.Services.Global;
 using GooseGames.Services.JustOne.RoundStatus;
 using Models.Enums;
 using Models.Requests;
@@ -17,9 +18,10 @@ namespace GooseGames.Services.JustOne
 {
     public class RoundService
     {
+        private readonly Global.SessionService _sessionService;
+        private readonly PlayerService _playerService;
+        private readonly IGameRepository _gameRepository;
         private readonly IRoundRepository _roundRepository;
-        private readonly ISessionRepository _sessionRepository;
-        private readonly IPlayerRepository _playerRepository;
         private readonly IResponseRepository _responseRepository;
         private readonly PrepareNextRoundService _prepareNextRoundService;
         private readonly RoundServiceProvider _roundServiceProvider;
@@ -27,17 +29,19 @@ namespace GooseGames.Services.JustOne
 
         private const int DefaultNumberOfRounds = 13;
 
-        public RoundService(IRoundRepository roundRepository, 
-            ISessionRepository sessionRepository, 
-            IPlayerRepository playerRepository, 
+        public RoundService(Global.SessionService sessionService,
+            Global.PlayerService playerService,         
+            IGameRepository gameRepository,
+            IRoundRepository roundRepository, 
             IResponseRepository responseRepository,
             PrepareNextRoundService prepareNextRoundService,
             RoundServiceProvider roundServiceProvider,
             RequestLogger<RoundService> logger)
         {
+            _sessionService = sessionService;
+            _playerService = playerService;
+            _gameRepository = gameRepository;
             _roundRepository = roundRepository;
-            _sessionRepository = sessionRepository;
-            _playerRepository = playerRepository;
             _responseRepository = responseRepository;
             _prepareNextRoundService = prepareNextRoundService;
             _roundServiceProvider = roundServiceProvider;
@@ -52,7 +56,7 @@ namespace GooseGames.Services.JustOne
 
             _logger.LogTrace($"Got round {round.Id} : {round.WordToGuess}", request);
 
-            var activePlayer = await _playerRepository.GetAsync(round.ActivePlayerId.Value);
+            var activePlayer = await _playerService.GetAsync(round.ActivePlayerId.Value);
 
             _logger.LogTrace($"Got active player {activePlayer.Id} : {activePlayer.Name}", request);
 
@@ -68,16 +72,31 @@ namespace GooseGames.Services.JustOne
         {
             _logger.LogTrace($"Getting round outcome", request);
             _logger.LogTrace($"Getting session");
-            var session = await _sessionRepository.GetAsync(request.SessionId);
+            var gameId = await _sessionService.GetGameIdAsync(request.SessionId, Entities.Global.Enums.GameEnum.JustOne);
+            if (!gameId.HasValue)
+            {
+                return GenericResponse<RoundOutcomeResponse>.Error("Unable to find game");
+            }
+
+            var game = await _gameRepository.GetAsync(gameId.Value);
+            if (game == null)
+            {
+                return GenericResponse<RoundOutcomeResponse>.Error($"Unable to find game from gameId {gameId.Value}");
+            }
+
+            if (game.CurrentRoundId == null)
+            {
+                return GenericResponse<RoundOutcomeResponse>.Error($"Unable to find current round for gameId {gameId.Value}");
+            }
 
             _logger.LogTrace($"Getting round");
-            var round = await _roundRepository.GetAsync(session.CurrentRoundId.Value);
+            var round = await _roundRepository.GetAsync(game.CurrentRoundId.Value);
 
             _logger.LogTrace($"Getting rounds remaining");
-            var roundsRemaining = await _roundRepository.CountAsync(r => r.Status == RoundStatusEnum.New && r.SessionId == request.SessionId);
+            var roundsRemaining = await _roundRepository.CountAsync(r => r.Status == RoundStatusEnum.New && r.GameId == gameId.Value);
 
             _logger.LogTrace($"Getting active player");
-            var activePlayer = await _playerRepository.GetAsync(round.ActivePlayerId.Value);
+            var activePlayer = await _playerService.GetAsync(round.ActivePlayerId.Value);
 
             _logger.LogTrace($"Getting active player response");
             var response = await _responseRepository.SingleOrDefaultAsync(r => r.PlayerId == activePlayer.Id && r.RoundId == round.Id);
@@ -85,11 +104,11 @@ namespace GooseGames.Services.JustOne
             bool gameEnded = roundsRemaining <= 0;
 
              _logger.LogTrace("Getting total number of rounds");
-            var roundsTotal = await _roundRepository.CountAsync(r => r.SessionId == request.SessionId);
+            var roundsTotal = await _roundRepository.CountAsync(r => r.GameId == gameId.Value);
 
             var nextRoundInformation = new RoundInformationResponse
             {
-                Score = session.Score,
+                Score = game.Score,
                 RoundsTotal = roundsTotal,
                 RoundNumber = gameEnded ? roundsTotal : (roundsTotal - roundsRemaining) + 1
             };
@@ -100,7 +119,7 @@ namespace GooseGames.Services.JustOne
                 ActivePlayerNumber = activePlayer.PlayerNumber,
                 GameEnded = gameEnded,
                 RoundOutcome = (Models.Responses.JustOne.Round.RoundOutcomeEnum)(int)round.Outcome,
-                Score = session.Score,
+                Score = game.Score,
                 WordGuessed = response != null ? response.Word.ToUpper() : null,
                 WordToGuess = round.WordToGuess.ToUpper(),
                 RoundId = round.Id,
@@ -109,11 +128,11 @@ namespace GooseGames.Services.JustOne
             return GenericResponse<RoundOutcomeResponse>.Ok(outcome);
         }
 
-        internal async Task PrepareRoundsAsync(Guid sessionId, IEnumerable<WordListEnum> includedWordLists)
+        internal async Task PrepareRoundsAsync(Guid gameId, IEnumerable<WordListEnum> includedWordLists)
         {
-            _logger.LogTrace("Preparing Round", sessionId);
+            _logger.LogTrace("Preparing Round", gameId);
 
-            var session = await _sessionRepository.GetAsync(sessionId);
+            var game = await _gameRepository.GetAsync(gameId);
 
             _logger.LogTrace("Found session");
 
@@ -123,7 +142,8 @@ namespace GooseGames.Services.JustOne
             {
                 return new Round
                 {
-                    Session = session,
+                    GameId = gameId,
+                    SessionId = game.SessionId,
                     Status = RoundStatusEnum.New,
                     WordToGuess = word
                 };
@@ -133,7 +153,7 @@ namespace GooseGames.Services.JustOne
             await _roundRepository.InsertRangeAsync(rounds);
 
             _logger.LogTrace("Preparing First round");
-            var nextRound = await _prepareNextRoundService.PrepareNextRoundAsync(session.Id);
+            var nextRound = await _prepareNextRoundService.PrepareGameNextRoundAsync(gameId, game.SessionId);
 
             await ProgressRoundAsync(nextRound.Id);
         }
@@ -157,7 +177,14 @@ namespace GooseGames.Services.JustOne
 
         internal async Task<Round> GetCurrentRoundAsync(PlayerSessionRequest request)
         {
-            return await _roundRepository.GetCurrentRoundForSessionAsync(request.SessionId);
+            _logger.LogTrace($"Getting session");
+            var gameId = await _sessionService.GetGameIdAsync(request.SessionId, Entities.Global.Enums.GameEnum.JustOne);
+            if (!gameId.HasValue)
+            {
+                throw new NullReferenceException($"Game did not exist for session {request.SessionId}");
+            }
+
+            return await _roundRepository.GetCurrentRoundForGameAsync(gameId.Value);
         }
     }
 }

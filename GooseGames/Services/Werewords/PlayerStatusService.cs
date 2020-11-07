@@ -79,9 +79,9 @@ namespace GooseGames.Services.Werewords
             var globalPlayerStatus = globalResponse.Data;
 
             Guid playerStatus;
-            if (globalPlayerStatus == Entities.Global.Enums.PlayerStatusEnum.New)
+            if (globalPlayerStatus == Entities.Global.Enums.PlayerStatusEnum.Lobby)
             {
-                playerStatus = Entities.Werewords.Enums.PlayerStatusEnum.New;
+                playerStatus = Entities.Werewords.Enums.PlayerStatusEnum.InLobby;
             }
             else if (globalPlayerStatus == Entities.Global.Enums.PlayerStatusEnum.Ready)
             {
@@ -95,26 +95,6 @@ namespace GooseGames.Services.Werewords
 
                 playerStatus = player.Status;
             }
-
-            //if (player == null)
-            //{
-            //    return GenericResponse<PlayerStatusValidationResponse>.Error("a530d7fa-f842-492b-a0fc-6473af1c907a");
-            //}
-            //if (player.RoundId == null)
-            //{
-            //    return GenericResponse<PlayerStatusValidationResponse>.Error("511c0fb3-7d49-4fdf-a1a7-b1281b5ada4b");
-            //}
-
-            //var session = await _sessionService.GetAsync(request.SessionId);
-            //if (session == null)
-            //{
-            //    return GenericResponse<PlayerStatusValidationResponse>.Error("You are not part of this session");
-            //}
-
-            //if (session.Status == SessionStatusEnum.Abandoned)
-            //{
-            //    return GenericResponse<PlayerStatusValidationResponse>.Error("This session was abandoned");
-            //}
 
             var response = new PlayerStatusValidationResponse
             {

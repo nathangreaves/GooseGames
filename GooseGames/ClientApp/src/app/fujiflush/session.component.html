@@ -22,6 +22,9 @@
     <div class="col-8 fuji-winner-text">is the winner!</div>
     <div class="col-2"></div>
   </div>
+  <div class="row">
+    <button class="btn btn-primary" (click)="PlayAgain()">Play Again</button>
+  </div>
 </div>
 <div class="fuji-main" *ngIf="!Loading && (!WinningPlayers || WinningPlayers.length <= 0)">
   <div class="container players-area">

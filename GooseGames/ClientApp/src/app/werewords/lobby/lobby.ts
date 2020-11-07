@@ -5,7 +5,7 @@ import { WerewordsSessionService } from '../../../services/werewords/session';
 import { ILobbyComponentParameters } from '../../components/lobby/lobby';
 
 const MinPlayers: number = 4;
-const MaxPlayers: number = 4;
+const MaxPlayers: number = 10;
 
 @Component({
   selector: 'app-werewords-lobby-component',

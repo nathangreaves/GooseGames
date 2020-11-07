@@ -50,22 +50,6 @@ namespace GooseGames.Hubs
             _logger = logger;
         }
 
-        public async Task SendPlayerAdded(Guid sessionId, PlayerDetailsResponse playerDetailsResponse)
-        {
-            _logger.LogInformation($"Sending playerAdded: to {sessionId} :: {playerDetailsResponse.Id}");
-            await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerAdded", playerDetailsResponse);
-        }
-        public async Task SendPlayerDetailsUpdated(Guid sessionId, PlayerDetailsResponse playerDetailsResponse)
-        {
-            _logger.LogInformation($"Sending playerDetailsUpdated: to {sessionId} :: {playerDetailsResponse.Id}");
-            await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerDetailsUpdated", playerDetailsResponse);
-        }
-        public async Task SendPlayerRemoved(Guid sessionId, Guid playerId)
-        {
-            _logger.LogInformation($"Sending playerRemoved: to {sessionId} :: {playerId}");
-            await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerRemoved", playerId);
-        }
-
         public async Task SendStartingSessionAsync(Guid sessionId)
         {
             _logger.LogInformation($"Sending startingSession: to {sessionId}");

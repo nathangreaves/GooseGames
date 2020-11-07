@@ -4,6 +4,8 @@ import { PlayerDetailsResponse } from '../../../models/player';
 import { GlobalSessionService } from '../../../services/session';
 import { GenericResponseBase } from '../../../models/genericresponse';
 import { IGlobalLobbyHubParameters } from './hub';
+import { GooseGamesLocalStorage } from '../../../services/localstorage';
+import { Router } from '@angular/router';
 
 export interface ILobbyComponentParameters {  
   minPlayers: number;
@@ -34,14 +36,17 @@ export class LobbyComponent {
   public Players: PlayerDetailsResponse[];
 
   DisableButtons: boolean;
-  StatusText: string;
+  
+  PlayerName: string;
+  playerReady: boolean;
 
   globalHubConnectionParameters: IGlobalLobbyHubParameters;
 
-  constructor(private _globalSessionService: GlobalSessionService) {
+  constructor(private _globalSessionService: GlobalSessionService, private localStorage: GooseGamesLocalStorage, private router: Router) {
 
     this.Loading = true;
 
+    this.PlayerName = this.localStorage.GetPlayerName();
   }
 
   playerAdded = (player: PlayerDetailsResponse) => {
@@ -59,10 +64,14 @@ export class LobbyComponent {
     }
   }
 
-  playerRemoved = (player: PlayerDetailsResponse) => {
-    if (this.Players && this.Players.length > 0) {
-      var index = _.findIndex(this.Players, p => p.id == player.id);
-      this.Players.splice(index, 1, player);
+  playerRemoved = (playerId: string) => {
+
+    if (playerId == this.parameters.playerId) {
+      this.router.navigate(['']);
+    }
+    else if (this.Players && this.Players.length > 0) {
+      var index = _.findIndex(this.Players, p => p.id == playerId);
+      this.Players.splice(index, 1);
     }
   }
 
@@ -106,6 +115,43 @@ export class LobbyComponent {
       });
   }
 
+  public Ready = () => {
+
+    if (this.playerReady) {
+      return this._globalSessionService.unreadyPlayer({
+        PlayerId: this.parameters.playerId,
+        SessionId: this.parameters.sessionId
+      }).then(data => {
+        if (data.success) {
+          this.playerReady = false;
+        }
+        else {
+          this.ErrorMessage = data.errorCode;
+        }
+      })
+        .catch(err => this.handleGenericError(err));
+    }
+
+    return this._globalSessionService.updatePlayerDetails({
+      playerId: this.parameters.playerId,
+      sessionId: this.parameters.sessionId,
+      playerName: this.PlayerName
+    })
+    .then(data => {
+      if (data.success) {
+        this.localStorage.CachePlayerDetails({
+          PlayerId: this.parameters.playerId,
+          SessionId: this.parameters.sessionId,
+        }, this.PlayerName);
+        this.playerReady = true;
+      }
+      else {
+        this.ErrorMessage = data.errorCode;
+      }
+    })
+    .catch(err => this.handleGenericError(err));
+  }
+
   public KickPlayer(playerId: string) {
     if (playerId == this.parameters.playerId) {
       return;
@@ -136,6 +182,10 @@ export class LobbyComponent {
           this.Players = data.data.players;
           _.forEach(this.Players, player => {
             this.setDefaultNewPlayerName(player);
+
+            if (player.id == this.parameters.playerId) {
+              this.playerReady = player.ready;
+            }
           });
           this.Loading = false;
         }

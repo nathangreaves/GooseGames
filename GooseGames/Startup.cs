@@ -48,7 +48,6 @@ namespace GooseGames
 
             //Just One
             services.AddScoped<Services.JustOne.SessionService>();
-            services.AddScoped<Services.JustOne.PlayerDetailsService>();
             services.AddScoped<Services.JustOne.PlayerStatusService>();
             services.AddScoped<Services.JustOne.RoundService>();
             services.AddScoped<Services.JustOne.PlayerResponseService>();
@@ -62,7 +61,6 @@ namespace GooseGames
 
             //Fuji Flush
             services.AddScoped<Services.Fuji.SessionService>();
-            services.AddScoped<Services.Fuji.PlayerDetailsService>();
             services.AddScoped<Services.Fuji.DeckService>();
             services.AddScoped<Services.Fuji.HandService>();
             services.AddScoped<Services.Fuji.CardService>();
@@ -83,7 +81,7 @@ namespace GooseGames
 
             //Hub Contexts
             services.AddScoped<GlobalHubContext>();
-            services.AddScoped<PlayerHubContext>();
+            services.AddScoped<JustOneHubContext>();
             services.AddScoped<FujiHubContext>();
             services.AddScoped<CodenamesHubContext>();
             services.AddScoped<WerewordsHubContext>();
@@ -127,7 +125,7 @@ namespace GooseGames
                     pattern: "{controller}/{action=Index}/{id?}");
 
                 endpoints.MapHub<GlobalHub>("/globalhub");
-                endpoints.MapHub<PlayerHub>("/lobbyhub");
+                endpoints.MapHub<JustOneHub>("/lobbyhub");
                 endpoints.MapHub<FujiHub>("/fujihub");
                 endpoints.MapHub<CodenamesHub>("/codenameshub");
                 endpoints.MapHub<WerewordsHub>("/werewordshub");

@@ -13,11 +13,11 @@ namespace Entities.JustOne
             Id = Guid.NewGuid();
         }
         public Guid Id { get; set; }
-        public DateTime CreatedUtc { get; set; }
-        public Guid? ActivePlayerId { get; set; }
-        public Player ActivePlayer { get; set; }
         public Guid SessionId { get; set; }
-        public Session Session { get; set; }
+        public DateTime CreatedUtc { get; set; }
+        public Guid? ActivePlayerId { get; set; }        
+        public Guid GameId { get; set; }
+        public Game Game { get; set; }
         public string WordToGuess { get; set; }
         public RoundStatusEnum Status { get; set; }
         public RoundOutcomeEnum Outcome { get; set; }

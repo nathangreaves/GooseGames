@@ -1,6 +1,8 @@
-﻿using Entities.JustOne;
+﻿using Entities.Global;
+using Entities.JustOne;
 using Entities.JustOne.Enums;
 using GooseGames.Logging;
+using GooseGames.Services.Global;
 using RepositoryInterface.JustOne;
 using System;
 using System.Collections.Generic;
@@ -11,28 +13,31 @@ namespace GooseGames.Services.JustOne
 {
     public class PrepareNextRoundService
     {
+        private readonly Global.SessionService _sessionService;
+        private readonly PlayerService _playerService;
         private readonly IRoundRepository _roundRepository;
-        private readonly ISessionRepository _sessionRepository;
-        private readonly IPlayerRepository _playerRepository;
+        private readonly IGameRepository _gameRepository;
         private readonly RequestLogger<PrepareNextRoundService> _logger;
 
         public PrepareNextRoundService(
+            Global.SessionService sessionService,
+            PlayerService playerService,
             IRoundRepository roundRepository, 
-            ISessionRepository sessionRepository,
-            IPlayerRepository playerRepository,
+            IGameRepository gameRepository,
             RequestLogger<PrepareNextRoundService> logger)
         {
+            _sessionService = sessionService;
+            _playerService = playerService;
             _roundRepository = roundRepository;
-            _sessionRepository = sessionRepository;
-            _playerRepository = playerRepository;
+            _gameRepository = gameRepository;
             _logger = logger;
         }
 
 
-        internal async Task<Round> PrepareNextRoundAsync(Guid sessionId, Guid? previourActivePlayerId = null)
+        internal async Task<Round> PrepareGameNextRoundAsync(Guid gameId, Guid sessionId, Guid? previourActivePlayerId = null)
         {
-            _logger.LogTrace($"Fetching next available round for session {sessionId}");
-            var nextAvailableRound = await _roundRepository.FirstOrDefaultAsync(r => r.SessionId == sessionId
+            _logger.LogTrace($"Fetching next available round for session {gameId}");
+            var nextAvailableRound = await _roundRepository.FirstOrDefaultAsync(r => r.GameId == gameId
             && r.ActivePlayerId == null
             && r.Status == RoundStatusEnum.New);
 
@@ -42,16 +47,16 @@ namespace GooseGames.Services.JustOne
                 return null;
             }
 
-            _logger.LogTrace($"Assigning round to session {sessionId}");
-            var session = await _sessionRepository.GetAsync(sessionId);
+            _logger.LogTrace($"Assigning round to session {gameId}");
+            var session = await _gameRepository.GetAsync(gameId);
             session.CurrentRoundId = nextAvailableRound.Id;
-            await _sessionRepository.UpdateAsync(session);
+            await _gameRepository.UpdateAsync(session);
 
             _logger.LogTrace("Getting New Active Player");
-            var activePlayer = await GetActivePlayerAsync(sessionId, previourActivePlayerId);
+            var activePlayerId = await GetActivePlayerAsync(sessionId, previourActivePlayerId);
 
-            _logger.LogTrace($"Assigning Active Player: {nextAvailableRound.ActivePlayerId} to round: {nextAvailableRound.Id}");
-            nextAvailableRound.ActivePlayerId = activePlayer.Id;
+            _logger.LogTrace($"Assigning Active Player: {activePlayerId} to round: {nextAvailableRound.Id}");
+            nextAvailableRound.ActivePlayerId = activePlayerId;
             await _roundRepository.UpdateAsync(nextAvailableRound);
 
             _logger.LogTrace($"Assigned Active Player: {nextAvailableRound.ActivePlayerId} to round: {nextAvailableRound.Id}");
@@ -59,28 +64,9 @@ namespace GooseGames.Services.JustOne
             return nextAvailableRound;
         }
 
-        private async Task<Player> GetActivePlayerAsync(Guid sessionId, Guid? previousActivePlayerId)
+        private async Task<Guid> GetActivePlayerAsync(Guid sessionId, Guid? previousActivePlayerId)
         {
-            var players = await _playerRepository.FilterAsync(p => p.SessionId == sessionId);
-
-            Player previousActivePlayer = null;
-            if (previousActivePlayerId == null)
-            {
-                previousActivePlayer = players[new Random().Next(players.Count)];
-            }
-            else
-            {
-                previousActivePlayer = players.Single(p => p.Id == previousActivePlayerId.Value);
-            }
-
-            var orderedList = players.OrderBy(x => x.PlayerNumber).ToList();
-
-            if (orderedList.Last().Id == previousActivePlayer.Id)
-            {
-                return orderedList.First();
-            }
-            var indexOfPrevious = orderedList.IndexOf(previousActivePlayer);
-            return orderedList[indexOfPrevious + 1];
+            return await _playerService.GetNextActivePlayerAsync(sessionId, previousActivePlayerId);
         }
     }
 }

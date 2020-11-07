@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace RepositoryInterface.Fuji
 {
-    public interface ISessionRepository : ICommonRepository<Session>
+    public interface IGameRepository : ICommonRepository<Game>
     {
-        Task AbandonSessionsOlderThanAsync(Guid sessionId, DateTime dateTime);
     }
 }

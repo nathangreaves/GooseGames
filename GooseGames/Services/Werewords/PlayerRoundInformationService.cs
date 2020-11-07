@@ -1,4 +1,6 @@
-﻿using GooseGames.Logging;
+﻿using Entities.Werewords;
+using Entities.Werewords.Enums;
+using GooseGames.Logging;
 using GooseGames.Services.Global;
 using Models.Enums.Werewords;
 using Models.Requests;
@@ -21,7 +23,7 @@ namespace GooseGames.Services.Werewords
 
         public PlayerRoundInformationService(SessionService sessionService,
             Global.PlayerService playerService,
-            IPlayerRoundInformationRepository playerRoundInformationRepository,
+            IPlayerRoundInformationRepository playerRoundInformationRepository,            
             RequestLogger<PlayerRoundInformationService> logger)
         {
             _sessionService = sessionService;
@@ -57,12 +59,37 @@ namespace GooseGames.Services.Werewords
 
             var mayorPlayerName = await _playerService.GetPlayerNameAsync(mayorPlayerId.Value);
 
-            return GenericResponse<PlayerSecretRoleResponse>.Ok(new PlayerSecretRoleResponse 
-            { 
+            var knowledgeOfOtherPlayers = new List<OtherPlayerSecretRoleResponse>();
+
+            var playerReceivesKnowledgeOfWerewolves = PlayerReceivesKnowledgeOfWerewolves(playerRoundInformation);
+            if (playerReceivesKnowledgeOfWerewolves)
+            {
+                var otherWerewolves = await _playerRoundInformationRepository.FilterAsync(p => 
+                                                        p.RoundId == playerRoundInformation.RoundId && 
+                                                        p.PlayerId != request.PlayerId && 
+                                                        p.SecretRole == SecretRolesEnum.Werewolf);
+
+                var playerNames = await _playerService.GetPlayerNamesAsync(otherWerewolves.Select(oW => oW.PlayerId));
+
+                knowledgeOfOtherPlayers.AddRange(otherWerewolves.Select(oW => new OtherPlayerSecretRoleResponse { 
+                    PlayerId = oW.PlayerId,
+                    SecretRole = (SecretRole)(int)oW.SecretRole,
+                    PlayerName = playerNames[oW.PlayerId]
+                }));
+            }
+
+            return GenericResponse<PlayerSecretRoleResponse>.Ok(new PlayerSecretRoleResponse
+            {
                 SecretRole = (SecretRole)(int)playerRoundInformation.SecretRole,
                 MayorName = mayorPlayerName,
-                MayorPlayerId = mayorPlayerId.Value
+                MayorPlayerId = mayorPlayerId.Value,
+                KnowledgeAboutOtherPlayers = knowledgeOfOtherPlayers
             });
+        }
+
+        internal bool PlayerReceivesKnowledgeOfWerewolves(PlayerRoundInformation playerRoundInformation)
+        {
+            return playerRoundInformation.SecretRole == SecretRolesEnum.Werewolf;
         }
     }
 }

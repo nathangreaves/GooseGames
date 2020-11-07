@@ -49,48 +49,6 @@ namespace GooseGames.Controllers.Fuji
         }
 
         [HttpPost]
-        public async Task<GenericResponse<NewSessionResponse>> PostAsync(NewSessionRequest request)
-        {
-            try
-            {
-                _logger.LogInformation("Received request", request);
-
-                var result = await _sessionService.CreateSessionAsync(request);
-
-                _logger.LogInformation("Returned result", result);
-
-                return result;
-            }
-            catch (Exception e)
-            {
-                var errorGuid = Guid.NewGuid();
-                _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return GenericResponse<NewSessionResponse>.Error($"Unknown Error {errorGuid}");
-            }
-        }
-
-        [HttpPatch]
-        public async Task<GenericResponse<JoinSessionResponse>> PatchAsync(JoinSessionRequest request)
-        {
-            try
-            {
-                _logger.LogInformation("Received request", request);
-
-                var result = await _sessionService.JoinSessionAsync(request);
-
-                _logger.LogInformation("Returned result", result);
-
-                return result;
-            }
-            catch (Exception e)
-            {
-                var errorGuid = Guid.NewGuid();
-                _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return GenericResponse<JoinSessionResponse>.Error($"Unknown Error {errorGuid}");
-            }
-        }
-
-        [HttpPost]
         [Route("StartSession")]
         public async Task<GenericResponseBase> StartSessionAsync(PlayerSessionRequest request)
         {
@@ -109,29 +67,6 @@ namespace GooseGames.Controllers.Fuji
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
                 return GenericResponseBase.Error($"Unknown Error {errorGuid}");
-            }
-        }
-
-        [HttpPost]
-        [Route("CreateTestSession")]
-        public async Task<GenericResponse<IEnumerable<JoinSessionResponse>>> CreateTestSessionAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Received request");
-
-                string sessionPassword = Guid.NewGuid().ToString();
-                var result = await _sessionService.CreateTestSessionAsync();
-                
-                _logger.LogInformation("Returned result");
-
-                return GenericResponse<IEnumerable<JoinSessionResponse>>.Ok(result);
-            }
-            catch (Exception e)
-            {
-                var errorGuid = Guid.NewGuid();
-                _logger.LogError($"Unknown Error {errorGuid}", e);
-                return GenericResponse<IEnumerable<JoinSessionResponse>>.Error($"Unknown Error {errorGuid}");
             }
         }
     }

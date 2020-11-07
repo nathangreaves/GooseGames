@@ -14,7 +14,7 @@ import { WerewordsPlayerStatusService } from '../../../services/werewords/player
 export class WerewordsNightSecretRoleComponent extends WerewordsComponentBase implements OnInit, OnDestroy {
   SecretRole: SecretRole;
   SecretRoleDescription: string;
-  KnowledgeAboutOtherPlayers: OtherPlayerSecretRoleResponse[];
+  KnowledgeAboutOtherPlayers: string;
   MayorName: string;
   MayorId: string;
   IsMayor: boolean;
@@ -57,7 +57,14 @@ export class WerewordsNightSecretRoleComponent extends WerewordsComponentBase im
           this.MayorName = r.mayorName;
           this.MayorId = r.mayorPlayerId;
           this.IsMayor = r.mayorPlayerId.toLowerCase() == this.PlayerId.toLowerCase();
-          this.KnowledgeAboutOtherPlayers = r.knowledgeAboutOtherPlayers;
+
+          var otherWerewolves = _.filter(r.knowledgeAboutOtherPlayers, p => p.secretRole == SecretRole.Werewolf);
+          if (otherWerewolves.length == 1) {
+            this.KnowledgeAboutOtherPlayers = `${otherWerewolves[0].playerName} is a Werewolf`
+          }
+          else if (otherWerewolves.length > 1) {
+            this.KnowledgeAboutOtherPlayers = `${_.reduce(otherWerewolves, (result, w) => `${result}${result ? ', ' : ''}${w.playerName}`, '')} are Werewolves`
+          }
 
           return Promise.resolve(<GenericResponseBase>{ success: true });
         });

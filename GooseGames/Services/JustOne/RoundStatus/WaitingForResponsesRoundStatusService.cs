@@ -17,7 +17,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
         private readonly IRoundRepository _roundRepository;
         private readonly IPlayerStatusRepository _playerStatusRepository;
         private readonly PlayerStatusQueryService _playerStatusQueryService;
-        private readonly PlayerHubContext _playerHub;
+        private readonly JustOneHubContext _playerHub;
         private readonly RequestLogger<WaitingForResponsesRoundStatusService> _logger;
 
         public override RoundStatusEnum RoundStatus => RoundStatusEnum.WaitingForResponses;
@@ -27,7 +27,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
             IRoundRepository roundRepository, 
             IPlayerStatusRepository playerStatusRepository,
             PlayerStatusQueryService playerStatusQueryService,
-            PlayerHubContext playerHub,
+            JustOneHubContext playerHub,
             RequestLogger<WaitingForResponsesRoundStatusService> logger)
         {
             _responseRepository = responseRepository;
@@ -57,7 +57,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
 
         private async Task<bool> AllPlayersHaveResponded(Round round)
         {
-            return await _playerStatusQueryService.AllPlayersMatchStatus(round.SessionId, PlayerStatusEnum.PassivePlayerWaitingForClues, round.ActivePlayerId);
+            return await _playerStatusQueryService.AllPlayersMatchStatusForGameAsync(round.GameId, PlayerStatusEnum.PassivePlayerWaitingForClues, round.ActivePlayerId);
         }
 
         private async Task TransitionRoundStatusAsync(Round round)

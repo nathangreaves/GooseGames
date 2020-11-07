@@ -1,4 +1,6 @@
-﻿using GooseGames.Logging;
+﻿using Entities.Fuji;
+using Entities.Global.Enums;
+using GooseGames.Logging;
 using Models.Requests;
 using Models.Responses;
 using Models.Responses.Fuji.Hands;
@@ -12,14 +14,17 @@ namespace GooseGames.Services.Fuji
 {
     public class HandService
     {
+        private readonly Global.SessionService _sessionService;
         private readonly IHandCardRepository _handCardRepository;
-        private readonly IPlayerRepository _playerRepository;
+        private readonly IPlayerInformationRepository _playerRepository;
         private readonly RequestLogger<HandService> _logger;
 
-        public HandService(IHandCardRepository handCardRepository,
-            IPlayerRepository playerRepository,
+        public HandService(Global.SessionService sessionService,
+            IHandCardRepository handCardRepository,
+            IPlayerInformationRepository playerRepository,
             RequestLogger<HandService> logger)
         {
+            _sessionService = sessionService;
             _handCardRepository = handCardRepository;
             _playerRepository = playerRepository;
             _logger = logger;
@@ -27,9 +32,15 @@ namespace GooseGames.Services.Fuji
 
         internal async Task<GenericResponse<PlayerHand>> GetPlayerHandAsync(PlayerSessionRequest request)
         {
-            var playedCardId = await _playerRepository.GetPropertyAsync(request.PlayerId, p => p.PlayedCardId);
+            var gameId = await _sessionService.GetGameIdAsync(request.SessionId, GameEnum.FujiFlush);
+            if (gameId == null)
+            {
+                return GenericResponse<PlayerHand>.Error("Unable to find game");
+            }
+            var player = await _playerRepository.GetPlayerInformationFromPlayerIdAndGameId(request.PlayerId, gameId.Value);
+            var playedCardId = player.PlayedCardId;
 
-            var cards = await _handCardRepository.FilterAsync(c => c.SessionId == request.SessionId && c.PlayerId == request.PlayerId && (playedCardId == null || playedCardId != c.Id));
+            var cards = await _handCardRepository.FilterAsync(c => c.GameId == gameId.Value && c.PlayerId == request.PlayerId && (playedCardId == null || playedCardId != c.Id));
 
             return GenericResponse<PlayerHand>.Ok(new PlayerHand 
             {

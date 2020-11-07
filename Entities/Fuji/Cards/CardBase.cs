@@ -9,8 +9,8 @@ namespace Entities.Fuji
     {
         public Guid Id { get; set; }
         public DateTime CreatedUtc { get; set; }
-        public Guid SessionId { get; set; }
-        public Session Session { get; set; }
+        public Guid GameId { get; set; }
+        public Game Game { get; set; }
         public int FaceValue { get; set; }
     }
 }

@@ -6,6 +6,7 @@ import { SessionLandingResponse } from '../../models/session'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { NavbarService } from '../../services/navbar';
 import { FujiLocalStorage } from '../../services/fujiflush/localstorage';
+import { GlobalSessionService } from '../../services/session';
 
 @Component({
   selector: 'app-fuji-landing-component',
@@ -14,7 +15,6 @@ import { FujiLocalStorage } from '../../services/fujiflush/localstorage';
 
 export class FujiLandingComponent {
 
-  _sessionService: FujiSessionService;
   _fujiLocalStorage: FujiLocalStorage;
   _router: Router;
   _navbarService: NavbarService;
@@ -23,9 +23,8 @@ export class FujiLandingComponent {
   DisableButtons: boolean;
   CanRejoin: boolean = false;
 
-  constructor(sessionService: FujiSessionService, fujiLocalStorage: FujiLocalStorage, navbarService: NavbarService, router: Router) {
-    this._sessionService = sessionService;
-    this._navbarService = navbarService;
+  constructor(private sessionService: GlobalSessionService, fujiLocalStorage: FujiLocalStorage, navbarService: NavbarService, router: Router) {
+      this._navbarService = navbarService;
     this._fujiLocalStorage = fujiLocalStorage;
     this._router = router;
 
@@ -34,23 +33,6 @@ export class FujiLandingComponent {
     if (this._fujiLocalStorage.GetPlayerDetails()) {
       this.CanRejoin = true;
     }
-  }
-
-
-  public StartNewGame(password: string) {
-    this.clearMessage();
-
-    if (!password) {
-      this.ErrorMessage = "No game identifier given for new game";
-      return;
-    }
-
-    this.DisableButtons = true;    
-    this._sessionService.CreateGame({ password: password })
-      .then(data => this.handleResponse(data))
-      .catch(data => this.genericError())
-      .finally(() => this.DisableButtons = false);
-
   }
 
   public JoinGame(password: string) {
@@ -62,7 +44,7 @@ export class FujiLandingComponent {
     }
 
     this.DisableButtons = true;
-    this._sessionService.JoinGame({ password: password })
+    this.sessionService.enterGame({ password: password })
       .then(data => this.handleResponse(data))
       .catch(data => this.genericError())
       .finally(() => this.DisableButtons = false);
@@ -78,7 +60,7 @@ export class FujiLandingComponent {
 
       this._navbarService.setReadOnly(true);
 
-      this._router.navigate(['/fujiflush/disclaimer', { SessionId: data.data.sessionId, PlayerId: data.data.playerId }]);
+      this._router.navigate(['/fujiflush/sessionlobby', { SessionId: data.data.sessionId, PlayerId: data.data.playerId }]);
     }
     else {
       //Stay on page and display error

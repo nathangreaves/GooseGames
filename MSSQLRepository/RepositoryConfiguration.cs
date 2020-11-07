@@ -44,15 +44,14 @@ namespace MSSQLRepository
             services.AddScoped<RepositoryInterface.Global.ISessionRepository, Global.SessionRepository>();
             services.AddScoped<RepositoryInterface.Global.IPlayerRepository, Global.PlayerRepository>();
 
-            services.AddScoped<RepositoryInterface.JustOne.ISessionRepository, JustOne.SessionRepository>();
-            services.AddScoped<RepositoryInterface.JustOne.IPlayerRepository, JustOne.PlayerRepository>();
+            services.AddScoped<RepositoryInterface.JustOne.IGameRepository, JustOne.GameRepository>();
             services.AddScoped<RepositoryInterface.JustOne.IRoundRepository, JustOne.RoundRepository>();
             services.AddScoped<RepositoryInterface.JustOne.IResponseRepository, JustOne.ResponseRepository>();
             services.AddScoped<RepositoryInterface.JustOne.IPlayerStatusRepository, JustOne.PlayerStatusRepository>();
             services.AddScoped<RepositoryInterface.JustOne.IResponseVoteRepository, JustOne.ResponseVoteRepository>();
 
-            services.AddScoped<RepositoryInterface.Fuji.ISessionRepository, Fuji.SessionRepository>();
-            services.AddScoped<RepositoryInterface.Fuji.IPlayerRepository, Fuji.PlayerRepository>();
+            services.AddScoped<RepositoryInterface.Fuji.IGameRepository, Fuji.GameRepository>();
+            services.AddScoped<RepositoryInterface.Fuji.IPlayerInformationRepository, Fuji.PlayerInformationRepository>();
             services.AddScoped<RepositoryInterface.Fuji.IHandCardRepository, Fuji.HandCardRepository>();
             services.AddScoped<RepositoryInterface.Fuji.IDeckCardRepository, Fuji.DeckCardRepository>();
             services.AddScoped<RepositoryInterface.Fuji.IDiscardedCardRepository, Fuji.DiscardedCardRepository>();

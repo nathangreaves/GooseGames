@@ -8,6 +8,6 @@ namespace RepositoryInterface.Fuji
 {
     public interface IDeckCardRepository : ICommonRepository<DeckCard>
     {
-        Task<DeckCard> GetNextCardAsync(Guid sessionId);
+        Task<DeckCard> GetNextCardAsync(Guid gameId);
     }
 }

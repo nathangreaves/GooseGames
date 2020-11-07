@@ -7,7 +7,7 @@ export interface IGlobalLobbyHubParameters {
   playerId: string;
   handlePlayerAdded: (player: PlayerDetailsResponse) => void;
   handlePlayerDetailsUpdated: (player: PlayerDetailsResponse) => void;
-  handlePlayerRemoved: (playerId: PlayerDetailsResponse) => void;
+  handlePlayerRemoved: (playerId: string) => void;
   handleConnectionError: (error: string) => void;
   handleReconnected: () => void;
 }

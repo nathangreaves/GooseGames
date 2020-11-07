@@ -1,21 +1,24 @@
 ﻿using GooseGames.Logging;
-using GooseGames.Services.JustOne;
+using GooseGames.Services.Global;
 using Microsoft.AspNetCore.SignalR;
 using Models.Responses.PlayerDetails;
+using RepositoryInterface.JustOne;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace GooseGames.Hubs
 {
-    public class PlayerHub : Hub
+    public class JustOneHub : Hub
     {
-        private readonly PlayerDetailsService _playerDetailsService;
-        private readonly RequestLogger<PlayerHub> _logger;
+        private readonly IPlayerStatusRepository _playerStatusRepository;
+        private readonly SessionService _sessionService;
+        private readonly RequestLogger<JustOneHub> _logger;
 
-        public PlayerHub(PlayerDetailsService playerDetailsService, RequestLogger<PlayerHub> logger)
+        public JustOneHub(IPlayerStatusRepository playerStatusRepository, SessionService sessionService, RequestLogger<JustOneHub> logger)
         {
-            _playerDetailsService = playerDetailsService;
+            _playerStatusRepository = playerStatusRepository;
+            _sessionService = sessionService;
             _logger = logger;
         }
 
@@ -25,7 +28,19 @@ namespace GooseGames.Hubs
             var sessionId = Context.GetHttpContext().Request.Query["sessionId"].FirstOrDefault();
             var connectionId = Context.ConnectionId;
 
-            await _playerDetailsService.UpdateSignalRConnectionIdAsync(playerId, connectionId);
+            if (Guid.TryParse(playerId, out Guid playerIdGuid) && Guid.TryParse(sessionId, out Guid sessionIdGuid))
+            {
+                var gameId = await _sessionService.GetGameIdAsync(sessionIdGuid, Entities.Global.Enums.GameEnum.JustOne);
+                if (gameId.HasValue)
+                {
+                    var playerStatus = await _playerStatusRepository.SingleOrDefaultAsync(p => p.PlayerId == playerIdGuid && gameId == p.GameId);
+                    if (playerStatus != null)
+                    {
+                        playerStatus.ConnectionId = connectionId;
+                        await _playerStatusRepository.UpdateAsync(playerStatus);
+                    }
+                }
+            }
 
             await Groups.AddToGroupAsync(connectionId, sessionId);
 
@@ -42,12 +57,12 @@ namespace GooseGames.Hubs
         }
     }
 
-    public class PlayerHubContext
+    public class JustOneHubContext
     {
-        private readonly IHubContext<PlayerHub> _hub;
-        private readonly RequestLogger<PlayerHubContext> _logger;
+        private readonly IHubContext<JustOneHub> _hub;
+        private readonly RequestLogger<JustOneHubContext> _logger;
 
-        public PlayerHubContext(IHubContext<PlayerHub> hub, RequestLogger<PlayerHubContext> logger)
+        public JustOneHubContext(IHubContext<JustOneHub> hub, RequestLogger<JustOneHubContext> logger)
         {
             _hub = hub;
             _logger = logger;
@@ -79,8 +94,11 @@ namespace GooseGames.Hubs
             _logger.LogInformation($"Sending beginRoundPassivePlayer: to {sessionId}");
             await _hub.Clients.GroupExcept(sessionId.ToString(), activePlayerConnectionId).SendAsync("beginRoundPassivePlayer");
 
-            _logger.LogInformation($"Sending beginRoundActivePlayer: to {sessionId}");
-            await _hub.Clients.Client(activePlayerConnectionId).SendAsync("beginRoundActivePlayer");
+            if (activePlayerConnectionId != null)
+            {
+                _logger.LogInformation($"Sending beginRoundActivePlayer: to {sessionId}");
+                await _hub.Clients.Client(activePlayerConnectionId).SendAsync("beginRoundActivePlayer");
+            }
         }
 
         public async Task SendPlayerReadyForRoundAsync(Guid sessionId, Guid playerId)

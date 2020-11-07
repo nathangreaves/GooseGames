@@ -23,9 +23,9 @@ namespace MSSQLRepository.Fuji
         {
         }
 
-        public async Task<DeckCard> GetNextCardAsync(Guid sessionId)
+        public async Task<DeckCard> GetNextCardAsync(Guid gameId)
         {
-            return await Context.DeckCards.Where(c => c.SessionId == sessionId).OrderBy(c => c.Order).FirstOrDefaultAsync().ConfigureAwait(false);
+            return await Context.DeckCards.Where(c => c.GameId == gameId).OrderBy(c => c.Order).FirstOrDefaultAsync().ConfigureAwait(false);
         }
     }
 }

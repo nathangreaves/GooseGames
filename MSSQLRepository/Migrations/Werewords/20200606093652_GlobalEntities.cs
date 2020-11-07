@@ -70,6 +70,11 @@ namespace MSSQLRepository.Migrations.Werewords
                 schema: "Werewords",
                 table: "PlayerRoundInformation");
 
+            migrationBuilder.Sql("DELETE FROM Werewords.PlayerVotes", false);
+            migrationBuilder.Sql("DELETE FROM Werewords.PlayerResponses", false);
+            migrationBuilder.Sql("DELETE FROM Werewords.PlayerRoundInformation", false);
+            migrationBuilder.Sql("DELETE FROM Werewords.Rounds", false);
+
             migrationBuilder.AddColumn<string>(
                 name: "Description",
                 schema: "Werewords",

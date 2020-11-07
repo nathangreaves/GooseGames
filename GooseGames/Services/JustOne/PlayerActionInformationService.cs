@@ -1,6 +1,7 @@
 ﻿using Entities.JustOne.Enums;
 using GooseGames.Hubs;
 using GooseGames.Logging;
+using GooseGames.Services.Global;
 using Microsoft.AspNetCore.SignalR;
 using Models.Requests;
 using Models.Responses;
@@ -15,19 +16,19 @@ namespace GooseGames.Services.JustOne
     public class PlayerActionInformationService
     {
         private readonly RoundService _roundService;
-        private readonly IPlayerRepository _playerRepository;
+        private readonly PlayerService _playerService;
         private readonly IPlayerStatusRepository _playerStatusRepository;
         private readonly IResponseRepository _responseRepository;
         private readonly RequestLogger<PlayerActionInformationService> _logger;
 
         public PlayerActionInformationService(RoundService roundService, 
-            IPlayerRepository playerRepository, 
+            Global.PlayerService playerService,
             IPlayerStatusRepository playerStatusRepository,
             IResponseRepository responseRepository, 
             RequestLogger<PlayerActionInformationService> logger)
         {
             _roundService = roundService;
-            _playerRepository = playerRepository;
+            _playerService = playerService;
             _playerStatusRepository = playerStatusRepository;
             _responseRepository = responseRepository;
             _logger = logger;
@@ -48,7 +49,7 @@ namespace GooseGames.Services.JustOne
             }
 
             _logger.LogTrace("Getting players for session");
-            var playersExceptActivePlayer = await _playerRepository.FilterAsync(p => p.SessionId == request.SessionId && p.Id != currentRound.ActivePlayerId);
+            var playersExceptActivePlayer = (await _playerService.GetForSessionAsync(request.SessionId)).Where(p => p.Id != currentRound.ActivePlayerId.Value);
             var playerIds = playersExceptActivePlayer.Select(player => player.Id).ToList();
 
             _logger.LogTrace("Getting responses");
@@ -92,14 +93,16 @@ namespace GooseGames.Services.JustOne
             }
 
             _logger.LogTrace("Getting players for session");
-            var playersToSelect = await _playerRepository.FilterAsync(p => p.SessionId == request.SessionId && (!excludeActivePlayer || p.Id != currentRound.ActivePlayerId));
-            var playerIds = playersToSelect.Select(player => player.Id).ToList();
+            //var playersToSelect = await _playerRepository.FilterAsync(p => p.SessionId == request.SessionId && (!excludeActivePlayer || p.Id != currentRound.ActivePlayerId));
+            //var playerIds = playersToSelect.Select(player => player.Id).ToList();
 
             _logger.LogTrace("Getting player status");
-            var playersThatHaveVoted = await _playerStatusRepository.FilterAsync(p => playerIds.Contains(p.PlayerId) && p.Status == playerStatus);
+            var playersThatHaveVoted = await _playerStatusRepository.FilterAsync(p => p.GameId == currentRound.GameId && (!excludeActivePlayer || p.PlayerId != currentRound.ActivePlayerId) && p.Status == playerStatus);
+
+            var players = (await _playerService.GetForSessionAsync(request.SessionId)).Where(p => !excludeActivePlayer || p.Id != currentRound.ActivePlayerId);
 
             _logger.LogTrace("Preparing result");
-            var result = playersToSelect.Select(p => new PlayerActionResponse
+            var result = players.Select(p => new PlayerActionResponse
             {
                 Id = p.Id,
                 PlayerName = p.Name,
