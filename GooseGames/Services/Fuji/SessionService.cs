@@ -1,7 +1,8 @@
 ﻿using Entities.Fuji;
-using Entities.Fuji.Enums;
+using Entities.Global.Enums;
 using GooseGames.Hubs;
 using GooseGames.Logging;
+using GooseGames.Services.Global;
 using Models.Requests;
 using Models.Requests.Sessions;
 using Models.Responses;
@@ -20,8 +21,10 @@ namespace GooseGames.Services.Fuji
 {
     public class SessionService
     {
-        private readonly ISessionRepository _sessionRepository;
-        private readonly IPlayerRepository _playerRepository;
+        private readonly Global.SessionService _sessionService;
+        private readonly PlayerService _playerService;
+        private readonly IGameRepository _gameRepository;
+        private readonly IPlayerInformationRepository _playerRepository;
         private readonly DeckService _deckService;
         private readonly CardService _cardService;
         private readonly FujiHubContext _fujiHubContext;
@@ -30,14 +33,18 @@ namespace GooseGames.Services.Fuji
         private const int MinNumberOfPlayersPerSession = 2;
         private const int MaxNumberOfPlayersPerSession = 8;
 
-        public SessionService(ISessionRepository sessionRepository,
-            IPlayerRepository playerRepository,
+        public SessionService(Global.SessionService sessionService,
+            Global.PlayerService playerService,
+            IGameRepository gameRepository,
+            IPlayerInformationRepository playerRepository,
             DeckService deckService,
             CardService cardService,
             FujiHubContext fujiHubContext,
             RequestLogger<SessionService> logger)
         {
-            _sessionRepository = sessionRepository;
+            _sessionService = sessionService;
+            _playerService = playerService;
+            _gameRepository = gameRepository;
             _playerRepository = playerRepository;
             _deckService = deckService;
             _cardService = cardService;
@@ -45,192 +52,46 @@ namespace GooseGames.Services.Fuji
             _logger = logger;
         }
 
-        internal async Task<GenericResponse<NewSessionResponse>> CreateSessionAsync(NewSessionRequest request)
-        {
-            _logger.LogTrace($"Starting session creation");
-
-            var password = request.Password;
-
-            if (await SessionExistsForPasswordAsync(password))
-            {
-                _logger.LogTrace("Session already exists");
-                return NewResponse.Error<NewSessionResponse>($"Session already exists with identifier: {password}");
-            }
-            var dateTime = DateTime.UtcNow;
-
-            Player newPlayer = new Player
-            {
-                CreatedUtc = dateTime
-            };
-            var newSession = new Session
-            {
-                CreatedUtc = dateTime,
-                Password = password,
-                Players = new List<Player>
-                {
-                    newPlayer
-                }
-            };
-
-            _logger.LogTrace($"Ok to insert session");
-
-            using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-            {
-                _logger.LogTrace($"Inserting session");
-                await _sessionRepository.InsertAsync(newSession);
-                newSession.SessionMaster = newPlayer;
-                _logger.LogTrace($"Setting session master");
-                await _sessionRepository.UpdateAsync(newSession);
-
-                transaction.Complete();
-            }
-
-            _logger.LogTrace($"Session inserted");
-            return GenericResponse<NewSessionResponse>.Ok(new NewSessionResponse
-            {
-                SessionId = newSession.Id,
-                PlayerId = newPlayer.Id
-            });
-        }
-
-        internal async Task<GenericResponse<JoinSessionResponse>> JoinSessionAsync(JoinSessionRequest request)
-        {
-            _logger.LogTrace($"Starting session join");
-            var password = request.Password;
-
-            var session = await GetSessionFromPasswordAsync(password);
-
-            if (session == null)
-            {
-                _logger.LogWarning("Session doesn't exist");
-                return GenericResponse<JoinSessionResponse>.Error($"Session doesn't exist with identifier: {password}");
-            }
-            if (session.StatusId != SessionStatusEnum.New)
-            {
-                _logger.LogWarning("Player tried to join an in progress session");
-                return GenericResponse<JoinSessionResponse>.Error("Session is already in progress");
-            }
-
-            _logger.LogTrace($"Getting count of players");
-            var countOfPlayers = await _playerRepository.CountAsync(p => p.SessionId == session.Id);
-            if (countOfPlayers >= MaxNumberOfPlayersPerSession)
-            {
-                _logger.LogDebug($"Already {countOfPlayers} on session");
-                return GenericResponse<JoinSessionResponse>.Error($"Session is full");
-            }
-
-            _logger.LogTrace($"Ok to insert player");
-
-            Player newPlayer = new Player();
-            newPlayer.Session = session;
-
-            await _playerRepository.InsertAsync(newPlayer);
-
-            _logger.LogTrace($"Player inserted");
-
-            _logger.LogTrace("Sending update to clients");
-            await _fujiHubContext.SendPlayerAdded(newPlayer.SessionId, new PlayerDetailsResponse
-            {
-                Id = newPlayer.Id
-            });
-
-            return NewResponse.Ok(new JoinSessionResponse
-            {
-                SessionId = session.Id,
-                PlayerId = newPlayer.Id
-            });
-        }
-
-        internal async Task<IEnumerable<JoinSessionResponse>> CreateTestSessionAsync()
-        {
-            var password = Guid.NewGuid().ToString();
-            var sessionResponse = await CreateSessionAsync(new NewSessionRequest { Password = password });
-            var masterPlayerId = sessionResponse.Data.PlayerId;
-            var sessionId = sessionResponse.Data.SessionId;
-
-            var masterPlayer = await _playerRepository.GetAsync(masterPlayerId);
-            masterPlayer.Name = "Player 1";
-            masterPlayer.PlayerNumber = 1;
-            await _playerRepository.UpdateAsync(masterPlayer);
-
-            var player2 = new Player 
-            {
-                SessionId = sessionId,
-                Name = "Player 2",
-                PlayerNumber = 2
-            };
-
-            var player3 = new Player
-            {
-                SessionId = sessionId,
-                Name = "Player 3",
-                PlayerNumber = 3
-            };
-
-            await _playerRepository.InsertAsync(player2);
-            await _playerRepository.InsertAsync(player3);
-
-            var session = await _sessionRepository.GetAsync(sessionId);
-            session.StatusId = SessionStatusEnum.InProgress;
-            session.ActivePlayerId = masterPlayerId;
-
-            await _sessionRepository.UpdateAsync(session);
-
-            await _deckService.PrepareDeckAsync(sessionId, testSession: true);
-
-            return new[] 
-            { 
-                new JoinSessionResponse { PlayerId = masterPlayer.Id, SessionId = sessionId } ,
-
-                new JoinSessionResponse { PlayerId = player2.Id, SessionId = sessionId },
-
-                new JoinSessionResponse { PlayerId = player3.Id, SessionId = sessionId }
-            };
-        }
-
         internal async Task<GenericResponseBase> StartSessionAsync(PlayerSessionRequest request)
         {
             _logger.LogTrace("Starting session", request);
-
-            if (!await ValidateSessionStatusAsync(request.SessionId, SessionStatusEnum.New))
+            var validationResponse = await _sessionService.ValidateSessionToStartAsync(request, MinNumberOfPlayersPerSession, MaxNumberOfPlayersPerSession);
+            if (!validationResponse.Success)
             {
-                _logger.LogWarning("Session did not exist to start");
-                return GenericResponse<bool>.Error("Session does not exist");
-            }
-            if (!await ValidateSessionMasterAsync(request.SessionId, request.PlayerId))
-            {
-                _logger.LogWarning("Request to start session from player other than the session master");
-                return GenericResponse<bool>.Error("You do not have the authority to start the session");
-            }
-            if (!await ValidateMinimumNumberOfPlayersAsync(request.SessionId))
-            {
-                _logger.LogWarning("Request to start session with not enough players");
-                return GenericResponse<bool>.Error("There are not yet enough players to start");
+                return validationResponse;
             }
             _logger.LogTrace("Session cleared to start");
 
-            _logger.LogTrace("Fetching session");
-            var session = await _sessionRepository.GetAsync(request.SessionId);
-            session.StatusId = SessionStatusEnum.InProgress;
-            var players = await _playerRepository.FilterAsync(p => p.SessionId == request.SessionId && p.PlayerNumber > 0);
+            await _sessionService.StartSessionAsync(request.SessionId);
 
+            var globalPlayers = await _playerService.GetForSessionAsync(request.SessionId);
             var random = new Random();
-            session.ActivePlayerId = players.Skip(random.Next(0, players.Count - 1)).Take(1).First().Id;
+            var activePlayerId = globalPlayers.Skip(random.Next(0, globalPlayers.Count - 1)).Take(1).First().Id;
 
-            _logger.LogTrace("Marking session in progress");
-            await _sessionRepository.UpdateAsync(session);
+            _logger.LogTrace("Inserting game");
+            var game = new Game
+            {
+                Id = Guid.NewGuid(),
+                SessionId = request.SessionId,
+                ActivePlayerId = activePlayerId
+            };
+            await _gameRepository.InsertAsync(game);
 
-            _logger.LogTrace("Removing unready players");
-            await _playerRepository.DeleteUnreadyPlayersAsync(request.SessionId);
+            _logger.LogTrace("Inserting game player information");
+            var playerInformation = globalPlayers.Select(x => new PlayerInformation
+            {
+                GameId = game.Id,
+                PlayerId = x.Id
+            });
+            await _playerRepository.InsertRangeAsync(playerInformation);
+
+            _logger.LogTrace("Updating global session to game");
+            await _sessionService.SetGameSessionIdentifierAsync(request.SessionId, GameEnum.FujiFlush, game.Id);
 
             _logger.LogTrace("Sending update to clients");
             await _fujiHubContext.SendStartingSessionAsync(request.SessionId);
 
-            await Task.Delay(TimeSpan.FromSeconds(2));
-
-            await CleanUpExpiredSessions(request.SessionId);
-
-            await _deckService.PrepareDeckAsync(request.SessionId);
+            await _deckService.PrepareDeckAsync(game.Id);
 
             await _fujiHubContext.SendBeginSessionAsync(request.SessionId);
 
@@ -239,21 +100,30 @@ namespace GooseGames.Services.Fuji
 
         internal async Task<GenericResponse<SessionResponse>> GetAsync(PlayerSessionRequest request)
         {
-            var session = await _sessionRepository.GetAsync(request.SessionId);
+            var gameId = await _sessionService.GetGameIdAsync(request.SessionId, GameEnum.FujiFlush);
+            if (gameId == null)
+            {
+                return GenericResponse<SessionResponse>.Error("Unable to find session");
+            }
 
-            var players = await _playerRepository.GetForSessionIncludePlayedCardsAsync(session.Id);
+            var game = await _gameRepository.GetAsync(gameId.Value);
 
-            var cards = await _deckService.GetHandCardsForSessionAsync(request.SessionId);
+            var players = await _playerRepository.GetForGameIncludePlayedCardsAsync(game.Id);
+
+            var cards = await _deckService.GetHandCardsForGameAsync(game.Id);
 
             var cardCombinedValues = _cardService.GetCardCombinedValues(players);
 
+            var playerNamesDictionary = await _playerService.GetPlayerNamesAsync(players.Select(p => p.PlayerId));
+            var playerNumbersDictionary = await _playerService.GetPlayerNumbersAsync(players.Select(p => p.PlayerId));
+
             return GenericResponse<SessionResponse>.Ok(new SessionResponse 
             { 
-                Players = players.OrderBy(p => p.PlayerNumber).Select(p => new Models.Responses.Fuji.Players.Player 
+                Players = players.OrderBy(p => playerNumbersDictionary[p.PlayerId]).Select(p => new Models.Responses.Fuji.Players.Player 
                 {
-                    Id = p.Id,
-                    Name = p.Name,
-                    PlayerNumber = p.PlayerNumber,
+                    Id = p.PlayerId,
+                    Name = playerNamesDictionary[p.PlayerId],
+                    PlayerNumber = playerNumbersDictionary[p.PlayerId],
                     PlayedCard = p.PlayedCard != null ? new Models.Responses.Fuji.Cards.PlayedCard 
                     {
                         FaceValue = p.PlayedCard.FaceValue,
@@ -261,59 +131,52 @@ namespace GooseGames.Services.Fuji
                     } : null,
                     Hand = new ConcealedHand 
                     {
-                        NumberOfCards = cards.Where(c => c.PlayerId == p.Id && (p.PlayedCardId == null || p.PlayedCardId != c.Id)).Count()
+                        NumberOfCards = cards.Where(c => c.PlayerId == p.PlayerId && (p.PlayedCardId == null || p.PlayedCardId != c.Id)).Count()
                     },
-                    IsActivePlayer = session.ActivePlayerId == p.Id
+                    IsActivePlayer = game.ActivePlayerId == p.PlayerId
                 })
             });
         }
 
-        internal async Task<Session> GetSessionAsync(Guid sessionId)
-        {
-            _logger.LogTrace("Fetching Session");
+        //internal async Task<Session> GetSessionAsync(Guid sessionId)
+        //{
+        //    _logger.LogTrace("Fetching Session");
 
-            return await _sessionRepository.GetAsync(sessionId);
-        }
+        //    return await _sessionRepository.GetAsync(sessionId);
+        //}
 
-        private async Task<bool> SessionExistsForPasswordAsync(string password)
-        {
-            _logger.LogTrace($"Checking existance of session with password {password}");
-            var found = await GetSessionFromPasswordAsync(password);
+        //private async Task<bool> SessionExistsForPasswordAsync(string password)
+        //{
+        //    _logger.LogTrace($"Checking existance of session with password {password}");
+        //    var found = await GetSessionFromPasswordAsync(password);
 
-            return found != null;
-        }
+        //    return found != null;
+        //}
 
-        private async Task<Session> GetSessionFromPasswordAsync(string password)
-        {
-            _logger.LogTrace($"Fetching session with password {password}");
+        //private async Task<Session> GetSessionFromPasswordAsync(string password)
+        //{
+        //    _logger.LogTrace($"Fetching session with password {password}");
 
-            return await _sessionRepository.SingleOrDefaultAsync(session =>
-                (session.StatusId == SessionStatusEnum.New
-                || session.StatusId == SessionStatusEnum.InProgress)
-                && session.Password.ToLower() == password.ToLower());
-        }
+        //    return await _sessionRepository.SingleOrDefaultAsync(session =>
+        //        (session.StatusId == SessionStatusEnum.New
+        //        || session.StatusId == SessionStatusEnum.InProgress)
+        //        && session.Password.ToLower() == password.ToLower());
+        //}
+        //public async Task<bool> ValidateSessionStatusAsync(Guid sessionId, SessionStatusEnum status)
+        //{
+        //    _logger.LogTrace("Validating session exists and has status: ", status);
 
-        private async Task<bool> ValidateMinimumNumberOfPlayersAsync(Guid sessionId)
-        {
-            var readyPlayers = await _playerRepository.CountAsync(p => p.SessionId == sessionId && p.Name != null && p.PlayerNumber > 0);
+        //    return await _sessionService.ValidateSessionStatusAsync(sessionId, status);
+        //}
+        //internal async Task<bool> ValidateSessionMasterAsync(Guid sessionId, Guid sessionMasterId)
+        //{
+        //    _logger.LogTrace("Validating session master: ", sessionMasterId);
 
-            return readyPlayers >= MinNumberOfPlayersPerSession;
-        }
-        public async Task<bool> ValidateSessionStatusAsync(Guid sessionId, SessionStatusEnum status)
-        {
-            _logger.LogTrace("Validating session exists and has status: ", status);
-
-            return await _sessionRepository.SingleResultMatchesAsync(sessionId, s => s.StatusId == status);
-        }
-        internal async Task<bool> ValidateSessionMasterAsync(Guid sessionId, Guid sessionMasterId)
-        {
-            _logger.LogTrace("Validating session master: ", sessionMasterId);
-
-            return await _sessionRepository.SingleResultMatchesAsync(sessionId, s => s.SessionMasterId == sessionMasterId);
-        }
-        private async Task CleanUpExpiredSessions(Guid sessionId)
-        {
-            await _sessionRepository.AbandonSessionsOlderThanAsync(sessionId, DateTime.UtcNow.AddDays(-1));
-        }
+        //    return await _sessionService.ValidateSessionMasterAsync(sessionId, sessionMasterId);
+        //}
+        //private async Task CleanUpExpiredSessions(Guid sessionId)
+        //{
+        //    await _sessionRepository.AbandonSessionsOlderThanAsync(sessionId, DateTime.UtcNow.AddDays(-1));
+        //}
     }
 }

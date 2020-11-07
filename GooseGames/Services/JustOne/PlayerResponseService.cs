@@ -2,6 +2,7 @@
 using Entities.JustOne.Enums;
 using GooseGames.Hubs;
 using GooseGames.Logging;
+using GooseGames.Services.Global;
 using Models.Requests;
 using Models.Requests.JustOne.Response;
 using Models.Responses;
@@ -17,22 +18,25 @@ namespace GooseGames.Services.JustOne
     public class PlayerResponseService
     {
         private readonly RoundService _roundService;
-        private readonly IPlayerRepository _playerRepository;
+        private readonly Global.SessionService _sessionService;
+        private readonly PlayerService _playerService;
         private readonly IPlayerStatusRepository _playerStatusRepository;
         private readonly IResponseRepository _responseRepository;
         private readonly IResponseVoteRepository _responseVoteRepository;
-        private readonly PlayerHubContext _playerHub;
+        private readonly JustOneHubContext _playerHub;
         private readonly RequestLogger<PlayerResponseService> _logger;
 
         public PlayerResponseService(RoundService roundService,
-            IPlayerRepository playerRepository,
+            Global.SessionService sessionService,
+            Global.PlayerService playerService,
             IPlayerStatusRepository playerStatusRepository,
             IResponseRepository responseRepository,
             IResponseVoteRepository responseVoteRepository,
-            PlayerHubContext playerHub, RequestLogger<PlayerResponseService> logger)
+            JustOneHubContext playerHub, RequestLogger<PlayerResponseService> logger)
         {
             _roundService = roundService;
-            _playerRepository = playerRepository;
+            _sessionService = sessionService;
+            _playerService = playerService;
             _playerStatusRepository = playerStatusRepository;
             _responseRepository = responseRepository;
             _responseVoteRepository = responseVoteRepository;
@@ -51,32 +55,36 @@ namespace GooseGames.Services.JustOne
             var responsesDictionary = (await _responseRepository.FilterAsync(r => r.RoundId == round.Id)).ToDictionary(r => r.PlayerId, r => r);
 
             _logger.LogTrace("Getting players");
-            var players = await _playerRepository
-                .FilterAsync(player => player.SessionId == request.SessionId);
+            var playerStatuses = await _playerStatusRepository
+                .FilterAsync(player => player.GameId == round.GameId);
 
             _logger.LogTrace("Getting players except active player");
-            var playersExceptActivePlayer = players.Where(p => p.Id != round.ActivePlayerId);
-
-            _logger.LogTrace("Getting active player details");
-            var activePlayer = players.Single(p => p.Id == round.ActivePlayerId.Value);
+            var playersExceptActivePlayer = playerStatuses.Where(p => p.PlayerId != round.ActivePlayerId);
 
             var isActivePlayer = request.PlayerId == round.ActivePlayerId;
             _logger.LogTrace($"Requesting player is active player = {isActivePlayer}");
 
-            var responses = playersExceptActivePlayer.OrderBy(x => x.PlayerNumber).Select(p =>
+            var globalPlayers = await _playerService.GetPlayersAsync(playerStatuses.Select(p => p.PlayerId));
+
+            var responses = playersExceptActivePlayer.OrderBy(x => globalPlayers[x.PlayerId].PlayerNumber).Select(p =>
             {
-                var response = responsesDictionary[p.Id];
+                var player = globalPlayers[p.PlayerId];
+
+                var response = responsesDictionary[p.PlayerId];
                 var responseInvalid = response.Status == ResponseStatusEnum.AutoInvalid || response.Status == ResponseStatusEnum.ManualInvalid;
                 return new PlayerResponse
                 {
                     ResponseId = response.Id,
-                    PlayerId = p.Id,
-                    PlayerName = p.Name,
-                    PlayerNumber = p.PlayerNumber,
+                    PlayerId = p.PlayerId,
+                    PlayerName = player.Name,
+                    PlayerNumber = player.PlayerNumber,
                     Response = isActivePlayer && responseInvalid && round.Status == RoundStatusEnum.WaitingForLeaderResponse ? null : response.Word,
                     ResponseInvalid = responseInvalid
                 };
             }).ToList();
+
+            _logger.LogTrace("Getting active player details");
+            var activePlayer = globalPlayers[round.ActivePlayerId.Value];
 
             _logger.LogTrace($"Returning responses", responses);
             return GenericResponse<PlayerResponses>.Ok(new PlayerResponses
@@ -99,7 +107,7 @@ namespace GooseGames.Services.JustOne
             var activePlayerResponse = await _responseRepository.SingleOrDefaultAsync(r => r.RoundId == round.Id && r.PlayerId == round.ActivePlayerId.Value);
 
             _logger.LogTrace("Getting active player details");
-            var activePlayer = await _playerRepository
+            var activePlayer = await _playerService
                 .GetAsync(round.ActivePlayerId.Value);
 
             return GenericResponse<PlayerResponses>.Ok(new PlayerResponses
@@ -143,7 +151,7 @@ namespace GooseGames.Services.JustOne
             await _responseRepository.InsertAsync(response);
 
             _logger.LogTrace($"Updating status of player");
-            await _playerStatusRepository.UpdateStatusAsync(request.PlayerId, PlayerStatusEnum.PassivePlayerWaitingForClues);
+            await _playerStatusRepository.UpdateStatusAsync(request.PlayerId, round.GameId, PlayerStatusEnum.PassivePlayerWaitingForClues);
 
             _logger.LogTrace($"Sending notification of clue submission");
             await _playerHub.SendClueSubmittedAsync(request.SessionId, request.PlayerId);
@@ -183,7 +191,7 @@ namespace GooseGames.Services.JustOne
             }
 
             _logger.LogTrace($"Updating status of player");
-            await _playerStatusRepository.UpdateStatusAsync(request.PlayerId, PlayerStatusEnum.PassivePlayerWaitingForClueVotes);
+            await _playerStatusRepository.UpdateStatusAsync(request.PlayerId, round.GameId, PlayerStatusEnum.PassivePlayerWaitingForClueVotes);
 
             _logger.LogTrace($"Sending notification of clue submission");
             await _playerHub.SendClueVoteSubmittedAsync(request.SessionId, request.PlayerId);
@@ -248,7 +256,7 @@ namespace GooseGames.Services.JustOne
             }
 
             _logger.LogTrace($"Updating status of player");
-            await _playerStatusRepository.UpdateStatusAsync(request.PlayerId, PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes);
+            await _playerStatusRepository.UpdateStatusAsync(request.PlayerId, round.GameId, PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes);
 
             _logger.LogTrace($"Sending notification of clue submission");
             await _playerHub.SendResponseVoteSubmittedAsync(request.SessionId, request.PlayerId);

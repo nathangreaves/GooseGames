@@ -22,6 +22,7 @@ import * as signalR from "@microsoft/signalr";
 import { FujiCardService } from "../../services/fujiflush/card";
 import { FujiUpdate } from "../../models/fujiflush/fujiupdate";
 import { NavbarService } from "../../services/navbar";
+import { GlobalSessionService } from "../../services/session";
 
 @Component({
   selector: 'app-fujiflush-session-component',
@@ -126,7 +127,12 @@ export class FujiSessionComponent implements IPlayerSession {
 
   CardNumberCss = CardNumberCss;
 
-  constructor(sessionService: FujiSessionService, handService: FujiHandService, cardService: FujiCardService, navbarService: NavbarService, activatedRoute: ActivatedRoute) {
+  constructor(sessionService: FujiSessionService,
+    private globalSessionService: GlobalSessionService,
+    handService: FujiHandService, cardService: FujiCardService, navbarService: NavbarService,
+    activatedRoute: ActivatedRoute,
+    private router: Router
+  ) {
 
     this._sessionService = sessionService;
     this._handService = handService;
@@ -172,6 +178,19 @@ export class FujiSessionComponent implements IPlayerSession {
     hand.numberOfCards -= 1;
 
     this._cardService.PlayCard(this, card.id);
+  }
+
+  PlayAgain = () => {
+    this.globalSessionService.again(this)
+      .then(data => {
+        if (data.success) {
+          this.router.navigate(['/fujiflush/sessionlobby', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+        }
+        else {
+          this.ErrorMessage = data.errorCode;
+        }
+      })
+      .catch((err) => this.handleGenericError(err));
   }
 
   loadSession(): Promise<GenericResponseBase> {

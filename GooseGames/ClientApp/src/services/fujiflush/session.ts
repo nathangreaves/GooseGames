@@ -18,15 +18,6 @@ export class FujiSessionService {
     this._http = http;
   }
 
-  public CreateGame(request: SessionLandingRequest): Promise<GenericResponse<SessionLandingResponse>>
-  {
-    return this._http.post<GenericResponse<SessionLandingResponse>>(this._baseUrl + 'FujiSession', request).toPromise();
-  }
-
-  public JoinGame(request: SessionLandingRequest): Promise<GenericResponse<SessionLandingResponse>> {
-    return this._http.patch<GenericResponse<SessionLandingResponse>>(this._baseUrl + 'FujiSession', request).toPromise();
-  }
-
   public StartSession(request: IPlayerSession): Promise<GenericResponse<boolean>> {
 
     var request = <IPlayerSession>{
@@ -40,9 +31,5 @@ export class FujiSessionService {
     request = ConvertToPlayerSessionRequest(request);
     var parameters = Object.keys(request).map(key => key + '=' + request[key]).join('&');
     return this._http.get<GenericResponse<FujiSession>>(this._baseUrl + `FujiSession?${parameters}`).toPromise();
-  }
-
-  public CreateTestSession(): Promise<GenericResponse<SessionLandingResponse[]>> {
-    return this._http.post<GenericResponse<SessionLandingResponse[]>>(this._baseUrl + 'FujiSession/createtestsession', {}).toPromise();
   }
 }

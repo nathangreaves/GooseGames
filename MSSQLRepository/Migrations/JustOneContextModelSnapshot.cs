@@ -20,7 +20,35 @@ namespace MSSQLRepository.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Entities.JustOne.Player", b =>
+            modelBuilder.Entity("Entities.JustOne.Game", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CurrentRoundId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("LastUpdatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurrentRoundId");
+
+                    b.ToTable("Games");
+                });
+
+            modelBuilder.Entity("Entities.JustOne.PlayerStatus", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -32,33 +60,11 @@ namespace MSSQLRepository.Migrations
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PlayerNumber")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("SessionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SessionId");
-
-                    b.ToTable("Players");
-                });
-
-            modelBuilder.Entity("Entities.JustOne.PlayerStatus", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedUtc")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PlayerId")
                         .HasColumnType("uniqueidentifier");
@@ -67,9 +73,6 @@ namespace MSSQLRepository.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PlayerId")
-                        .IsUnique();
 
                     b.ToTable("PlayerStatuses");
                 });
@@ -97,8 +100,6 @@ namespace MSSQLRepository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PlayerId");
-
                     b.HasIndex("RoundId");
 
                     b.ToTable("Responses");
@@ -121,8 +122,6 @@ namespace MSSQLRepository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PlayerId");
-
                     b.HasIndex("ResponseId");
 
                     b.ToTable("ResponseVotes");
@@ -140,6 +139,9 @@ namespace MSSQLRepository.Migrations
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Outcome")
                         .HasColumnType("int");
 
@@ -154,72 +156,20 @@ namespace MSSQLRepository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ActivePlayerId");
-
-                    b.HasIndex("SessionId");
+                    b.HasIndex("GameId");
 
                     b.ToTable("Rounds");
                 });
 
-            modelBuilder.Entity("Entities.JustOne.Session", b =>
+            modelBuilder.Entity("Entities.JustOne.Game", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CurrentRoundId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Score")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("SessionMasterId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("StatusId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CurrentRoundId");
-
-                    b.HasIndex("SessionMasterId");
-
-                    b.ToTable("Sessions");
-                });
-
-            modelBuilder.Entity("Entities.JustOne.Player", b =>
-                {
-                    b.HasOne("Entities.JustOne.Session", "Session")
-                        .WithMany("Players")
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Entities.JustOne.PlayerStatus", b =>
-                {
-                    b.HasOne("Entities.JustOne.Player", "Player")
-                        .WithOne("PlayerStatus")
-                        .HasForeignKey("Entities.JustOne.PlayerStatus", "PlayerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Entities.JustOne.Round", "CurrentRound")
+                        .WithMany()
+                        .HasForeignKey("CurrentRoundId");
                 });
 
             modelBuilder.Entity("Entities.JustOne.Response", b =>
                 {
-                    b.HasOne("Entities.JustOne.Player", "Player")
-                        .WithMany("Responses")
-                        .HasForeignKey("PlayerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Entities.JustOne.Round", "Round")
                         .WithMany("Responses")
                         .HasForeignKey("RoundId")
@@ -229,12 +179,6 @@ namespace MSSQLRepository.Migrations
 
             modelBuilder.Entity("Entities.JustOne.ResponseVote", b =>
                 {
-                    b.HasOne("Entities.JustOne.Player", "Player")
-                        .WithMany()
-                        .HasForeignKey("PlayerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Entities.JustOne.Response", "Response")
                         .WithMany("ResponseVotes")
                         .HasForeignKey("ResponseId")
@@ -244,26 +188,11 @@ namespace MSSQLRepository.Migrations
 
             modelBuilder.Entity("Entities.JustOne.Round", b =>
                 {
-                    b.HasOne("Entities.JustOne.Player", "ActivePlayer")
-                        .WithMany()
-                        .HasForeignKey("ActivePlayerId");
-
-                    b.HasOne("Entities.JustOne.Session", "Session")
+                    b.HasOne("Entities.JustOne.Game", "Game")
                         .WithMany("Rounds")
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Entities.JustOne.Session", b =>
-                {
-                    b.HasOne("Entities.JustOne.Round", "CurrentRound")
-                        .WithMany()
-                        .HasForeignKey("CurrentRoundId");
-
-                    b.HasOne("Entities.JustOne.Player", "SessionMaster")
-                        .WithMany()
-                        .HasForeignKey("SessionMasterId");
                 });
 #pragma warning restore 612, 618
         }

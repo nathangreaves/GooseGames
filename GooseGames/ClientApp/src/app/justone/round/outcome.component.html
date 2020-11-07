@@ -41,7 +41,7 @@
   <br />
 
   <div>
-    Your team now has <span style="font-weight:bold;">{{RoundOutcome.score}} </span><span *ngIf="RoundOutcome.score == 1">point</span><span *ngIf="RoundOutcome.score != 1">points</span>
+    <span *ngIf="!RoundOutcome.gameEnded">Your team now has </span><span style="font-weight:bold;">{{RoundOutcome.score}} </span><span *ngIf="RoundOutcome.score == 1">point</span><span *ngIf="RoundOutcome.score != 1">points</span>
   </div>
 
   <div *ngIf="!RoundOutcome.gameEnded">
@@ -50,6 +50,7 @@
 
   <div *ngIf="RoundOutcome.gameEnded">
     <span>Game Over!</span>
+    <div><button class="btn btn-primary" (click)="Again()">Play Again!</button></div>
   </div>
 
 </div>

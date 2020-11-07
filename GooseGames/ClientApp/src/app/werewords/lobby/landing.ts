@@ -5,19 +5,18 @@ import { SessionLandingResponse } from '../../../models/session'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { WerewordsComponentBase, WerewordsPlayerStatus } from '../../../models/werewords/content';
 import { WerewordsSessionService } from '../../../services/werewords/session';
-import { NavbarService } from '../../../services/navbar';
+import { GlobalSessionService } from '../../../services/session';
 
 @Component({
   selector: 'app-werewords-landing-component',
   templateUrl: './landing.html'
 })
-
 export class WerewordsLandingComponent extends WerewordsComponentBase {
 
   DisableButtons: boolean;
 
   SessionIdentifier: string;
-  constructor(private _sessionService: WerewordsSessionService, private _router: Router) {
+  constructor(private _sessionService: GlobalSessionService, private _router: Router) {
     super();
 
     this.Loading = false;
@@ -33,16 +32,15 @@ export class WerewordsLandingComponent extends WerewordsComponentBase {
 
     this.DisableButtons = true;
 
-    if (this.ReadSessionData) {
+    if (this.ReadSessionData(this.SessionIdentifier)) {
       this._router.navigate(['/werewords', this.SessionIdentifier]);
     }
     else {
-      this._sessionService.EnterGame({ password: password })
+      this._sessionService.enterGame({ password: password })
         .then(data => this.handleResponse(data))
         .catch(data => this.HandleGenericError(data))
         .finally(() => this.DisableButtons = false);
     }
-
   }
 
   private handleResponse(data: GenericResponse<SessionLandingResponse>) {

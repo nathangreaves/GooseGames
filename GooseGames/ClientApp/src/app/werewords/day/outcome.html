@@ -15,7 +15,7 @@
         <span *ngFor="let werewolf of Werewolves; let last = last; let i = index">
           <span *ngIf="werewolf.isMayor">Mayor </span>
           <span class="werewolf-name">{{werewolf.name}}</span>
-          <span *ngIf="!last"> and</span>
+          <span *ngIf="!last"> and </span>
         </span>
         <span *ngIf="RoundOutcome === VillagersVotedWrong">
           went undetected
@@ -30,7 +30,7 @@
       <p *ngIf="RoundOutcome === WerewolvesVotedWrong">
         <span *ngFor="let werewolf of Werewolves; let last = last; let i = index">
           <span class="werewolf-name">{{werewolf.name}}</span>
-          <span *ngIf="!last"> and</span>
+          <span *ngIf="!last"> and </span>
         </span>
         did not detect <span *ngIf="Seer.isMayor">Mayor </span><span>{{Seer.name}}</span> as the Seer
       </p>

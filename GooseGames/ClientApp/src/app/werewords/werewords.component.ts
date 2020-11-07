@@ -9,6 +9,8 @@ import { WerewordsLandingComponent } from './lobby/landing';
 import { WerewordsSessionService } from '../../services/werewords/session';
 import { WerewordsPlayerStatus, IWerewordsComponentBase, IWerewordsComponent } from '../../models/werewords/content';
 import { RegisteredContent } from './registered-content';
+import { GlobalSessionService } from '../../services/session';
+import { GooseGamesLocalStorage } from '../../services/localstorage';
 
 @Component({
   selector: 'app-werewords-component',
@@ -28,7 +30,7 @@ export class WerewordsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    if (this.SessionId && this.PlayerId) {
+    if (this.ReadSessionData(this.GameIdentifier)) {
       this.setupConnection()
         .then(() => {
           this.route(WerewordsPlayerStatus.InLobby);
@@ -39,7 +41,7 @@ export class WerewordsComponent implements OnInit, OnDestroy {
         this.setContent(new WerewordsContent(null, WerewordsLandingComponent), null);
       }
       else {
-        this._sessionService.EnterGame({ password: this.GameIdentifier })
+        this._sessionService.enterGame({ password: this.GameIdentifier })
           .then(response => {
             if (response.success) {
               this.SetSessionData(response.data.sessionId, response.data.playerId, this.GameIdentifier);
@@ -70,10 +72,11 @@ export class WerewordsComponent implements OnInit, OnDestroy {
 
   constructor(private componentFactoryResolver: ComponentFactoryResolver,
     private playerStatusService: WerewordsPlayerStatusService,
-    private _sessionService: WerewordsSessionService,
+    private _sessionService: GlobalSessionService,
     private navbarService: NavbarService,
     activatedRoute: ActivatedRoute,
-    private router: Router) {
+    private router: Router,
+    private globalStorage: GooseGamesLocalStorage) {
 
     this.GameIdentifier = activatedRoute.snapshot.params.id;
     if (this.GameIdentifier) {
@@ -89,10 +92,7 @@ export class WerewordsComponent implements OnInit, OnDestroy {
       this.router.navigate(['/werewords', this.GameIdentifier]);
     }
     else if (this.GameIdentifier) {
-
-      var gameIdentifier = this.GameIdentifier;
-
-      this.ReadSessionData(gameIdentifier);
+      this.ReadSessionData(this.GameIdentifier);
     }
   }
 
@@ -115,7 +115,7 @@ export class WerewordsComponent implements OnInit, OnDestroy {
             //Has been previously booted from session, attempt rejoin.
 
             if (this.GameIdentifier) {
-              this._sessionService.EnterGame({ password: this.GameIdentifier })
+              this._sessionService.enterGame({ password: this.GameIdentifier })
                 .then(response => {
                   if (response.success) {
                     this.SetSessionData(response.data.sessionId, response.data.playerId, this.GameIdentifier);
@@ -132,10 +132,10 @@ export class WerewordsComponent implements OnInit, OnDestroy {
             }
           }
           else if (response.errorCode == "a530d7fa-f842-492b-a0fc-6473af1c907a") {
-            this.SetSessionData(null, null, null);
+            //Player id doesn't exist so clear it from local storage
+            this.globalStorage.ClearPlayerDetails();
             this.router.navigate(['/werewords', this.GameIdentifier], { replaceUrl: true });
           }
-
       });
   }
 
@@ -148,46 +148,29 @@ export class WerewordsComponent implements OnInit, OnDestroy {
 
   SetSessionData = (sessionId: string, playerId: string, gameIdentifier: string) => {
 
-
     if (gameIdentifier) {
-      this.GameIdentifier = gameIdentifier.toLowerCase();
+      this.GameIdentifier = gameIdentifier.toLowerCase();      
     }
+    this.SessionId = sessionId;
+    this.PlayerId = playerId;
 
-    if (this.GameIdentifier && (!sessionId || !playerId)) {
-      localStorage.removeItem(`werewords_${this.GameIdentifier}_Session`);
-      localStorage.removeItem(`werewords_${this.GameIdentifier}_Player`);
-      localStorage.removeItem(`werewords_${this.GameIdentifier}_Timeout`);
-    }
-    else {
-      this.SessionId = sessionId.toLowerCase();
-      this.PlayerId = playerId.toLowerCase();
-
-      if (this.GameIdentifier) {
-        localStorage.setItem(`werewords_${this.GameIdentifier}_Session`, this.SessionId);
-        localStorage.setItem(`werewords_${this.GameIdentifier}_Player`, this.PlayerId);
-        const numberOfMillisecondsPerHour = 3600000;
-        var timeout = (new Date().getTime() + numberOfMillisecondsPerHour).toString();
-        localStorage.setItem(`werewords_${this.GameIdentifier}_Timeout`, timeout);
-      }
-    }
+    this.globalStorage.CachePlayerDetails({ PlayerId: playerId, SessionId: sessionId });
+    localStorage.setItem('goose-games-werewords-id', gameIdentifier);
   }
 
   ReadSessionData = (gameIdentifier: string): boolean => {
-    const numberOfMillisecondsPerHour = 3600000;
-    var timeout = (new Date().getTime() + numberOfMillisecondsPerHour).toString();
-    var expiry = localStorage.getItem(`werewords_${gameIdentifier}_Timeout`);
-    if (expiry && Number(expiry) > new Date().getTime()) {
-      this.SessionId = localStorage.getItem(`werewords_${gameIdentifier}_Session`);
-      this.PlayerId = localStorage.getItem(`werewords_${gameIdentifier}_Player`);
 
-      if (this.SessionId && this.PlayerId) {
-        const numberOfMillisecondsPerHour = 3600000;
-        var timeout = (new Date().getTime() + numberOfMillisecondsPerHour).toString();
-        localStorage.setItem(`werewords_${gameIdentifier}_Timeout`, timeout);
+    var playerDetails = this.globalStorage.GetPlayerDetails();
+    if (playerDetails && playerDetails.SessionId && playerDetails.PlayerId) {
+      this.SessionId = playerDetails.SessionId;
+      this.PlayerId = playerDetails.PlayerId;
 
+      var cachedGameId = localStorage.getItem('goose-games-werewords-id') as string;
+      if (cachedGameId && gameIdentifier && cachedGameId.toLowerCase() == gameIdentifier.toLowerCase()) {
         return true;
       }
     }
+
     return false;
   }
 

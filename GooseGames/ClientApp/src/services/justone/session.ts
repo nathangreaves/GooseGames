@@ -18,15 +18,6 @@ export class JustOneSessionService {
     this._http = http;
   }
 
-  public CreateGame(request: SessionLandingRequest): Promise<GenericResponse<SessionLandingResponse>>
-  {
-    return this._http.post<GenericResponse<SessionLandingResponse>>(this._baseUrl + 'JustOneSession', request).toPromise();
-  }
-
-  public JoinGame(request: SessionLandingRequest): Promise<GenericResponse<SessionLandingResponse>> {
-    return this._http.patch<GenericResponse<SessionLandingResponse>>(this._baseUrl + 'JustOneSession', request).toPromise();
-  }
-
   public StartSession(request: IPlayerSession, wordLists: JustOneWordList[]): Promise<GenericResponse<boolean>> {
 
     var newRequest = <any>(<IPlayerSession>{

@@ -32,15 +32,15 @@ namespace MSSQLRepository.Migrations.Fuji
                     b.Property<int>("FaceValue")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("SessionId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("SessionId");
+                    b.HasIndex("GameId");
 
                     b.ToTable("DeckCards");
                 });
@@ -57,12 +57,12 @@ namespace MSSQLRepository.Migrations.Fuji
                     b.Property<int>("FaceValue")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("SessionId")
+                    b.Property<Guid>("GameId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SessionId");
+                    b.HasIndex("GameId");
 
                     b.ToTable("DiscardedCards");
                 });
@@ -79,55 +79,25 @@ namespace MSSQLRepository.Migrations.Fuji
                     b.Property<int>("FaceValue")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("PlayerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("SessionId")
+                    b.Property<Guid?>("PlayerInformationId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PlayerId");
+                    b.HasIndex("GameId");
 
-                    b.HasIndex("SessionId");
+                    b.HasIndex("PlayerInformationId");
 
                     b.ToTable("HandCards");
                 });
 
-            modelBuilder.Entity("Entities.Fuji.Player", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ConnectionId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("PlayedCardId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("PlayerNumber")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("SessionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PlayedCardId");
-
-                    b.HasIndex("SessionId");
-
-                    b.ToTable("Players");
-                });
-
-            modelBuilder.Entity("Entities.Fuji.Session", b =>
+            modelBuilder.Entity("Entities.Fuji.Game", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -139,79 +109,89 @@ namespace MSSQLRepository.Migrations.Fuji
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("LastUpdatedUtc")
+                        .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("SessionMasterId")
+                    b.Property<Guid>("SessionId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("StatusId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ActivePlayerId");
+                    b.ToTable("Games");
+                });
 
-                    b.HasIndex("SessionMasterId");
+            modelBuilder.Entity("Entities.Fuji.PlayerInformation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                    b.ToTable("Sessions");
+                    b.Property<DateTime>("CreatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("LastUpdatedUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("PlayedCardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlayerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("PlayedCardId");
+
+                    b.ToTable("PlayerInformation");
                 });
 
             modelBuilder.Entity("Entities.Fuji.Cards.DeckCard", b =>
                 {
-                    b.HasOne("Entities.Fuji.Session", "Session")
+                    b.HasOne("Entities.Fuji.Game", "Game")
                         .WithMany("DeckCards")
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Entities.Fuji.Cards.DiscardedCard", b =>
                 {
-                    b.HasOne("Entities.Fuji.Session", "Session")
+                    b.HasOne("Entities.Fuji.Game", "Game")
                         .WithMany("DiscardedCards")
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Entities.Fuji.Cards.HandCard", b =>
                 {
-                    b.HasOne("Entities.Fuji.Player", "Player")
-                        .WithMany("Cards")
-                        .HasForeignKey("PlayerId")
+                    b.HasOne("Entities.Fuji.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Entities.Fuji.Session", "Session")
-                        .WithMany()
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Entities.Fuji.PlayerInformation", null)
+                        .WithMany("Cards")
+                        .HasForeignKey("PlayerInformationId");
                 });
 
-            modelBuilder.Entity("Entities.Fuji.Player", b =>
+            modelBuilder.Entity("Entities.Fuji.PlayerInformation", b =>
                 {
+                    b.HasOne("Entities.Fuji.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Entities.Fuji.Cards.HandCard", "PlayedCard")
                         .WithMany()
                         .HasForeignKey("PlayedCardId");
-
-                    b.HasOne("Entities.Fuji.Session", "Session")
-                        .WithMany("Players")
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Entities.Fuji.Session", b =>
-                {
-                    b.HasOne("Entities.Fuji.Player", "ActivePlayer")
-                        .WithMany()
-                        .HasForeignKey("ActivePlayerId");
-
-                    b.HasOne("Entities.Fuji.Player", "SessionMaster")
-                        .WithMany()
-                        .HasForeignKey("SessionMasterId");
                 });
 #pragma warning restore 612, 618
         }

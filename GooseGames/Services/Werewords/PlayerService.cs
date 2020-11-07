@@ -1,5 +1,6 @@
 ﻿using Entities.Werewords;
 using GooseGames.Logging;
+using GooseGames.Services.Global;
 using Models.Enums.Werewords;
 using Models.Requests;
 using Models.Responses;
@@ -14,62 +15,60 @@ namespace GooseGames.Services.Werewords
 {
     public class PlayerService
     {
-        private readonly IPlayerRepository _playerRepository;
-        private readonly IRoundRepository _roundRepository;
-        private readonly ISessionRepository _sessionRepository;
+        private readonly SessionService _sessionService;
+        private readonly Global.PlayerService _playerService;
         private readonly IPlayerRoundInformationRepository _playerRoundInformationRepository;
         private readonly RequestLogger<PlayerService> _logger;
 
-        public PlayerService(IPlayerRepository playerRepository,
-            IRoundRepository roundRepository,
-            ISessionRepository sessionRepository,
+        public PlayerService(
+            SessionService sessionService,
+            Global.PlayerService playerService,
             IPlayerRoundInformationRepository playerRoundInformationRepository,
             RequestLogger<PlayerService> logger)
         {
-            _playerRepository = playerRepository;
-            _roundRepository = roundRepository;
-            _sessionRepository = sessionRepository;
+            _sessionService = sessionService;
+            _playerService = playerService;
             _playerRoundInformationRepository = playerRoundInformationRepository;
             _logger = logger;
         }
 
         public async Task<GenericResponse<PlayerSecretRoleResponse>> GetSecretRoleAsync(PlayerSessionRequest request)
         {
-            var session = await _sessionRepository.GetAsync(request.SessionId);
+            var session = await _sessionService.GetAsync(request.SessionId);
 
             if (session == null)
             {
                 return GenericResponse<PlayerSecretRoleResponse>.Error("Session did not exist");
             }
 
-            if (session.CurrentRoundId == null)
+            if (session.GameSessionId == null)
             {
                 return GenericResponse<PlayerSecretRoleResponse>.Error("Session current round did not exist");
             }
-            var playerInformation = await _playerRoundInformationRepository.SingleOrDefaultAsync(i => i.PlayerId == request.PlayerId && i.RoundId == session.CurrentRoundId.Value);
+            var playerInformation = await _playerRoundInformationRepository.SingleOrDefaultAsync(i => i.PlayerId == request.PlayerId && i.RoundId == session.GameSessionId.Value);
 
             if (playerInformation == null)
             {
                 return GenericResponse<PlayerSecretRoleResponse>.Error("Could not find player information");
             }
 
-            Guid? mayorId = playerInformation.PlayerId;
+            Guid? mayorPlayerId = playerInformation.PlayerId;
             if (!playerInformation.IsMayor)
             {
-                mayorId = (await _playerRoundInformationRepository.SingleOrDefaultAsync(i => i.RoundId == session.CurrentRoundId.Value && i.IsMayor))?.PlayerId;
+                mayorPlayerId = (await _playerRoundInformationRepository.SingleOrDefaultAsync(i => i.RoundId == session.GameSessionId.Value && i.IsMayor))?.PlayerId;
             }
 
-            if (mayorId == null)
+            if (mayorPlayerId == null)
             {
                 return GenericResponse<PlayerSecretRoleResponse>.Error("Could not find the mayor!");
             }
 
-            var mayorName = await _playerRepository.GetPropertyAsync(mayorId.Value, m => m.Name);
+            var mayorName = await _playerService.GetPlayerNameAsync(mayorPlayerId.Value);
 
             return GenericResponse<PlayerSecretRoleResponse>.Ok(new PlayerSecretRoleResponse 
             {
                 MayorName = mayorName,
-                MayorPlayerId = mayorId.Value,
+                MayorPlayerId = mayorPlayerId.Value,
                 SecretRole = (SecretRole)(int)playerInformation.SecretRole
             });
         }

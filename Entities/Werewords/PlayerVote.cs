@@ -11,11 +11,9 @@ namespace Entities.Werewords
         public Guid Id { get; set; }
         public DateTime CreatedUtc { get; set; }
         public Guid PlayerId { get; set; }
-        public Player Player { get; set; }
         public Guid RoundId { get; set; }
         public Round Round { get; set; }
         public Guid VotedPlayerId { get; set; }
-        public Player VotedPlayer { get; set; }
         public PlayerVoteTypeEnum VoteType { get; set; }
     }
 }

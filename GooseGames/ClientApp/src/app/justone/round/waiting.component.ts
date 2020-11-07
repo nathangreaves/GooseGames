@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import * as _ from 'lodash';
-import { JustOnePlayerDetailsService } from '../../../services/justone/playerdetails'
 import { PlayerDetails, UpdatePlayerDetailsRequest } from '../../../models/player'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import * as signalR from "@microsoft/signalr";

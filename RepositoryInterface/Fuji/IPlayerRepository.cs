@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace RepositoryInterface.Fuji
 {
-    public interface IPlayerRepository : ICommonRepository<Player>
+    public interface IPlayerInformationRepository : ICommonRepository<PlayerInformation>
     {
-        Task DeleteUnreadyPlayersAsync(Guid sessionId);
-        Task<int> GetNextPlayerNumberAsync(Guid sessionId);
-        Task<List<Player>> GetForSessionIncludePlayedCardsAsync(Guid sessionId);
+        Task<List<PlayerInformation>> GetForGameIncludePlayedCardsAsync(Guid gameId);
+
+        Task<PlayerInformation> GetPlayerInformationFromPlayerIdAndGameId(Guid playerId, Guid gameId);
     }
 }

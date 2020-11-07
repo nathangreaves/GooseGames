@@ -17,6 +17,7 @@ import { WerewordsLandingComponent } from './lobby/landing';
 import { WerewordsNewPlayerDetailsComponent } from './lobby/newplayer';
 import { WerewordsLobbyComponent } from './lobby/lobby';
 import { WerewordsContentDirective } from './scaffolding/content';
+import { SharedModule } from '../shared.module';
 
 
 const routes: Routes = [
@@ -44,7 +45,8 @@ const routes: Routes = [
   imports: [
     RouterModule.forChild(routes),
     CommonModule,
-    FormsModule
+    FormsModule,
+    SharedModule
   ],
   exports: [
     RouterModule

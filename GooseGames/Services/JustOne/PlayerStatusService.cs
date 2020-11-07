@@ -1,7 +1,9 @@
-﻿using Entities.JustOne;
+﻿using Entities.Global.Enums;
+using Entities.JustOne;
 using Entities.JustOne.Enums;
 using GooseGames.Hubs;
 using GooseGames.Logging;
+using GooseGames.Services.Global;
 using Models.Requests;
 using Models.Requests.JustOne.Round;
 using Models.Responses;
@@ -16,71 +18,99 @@ namespace GooseGames.Services.JustOne
 {
     public class PlayerStatusService
     {
+        private readonly Global.SessionService _sessionService;
+        private readonly PlayerService _playerService;
         private readonly IPlayerStatusRepository _playerStatusRepository;
         private readonly RoundService _roundService;
-        private readonly ISessionRepository _sessionRepository;
         private readonly PlayerStatusQueryService _playerStatusQueryService;
-        private readonly PlayerHubContext _playerHubContext;
-        private readonly RequestLogger<PlayerDetailsService> _logger;
+        private readonly JustOneHubContext _playerHubContext;
+        private readonly RequestLogger<PlayerStatusService> _logger;
 
-        public PlayerStatusService(IPlayerStatusRepository playerStatusRepository,
+        public PlayerStatusService(Global.SessionService sessionService,
+            Global.PlayerService playerService,
+            IPlayerStatusRepository playerStatusRepository,
             RoundService roundService,
-            ISessionRepository sessionRepository,
             PlayerStatusQueryService playerStatusQueryService,
-            PlayerHubContext playerHubContext,
-            RequestLogger<PlayerDetailsService> logger)
+            JustOneHubContext playerHubContext,
+            RequestLogger<PlayerStatusService> logger)
         {
+            _sessionService = sessionService;
+            _playerService = playerService;
             _playerStatusRepository = playerStatusRepository;
             _roundService = roundService;
-            _sessionRepository = sessionRepository;
             _playerStatusQueryService = playerStatusQueryService;
             _playerHubContext = playerHubContext;
             _logger = logger;
         }
 
+        internal async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateGlobalPlayerStatusLobbyAsync(PlayerSessionRequest request)
+        {
+            var player = await _playerService.GetAsync(request.PlayerId);
+
+            if (player == null)
+            {
+                return GenericResponse<PlayerStatusValidationResponse>.Error("Player not found");
+            }
+
+            if (player.SessionId != request.SessionId)
+            {
+                return GenericResponse<PlayerStatusValidationResponse>.Error("You are not part of this session");
+            }
+
+            return GenericResponse<PlayerStatusValidationResponse>.Ok(new PlayerStatusValidationResponse
+            {
+                RequiredStatus = Entities.JustOne.Enums.PlayerStatusEnum.InLobby.ToString(),
+                StatusCorrect = player.Status == Entities.Global.Enums.PlayerStatusEnum.Lobby || player.Status == Entities.Global.Enums.PlayerStatusEnum.Ready
+            });
+        }
+
         public async Task<GenericResponse<PlayerStatusValidationResponse>> ValidatePlayerStatusAsync(PlayerSessionRequest request, Guid status)
         {
-            var playerStatus = await _playerStatusRepository.SingleOrDefaultAsync(p => p.PlayerId == request.PlayerId);
-            if (playerStatus == null)
-            {
-                return NewResponse.Error<PlayerStatusValidationResponse>("You are not part of this session");
-            }
-
-            var session = await _sessionRepository.GetAsync(request.SessionId);
+            var session = await _sessionService.GetAsync(request.SessionId);
             if (session == null)
             {
-                return NewResponse.Error<PlayerStatusValidationResponse>("You are not part of this session");
+                return GenericResponse<PlayerStatusValidationResponse>.Error("You are not part of this session");
             }
 
-            if (session.StatusId == SessionStatusEnum.Abandoned)
+            var playerStatus = await _playerStatusRepository.SingleOrDefaultAsync(p => p.PlayerId == request.PlayerId && p.GameId == session.GameSessionId.Value);
+            if (playerStatus == null)
             {
-                return NewResponse.Error<PlayerStatusValidationResponse>("This session was abandoned");
+                return GenericResponse<PlayerStatusValidationResponse>.Error("You are not part of this session");
+            }
+
+            if (session.Status == SessionStatusEnum.Abandoned)
+            {
+                return GenericResponse<PlayerStatusValidationResponse>.Error("This session was abandoned");
+            }
+
+            if (session.Game != GameEnum.JustOne && session.GameSessionId.GetValueOrDefault() != playerStatus.GameId)
+            {
+                return GenericResponse<PlayerStatusValidationResponse>.Error("This player is not part of the in progress game");
             }
 
             var response = new PlayerStatusValidationResponse
             {
-                RequiredStatus = PlayerStatusEnum.GetDescription(playerStatus.Status),
+                RequiredStatus = Entities.JustOne.Enums.PlayerStatusEnum.GetDescription(playerStatus.Status),
                 StatusCorrect = playerStatus.Status == status
             };
-            return NewResponse.Ok(response);
+            return GenericResponse<PlayerStatusValidationResponse>.Ok(response);
         }
 
-        public async Task UpdatePlayerStatusAsync(Guid playerId, Guid newStatus)
+        public async Task UpdatePlayerStatusAsync(Guid playerId, Guid gameId, Guid newStatus)
         {
-            var status = await _playerStatusRepository.SingleOrDefaultAsync(p => p.PlayerId == playerId);
-            status.Status = newStatus;
-
-            await _playerStatusRepository.UpdateAsync(status);
+            await _playerStatusRepository.UpdateStatusAsync(playerId, gameId, newStatus);
         }
 
-        public async Task UpdateAllPlayersForSessionAsync(Guid sessionId, Guid newStatus)
+        public async Task UpdateAllPlayersForGameAsync(Guid gameId, Guid newStatus)
         {
-            await _playerStatusRepository.UpdatePlayerStatusesForSession(sessionId, newStatus);
+            await _playerStatusRepository.UpdatePlayerStatusesForGame(gameId, newStatus);
         }
 
         internal async Task UpdatePlayerStatusToRoundWaitingAsync(PlayerSessionRoundRequest request)
         {
-            await UpdatePlayerStatusAsync(request.PlayerId, PlayerStatusEnum.RoundWaiting);
+            var gameId = await _sessionService.GetGameIdAsync(request.SessionId, GameEnum.JustOne);
+
+            await UpdatePlayerStatusAsync(request.PlayerId, gameId.Value, Entities.JustOne.Enums.PlayerStatusEnum.RoundWaiting);
 
             await _playerHubContext.SendPlayerReadyForRoundAsync(request.SessionId, request.PlayerId);
 
@@ -91,11 +121,11 @@ namespace GooseGames.Services.JustOne
         {
             var currentRound = await _roundService.GetCurrentRoundAsync(request);
 
-            if (await _playerStatusQueryService.AllPlayersMatchStatus(request.SessionId, PlayerStatusEnum.PassivePlayerWaitingForClues, currentRound.ActivePlayerId))
+            if (await _playerStatusQueryService.AllPlayersMatchStatusForGameAsync(currentRound.GameId, Entities.JustOne.Enums.PlayerStatusEnum.PassivePlayerWaitingForClues, currentRound.ActivePlayerId))
             {
                 return GenericResponseBase.Error("Unable to undo as all players have now finished");
             }
-            await UpdatePlayerStatusAsync(request.PlayerId, PlayerStatusEnum.PassivePlayerClue);
+            await UpdatePlayerStatusAsync(request.PlayerId, currentRound.GameId, Entities.JustOne.Enums.PlayerStatusEnum.PassivePlayerClue);
 
             await _playerHubContext.SendClueRevokedAsync(request.SessionId, request.PlayerId);
 
@@ -106,11 +136,11 @@ namespace GooseGames.Services.JustOne
         {
             var currentRound = await _roundService.GetCurrentRoundAsync(request);
 
-            if (await _playerStatusQueryService.AllPlayersMatchStatus(request.SessionId, PlayerStatusEnum.PassivePlayerWaitingForClueVotes, currentRound.ActivePlayerId))
+            if (await _playerStatusQueryService.AllPlayersMatchStatusForGameAsync(currentRound.GameId, Entities.JustOne.Enums.PlayerStatusEnum.PassivePlayerWaitingForClueVotes, currentRound.ActivePlayerId))
             {
                 return GenericResponseBase.Error("Unable to undo as all players have now finished");
             }
-            await UpdatePlayerStatusAsync(request.PlayerId, PlayerStatusEnum.PassivePlayerClueVote);
+            await UpdatePlayerStatusAsync(request.PlayerId, currentRound.GameId, Entities.JustOne.Enums.PlayerStatusEnum.PassivePlayerClueVote);
 
             await _playerHubContext.SendClueVoteRevokedAsync(request.SessionId, request.PlayerId);
 
@@ -121,15 +151,20 @@ namespace GooseGames.Services.JustOne
         {
             var currentRound = await _roundService.GetCurrentRoundAsync(request);
 
-            if (await _playerStatusQueryService.AllPlayersMatchStatus(request.SessionId, PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes, currentRound.ActivePlayerId))
+            if (await _playerStatusQueryService.AllPlayersMatchStatusForGameAsync(currentRound.GameId, Entities.JustOne.Enums.PlayerStatusEnum.PassivePlayerWaitingForOutcomeVotes, currentRound.ActivePlayerId))
             {
                 return GenericResponseBase.Error("Unable to undo as all players have now finished");
             }
-            await UpdatePlayerStatusAsync(request.PlayerId, PlayerStatusEnum.PassivePlayerOutcomeVote);
+            await UpdatePlayerStatusAsync(request.PlayerId, currentRound.GameId, Entities.JustOne.Enums.PlayerStatusEnum.PassivePlayerOutcomeVote);
 
             await _playerHubContext.SendResponseVoteRevokedAsync(request.SessionId, request.PlayerId);
 
             return GenericResponseBase.Ok();
+        }
+
+        internal async Task<GenericResponseBase> SetLobbyAsync(PlayerSessionRequest request)
+        {
+            return await _playerService.SendPlayerToLobbyAsync(request);
         }
     }
 }

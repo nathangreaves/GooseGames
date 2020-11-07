@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import * as _ from 'lodash';
-import { JustOnePlayerDetailsService } from '../../../services/justone/playerdetails'
 import { PlayerDetails, UpdatePlayerDetailsRequest } from '../../../models/player'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { IPlayerSessionComponent } from '../../../models/session';
@@ -114,6 +113,16 @@ export abstract class JustOneRoundOutcomeComponentBase extends JustOneClueListCo
         }
       })
       .catch(() => this.HandleGenericError());
+  }
+
+  Again = () => {
+    this._playerStatusService.Set(this.PlayerId, this.SessionId, PlayerStatus.InLobby)
+      .then(response => {
+      if (response.success) {
+        this._router.navigate([
+          PlayerStatusRoutesMap.InLobby, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+      }
+    });
   }
 
   isClueListReadOnly(): boolean {

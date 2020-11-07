@@ -10,6 +10,6 @@ namespace GooseGames.Services.Werewords.PlayerStatus
     public interface IPlayerStatusKeyedService
     {
         Guid PlayerStatus { get; }
-        Task<GenericResponse<string>> TransitionPlayerStatus(Session session, PlayerRoundInformation playerRoundInformation);
+        Task<GenericResponse<string>> TransitionPlayerStatus(Guid roundId, PlayerRoundInformation playerRoundInformation);
     }
 }

@@ -13,17 +13,20 @@ namespace GooseGames.Services.JustOne.RoundStatus
     public abstract class CanTriggerRoundEndRoundStatusServiceBase : RoundStatusKeyedServiceBase
     {
         private readonly IRoundRepository _roundRepository;
-        private readonly ISessionRepository _sessionRepository;
-        private readonly IPlayerStatusRepository _playerStatusRepository;
-        private readonly PlayerHubContext _playerHub;
+        private readonly IGameRepository _gameRepository;
+        private readonly Global.SessionService _sessionService;
+        protected readonly IPlayerStatusRepository _playerStatusRepository;
+        private readonly JustOneHubContext _playerHub;
 
         public CanTriggerRoundEndRoundStatusServiceBase(IRoundRepository roundRepository,
-            ISessionRepository sessionRepository,
+            IGameRepository gameRepository,
+            Global.SessionService sessionService,
             IPlayerStatusRepository playerStatusRepository,
-            PlayerHubContext playerHub)
+            JustOneHubContext playerHub)
         {
             _roundRepository = roundRepository;
-            _sessionRepository = sessionRepository;
+            _gameRepository = gameRepository;
+            _sessionService = sessionService;
             _playerStatusRepository = playerStatusRepository;
             _playerHub = playerHub;
         }
@@ -38,28 +41,28 @@ namespace GooseGames.Services.JustOne.RoundStatus
             var roundsToRemove = score;
             if (roundsToRemove < 0)
             {
-                var roundsRemoved = await _roundRepository.RemoveRoundsAsync(round.SessionId, Math.Abs(roundsToRemove));
+                var roundsRemoved = await _roundRepository.RemoveRoundsForGameAsync(round.GameId, Math.Abs(roundsToRemove));
                 score = score + roundsRemoved;
             }
 
-            var sessionEnded = (await _roundRepository.CountAsync(r => r.Status == RoundStatusEnum.New && r.SessionId == round.SessionId)) <= 0;
+            var sessionEnded = (await _roundRepository.CountAsync(r => r.Status == RoundStatusEnum.New && r.GameId == round.GameId)) <= 0;
 
+            var game = await _gameRepository.GetAsync(round.GameId);
             if (score != 0)
             {
-                var session = await _sessionRepository.GetAsync(round.SessionId);
-                session.Score = session.Score + score;
+                game.Score = game.Score + score;
 
                 if (sessionEnded)
                 {
-                    session.StatusId = SessionStatusEnum.Complete;
+                    await _sessionService.SetToLobbyAsync(game.SessionId);
                 }
 
-                await _sessionRepository.UpdateAsync(session);
+                await _gameRepository.UpdateAsync(game);
             }
 
             await _playerStatusRepository.UpdatePlayerStatusesForRoundAsync(round.Id, PlayerStatusEnum.PassivePlayerOutcome, PlayerStatusEnum.ActivePlayerOutcome);
 
-            await _playerHub.SendRoundOutcomeAvailableAsync(round.SessionId);
+            await _playerHub.SendRoundOutcomeAvailableAsync(game.SessionId);
         }
     }
 }

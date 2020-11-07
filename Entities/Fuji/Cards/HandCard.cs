@@ -7,6 +7,5 @@ namespace Entities.Fuji.Cards
     public class HandCard : CardBase
     {
         public Guid PlayerId { get; set; }
-        public Player Player { get; set; }
     }
 }

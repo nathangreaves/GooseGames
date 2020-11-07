@@ -10,7 +10,7 @@ import { WerewordsPlayerStatus } from "../../models/werewords/content";
 import { WerewordsContent } from "./scaffolding/content";
 
 export const RegisteredContent: WerewordsContent[] = [
-  new WerewordsContent(WerewordsPlayerStatus.New, WerewordsNewPlayerDetailsComponent),
+  new WerewordsContent(WerewordsPlayerStatus.New, WerewordsLobbyComponent),
   new WerewordsContent(WerewordsPlayerStatus.InLobby, WerewordsLobbyComponent),
 
   new WerewordsContent(WerewordsPlayerStatus.NightRevealSecretRole, WerewordsNightSecretRoleComponent),

@@ -10,5 +10,6 @@ namespace Models.Responses.Werewords
         public SecretRole SecretRole { get; set; }
         public Guid MayorPlayerId { get; set; }
         public string MayorName { get; set; }
+        public IEnumerable<OtherPlayerSecretRoleResponse> KnowledgeAboutOtherPlayers { get; set; }
     }
 }

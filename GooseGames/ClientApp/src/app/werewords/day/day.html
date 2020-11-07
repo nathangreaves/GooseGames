@@ -23,7 +23,7 @@
         </span>
       </div>
       <div *ngIf="!IsWerewolf">
-        Waiting for <span *ngFor="let werewolf of Werewolves; let last = last; let i = index"><span class="werewolf-name">{{werewolf.name}}</span><span *ngIf="!last"> and</span></span> to choose the Seer
+        Waiting for <span *ngFor="let werewolf of Werewolves; let last = last; let i = index"><span class="werewolf-name">{{werewolf.name}}</span><span *ngIf="!last"> and </span></span> to choose the Seer
       </div>
     </div>
     <div *ngIf="CurrentStatus === VotingOnWerewolfStatus">

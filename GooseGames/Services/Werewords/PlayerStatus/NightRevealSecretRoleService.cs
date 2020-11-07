@@ -11,23 +11,23 @@ namespace GooseGames.Services.Werewords.PlayerStatus
 {
     public class NightRevealSecretRoleService : PlayerStatusKeyedServiceBase
     {
-        private readonly IRoundRepository _round;
+        private readonly IRoundRepository _roundRepository;
 
         public override Guid PlayerStatus => PlayerStatusEnum.NightRevealSecretRole;
 
-        public NightRevealSecretRoleService(IRoundRepository round, IPlayerRepository playerRepository) : base(playerRepository)
+        public NightRevealSecretRoleService(IRoundRepository roundRepository, IPlayerRoundInformationRepository playerRepository) : base(playerRepository)
         {
-            _round = round;
+            _roundRepository = roundRepository;
         }
 
-        protected override async Task<Guid> GetNextStatusAsync(Session session, PlayerRoundInformation playerRoundInformation)
+        protected override async Task<Guid> GetNextStatusAsync(Guid roundId, PlayerRoundInformation playerRoundInformation)
         {
             if (playerRoundInformation.IsMayor)
             {
                 return PlayerStatusEnum.NightMayorPickSecretWord;
             }
 
-            var currentRoundStatus = await _round.GetPropertyAsync(session.CurrentRoundId.Value, r => r.Status);
+            var currentRoundStatus = await _roundRepository.GetPropertyAsync(roundId, r => r.Status);
 
             if (currentRoundStatus == RoundStatusEnum.NightRevealSecretWord)
             {
@@ -37,19 +37,19 @@ namespace GooseGames.Services.Werewords.PlayerStatus
             return PlayerStatusEnum.NightWaitingForMayor;
         }
 
-        internal override Task NotifyOtherPlayersAsync(Player player)
-        {
-            return Task.FromResult<object>(null);
-        }
-
-        internal override Task<bool> ShouldTransitionRoundAsync(Session session, PlayerRoundInformation playerRoundInformation)
+        internal override Task TransitionRoundAsync(Guid roundId, PlayerRoundInformation playerRoundInformation)
         {
             return Task.FromResult(false);
         }
 
-        internal override Task TransitionRoundAsync(Session session, PlayerRoundInformation playerRoundInformation)
+        internal override Task<bool> ShouldTransitionRoundAsync(Guid roundId, PlayerRoundInformation playerRoundInformation)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(false);
+        }
+
+        internal override Task NotifyOtherPlayersAsync(PlayerRoundInformation playerRoundInformation)
+        {
+            return Task.FromResult(false);
         }
     }
 }

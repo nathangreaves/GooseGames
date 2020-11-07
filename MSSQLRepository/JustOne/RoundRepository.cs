@@ -24,9 +24,9 @@ namespace MSSQLRepository.JustOne
 
         }
 
-        public async Task<int> RemoveRoundsAsync(Guid sessionId, int numberOfRoundsToRemove)
+        public async Task<int> RemoveRoundsForGameAsync(Guid gameId, int numberOfRoundsToRemove)
         {
-            var rounds = await Context.Rounds.Where(r => r.SessionId == sessionId
+            var rounds = await Context.Rounds.Where(r => r.GameId == gameId
             && r.ActivePlayerId == null && r.Status == Entities.JustOne.Enums.RoundStatusEnum.New)
                 .Take(numberOfRoundsToRemove)
                 .ToListAsync();
@@ -41,9 +41,9 @@ namespace MSSQLRepository.JustOne
             return roundsRemoved;
         }
 
-        public async Task<Round> GetCurrentRoundForSessionAsync(Guid sessionId)
+        public async Task<Round> GetCurrentRoundForGameAsync(Guid gameId)
         {
-            return await Context.Sessions.Where(s => s.Id == sessionId).Select(s => s.CurrentRound).SingleAsync(); ;
+            return await Context.Games.Where(s => s.Id == gameId).Select(s => s.CurrentRound).SingleAsync(); ;
         }
     }
 }

@@ -11,9 +11,7 @@ namespace Entities.Werewords
         public Guid Id { get; set; }
         public DateTime CreatedUtc { get; set; }
         public Guid SessionId { get; set; }
-        public Session Session { get; set; }
         public Guid? MayorId { get; set; }
-        public Player Mayor { get; set; }
         public string SecretWord { get; set; }
         public DateTime RoundStartedUtc { get; set; }
         public int RoundDurationMinutes { get; set; }

@@ -41,9 +41,13 @@ namespace GooseGames
 
             MSSQLRepository.RepositoryConfiguration.ConfigureServices(services, Configuration);
 
+            //Global
+            services.AddScoped<Services.Global.SessionService>();
+            services.AddScoped<Services.Global.PlayerService>();
+            services.AddScoped<Services.Global.GlobalPlayerStatusService>();
+
             //Just One
             services.AddScoped<Services.JustOne.SessionService>();
-            services.AddScoped<Services.JustOne.PlayerDetailsService>();
             services.AddScoped<Services.JustOne.PlayerStatusService>();
             services.AddScoped<Services.JustOne.RoundService>();
             services.AddScoped<Services.JustOne.PlayerResponseService>();
@@ -57,7 +61,6 @@ namespace GooseGames
 
             //Fuji Flush
             services.AddScoped<Services.Fuji.SessionService>();
-            services.AddScoped<Services.Fuji.PlayerDetailsService>();
             services.AddScoped<Services.Fuji.DeckService>();
             services.AddScoped<Services.Fuji.HandService>();
             services.AddScoped<Services.Fuji.CardService>();
@@ -68,9 +71,8 @@ namespace GooseGames
             //Werewords
             services.AddScoped<Services.Werewords.PlayerService>();
             services.AddScoped<Services.Werewords.PlayerStatusService>();
-            services.AddScoped<Services.Werewords.SessionService>();
+            services.AddScoped<Services.Werewords.LobbyService>();
             services.AddScoped<Services.Werewords.RoundService>();
-            services.AddScoped<Services.Werewords.ProgressRoundService>();
             services.AddScoped<Services.Werewords.PlayerRoundInformationService>();
             services.AddScoped<Services.Werewords.PlayerActionInformationService>();
 
@@ -78,7 +80,8 @@ namespace GooseGames
             AddKeyedServices<Services.Werewords.PlayerStatus.IPlayerStatusKeyedService>(services);
 
             //Hub Contexts
-            services.AddScoped<PlayerHubContext>();
+            services.AddScoped<GlobalHubContext>();
+            services.AddScoped<JustOneHubContext>();
             services.AddScoped<FujiHubContext>();
             services.AddScoped<CodenamesHubContext>();
             services.AddScoped<WerewordsHubContext>();
@@ -121,7 +124,8 @@ namespace GooseGames
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
 
-                endpoints.MapHub<PlayerHub>("/lobbyhub");
+                endpoints.MapHub<GlobalHub>("/globalhub");
+                endpoints.MapHub<JustOneHub>("/lobbyhub");
                 endpoints.MapHub<FujiHub>("/fujihub");
                 endpoints.MapHub<CodenamesHub>("/codenameshub");
                 endpoints.MapHub<WerewordsHub>("/werewordshub");

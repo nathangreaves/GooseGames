@@ -1,0 +1,70 @@
+<div class="loading" *ngIf="Loading && !ErrorMessage">
+  I am loading...
+</div>
+<global-lobby-hub-component
+  [parameters]="globalHubConnectionParameters"
+>
+
+</global-lobby-hub-component>
+<div *ngIf="!Loading">
+
+  <div class="lobby-header alert alert-info" *ngIf="SessionMaster && Players.length < parameters.minPlayers">
+    Waiting for at least {{parameters.minPlayers}} players before you can start game
+  </div>
+  <div class="lobby-header alert alert-info" *ngIf="SessionMaster">
+    Your game's identifier is <span style="font-weight: bold">{{Password}}</span>
+  </div>
+
+  <form>
+    <fieldset [disabled]="playerReady ? 'disabled' : null">
+      <div>
+        <label for="playerName"><strong>Name:</strong></label>
+      </div>
+      <div>
+        <input id="playerName" [(ngModel)]="PlayerName" name="playername" />
+      </div>
+    </fieldset>
+  </form>
+
+  <div>
+    <table class="player-table">
+      <tr *ngFor="let player of Players;" [ngClass]="{'new-player' : player.playerNumber == 0}">
+        <td class="player-number-cell">{{player.playerNumber}}</td>
+        <td class="player-name-cell">
+          {{player.playerName}}
+        </td>
+        <td class="player-name-cell">
+          <div *ngIf="player.ready">
+            <i class="fas fa-check"></i>
+          </div>
+          <div *ngIf="!player.ready">
+            <i class="fas fa-times"></i>
+          </div>
+        </td>
+        <td><button [disabled]="DisableButtons" *ngIf="SessionMaster && player.id != parameters.playerId" class="btn btn-primary" (click)="KickPlayer(player.id)">Kick</button></td>
+      </tr>
+    </table>
+  </div>
+
+  <div>
+    <button class="btn btn-primary" type="submit" (click)="Ready()"><span *ngIf="!playerReady">Ready</span><span *ngIf="playerReady">Not Ready</span></button>
+  </div>
+  <div *ngIf="!SessionMaster">
+    <ng-container [ngTemplateOutlet]="readOnlyGameConfigTemplate" [ngTemplateOutletContext]="{}">
+
+    </ng-container>
+  </div>
+  <div *ngIf="SessionMaster">
+
+    <button [disabled]="DisableButtons || Players.length < parameters.minPlayers || Players.length > parameters.maxPlayers" class="btn btn-primary" (click)="StartGame()">Start Game</button>
+
+
+    <!-- [ngTemplateOutletContext]="{data: data}" use this if we need data to be passed to the template-->
+    <ng-container [ngTemplateOutlet]="gameConfigTemplate" [ngTemplateOutletContext]="{}">
+
+    </ng-container>
+
+  </div>
+
+</div>
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

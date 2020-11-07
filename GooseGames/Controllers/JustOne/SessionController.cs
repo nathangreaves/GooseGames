@@ -30,50 +30,8 @@ namespace GooseGames.Controllers.JustOne
         }
 
         [HttpPost]
-        public async Task<GenericResponse<NewSessionResponse>> PostAsync(NewSessionRequest request)
-        {
-            try
-            {
-                _logger.LogInformation("Received request", request);
-
-                var result = await _sessionService.CreateSessionAsync(request);
-
-                _logger.LogInformation("Returned result", result);
-
-                return result;
-            }
-            catch (Exception e)
-            {
-                var errorGuid = Guid.NewGuid();
-                _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return NewResponse.Error<NewSessionResponse>($"Unknown Error {errorGuid}");
-            }
-        }
-
-        [HttpPatch]
-        public async Task<GenericResponse<JoinSessionResponse>> PatchAsync(JoinSessionRequest request)
-        {
-            try
-            {
-                _logger.LogInformation("Received request", request);
-
-                var result = await _sessionService.JoinSessionAsync(request);
-
-                _logger.LogInformation("Returned result", result);
-
-                return result;
-            }
-            catch (Exception e)
-            {
-                var errorGuid = Guid.NewGuid();
-                _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return NewResponse.Error<JoinSessionResponse>($"Unknown Error {errorGuid}");
-            }
-        }
-
-        [HttpPost]
         [Route("StartSession")]
-        public async Task<GenericResponse<bool>> StartSessionAsync(StartSessionRequest request)
+        public async Task<GenericResponseBase> StartSessionAsync(StartSessionRequest request)
         {
             try
             {
@@ -89,7 +47,7 @@ namespace GooseGames.Controllers.JustOne
             {
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return NewResponse.Error<bool>($"Unknown Error {errorGuid}");
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
             }
         }
     }

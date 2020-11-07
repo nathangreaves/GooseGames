@@ -26,13 +26,13 @@ namespace MSSQLRepository.JustOne
 
         public async Task<bool> AllPlayersHaveResponded(Round round)
         {
-            var sessionId = round.SessionId;
+            var gameId = round.GameId;
             var roundId = round.Id;
             var activePlayerId = round.ActivePlayerId.Value;
 
-            var  countOfPlayersThatHaveNoResponse = await Context.Players
-                .Where(p => p.SessionId == sessionId && p.Id != activePlayerId)
-                .Where(p => !Context.Responses.Any(r => r.RoundId == roundId && r.PlayerId == p.Id))
+            var  countOfPlayersThatHaveNoResponse = await Context.PlayerStatuses
+                .Where(p => p.GameId == gameId && p.PlayerId != activePlayerId)
+                .Where(p => !Context.Responses.Any(r => r.RoundId == roundId && r.PlayerId == p.PlayerId))
                 .CountAsync().ConfigureAwait(false);
 
             return countOfPlayersThatHaveNoResponse == 0;

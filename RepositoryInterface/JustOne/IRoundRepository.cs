@@ -8,7 +8,7 @@ namespace RepositoryInterface.JustOne
 {
     public interface IRoundRepository : ICommonRepository<Round>
     {
-        Task<Round> GetCurrentRoundForSessionAsync(Guid sessionId);
-        Task<int> RemoveRoundsAsync(Guid sessionId, int numberOfRoundsToRemove);
+        Task<Round> GetCurrentRoundForGameAsync(Guid gameId);
+        Task<int> RemoveRoundsForGameAsync(Guid gameId, int numberOfRoundsToRemove);
     }
 }

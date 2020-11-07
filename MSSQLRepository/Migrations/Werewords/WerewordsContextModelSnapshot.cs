@@ -20,40 +20,6 @@ namespace MSSQLRepository.Migrations.Werewords
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Entities.Werewords.Player", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ConnectionId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PlayerNumber")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("SessionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("Status")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SessionId");
-
-                    b.ToTable("Players");
-                });
-
             modelBuilder.Entity("Entities.Werewords.PlayerResponse", b =>
                 {
                     b.Property<Guid>("Id")
@@ -85,6 +51,9 @@ namespace MSSQLRepository.Migrations.Werewords
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsMayor")
                         .HasColumnType("bit");
 
@@ -97,9 +66,10 @@ namespace MSSQLRepository.Migrations.Werewords
                     b.Property<int>("SecretRole")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<Guid>("Status")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasIndex("PlayerId");
+                    b.HasKey("Id");
 
                     b.HasIndex("RoundId");
 
@@ -129,11 +99,7 @@ namespace MSSQLRepository.Migrations.Werewords
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PlayerId");
-
                     b.HasIndex("RoundId");
-
-                    b.HasIndex("VotedPlayerId");
 
                     b.ToTable("PlayerVotes");
                 });
@@ -182,55 +148,7 @@ namespace MSSQLRepository.Migrations.Werewords
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MayorId");
-
-                    b.HasIndex("SessionId");
-
                     b.ToTable("Rounds");
-                });
-
-            modelBuilder.Entity("Entities.Werewords.Session", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CurrentRoundId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("LastUpdatedUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Password")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid?>("SessionMasterId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("StatusId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CurrentRoundId");
-
-                    b.HasIndex("Password")
-                        .IsUnique()
-                        .HasFilter("[Password] IS NOT NULL");
-
-                    b.HasIndex("SessionMasterId");
-
-                    b.ToTable("Sessions");
-                });
-
-            modelBuilder.Entity("Entities.Werewords.Player", b =>
-                {
-                    b.HasOne("Entities.Werewords.Session", "Session")
-                        .WithMany("Players")
-                        .HasForeignKey("SessionId");
                 });
 
             modelBuilder.Entity("Entities.Werewords.PlayerResponse", b =>
@@ -244,12 +162,6 @@ namespace MSSQLRepository.Migrations.Werewords
 
             modelBuilder.Entity("Entities.Werewords.PlayerRoundInformation", b =>
                 {
-                    b.HasOne("Entities.Werewords.Player", "Player")
-                        .WithMany()
-                        .HasForeignKey("PlayerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Entities.Werewords.Round", "Round")
                         .WithMany()
                         .HasForeignKey("RoundId")
@@ -259,47 +171,11 @@ namespace MSSQLRepository.Migrations.Werewords
 
             modelBuilder.Entity("Entities.Werewords.PlayerVote", b =>
                 {
-                    b.HasOne("Entities.Werewords.Player", "Player")
-                        .WithMany()
-                        .HasForeignKey("PlayerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Entities.Werewords.Round", "Round")
                         .WithMany()
                         .HasForeignKey("RoundId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Entities.Werewords.Player", "VotedPlayer")
-                        .WithMany()
-                        .HasForeignKey("VotedPlayerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Entities.Werewords.Round", b =>
-                {
-                    b.HasOne("Entities.Werewords.Player", "Mayor")
-                        .WithMany()
-                        .HasForeignKey("MayorId");
-
-                    b.HasOne("Entities.Werewords.Session", "Session")
-                        .WithMany()
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Entities.Werewords.Session", b =>
-                {
-                    b.HasOne("Entities.Werewords.Round", "CurrentRound")
-                        .WithMany()
-                        .HasForeignKey("CurrentRoundId");
-
-                    b.HasOne("Entities.Werewords.Player", "SessionMaster")
-                        .WithMany()
-                        .HasForeignKey("SessionMasterId");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,6 +1,7 @@
 ﻿using Entities.Fuji;
 using Entities.Fuji.Cards;
 using GooseGames.Logging;
+using GooseGames.Services.Global;
 using Models.Requests.Fuji;
 using Models.Responses;
 using RepositoryInterface.Fuji;
@@ -47,7 +48,7 @@ namespace GooseGames.Services.Fuji
             { 8, 5 }
         };
 
-        private readonly IPlayerRepository _playerRepository;
+        private readonly IPlayerInformationRepository _playerRepository;
         private readonly IHandCardRepository _handCardRepository;
         private readonly IDeckCardRepository _deckCardRepository;
         private readonly IDiscardedCardRepository _discardedCardRepository;
@@ -55,7 +56,12 @@ namespace GooseGames.Services.Fuji
 
         private static readonly Random s_Random = new Random();
 
-        public DeckService(IPlayerRepository playerRepository, IHandCardRepository handCardRepository, IDeckCardRepository deckCardRepository, IDiscardedCardRepository discardedCardRepository, RequestLogger<DeckService> logger)
+        public DeckService(
+            IPlayerInformationRepository playerRepository, 
+            IHandCardRepository handCardRepository, 
+            IDeckCardRepository deckCardRepository, 
+            IDiscardedCardRepository discardedCardRepository, 
+            RequestLogger<DeckService> logger)
         {
             _playerRepository = playerRepository;
             _handCardRepository = handCardRepository;
@@ -64,11 +70,11 @@ namespace GooseGames.Services.Fuji
             _logger = logger;
         }
 
-        internal async Task<GenericResponseBase> PrepareDeckAsync(Guid sessionId, bool testSession = false)
+        internal async Task<GenericResponseBase> PrepareDeckAsync(Guid gameId)
         {
-            List<DeckCard> deckCards = CreateNewDeck(sessionId);
+            List<DeckCard> deckCards = CreateNewDeck(gameId);
 
-            var players = await _playerRepository.FilterAsync(p => p.SessionId == sessionId);
+            var players = await _playerRepository.FilterAsync(p => p.GameId == gameId);
 
             var cardsPerPlayer = s_PlayerCountStartingHandSizes[players.Count];
             foreach (var player in players)
@@ -77,19 +83,7 @@ namespace GooseGames.Services.Fuji
                 for (int i = 0; i < cardsPerPlayer; i++)
                 {
                     int deckIndex = 0;                    
-                    if (testSession)
-                    {
-                        //In a test session, deal everyone at least 1 copy of 2 & 3
-                        if (i == 0)
-                        {
-                            deckIndex = deckCards.FindIndex(0, x => x.FaceValue == 2);
-                        }
-                        else if (i == 1)
-                        {
-                            deckIndex = deckCards.FindIndex(0, x => x.FaceValue == 3);
-                        }
-                    }
-
+                   
                     var card = deckCards[deckIndex];
                     deckCards.RemoveAt(deckIndex);
 
@@ -104,7 +98,7 @@ namespace GooseGames.Services.Fuji
             return GenericResponseBase.Ok();
         }
 
-        public static List<DeckCard> CreateNewDeck(Guid sessionId)
+        public static List<DeckCard> CreateNewDeck(Guid gameId)
         {
             var list = new List<int> { };
 
@@ -116,7 +110,7 @@ namespace GooseGames.Services.Fuji
                 }
             }
 
-            List<DeckCard> deckCards = CreateDeck(sessionId, list);
+            List<DeckCard> deckCards = CreateDeck(gameId, list);
             return deckCards;
         }
 
@@ -125,7 +119,7 @@ namespace GooseGames.Services.Fuji
             list.Insert(s_Random.Next(0, list.Count), cardValue);
         }
 
-        private static List<DeckCard> CreateDeck(Guid sessionId, List<int> list)
+        private static List<DeckCard> CreateDeck(Guid gameId, List<int> list)
         {
             int o = 1;
 
@@ -134,7 +128,7 @@ namespace GooseGames.Services.Fuji
             {
                 FaceValue = l,
                 Order = o++,
-                SessionId = sessionId,
+                GameId = gameId,
                 CreatedUtc = createdDate
             }).ToList();
             return deckCards;
@@ -148,37 +142,37 @@ namespace GooseGames.Services.Fuji
             {
                 Id = card.Id,
                 FaceValue = card.FaceValue,
-                SessionId = card.SessionId
+                GameId = card.GameId
             });
         }
 
-        private HandCard DealToPlayer(DeckCard deckCard, Player player)
+        private HandCard DealToPlayer(DeckCard deckCard, PlayerInformation player)
         {
             return new HandCard
             {
                 Id = deckCard.Id,
                 FaceValue = deckCard.FaceValue,
-                PlayerId = player.Id,
-                SessionId = player.SessionId,
+                PlayerId = player.PlayerId,
+                GameId = player.GameId,
                 CreatedUtc = DateTime.UtcNow
             };
         }
 
-        internal async Task<List<HandCard>> GetHandCardsForSessionAsync(Guid sessionId)
+        internal async Task<List<HandCard>> GetHandCardsForGameAsync(Guid gameId)
         {
-            return await _handCardRepository.FilterAsync(c => c.SessionId == sessionId);
+            return await _handCardRepository.FilterAsync(c => c.GameId == gameId);
         }
 
-        internal async Task<HandCard> DealNewCardToPlayerAsync(Player player)
+        internal async Task<HandCard> DealNewCardToPlayerAsync(PlayerInformation player)
         {
-            var deckCard = await _deckCardRepository.GetNextCardAsync(player.SessionId);
+            var deckCard = await _deckCardRepository.GetNextCardAsync(player.GameId);
 
             if (deckCard == null)
             {
                 //Shuffle discards into deck
-                await ShuffleDeckAsync(player.SessionId);
+                await ShuffleDeckAsync(player.GameId);
 
-                deckCard = await _deckCardRepository.GetNextCardAsync(player.SessionId);
+                deckCard = await _deckCardRepository.GetNextCardAsync(player.GameId);
             }
 
             var handCard = DealToPlayer(deckCard, player);
@@ -189,9 +183,9 @@ namespace GooseGames.Services.Fuji
             return handCard;
         }
 
-        private async Task ShuffleDeckAsync(Guid sessionId)
+        private async Task ShuffleDeckAsync(Guid gameId)
         {
-            var discardedCards = await _discardedCardRepository.FilterAsync(c => c.SessionId == sessionId);
+            var discardedCards = await _discardedCardRepository.FilterAsync(c => c.GameId == gameId);
 
             List<int> cardValues = new List<int>();
             foreach (var item in discardedCards.Select(c => c.FaceValue))
@@ -199,7 +193,7 @@ namespace GooseGames.Services.Fuji
                 InsertIntoListAtRandomPosition(cardValues, item);
             }
 
-            var deck = CreateDeck(sessionId, cardValues);
+            var deck = CreateDeck(gameId, cardValues);
 
             await _deckCardRepository.InsertRangeAsync(deck);
         }

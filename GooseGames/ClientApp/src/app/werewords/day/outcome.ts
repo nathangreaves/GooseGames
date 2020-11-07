@@ -64,7 +64,6 @@ export class WerewordsDayOutcomeComponent extends WerewordsComponentBase impleme
 
     this.sessionService.Again(this).then(response => this.HandleGenericResponseBase(response, () => {
 
-      this.SetSessionData(this.SessionId, this.PlayerId, null);
       this.RouteToValidated(WerewordsPlayerStatus.InLobby);
 
       return Promise.resolve(response);

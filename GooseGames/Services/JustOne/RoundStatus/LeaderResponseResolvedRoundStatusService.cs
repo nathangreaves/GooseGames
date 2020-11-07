@@ -33,7 +33,7 @@ namespace GooseGames.Services.JustOne.RoundStatus
         public override async Task ConditionallyTransitionRoundStatusAsync(Round round)
         {
             _logger.LogTrace("Checking all players are ready for next round", round);
-            if (await AllPlayersReady(round.SessionId))
+            if (await AllPlayersReady(round.GameId))
             {
                 _logger.LogTrace("All players are ready for next round", round);
                 await TransitionRoundStatusAsync(round);
@@ -45,15 +45,15 @@ namespace GooseGames.Services.JustOne.RoundStatus
         }
 
         private async Task TransitionRoundStatusAsync(Round round)
-        {
-            var newRound = await _roundService.PrepareNextRoundAsync(round.SessionId, round.ActivePlayerId);
+        {            
+            var newRound = await _roundService.PrepareGameNextRoundAsync(round.GameId, round.SessionId, round.ActivePlayerId);
 
             await _newRoundStatusService.ConditionallyTransitionRoundStatusAsync(newRound);
         }
 
-        private async Task<bool> AllPlayersReady(Guid sessionId)
+        private async Task<bool> AllPlayersReady(Guid gameId)
         {
-            return await _playerStatusQueryService.AllPlayersMatchStatus(sessionId, PlayerStatusEnum.RoundWaiting);
+            return await _playerStatusQueryService.AllPlayersMatchStatusForGameAsync(gameId, PlayerStatusEnum.RoundWaiting);
         }
     }
 }

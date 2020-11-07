@@ -1,9 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import * as _ from 'lodash';
-import { JustOnePlayerDetailsService } from '../../services/justone/playerdetails'
 import { JustOneSessionService } from '../../services/justone/session'
-import { GenericResponse } from '../../models/genericresponse'
-import { PlayerDetails, UpdatePlayerDetailsRequest, PlayerDetailsResponse } from '../../models/player'
+import { GenericResponseBase } from '../../models/genericresponse'
+import { PlayerDetailsResponse } from '../../models/player'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import * as signalR from "@microsoft/signalr";
 import { JustOnePlayerStatusService } from '../../services/justone/playerstatus'
@@ -11,18 +10,20 @@ import { PlayerStatus } from '../../models/justone/playerstatus'
 import { IPlayerSessionComponent } from '../../models/session';
 import { PlayerNumberCss } from '../../services/justone/ui'
 import { WordListCheckboxListItem, JustOneWordList } from '../../models/justone/wordlistenum';
+import { ILobbyComponentParameters } from '../components/lobby/lobby';
+
+const MinPlayers: number = 3;
+const MaxPlayers: number = 7;
 
 @Component({
   selector: 'app-just-one-sessionlobby-component',
   templateUrl: './sessionlobby.component.html',
   styleUrls: ['./sessionlobby.component.css'],
 })
-
-export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
+export class JustOneSessionLobbyComponent implements IPlayerSessionComponent, OnInit {
 
   PlayerNumberCSS = PlayerNumberCss;
 
-  private _playerDetailsService: JustOnePlayerDetailsService;
   private _sessionService: JustOneSessionService;
   private _playerStatusService: JustOnePlayerStatusService;
   private _router: Router;
@@ -40,12 +41,13 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
   public Players: PlayerDetailsResponse[];
   public AvailableWordLists: WordListCheckboxListItem[];
 
-  MinPlayers: number = 3;
-
   DisableButtons: boolean;
+  lobbyParameters: ILobbyComponentParameters;
 
-  constructor(playerDetailsService: JustOnePlayerDetailsService, sessionService: JustOneSessionService, playerStatusService: JustOnePlayerStatusService, router: Router, activatedRoute: ActivatedRoute) {
-    this._playerDetailsService = playerDetailsService;
+  constructor(sessionService: JustOneSessionService,
+              playerStatusService: JustOnePlayerStatusService,
+              router: Router,
+              activatedRoute: ActivatedRoute) {
     this._playerStatusService = playerStatusService;
     this._sessionService = sessionService;
     this._router = router;
@@ -57,96 +59,62 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
 
     this.setupConnection();
 
-    this.Validate()
-      .then(() => this.load());
+    this.Validate();
+  }
+
+  ngOnInit(): void {
+    this.lobbyParameters = {
+      canStartSession: this.canStartSession,
+      maxPlayers: MaxPlayers,
+      minPlayers: MinPlayers,
+      playerId: this.PlayerId,
+      sessionId: this.SessionId,
+      startSession: this.startGame
+    }
+
+    this.AvailableWordLists = [
+      <WordListCheckboxListItem>{
+        Name: "Just One",
+        Checked: true,
+        WordList: JustOneWordList.JustOne
+      },
+      <WordListCheckboxListItem>{
+        Name: "Codenames",
+        Checked: true,
+        WordList: JustOneWordList.Codenames
+      },
+      <WordListCheckboxListItem>{
+        Name: "Codenames Duet",
+        Checked: true,
+        WordList: JustOneWordList.CodenamesDuet
+      },
+      <WordListCheckboxListItem>{
+        Name: "Codenames Rude Words 😲",
+        Checked: false,
+        WordList: JustOneWordList.CodenamesDeepUndercover
+      }
+    ];
+  }
+
+  canStartSession = () : boolean => {
+    if (!_.find(this.AvailableWordLists, p => p.Checked)) {
+      this.ErrorMessage = "Please select at least one word list";
+      return false;
+    }
+
+    return true;
   }
 
   private Validate(): Promise<any> {
     return this._playerStatusService.Validate(this, PlayerStatus.InLobby, () => { this.CloseConnection(); });
+  }   
+
+  startGame = (): Promise<GenericResponseBase> => {
+    return this._sessionService
+      .StartSession(this, _.filter(this.AvailableWordLists, w => w.Checked).map(w => w.WordList));      
   }
 
-  public StartGame() {
-    if (_.find(this.Players, p => p.playerNumber == 0)) {
-      this.ErrorMessage = "Not all players are ready";
-      return;
-    }
-    if (!_.find(this.AvailableWordLists, p => p.Checked)) {
-      this.ErrorMessage = "Please select at least one word list";
-      return;
-    }
-
-    this.DisableButtons = true;
-    this._sessionService.StartSession(this, _.filter(this.AvailableWordLists, w => w.Checked).map(w => w.WordList))
-      .then(response => {
-        if (!response.success) {
-          this.ErrorMessage = response.errorCode;
-        }
-      })
-      .catch(() => this.HandleGenericError())
-      .finally(() => this.DisableButtons = false);
-  }
-
-  public KickPlayer(playerId: string) {
-    if (playerId == this.PlayerId) {
-      return;
-    }
-    this.DisableButtons = true;
-    this._playerDetailsService.DeletePlayer({ sessionMasterId: this.PlayerId, playerToDeleteId: playerId })
-      .then(response => {
-        if (!response.success) {
-          this.ErrorMessage = response.errorCode;
-        }
-      })
-      .catch(() => this.HandleGenericError())
-      .finally(() => this.DisableButtons = false);
-  }
-
-  private load() {
-    this._playerDetailsService.GetPlayerDetails({ playerId: this.PlayerId, sessionId: this.SessionId })
-      .then(data => {
-        if (data.success) {
-
-          this.SessionMaster = data.data.sessionMaster;
-          this.SessionMasterName = data.data.sessionMasterName ? data.data.sessionMasterName : "Session Master";
-          this.SessionMasterPlayerNumber = data.data.sessionMasterPlayerNumber ? data.data.sessionMasterPlayerNumber : null;
-          this.Password = data.data.password;
-          this.Players = data.data.players;
-          _.forEach(this.Players, player => {
-            this.setDefaultNewPlayerName(player);
-          });
-
-          this.AvailableWordLists = [
-            <WordListCheckboxListItem>{
-              Name: "Just One",
-              Checked: true,
-              WordList: JustOneWordList.JustOne
-            },
-            <WordListCheckboxListItem>{
-              Name: "Codenames",
-              Checked: true,
-              WordList: JustOneWordList.Codenames
-            },
-            <WordListCheckboxListItem>{
-              Name: "Codenames Duet",
-              Checked: true,
-              WordList: JustOneWordList.CodenamesDuet
-            },
-            <WordListCheckboxListItem>{
-              Name: "Codenames Rude Words 😲",
-              Checked: false,
-              WordList: JustOneWordList.CodenamesDeepUndercover
-            }
-          ];
-
-          this.Loading = false;
-        }
-        else {
-          this.ErrorMessage = data.errorCode;
-        }
-      })
-      .catch(() => this.HandleGenericError());
-  }
-  private setupConnection() : Promise<any> {
+  private setupConnection(): Promise<any> {
     this._hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
       .withAutomaticReconnect()
@@ -159,21 +127,6 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
       this.HandleGenericError();
     });
 
-    this._hubConnection.on("playerAdded", (player: PlayerDetailsResponse) => {
-      this.setDefaultNewPlayerName(player);
-      this.Players.push(player);
-    });
-    this._hubConnection.on("playerDetailsUpdated", (player: PlayerDetailsResponse) => {
-      if (this.Players && this.Players.length > 0) {
-        var index = _.findIndex(this.Players, p => p.id == player.id);
-        this.Players.splice(index, 1, player);
-      }
-    });
-    this._hubConnection.on("playerRemoved", (playerId: string) => {
-      if (this.Players && this.Players.length > 0) {
-        _.remove(this.Players, p => p.id === playerId);
-      }
-    });
     this._hubConnection.on("startingSession", () => {
       this.CloseConnection();
       this._router.navigate(['/justone/waitingforgame', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
@@ -184,9 +137,6 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
   CloseConnection() {
     var connection = this._hubConnection;
     if (connection) {
-      connection.off("playerAdded");
-      connection.off("playerDetailsUpdated");
-      connection.off("playerRemoved");
       connection.off("startingSession");
 
       connection.onclose(() => { });
@@ -194,12 +144,6 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent {
       connection.stop().then(() => {
         this._hubConnection = null;
       });
-    }
-  }
-
-  private setDefaultNewPlayerName(player: PlayerDetailsResponse) {
-    if (!player.playerName) {
-      player.playerName = "New Player";
     }
   }
 

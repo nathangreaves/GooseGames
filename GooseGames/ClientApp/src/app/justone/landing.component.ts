@@ -6,6 +6,7 @@ import { SessionLandingResponse } from '../../models/session'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { NavbarService } from '../../services/navbar';
 import { JustOneLocalStorage } from '../../services/justone/localstorage';
+import { GlobalSessionService } from '../../services/session';
 
 @Component({
   selector: 'app-just-one-landing-component',
@@ -14,7 +15,6 @@ import { JustOneLocalStorage } from '../../services/justone/localstorage';
 
 export class JustOneLandingComponent {
 
-  _sessionService: JustOneSessionService;
   _justOneLocalStorage: JustOneLocalStorage;
   _router: Router;
   _navbarService: NavbarService;
@@ -23,8 +23,8 @@ export class JustOneLandingComponent {
   DisableButtons: boolean;
   CanRejoin: boolean = false;
 
-  constructor(sessionService: JustOneSessionService, justOneLocalStorage: JustOneLocalStorage, navbarService: NavbarService, router: Router) {
-    this._sessionService = sessionService;
+  constructor(private sessionService: GlobalSessionService, justOneLocalStorage: JustOneLocalStorage, navbarService: NavbarService, router: Router) {
+    
     this._navbarService = navbarService;
     this._justOneLocalStorage = justOneLocalStorage;
     this._router = router;
@@ -38,22 +38,6 @@ export class JustOneLandingComponent {
   }
 
 
-  public StartNewGame(password: string) {
-    this.clearMessage();
-
-    if (!password) {
-      this.ErrorMessage = "No game identifier given for new game";
-      return;
-    }
-
-    this.DisableButtons = true;    
-    this._sessionService.CreateGame({ password: password })
-      .then(data => this.handleResponse(data))
-      .catch(data => this.genericError())
-      .finally(() => this.DisableButtons = false);
-
-  }
-
   public JoinGame(password: string) {
     this.clearMessage();
 
@@ -63,7 +47,7 @@ export class JustOneLandingComponent {
     }
 
     this.DisableButtons = true;
-    this._sessionService.JoinGame({ password: password })
+    this.sessionService.enterGame({ password: password })
       .then(data => this.handleResponse(data))
       .catch(data => this.genericError())
       .finally(() => this.DisableButtons = false);
@@ -79,7 +63,7 @@ export class JustOneLandingComponent {
 
       this._navbarService.setReadOnly(true);
 
-      this._router.navigate(['/justone/disclaimer', { SessionId: data.data.sessionId, PlayerId: data.data.playerId }]);
+      this._router.navigate(['/justone/sessionlobby', { SessionId: data.data.sessionId, PlayerId: data.data.playerId }]);
     }
     else {
       //Stay on page and display error

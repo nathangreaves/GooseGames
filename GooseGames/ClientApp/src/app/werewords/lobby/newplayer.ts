@@ -4,6 +4,7 @@ import { WerewordsComponentBase, WerewordsPlayerStatus } from '../../../models/w
 import { UpdatePlayerDetailsRequest } from '../../../models/player';
 import { GooseGamesLocalStorage } from '../../../services/localstorage';
 import { WerewordsSessionService } from '../../../services/werewords/session';
+import { GlobalSessionService } from '../../../services/session';
 
 @Component({
   selector: 'app-werewords-newplayer-component',
@@ -14,10 +15,9 @@ export class WerewordsNewPlayerDetailsComponent extends WerewordsComponentBase {
     
   PlayerName: string;
 
-  constructor(private _playerDetailsService: WerewordsSessionService, private _localStorage: GooseGamesLocalStorage) {
+  constructor(private _playerDetailsService: GlobalSessionService, private _localStorage: GooseGamesLocalStorage) {
 
     super();
-
     
     this.PlayerName = this._localStorage.GetPlayerName();
 
@@ -33,7 +33,7 @@ export class WerewordsNewPlayerDetailsComponent extends WerewordsComponentBase {
         playerId: this.PlayerId
       };
 
-    this._playerDetailsService.UpdatePlayerDetails(playerDetailsRequest)
+    this._playerDetailsService.updatePlayerDetails(playerDetailsRequest)
       .then(data => {
         if (data.success) {
 

@@ -18,20 +18,15 @@ namespace MSSQLRepository
         {
             modelBuilder.HasDefaultSchema("Fuji");
 
-            modelBuilder.Entity<Session>().HasMany(s => s.Players).WithOne(s => s.Session).HasForeignKey(r => r.SessionId)
-                .OnDelete(DeleteBehavior.NoAction);
-            modelBuilder.Entity<Session>().HasMany(s => s.DeckCards).WithOne(s => s.Session).HasForeignKey(r => r.SessionId);
-            modelBuilder.Entity<Session>().HasMany(s => s.DiscardedCards).WithOne(s => s.Session).HasForeignKey(r => r.SessionId);
+            modelBuilder.Entity<Game>().HasMany(s => s.DeckCards).WithOne(s => s.Game).HasForeignKey(r => r.GameId).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Game>().HasMany(s => s.DiscardedCards).WithOne(s => s.Game).HasForeignKey(r => r.GameId).OnDelete(DeleteBehavior.NoAction);
                        
-            modelBuilder.Entity<Session>().HasOne(s => s.SessionMaster).WithMany().HasForeignKey(s => s.SessionMasterId);
-            modelBuilder.Entity<Session>().HasOne(s => s.ActivePlayer).WithMany().HasForeignKey(s => s.ActivePlayerId);
-
-            modelBuilder.Entity<Player>().HasMany(s => s.Cards).WithOne(s => s.Player).HasForeignKey(r => r.PlayerId);
-            modelBuilder.Entity<Player>().HasOne(s => s.PlayedCard).WithMany().HasForeignKey(s => s.PlayedCardId);
+            //modelBuilder.Entity<PlayerInformation>().HasMany(s => s.Cards);
+            modelBuilder.Entity<PlayerInformation>().HasOne(s => s.PlayedCard).WithMany().HasForeignKey(s => s.PlayedCardId);
         }
 
-        public DbSet<Session> Sessions { get; set; }
-        public DbSet<Player> Players { get; set; }
+        public DbSet<Game> Games { get; set; }
+        public DbSet<PlayerInformation> PlayerInformation { get; set; }
         public DbSet<DeckCard> DeckCards { get; set; }
         public DbSet<DiscardedCard> DiscardedCards { get; set; }
         public DbSet<HandCard> HandCards { get; set; }

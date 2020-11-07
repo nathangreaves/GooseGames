@@ -1,8 +1,10 @@
-﻿using Entities.Werewords;
+﻿using Entities.Global.Enums;
+using Entities.Werewords;
 using Entities.Werewords.Enums;
 using GooseGames.Hubs;
 using GooseGames.Logging;
 using GooseGames.Services;
+using GooseGames.Services.Global;
 using Microsoft.Extensions.Caching.Memory;
 using Models.Enums;
 using Models.Enums.Werewords;
@@ -23,8 +25,8 @@ namespace GooseGames.Services.Werewords
     public class RoundService
     {
         private readonly IRoundRepository _roundRepository;
-        private readonly IPlayerRepository _playerRepository;
-        private readonly ISessionRepository _sessionRepository;
+        private readonly SessionService _sessionService;
+        private readonly Global.PlayerService _playerService;
         private readonly IPlayerRoundInformationRepository _playerRoundInformationRepository;
         private readonly IPlayerResponseRepository _playerResponseRepository;
         private readonly IPlayerVoteRepository _playerVoteRepository;
@@ -37,8 +39,8 @@ namespace GooseGames.Services.Werewords
         private const int DefaultRoundLength = 4;
 
         public RoundService(IRoundRepository roundRepository,
-            IPlayerRepository playerRepository,
-            ISessionRepository sessionRepository,
+            SessionService sessionService,
+            Global.PlayerService playerService,
             IPlayerRoundInformationRepository playerRoundInformationRepository,
             IPlayerResponseRepository playerResponseRepository,
             IPlayerVoteRepository playerVoteRepository,
@@ -48,8 +50,8 @@ namespace GooseGames.Services.Werewords
             IMemoryCache memoryCache)
         {
             _roundRepository = roundRepository;
-            _playerRepository = playerRepository;
-            _sessionRepository = sessionRepository;
+            _sessionService = sessionService;
+            _playerService = playerService;
             _playerRoundInformationRepository = playerRoundInformationRepository;
             _playerResponseRepository = playerResponseRepository;
             _playerVoteRepository = playerVoteRepository;
@@ -59,26 +61,24 @@ namespace GooseGames.Services.Werewords
             _memoryCache = memoryCache;
         }
 
-        internal async Task CreateNewRoundAsync(Session session)
+        internal async Task CreateNewRoundAsync(Guid sessionId)
         {
-            var players = await _playerRepository.FilterAsync(p => p.SessionId == session.Id);
+            var players = await _playerService.GetForSessionAsync(sessionId);
 
             var mayor = players[s_Random.Next(players.Count)];
             var otherPlayers = players.Where(p => p.Id != mayor.Id);
 
             var round = new Round
             {
-                Mayor = mayor,
-                Session = session,
+                MayorId = mayor.Id,
+                SessionId = sessionId,
                 RoundDurationMinutes = DefaultRoundLength,
                 Status = RoundStatusEnum.NightSecretRole
             };
 
             await _roundRepository.InsertAsync(round);
 
-            session.CurrentRound = round;
-
-            await _sessionRepository.UpdateAsync(session);
+            await _sessionService.SetGameSessionIdentifierAsync(sessionId, GameEnum.Werewords, round.Id);
 
             var secretRoles = PlayerCountConfiguration.GetShuffledSecretRolesList(players.Count);
 
@@ -86,16 +86,16 @@ namespace GooseGames.Services.Werewords
             {
                 await _playerRoundInformationRepository.InsertAsync(new PlayerRoundInformation
                 {
-                    Player = player,
+                    PlayerId = player.Id,
                     Round = round,
                     SecretRole = secretRoles.Pop(),
                     IsMayor = player.Id == mayor.Id
                 });
             }
 
-            await _playerStatusService.UpdateAllPlayersForSessionAsync(session.Id, PlayerStatusEnum.NightRevealSecretRole);
+            await _playerStatusService.UpdateAllPlayersForSessionAsync(round.Id, Entities.Werewords.Enums.PlayerStatusEnum.NightRevealSecretRole);
 
-            await _werewordsHubContext.SendSecretRoleAsync(session.Id);
+            await _werewordsHubContext.SendSecretRoleAsync(sessionId);
         }
 
         internal GenericResponse<IEnumerable<string>> GetWordChoiceAsync(PlayerSessionRequest request)
@@ -116,17 +116,17 @@ namespace GooseGames.Services.Werewords
 
         internal async Task<GenericResponseBase> SubmitPlayerResponseAsync(SubmitPlayerResponseRequest request)
         {
-            var session = await _sessionRepository.GetAsync(request.SessionId);
+            var session = await _sessionService.GetAsync(request.SessionId);
             if (session == null)
             {
                 return GenericResponseBase.Error("Unable to find session");
             }
-            if (!session.CurrentRoundId.HasValue)
+            if (!session.GameSessionId.HasValue)
             {
                 return GenericResponseBase.Error("Session does not have current round");
             }
 
-            var round = await _roundRepository.GetAsync(session.CurrentRoundId.Value);
+            var round = await _roundRepository.GetAsync(session.GameSessionId.Value);
 
             if (round == null)
             {
@@ -161,7 +161,7 @@ namespace GooseGames.Services.Werewords
 
             if (request.ResponseType == PlayerResponseType.Correct)
             {
-                await _playerStatusService.UpdateAllPlayersForSessionAsync(session.Id, PlayerStatusEnum.DayVotingOnSeer);
+                await _playerStatusService.UpdateAllPlayersForSessionAsync(round.Id, Entities.Werewords.Enums.PlayerStatusEnum.DayVotingOnSeer);
 
                 round.Status = RoundStatusEnum.DayVoteSeer;
                 round.VoteStartedUtc = DateTime.UtcNow.AddSeconds(1);
@@ -172,7 +172,7 @@ namespace GooseGames.Services.Werewords
             }
             else if (TimerExpired(round))
             {
-                await SetRoundToVotingOnWerewolvesAsync(session, round);
+                await SetRoundToVotingOnWerewolvesAsync(round);
             }
             else 
             {
@@ -182,25 +182,27 @@ namespace GooseGames.Services.Werewords
                     round.WayOffSpent = round.WayOffSpent || request.ResponseType == PlayerResponseType.WayOff;
 
                     await _roundRepository.UpdateAsync(round);
-                }                
+                }
 
-                var currentActivePlayer = respondingPlayer.Player;
-                currentActivePlayer.Status = PlayerStatusEnum.DayPassive;
-                var nextActivePlayerInformation = GetNextActivePlayer(playerInformations, respondingPlayer);
+                var mayorPlayerId = playerInformations.First(p => p.IsMayor).PlayerId;
 
-                var nextActivePlayer = nextActivePlayerInformation.Player;
-                nextActivePlayer.Status = PlayerStatusEnum.DayActive;
+                var currentActivePlayer = respondingPlayer;
+                currentActivePlayer.Status = Entities.Werewords.Enums.PlayerStatusEnum.DayPassive;
+                var nextActivePlayerId = await _playerService.GetNextActivePlayerAsync(request.SessionId, respondingPlayer.PlayerId, p => p.Id == mayorPlayerId);
 
-                await _playerRepository.UpdateAsync(currentActivePlayer);
-                await _playerRepository.UpdateAsync(nextActivePlayer);
+                var nextActivePlayer = playerInformations.First(p => p.PlayerId == nextActivePlayerId);
+                nextActivePlayer.Status = Entities.Werewords.Enums.PlayerStatusEnum.DayActive;
 
-                await _werewordsHubContext.SendActivePlayerAsync(session.Id, nextActivePlayer.Id);
+                await _playerRoundInformationRepository.UpdateAsync(currentActivePlayer);
+                await _playerRoundInformationRepository.UpdateAsync(nextActivePlayer);
+
+                await _werewordsHubContext.SendActivePlayerAsync(session.Id, nextActivePlayer.PlayerId);
             }            
 
             return GenericResponseBase.Ok();
         }
 
-        private async Task SetRoundToVotingOnWerewolvesAsync(Session session, Round round)
+        private async Task SetRoundToVotingOnWerewolvesAsync(Round round)
         {
             var setRoundToVotingOnWerewolvesRequestKey = $"{round.Id}_VoW";
 
@@ -213,29 +215,29 @@ namespace GooseGames.Services.Werewords
 
             _memoryCache.Set(setRoundToVotingOnWerewolvesRequestKey, Guid.NewGuid().ToString(), DateTimeOffset.UtcNow.AddSeconds(30));
 
-            await _playerStatusService.UpdateAllPlayersForSessionAsync(session.Id, PlayerStatusEnum.DayVotingOnWerewolves);
+            await _playerStatusService.UpdateAllPlayersForSessionAsync(round.Id, Entities.Werewords.Enums.PlayerStatusEnum.DayVotingOnWerewolves);
 
             round.Status = RoundStatusEnum.DayVoteWerewolves;
             round.VoteStartedUtc = DateTime.UtcNow.AddSeconds(1);
             round.VoteDurationSeconds = 60;
 
             await _roundRepository.UpdateAsync(round);
-            await _werewordsHubContext.SendVoteWerewolvesAsync(session.Id, round.VoteStartedUtc.AddSeconds(round.VoteDurationSeconds), round.SecretWord);
+            await _werewordsHubContext.SendVoteWerewolvesAsync(round.SessionId, round.VoteStartedUtc.AddSeconds(round.VoteDurationSeconds), round.SecretWord);
         }
 
         internal async Task<GenericResponseBase> SubmitVoteAsync(SubmitVoteRequest request, PlayerVoteTypeEnum voteType)
         {
-            var session = await _sessionRepository.GetAsync(request.SessionId);
+            var session = await _sessionService.GetAsync(request.SessionId);
             if (session == null)
             {
                 return GenericResponseBase.Error("Unable to find session");
             }
-            if (!session.CurrentRoundId.HasValue)
+            if (!session.GameSessionId.HasValue)
             {
                 return GenericResponseBase.Error("Session does not have current round");
             }
 
-            var round = await _roundRepository.GetAsync(session.CurrentRoundId.Value);
+            var round = await _roundRepository.GetAsync(session.GameSessionId.Value);
 
             if (round == null)
             {
@@ -276,42 +278,20 @@ namespace GooseGames.Services.Werewords
             return false;
         }
 
-        private static PlayerRoundInformation GetNextActivePlayer(IEnumerable<PlayerRoundInformation> playerInformations, PlayerRoundInformation currentActivePlayer)
-        {
-            var orderedPlayerList = playerInformations.OrderBy(x => x.Player.PlayerNumber).ToList();
-
-            PlayerRoundInformation nextActivePlayer = null;
-            if (orderedPlayerList.Last().PlayerId == currentActivePlayer.PlayerId)
-            {
-                nextActivePlayer = orderedPlayerList.First();
-            }
-            else
-            {
-                var indexOfPrevious = orderedPlayerList.IndexOf(currentActivePlayer);
-                nextActivePlayer = orderedPlayerList[indexOfPrevious + 1];
-            }
-
-            if (nextActivePlayer.IsMayor)
-            {
-                return GetNextActivePlayer(playerInformations, nextActivePlayer);
-            }
-
-            return nextActivePlayer;
-        }
 
         internal async Task<GenericResponseBase> PostWordAsync(WordChoiceRequest request)
         {
-            var session = await _sessionRepository.GetAsync(request.SessionId);
+            var session = await _sessionService.GetAsync(request.SessionId);
             if (session == null)
             {
                 return GenericResponseBase.Error("Unable to find session");
             }
-            if (!session.CurrentRoundId.HasValue)
+            if (!session.GameSessionId.HasValue)
             {
                 return GenericResponseBase.Error("Session does not have current round");
             }
 
-            var round = await _roundRepository.GetAsync(session.CurrentRoundId.Value);
+            var round = await _roundRepository.GetAsync(session.GameSessionId.Value);
 
             if (round == null)
             {
@@ -332,8 +312,8 @@ namespace GooseGames.Services.Werewords
             
             await _roundRepository.UpdateAsync(round);
 
-            await _playerStatusService.ConditionallyUpdateAllPlayersForSessionAsync(session.Id, PlayerStatusEnum.NightWaitingForMayor, PlayerStatusEnum.NightSecretWord);
-            await _playerStatusService.UpdatePlayerToStatusAsync(request.PlayerId, PlayerStatusEnum.NightSecretWord);
+            await _playerStatusService.ConditionallyUpdateAllPlayersForSessionAsync(round.Id, Entities.Werewords.Enums.PlayerStatusEnum.NightWaitingForMayor, Entities.Werewords.Enums.PlayerStatusEnum.NightSecretWord);
+            await _playerStatusService.UpdatePlayerToStatusAsync(request.PlayerId, round.Id, Entities.Werewords.Enums.PlayerStatusEnum.NightSecretWord);
 
             await _werewordsHubContext.SendSecretWordAsync(session.Id);
 
@@ -343,17 +323,17 @@ namespace GooseGames.Services.Werewords
 
         internal async Task<GenericResponse<SecretWordResponse>> GetSecretWordAsync(PlayerSessionRequest request)
         {
-            var session = await _sessionRepository.GetAsync(request.SessionId);
+            var session = await _sessionService.GetAsync(request.SessionId);
             if (session == null)
             {
                 return GenericResponse<SecretWordResponse>.Error("Unable to find session");
             }
-            if (!session.CurrentRoundId.HasValue)
+            if (!session.GameSessionId.HasValue)
             {
                 return GenericResponse<SecretWordResponse>.Error("Session does not have current round");
             }
 
-            var round = await _roundRepository.GetAsync(session.CurrentRoundId.Value);
+            var round = await _roundRepository.GetAsync(session.GameSessionId.Value);
 
             if (round == null)
             {
@@ -366,29 +346,30 @@ namespace GooseGames.Services.Werewords
             var players = await _playerRoundInformationRepository.GetForRoundAsync(round.Id);
             var currentPlayer = players.First(p => p.PlayerId == request.PlayerId);
             var mayor = players.First(p => p.PlayerId == round.MayorId.Value);
+            var mayorPlayerName = await _playerService.GetPlayerNameAsync(mayor.PlayerId);
 
             return GenericResponse<SecretWordResponse>.Ok(new SecretWordResponse
             {
                 SecretRole = (SecretRole)(int)currentPlayer.SecretRole,
                 SecretWord = currentPlayer.SecretRole != SecretRolesEnum.Villager || currentPlayer.IsMayor ? round.SecretWord : null,
-                MayorName = mayor.Player.Name,
+                MayorName = mayorPlayerName,
                 MayorPlayerId = mayor.PlayerId
             });
         }
 
         internal async Task<GenericResponse<DayResponse>> GetDayAsync(PlayerSessionRequest request, bool checkTimers = true)
         {
-            var session = await _sessionRepository.GetAsync(request.SessionId);
+            var session = await _sessionService.GetAsync(request.SessionId);
             if (session == null)
             {
                 return GenericResponse<DayResponse>.Error("Unable to find session");
             }
-            if (!session.CurrentRoundId.HasValue)
+            if (!session.GameSessionId.HasValue)
             {
                 return GenericResponse<DayResponse>.Error("Session does not have current round");
             }
 
-            var round = await _roundRepository.GetAsync(session.CurrentRoundId.Value);
+            var round = await _roundRepository.GetAsync(session.GameSessionId.Value);
 
             if (round == null)
             {
@@ -402,18 +383,21 @@ namespace GooseGames.Services.Werewords
             var currentPlayer = players.First(p => p.PlayerId == request.PlayerId);
             var mayor = players.First(p => p.IsMayor);
 
+            var playerNamesDictionary = await _playerService.GetPlayerNamesAsync(players.Select(p => p.PlayerId));
+            var playerNumbersDictionary = await _playerService.GetPlayerNumbersAsync(players.Select(p => p.PlayerId));
+
             var isVote = round.Status == RoundStatusEnum.DayVoteSeer || round.Status == RoundStatusEnum.DayVoteWerewolves;
 
             if (checkTimers)
             {
                 if (isVote && VoteTimerExpired(round))
                 {
-                    await CompleteRoundAsync(round, session, players);
+                    await CompleteRoundAsync(round, players);
                     return await GetDayAsync(request, false);
                 }
                 else if (!isVote && TimerExpired(round) && round.Status != RoundStatusEnum.Complete)
                 {
-                    await SetRoundToVotingOnWerewolvesAsync(session, round);
+                    await SetRoundToVotingOnWerewolvesAsync(round);
                     return await GetDayAsync(request, false);
                 } 
             }
@@ -421,20 +405,20 @@ namespace GooseGames.Services.Werewords
             return GenericResponse<DayResponse>.Ok(new DayResponse 
             {
                 RoundId = round.Id,
-                MayorName = mayor.Player.Name,
+                MayorName = playerNamesDictionary[mayor.PlayerId],
                 MayorPlayerId = mayor.PlayerId,
                 SecretRole = (SecretRole)(int)currentPlayer.SecretRole,
                 SecretWord = currentPlayer.SecretRole != SecretRolesEnum.Villager || currentPlayer.IsMayor || isVote ? round.SecretWord : null,
-                IsActive = currentPlayer.Player.Status == PlayerStatusEnum.DayActive,
+                IsActive = currentPlayer.Status == Entities.Werewords.Enums.PlayerStatusEnum.DayActive,
                 EndTime = round.RoundStartedUtc != default ? DateTime.SpecifyKind(round.RoundStartedUtc, DateTimeKind.Utc).AddMinutes(round.RoundDurationMinutes) : (DateTime?)null,
                 VoteEndTime = round.VoteStartedUtc != default ? DateTime.SpecifyKind(round.VoteStartedUtc, DateTimeKind.Utc).AddSeconds(round.VoteDurationSeconds) : (DateTime?)null,
                 SoCloseSpent = round.SoCloseSpent,
                 WayOffSpent = round.WayOffSpent,
-                Players = players.Select(p => new PlayerRoundInformationResponse 
+                Players = players.OrderBy(p => playerNumbersDictionary[p.PlayerId]).Select(p => new PlayerRoundInformationResponse 
                 {
                     Id = p.PlayerId,
-                    Name = p.Player.Name,
-                    Active = p.Player.Status == PlayerStatusEnum.DayActive,
+                    Name = playerNamesDictionary[p.PlayerId],
+                    Active = p.Status == Entities.Werewords.Enums.PlayerStatusEnum.DayActive,
                     IsMayor = p.IsMayor,
                     SecretRole = round.Status == RoundStatusEnum.DayVoteSeer && p.SecretRole == SecretRolesEnum.Werewolf ? (SecretRole)(int)p.SecretRole : (SecretRole?)null,
                     Responses = p.Responses.OrderBy(r => r.CreatedUtc).Select(r => new Models.Responses.Werewords.Player.PlayerResponse 
@@ -445,20 +429,19 @@ namespace GooseGames.Services.Werewords
             });
         }
 
-
         internal async Task<GenericResponse<RoundOutcomeResponse>> GetOutcomeAsync(PlayerSessionRequest request)
         {
-            var session = await _sessionRepository.GetAsync(request.SessionId);
+            var session = await _sessionService.GetAsync(request.SessionId);
             if (session == null)
             {
                 return GenericResponse<RoundOutcomeResponse>.Error("Unable to find session");
             }
-            if (!session.CurrentRoundId.HasValue)
+            if (!session.GameSessionId.HasValue)
             {
                 return GenericResponse<RoundOutcomeResponse>.Error("Session does not have current round");
             }
 
-            var round = await _roundRepository.GetAsync(session.CurrentRoundId.Value);
+            var round = await _roundRepository.GetAsync(session.GameSessionId.Value);
 
             if (round == null)
             {
@@ -473,6 +456,8 @@ namespace GooseGames.Services.Werewords
                 mostVotedPlayers = await GetMostVotedPlayerIdsAsync(round);
             }
 
+            var playerNamesDictionary = await _playerService.GetPlayerNamesAsync(players.Select(p => p.PlayerId));
+
             return GenericResponse<RoundOutcomeResponse>.Ok(new RoundOutcomeResponse 
             {
                 SecretWord = round.SecretWord,
@@ -481,14 +466,14 @@ namespace GooseGames.Services.Werewords
                 {
                     Id = p.PlayerId,
                     IsMayor = p.IsMayor,
-                    Name = p.Player.Name,
+                    Name = playerNamesDictionary[p.PlayerId],
                     SecretRole = (SecretRole)(int)p.SecretRole,
                     WasVoted = mostVotedPlayers.Contains(p.PlayerId)
                 })
             });
         }
 
-        private async Task CompleteRoundAsync(Round round, Session session, IEnumerable<PlayerRoundInformation> players)
+        private async Task CompleteRoundAsync(Round round, IEnumerable<PlayerRoundInformation> players)
         {
             var completeRoundRequestKey = $"{round.Id}";
 
@@ -530,12 +515,11 @@ namespace GooseGames.Services.Werewords
                 }
             }
 
-            await _playerStatusService.UpdateAllPlayersForSessionAsync(round.SessionId, PlayerStatusEnum.DayOutcome);
+            await _playerStatusService.UpdateAllPlayersForSessionAsync(round.Id, Entities.Werewords.Enums.PlayerStatusEnum.DayOutcome);
 
             await _roundRepository.UpdateAsync(round);
 
-            session.StatusId = SessionStatusEnum.New;
-            await _sessionRepository.UpdateAsync(session);
+            await _sessionService.SetToLobbyAsync(round.SessionId);
 
             await _werewordsHubContext.SendRoundOutcomeAsync(round.SessionId);
         }
@@ -554,17 +538,17 @@ namespace GooseGames.Services.Werewords
 
         internal async Task<GenericResponseBase> StartAsync(PlayerSessionRequest request)
         {
-            var session = await _sessionRepository.GetAsync(request.SessionId);
+            var session = await _sessionService.GetAsync(request.SessionId);
             if (session == null)
             {
                 return GenericResponseBase.Error("Unable to find session");
             }
-            if (!session.CurrentRoundId.HasValue)
+            if (!session.GameSessionId.HasValue)
             {
                 return GenericResponseBase.Error("Session does not have current round");
             }
 
-            var round = await _roundRepository.GetAsync(session.CurrentRoundId.Value);
+            var round = await _roundRepository.GetAsync(session.GameSessionId.Value);
 
             if (round == null)
             {
