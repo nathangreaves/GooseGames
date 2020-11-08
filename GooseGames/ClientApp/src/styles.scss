@@ -1,5 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
+@import '~@ctrl/ngx-emoji-mart/picker';
 
+
+.emoji-mart-preview-name{
+  display: none;
+}
+.emoji-mart-preview-shortname {
+  display: none;
+}
+
+.emoji-mart-preview-emoticons{
+    display: none;
+}
 /* Provide sufficient contrast against white background */
 a {
   color: #0366d6;
@@ -78,3 +90,4 @@ code {
 .gg-error-message {
 
 }
+

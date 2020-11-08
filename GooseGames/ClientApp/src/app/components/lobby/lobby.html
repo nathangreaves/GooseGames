@@ -23,6 +23,31 @@
       <div>
         <input id="playerName" [(ngModel)]="PlayerName" name="playername" />
       </div>
+
+      <div>
+        <div>
+          <label for="emoji"><strong>Emoji:</strong></label>
+        </div>
+        <div>
+          <ngx-emoji [emoji]="selectedEmoji"
+                     size="24"
+                     isNative="true"
+                     (click)="toggled = !toggled">
+          </ngx-emoji>
+        </div>
+        <div>
+          <emoji-mart [ngClass]="{'hidden-mart' : !toggled}"
+                      title="Pick Emoji"
+                      showPreview="false"
+                      (emojiSelect)="handleClick($event)"
+                      isNative="true"
+                      perLine="8"
+                      [emoji]="selectedEmoji">
+
+          </emoji-mart>
+        </div>
+      </div>
+      
     </fieldset>
   </form>
 

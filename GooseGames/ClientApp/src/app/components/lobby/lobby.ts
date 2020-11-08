@@ -6,6 +6,7 @@ import { GenericResponseBase } from '../../../models/genericresponse';
 import { IGlobalLobbyHubParameters } from './hub';
 import { GooseGamesLocalStorage } from '../../../services/localstorage';
 import { Router } from '@angular/router';
+import { EmojiEvent, EmojiData, EmojiService } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 
 export interface ILobbyComponentParameters {  
   minPlayers: number;
@@ -39,14 +40,24 @@ export class LobbyComponent {
   
   PlayerName: string;
   playerReady: boolean;
-
+  toggled: boolean;
+  selectedEmoji: string;
+  
   globalHubConnectionParameters: IGlobalLobbyHubParameters;
 
-  constructor(private _globalSessionService: GlobalSessionService, private localStorage: GooseGamesLocalStorage, private router: Router) {
+  constructor(private _globalSessionService: GlobalSessionService, private localStorage: GooseGamesLocalStorage, private router: Router, private emojiSearch: EmojiService) {
 
     this.Loading = true;
 
     this.PlayerName = this.localStorage.GetPlayerName();
+    var emoji = _.first(this.emojiSearch.emojis);
+    this.selectedEmoji = emoji.colons ?? emoji.id;    
+  }
+
+  handleClick($event: EmojiEvent) {
+    var emoji = $event.emoji;
+    this.selectedEmoji = emoji.colons ?? emoji.id;    
+    this.toggled = false;
   }
 
   playerAdded = (player: PlayerDetailsResponse) => {

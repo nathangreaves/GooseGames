@@ -22,3 +22,8 @@
   .player-table waiting-for-response{
 
   }
+
+
+.hidden-mart{
+    display: none;
+}
