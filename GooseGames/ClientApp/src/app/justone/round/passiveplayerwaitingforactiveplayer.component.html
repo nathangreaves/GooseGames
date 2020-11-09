@@ -4,7 +4,8 @@
 <div>
   <div *ngIf="!Loading">
     <span>Waiting for </span>
-    <span [ngClass]="PlayerNumberCss.GetClass(ActivePlayerNumber)" class="just-one-apply-player-color">{{ActivePlayerName}}</span> to guess
+    <gg-emoji [emoji]="ActivePlayerEmoji"></gg-emoji>
+    <span [ngClass]="PlayerNumberCss.GetClass(ActivePlayerNumber)" class="just-one-apply-player-color"> {{ActivePlayerName}}</span> to guess
   </div>
   <div *ngIf="!Loading" class="just-one-important-word just-one-touch-area"
        (mousedown)="show()" (mouseup)="hide()" (touchstart)="show()" (touchend)="hide()">

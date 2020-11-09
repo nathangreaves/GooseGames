@@ -15,6 +15,7 @@ namespace Entities.Global
         public Session Session { get; set; }
         public int PlayerNumber { get; set; }
         public string Name { get; set; }
+        public string Emoji { get; set; }
         public PlayerStatusEnum Status { get; set; }
     }
 }

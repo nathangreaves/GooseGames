@@ -52,7 +52,6 @@
     <None Remove="ClientApp\src\app\justone\landing.component.ts" />
     <None Remove="ClientApp\src\app\justone\navbarheader.component.css" />
     <None Remove="ClientApp\src\app\justone\navbarheader.component.ts" />
-    <None Remove="ClientApp\src\app\justone\newplayerdetails.component.ts" />
     <None Remove="ClientApp\src\app\justone\rejoin.component.ts" />
     <None Remove="ClientApp\src\app\justone\round\activeplayerguess.component.ts" />
     <None Remove="ClientApp\src\app\justone\round\activeplayerwaitingforclues.component.ts" />
@@ -172,7 +171,6 @@
     <TypeScriptCompile Include="ClientApp\src\app\justone\navbarheader.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\landing.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\navbarheader.component.css" />
-    <TypeScriptCompile Include="ClientApp\src\app\justone\newplayerdetails.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\rejoin.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\round\activeplayerguess.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\justone\round\activeplayerwaitingforcluevote.component.ts">

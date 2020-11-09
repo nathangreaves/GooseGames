@@ -24,10 +24,12 @@ export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
 
   ActivePlayerNumber: number;
   ActivePlayerName: string;
+  ActivePlayerEmoji: string;
   Word: string;
   RevealedWord: string;
   clueListComponent: JustOneClueListComponent;
-
+  DisableSubmitClueVote: boolean;
+  
   constructor(clueService: JustOneClueService, router: Router, activatedRoute: ActivatedRoute) {
 
     super(activatedRoute);
@@ -57,6 +59,7 @@ export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
       if (response.success) {
         this.ActivePlayerNumber = response.data.activePlayerNumber;
         this.ActivePlayerName = response.data.activePlayerName;
+        this.ActivePlayerEmoji = response.data.activePlayerEmoji;
         this.RevealedWord = response.data.wordToGuess;
 
         _.forEach(response.data.responses, clue => { clue.responseVoted = (clue.responseInvalid === true) ? false : null; });
@@ -91,10 +94,17 @@ export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
     }
   }
 
+  HandleGenericError() {
+    this.DisableSubmitClueVote = false;
+    super.HandleGenericError();
+  }
+
   SubmitClueVote() {
 
+    this.DisableSubmitClueVote = true;
     if (_.find(this.clueListComponent.Clues, clue => clue.responseVoted == null)) {
       this.ErrorMessage = "Please mark all responses as either Valid or Invalid";
+      this.DisableSubmitClueVote = false;
       return;
     }
 
@@ -107,6 +117,7 @@ export class JustOneClueVoteComponent extends JustOneClueListComponentBase {
       .then(data => {
         if (!data.success) {
           this.ErrorMessage = data.errorCode;
+          this.DisableSubmitClueVote = false;
         }
         else {
           this._router.navigate([

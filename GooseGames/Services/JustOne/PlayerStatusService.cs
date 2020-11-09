@@ -20,6 +20,7 @@ namespace GooseGames.Services.JustOne
     {
         private readonly Global.SessionService _sessionService;
         private readonly PlayerService _playerService;
+        private readonly GlobalPlayerStatusService _globalPlayerStatusService;
         private readonly IPlayerStatusRepository _playerStatusRepository;
         private readonly RoundService _roundService;
         private readonly PlayerStatusQueryService _playerStatusQueryService;
@@ -28,6 +29,7 @@ namespace GooseGames.Services.JustOne
 
         public PlayerStatusService(Global.SessionService sessionService,
             Global.PlayerService playerService,
+            Global.GlobalPlayerStatusService globalPlayerStatusService,
             IPlayerStatusRepository playerStatusRepository,
             RoundService roundService,
             PlayerStatusQueryService playerStatusQueryService,
@@ -36,6 +38,7 @@ namespace GooseGames.Services.JustOne
         {
             _sessionService = sessionService;
             _playerService = playerService;
+            _globalPlayerStatusService = globalPlayerStatusService;
             _playerStatusRepository = playerStatusRepository;
             _roundService = roundService;
             _playerStatusQueryService = playerStatusQueryService;
@@ -45,6 +48,27 @@ namespace GooseGames.Services.JustOne
 
         internal async Task<GenericResponse<PlayerStatusValidationResponse>> ValidateGlobalPlayerStatusLobbyAsync(PlayerSessionRequest request)
         {
+            var globalResponse = await _globalPlayerStatusService.ValidatePlayerStatusAsync(request, GameEnum.JustOne);
+            if (!globalResponse.Success)
+            {
+                return GenericResponse<PlayerStatusValidationResponse>.Error(globalResponse.ErrorCode);
+            }
+
+            var session = await _sessionService.GetAsync(request.SessionId);
+            if (session == null)
+            {
+                return GenericResponse<PlayerStatusValidationResponse>.Error("You are not part of this session");
+            }
+
+            if (session.Status != SessionStatusEnum.Lobby)
+            {
+                var normalValidate = await ValidatePlayerStatusAsync(request, Entities.JustOne.Enums.PlayerStatusEnum.InLobby);
+                if (normalValidate.Success)
+                {
+                    return normalValidate;
+                }
+            }
+
             var player = await _playerService.GetAsync(request.PlayerId);
 
             if (player == null)
@@ -72,6 +96,11 @@ namespace GooseGames.Services.JustOne
                 return GenericResponse<PlayerStatusValidationResponse>.Error("You are not part of this session");
             }
 
+            if (session.Game != GameEnum.JustOne || session.GameSessionId == null)
+            {
+                return GenericResponse<PlayerStatusValidationResponse>.Error("This player and session are not valid for an in progress game of just one");
+            }
+
             var playerStatus = await _playerStatusRepository.SingleOrDefaultAsync(p => p.PlayerId == request.PlayerId && p.GameId == session.GameSessionId.Value);
             if (playerStatus == null)
             {
@@ -83,7 +112,7 @@ namespace GooseGames.Services.JustOne
                 return GenericResponse<PlayerStatusValidationResponse>.Error("This session was abandoned");
             }
 
-            if (session.Game != GameEnum.JustOne && session.GameSessionId.GetValueOrDefault() != playerStatus.GameId)
+            if (session.Game != GameEnum.JustOne || session.GameSessionId.GetValueOrDefault() != playerStatus.GameId)
             {
                 return GenericResponse<PlayerStatusValidationResponse>.Error("This player is not part of the in progress game");
             }

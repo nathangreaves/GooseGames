@@ -1,42 +1,52 @@
+<div *ngIf="ErrorMessage" class="alert alert-danger">
+  {{ErrorMessage}}
+  <div>
+    <button class="btn btn-primary" [routerLink]="['/']">Home</button>
+  </div>
+</div>
+<div *ngIf="Loading">
+  Loading... Just ONE moment please
+</div>
+<div *ngIf="!ErrorMessage && !Loading">
+  <global-lobby-component [parameters]="lobbyParameters"
+                          [gameConfigTemplate]="gameConfigTemplate"
+                          [readOnlyGameConfigTemplate]="readOnlyGameConfigTemplate">
 
-<global-lobby-component [parameters]="lobbyParameters"
-                        [gameConfigTemplate]="gameConfigTemplate"
-                        [readOnlyGameConfigTemplate]="readOnlyGameConfigTemplate">
+  </global-lobby-component>
 
-</global-lobby-component>
+  <ng-template #gameConfigTemplate>
 
-<ng-template #gameConfigTemplate>
+    <div class="just-one-config-area">
+      <div class="wordlist-header">
+        Word Lists:
+      </div>
 
-  <div class="just-one-config-area">
-    <div class="wordlist-header">
-      Word Lists:
-    </div>
-
-    <div class="word-list-item" *ngFor="let wordList of AvailableWordLists;">
-      <div class="form-check">
-        <input type="checkbox"
-               id="wordList.Name"
-               [checked]="wordList.Checked"
-               (change)="wordList.Checked = !wordList.Checked"
-               class="form-check-input"
-               attr.id="{{ 'cb-wordlist-' + wordList.WordList }}" />
-        <label attr.for="{{ 'cb-wordlist-' + wordList.WordList }}"
-               class="form-check-label cb-wordlist-label">
-          {{wordList.Name}}
-        </label>
+      <div class="word-list-item" *ngFor="let wordList of AvailableWordLists;">
+        <div class="form-check">
+          <input type="checkbox"
+                 id="wordList.Name"
+                 [checked]="wordList.Checked"
+                 (change)="wordList.Checked = !wordList.Checked"
+                 class="form-check-input"
+                 attr.id="{{ 'cb-wordlist-' + wordList.WordList }}" />
+          <label attr.for="{{ 'cb-wordlist-' + wordList.WordList }}"
+                 class="form-check-label cb-wordlist-label">
+            {{wordList.Name}}
+          </label>
+        </div>
       </div>
     </div>
-  </div>
 
-</ng-template>
+  </ng-template>
 
-<ng-template #readOnlyGameConfigTemplate>
+  <ng-template #readOnlyGameConfigTemplate>
 
-  <!--<p>If we need some game specific content we can put it here</p>-->
-  <!--<div>
-    <input type="checkbox"
-           [checked]="configYes"
-           (change)="flickConfig()" />
-  </div>-->
+    <!--<p>If we need some game specific content we can put it here</p>-->
+    <!--<div>
+      <input type="checkbox"
+             [checked]="configYes"
+             (change)="flickConfig()" />
+    </div>-->
 
-</ng-template>
+  </ng-template>
+</div>

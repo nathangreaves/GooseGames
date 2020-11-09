@@ -3,7 +3,8 @@
 </div>
 <div *ngIf="!Loading">
   <div>
-    <span [ngClass]="PlayerNumberCss.GetClass(ActivePlayerNumber)" class="just-one-apply-player-color">{{ActivePlayerName}}</span> is the active player
+    <gg-emoji [emoji]="ActivePlayerEmoji"></gg-emoji>
+    <span [ngClass]="PlayerNumberCss.GetClass(ActivePlayerNumber)" class="just-one-apply-player-color"> {{ActivePlayerName}}</span> is the active player
   </div>
   <div>
     Their word was:
@@ -22,10 +23,10 @@
     </p>
   </div>
   <div>
-    <button class="btn btn-primary" (click)="VoteCorrect()">Correct</button>
+    <button [disabled]="DisableButtons" class="btn btn-primary" (click)="VoteCorrect()">Correct</button>
   </div>
   <div>
-    <button class="btn btn-primary" (click)="VoteIncorrect()">Incorrect</button>
+    <button [disabled]="DisableButtons" class="btn btn-primary" (click)="VoteIncorrect()">Incorrect</button>
   </div>
 </div>
 

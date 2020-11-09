@@ -13,12 +13,15 @@ export class GooseGamesLocalStorage {
   GetPlayerName(): string {
     return localStorage.getItem("goose-games-player-name");
   }
+  GetPlayerEmoji(): string {
+    return localStorage.getItem("goose-games-player-emoji");
+  }
 
   //Clear() {
   //  localStorage.removeItem("goose-games-player-name");
   //}
 
-  CachePlayerDetails(playerSession: IPlayerSession, playerName: string = null) {
+  CachePlayerDetails(playerSession: IPlayerSession, playerName: string = null, playerEmoji: string = null) {
     localStorage.setItem("goose-games-session-id", playerSession.SessionId);
     localStorage.setItem("goose-games-player-id", playerSession.PlayerId);
 
@@ -28,6 +31,9 @@ export class GooseGamesLocalStorage {
 
     if (playerName) {
       localStorage.setItem("goose-games-player-name", playerName);
+    }
+    if (playerEmoji) {
+      localStorage.setItem("goose-games-player-emoji", playerEmoji);
     }
   }
 

@@ -8,6 +8,7 @@ namespace Models.Responses.JustOne.Response
     {
         public int ActivePlayerNumber { get; set; }
         public string ActivePlayerName { get; set; }
+        public string ActivePlayerEmoji { get; set; }
         public string WordToGuess { get; set; }
         public IEnumerable<PlayerResponse> Responses { get; set; }
     }

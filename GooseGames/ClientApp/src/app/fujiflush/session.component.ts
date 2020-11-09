@@ -1,5 +1,5 @@
 import { Router, ActivatedRoute } from "@angular/router";
-import { Component } from "@angular/core";
+import { Component, OnDestroy } from "@angular/core";
 import {
   trigger,
   state,
@@ -102,7 +102,7 @@ import { GlobalSessionService } from "../../services/session";
     ])
   ]
 })
-export class FujiSessionComponent implements IPlayerSession {
+export class FujiSessionComponent implements IPlayerSession, OnDestroy {
 
   _sessionService: FujiSessionService;
   _handService: FujiHandService;
@@ -144,7 +144,6 @@ export class FujiSessionComponent implements IPlayerSession {
 
     this.load();
   }
-
 
   CardSelected(card: FujiHandCard) {
 
@@ -266,6 +265,10 @@ export class FujiSessionComponent implements IPlayerSession {
 
     });
     return this._hubConnection.start().catch(err => console.error(err));
+  }
+
+  ngOnDestroy(): void {
+    this.CloseConnection();
   }
 
   reloadSession() {
@@ -429,13 +432,12 @@ export class FujiSessionComponent implements IPlayerSession {
   CloseConnection() {
     var connection = this._hubConnection;
     if (connection) {
+      this._hubConnection = null;
       connection.off("updateSession");
 
       connection.onclose(() => { });
 
-      connection.stop().then(() => {
-        this._hubConnection = null;
-      });
+      connection.stop();
     }
   }
 

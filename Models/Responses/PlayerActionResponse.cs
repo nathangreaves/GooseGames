@@ -9,6 +9,7 @@ namespace Models.Responses
         public Guid Id { get; set; }
         public string PlayerName { get; set; }
         public int PlayerNumber { get; set; }
+        public string Emoji { get; set; }
         public bool HasTakenAction { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import * as signalR from "@microsoft/signalr";
@@ -14,7 +14,7 @@ import { NavbarHeaderEnum } from '../nav-menu/navbar-header';
   templateUrl: './waiting.component.html'
 })
 
-export class FujiWaitingComponent implements IPlayerSessionComponent {
+export class FujiWaitingComponent implements IPlayerSessionComponent, OnDestroy {
   _router: Router;
   _hubConnection: signalR.HubConnection; 
 
@@ -46,6 +46,10 @@ export class FujiWaitingComponent implements IPlayerSessionComponent {
     });
   }
 
+  ngOnDestroy(): void {
+    this.CloseConnection();
+  }
+
   private setupConnection() {
     this._hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`/fujihub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
@@ -74,10 +78,11 @@ export class FujiWaitingComponent implements IPlayerSessionComponent {
     var connection = this._hubConnection;
 
     if (connection) {
+    this._hubConnection = null;
       connection.off("beginSession");
 
       connection.onclose(() => { });
-      connection.stop().then(() => { this._hubConnection = null; });
+      connection.stop();
 
     }
   }

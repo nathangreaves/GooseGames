@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import { JustOneSessionService } from '../../services/justone/session'
 import { GenericResponseBase } from '../../models/genericresponse'
@@ -11,6 +11,7 @@ import { IPlayerSessionComponent } from '../../models/session';
 import { PlayerNumberCss } from '../../services/justone/ui'
 import { WordListCheckboxListItem, JustOneWordList } from '../../models/justone/wordlistenum';
 import { ILobbyComponentParameters } from '../components/lobby/lobby';
+import { NavbarService } from '../../services/navbar';
 
 const MinPlayers: number = 3;
 const MaxPlayers: number = 7;
@@ -20,7 +21,7 @@ const MaxPlayers: number = 7;
   templateUrl: './sessionlobby.component.html',
   styleUrls: ['./sessionlobby.component.css'],
 })
-export class JustOneSessionLobbyComponent implements IPlayerSessionComponent, OnInit {
+export class JustOneSessionLobbyComponent implements IPlayerSessionComponent, OnInit, OnDestroy {
 
   PlayerNumberCSS = PlayerNumberCss;
 
@@ -47,7 +48,7 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent, On
   constructor(sessionService: JustOneSessionService,
               playerStatusService: JustOnePlayerStatusService,
               router: Router,
-              activatedRoute: ActivatedRoute) {
+    activatedRoute: ActivatedRoute) {
     this._playerStatusService = playerStatusService;
     this._sessionService = sessionService;
     this._router = router;
@@ -57,9 +58,8 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent, On
     this.SessionId = activatedRoute.snapshot.params.SessionId;
     this.PlayerId = activatedRoute.snapshot.params.PlayerId;
 
-    this.setupConnection();
-
-    this.Validate();
+    this.setupConnection()
+      .then(this.Validate);
   }
 
   ngOnInit(): void {
@@ -96,6 +96,10 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent, On
     ];
   }
 
+  ngOnDestroy() {
+    this.CloseConnection();
+  }
+
   canStartSession = () : boolean => {
     if (!_.find(this.AvailableWordLists, p => p.Checked)) {
       this.ErrorMessage = "Please select at least one word list";
@@ -105,8 +109,8 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent, On
     return true;
   }
 
-  private Validate(): Promise<any> {
-    return this._playerStatusService.Validate(this, PlayerStatus.InLobby, () => { this.CloseConnection(); });
+  private Validate = (): Promise<any> => {
+    return this._playerStatusService.Validate(this, PlayerStatus.InLobby, () => { this.CloseConnection(); }).finally(() => this.Loading = false);
   }   
 
   startGame = (): Promise<GenericResponseBase> => {
@@ -137,13 +141,12 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent, On
   CloseConnection() {
     var connection = this._hubConnection;
     if (connection) {
+      this._hubConnection = null;
       connection.off("startingSession");
 
       connection.onclose(() => { });
 
-      connection.stop().then(() => {
-        this._hubConnection = null;
-      });
+      connection.stop();
     }
   }
 

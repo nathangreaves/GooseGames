@@ -26,7 +26,7 @@ import { NavbarsModule } from './navbars.module';
     HomeComponent,
     CodenamesLandingComponent,
     BigCodenamesSessionComponent,
-    NormalCodenamesSessionComponent
+    NormalCodenamesSessionComponent    
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

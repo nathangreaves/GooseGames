@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { JustOnePlayerStatusService } from '../../../services/justone/playerstatus'
 import { PlayerStatus } from '../../../models/justone/playerstatus'
@@ -73,7 +73,7 @@ export abstract class JustOnePlayerWaitingComponentBase implements IJustOnePlaye
   templateUrl: './playerwaiting.component.html',
   styleUrls: ['../sessionlobby.component.css']
 })
-export class JustOnePlayerWaitingComponent implements OnInit {
+export class JustOnePlayerWaitingComponent implements OnInit, OnDestroy {
   
   PlayerNumberCss = PlayerNumberCss;
 
@@ -137,6 +137,9 @@ export class JustOnePlayerWaitingComponent implements OnInit {
         console.error(err);
       });
   }
+  ngOnDestroy(): void {
+    this.CloseHubConnection();
+  }
 
   constructor(playerStatusService: JustOnePlayerStatusService) {
     this._playerStatusService = playerStatusService;
@@ -157,14 +160,13 @@ export class JustOnePlayerWaitingComponent implements OnInit {
   CloseHubConnection() {
     var connection = this._connection;
     if (connection) {
+      this._connection = null;
 
       this.playerWaitingComponent.OnCloseHubConnection(connection);
 
       connection.onclose(() => { });
 
-      connection.stop().then(() => {
-        this._connection = null;
-      })
+      connection.stop()
       .catch(err => {
         console.log(err);
       })

@@ -3,26 +3,24 @@ import { GlobalLobbyHubComponent } from './components/lobby/hub';
 import { LobbyComponent } from './components/lobby/lobby';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PickerModule } from '@ctrl/ngx-emoji-mart';
-import { EmojiModule } from '@ctrl/ngx-emoji-mart/ngx-emoji';
+import { EmojiComponent } from './components/emoji/emoji.component';
 
 @NgModule({
   declarations: [
     LobbyComponent,
-    GlobalLobbyHubComponent
+    GlobalLobbyHubComponent,
+    EmojiComponent
   ],
   imports: [
     CommonModule,
-    FormsModule,
-    PickerModule,
-    EmojiModule
+    FormsModule
   ],
   exports: [
     LobbyComponent,
-    GlobalLobbyHubComponent
+    GlobalLobbyHubComponent,
+    EmojiComponent
   ],
   entryComponents: [
-
   ]
 })
 export class SharedModule { }

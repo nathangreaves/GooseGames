@@ -10,6 +10,7 @@ namespace Models.Responses.JustOne.Response
         public Guid PlayerId { get; set; }
         public int PlayerNumber { get; set; }
         public string PlayerName { get; set; }
+        public string PlayerEmoji { get; set; }
         public string Response { get; set; }
         public bool ResponseInvalid { get; set; }
     }

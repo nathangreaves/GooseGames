@@ -28,8 +28,10 @@ export class JustOnePassivePlayerOutcomeVoteComponent implements IPlayerSessionC
 
   ActivePlayerName: string;
   ActivePlayerNumber: number;
+  ActivePlayerEmoji: string;
   ResponseWord: string;
   WordToGuess: string;
+  DisableButtons: boolean;
 
   _responseId: string;
 
@@ -55,6 +57,7 @@ export class JustOnePassivePlayerOutcomeVoteComponent implements IPlayerSessionC
   }
 
   VoteCorrect() {
+    this.DisableButtons = true;
     this.vote({
       PlayerId: this.PlayerId,
       SessionId: this.SessionId,
@@ -63,6 +66,7 @@ export class JustOnePassivePlayerOutcomeVoteComponent implements IPlayerSessionC
   }
 
   VoteIncorrect() {
+    this.DisableButtons = true;
     this.vote({
       PlayerId: this.PlayerId,
       SessionId: this.SessionId,
@@ -79,6 +83,7 @@ export class JustOnePassivePlayerOutcomeVoteComponent implements IPlayerSessionC
         }
         else {
           this.ErrorMessage = response.errorCode;
+          this.DisableButtons = false;
         }
       })
       .catch(() => this.HandleGenericError());
@@ -91,6 +96,7 @@ export class JustOnePassivePlayerOutcomeVoteComponent implements IPlayerSessionC
         if (response.success) {
           this.ActivePlayerName = response.data.activePlayerName;
           this.ActivePlayerNumber = response.data.activePlayerNumber;
+          this.ActivePlayerEmoji = response.data.activePlayerEmoji;
           this.WordToGuess = response.data.wordToGuess;
           this.ResponseWord = response.data.responses[0].response;
           this._responseId = response.data.responses[0].responseId;
@@ -105,5 +111,6 @@ export class JustOnePassivePlayerOutcomeVoteComponent implements IPlayerSessionC
 
   HandleGenericError() {
     this.ErrorMessage = "An Unknown Error Occurred";
+    this.DisableButtons = false;
   }
 }

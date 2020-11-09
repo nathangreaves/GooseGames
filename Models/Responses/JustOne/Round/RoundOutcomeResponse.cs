@@ -12,6 +12,7 @@ namespace Models.Responses.JustOne.Round
         public string WordGuessed { get; set; }
         public string ActivePlayerName { get; set; }
         public int ActivePlayerNumber { get; set; }
+        public string ActivePlayerEmoji { get; set; }
         public RoundOutcomeEnum RoundOutcome { get; set; }
         public Guid RoundId { get; set; }
         public RoundInformationResponse NextRoundInformation { get; set; }

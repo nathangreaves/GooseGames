@@ -4,7 +4,8 @@
 <div class="loading" style="margin-bottom: 10px;"  *ngIf="!Loading && !ErrorMessage">
 
   <div>
-    <span [ngClass]="PlayerNumberCss.GetClass(RoundOutcome.activePlayerNumber)" class="just-one-apply-player-color">{{RoundOutcome.activePlayerName}}</span>
+    <gg-emoji [emoji]="RoundOutcome.activePlayerEmoji"></gg-emoji>
+    <span [ngClass]="PlayerNumberCss.GetClass(RoundOutcome.activePlayerNumber)" class="just-one-apply-player-color"> {{RoundOutcome.activePlayerName}}</span>
     <span *ngIf="RoundOutcome.roundOutcome != 2"> guessed</span>
   </div>
   <div *ngIf="RoundOutcome.roundOutcome == 2">

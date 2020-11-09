@@ -61,6 +61,7 @@ namespace GooseGames.Services.JustOne
                 Id = p.Id,
                 PlayerName = p.Name,
                 PlayerNumber = p.PlayerNumber,
+                Emoji = p.Emoji,
                 HasTakenAction = responses.Any(x => x.PlayerId == p.Id)
             });
 
@@ -107,6 +108,7 @@ namespace GooseGames.Services.JustOne
                 Id = p.Id,
                 PlayerName = p.Name,
                 PlayerNumber = p.PlayerNumber,
+                Emoji = p.Emoji,
                 HasTakenAction = playersThatHaveVoted.Any(x => x.PlayerId == p.Id)
             });
 

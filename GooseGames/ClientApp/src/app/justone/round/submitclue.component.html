@@ -2,8 +2,8 @@
   I am loading...
 </div>
 <div *ngIf="!Loading">
-  <div>
-    <span [ngClass]="PlayerNumberCss.GetClass(ActivePlayerNumber)" class="just-one-apply-player-color">{{ActivePlayerName}}</span> is the active player
+  <div>    
+    <span [ngClass]="PlayerNumberCss.GetClass(ActivePlayerNumber)" class="just-one-apply-player-color"><gg-emoji [emoji]="ActivePlayerEmoji"></gg-emoji> {{ActivePlayerName}}</span> is the active player
   </div>
   <div>
     Their word is:
