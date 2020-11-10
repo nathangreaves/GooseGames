@@ -41,6 +41,10 @@ namespace MSSQLRepository
                 .UseSqlServer(configuration["ConnectionStrings:MSSQL"])
             );
 
+            services.AddDbContext<LetterJamContext>(options => options
+                .UseSqlServer(configuration["ConnectionStrings:MSSQL"])
+            );
+
             services.AddScoped<RepositoryInterface.Global.ISessionRepository, Global.SessionRepository>();
             services.AddScoped<RepositoryInterface.Global.IPlayerRepository, Global.PlayerRepository>();
 
@@ -62,6 +66,8 @@ namespace MSSQLRepository
             services.AddScoped<RepositoryInterface.Werewords.IPlayerRoundInformationRepository, Werewords.PlayerRoundInformationRepository>();
             services.AddScoped<RepositoryInterface.Werewords.IPlayerVoteRepository, Werewords.PlayerVoteRepository>();
             services.AddScoped<RepositoryInterface.Werewords.IPlayerResponseRepository, Werewords.PlayerResponseRepository>();
+
+            services.AddScoped<RepositoryInterface.LetterJam.IGameRepository, LetterJam.GameRepository>();
         }
     }
 }
