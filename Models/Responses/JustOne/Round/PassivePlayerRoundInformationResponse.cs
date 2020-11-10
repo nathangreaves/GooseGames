@@ -8,6 +8,7 @@ namespace Models.Responses.JustOne.Round
     {
         public string ActivePlayerName { get; set; }
         public int ActivePlayerNumber { get; set; }
+        public string ActivePlayerEmoji { get; set; }
         public string Word { get; set; }
 
     }

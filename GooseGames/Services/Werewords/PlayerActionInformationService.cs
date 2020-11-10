@@ -60,6 +60,7 @@ namespace GooseGames.Services.Werewords
                 Id = p.Id,
                 PlayerName = p.Name,
                 PlayerNumber = p.PlayerNumber,
+                Emoji = p.Emoji,
                 HasTakenAction = playersMatchingStatus.Any(x => x.PlayerId == p.Id)
             });
 

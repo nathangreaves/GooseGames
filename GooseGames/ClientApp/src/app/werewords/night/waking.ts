@@ -14,14 +14,7 @@ import { WerewordsWaitingForPlayerActionComponent } from '../common/waitingforpl
   templateUrl: './waking.html'
 })
 export class WerewordsNightWakingComponent extends WerewordsWaitingForPlayerActionComponentBase implements OnInit, OnDestroy {
-  
-  SecretRole: SecretRole;
-  MayorName: string;
-  MayorId: string;
-  IsMayor: boolean;
-  DisableButtons: boolean = false;
-  WaitingForMayor: boolean = false;
-  SecretWord: string;
+    
   _playerWaitingComponent: WerewordsWaitingForPlayerActionComponent;
 
   constructor(private playerStatusService: WerewordsPlayerStatusService) {

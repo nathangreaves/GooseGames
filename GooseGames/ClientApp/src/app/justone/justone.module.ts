@@ -8,7 +8,6 @@ import { JustOneNavbarHeaderComponent } from './navbarheader.component';
 import { JustOneDeclarationComponent } from './declaration.component';
 import { JustOneRejoinComponent } from './rejoin.component';
 
-import { JustOneNewPlayerDetailsComponent } from './newplayerdetails.component';
 import { JustOneSessionLobbyComponent } from './sessionlobby.component';
 import { JustOneRoundWaitingComponent } from './round/waiting.component';
 import { JustOneWaitingForRoundComponent } from './round/waitingforround.component';
@@ -39,7 +38,6 @@ const routes: Routes = [
   
   { path: "disclaimer", component: JustOneDeclarationComponent },
   { path: "rejoin", component: JustOneRejoinComponent },
-  { path: "newplayer", component: JustOneNewPlayerDetailsComponent },
   { path: "sessionlobby", component: JustOneSessionLobbyComponent },
   { path: "waitingforgame", component: JustOneRoundWaitingComponent },
   { path: "round/waitingforround", component: JustOneWaitingForRoundComponent },
@@ -71,7 +69,6 @@ const routes: Routes = [
     JustOneDeclarationComponent,
     JustOneRejoinComponent,
 
-    JustOneNewPlayerDetailsComponent,
     JustOneSessionLobbyComponent,
     JustOneRoundWaitingComponent,
     JustOneSubmitClueComponent,

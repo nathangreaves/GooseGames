@@ -16,6 +16,7 @@ export class WerewordsNightSecretRoleComponent extends WerewordsComponentBase im
   SecretRoleDescription: string;
   KnowledgeAboutOtherPlayers: string;
   MayorName: string;
+  MayorEmoji: string;
   MayorId: string;
   IsMayor: boolean;
   ButtonsEnabled: boolean = false;
@@ -55,15 +56,16 @@ export class WerewordsNightSecretRoleComponent extends WerewordsComponentBase im
           this.SecretRole = r.secretRole;
           this.SecretRoleDescription = GetSecretRoleDescription(r.secretRole);
           this.MayorName = r.mayorName;
+          this.MayorEmoji = r.mayorEmoji;
           this.MayorId = r.mayorPlayerId;
           this.IsMayor = r.mayorPlayerId.toLowerCase() == this.PlayerId.toLowerCase();
 
           var otherWerewolves = _.filter(r.knowledgeAboutOtherPlayers, p => p.secretRole == SecretRole.Werewolf);
           if (otherWerewolves.length == 1) {
-            this.KnowledgeAboutOtherPlayers = `${otherWerewolves[0].playerName} is a Werewolf`
+            this.KnowledgeAboutOtherPlayers = `${otherWerewolves[0].playerEmoji} is a Werewolf`
           }
           else if (otherWerewolves.length > 1) {
-            this.KnowledgeAboutOtherPlayers = `${_.reduce(otherWerewolves, (result, w) => `${result}${result ? ', ' : ''}${w.playerName}`, '')} are Werewolves`
+            this.KnowledgeAboutOtherPlayers = `${_.reduce(otherWerewolves, (result, w) => `${result}${result ? ', ' : ''}${w.playerEmoji}`, '')} are Werewolves`
           }
 
           return Promise.resolve(<GenericResponseBase>{ success: true });

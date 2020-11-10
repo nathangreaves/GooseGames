@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import { Router, ActivatedRoute } from '@angular/router';
 import * as signalR from "@microsoft/signalr";
@@ -14,7 +14,7 @@ import { PlayerNumberCss } from '../../../services/justone/ui'
   templateUrl: './passiveplayerwaitingforactiveplayer.component.html'
 })
 
-export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOneClueListComponentBase {
+export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOneClueListComponentBase implements OnDestroy {
   PlayerNumberCss = PlayerNumberCss;
   _clueService: JustOneClueService;
   _clueListComponent: JustOneClueListComponent;
@@ -22,6 +22,7 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
   _router: Router;
   ActivePlayerNumber: number;
   ActivePlayerName: string;
+  ActivePlayerEmoji: string;
   Word: string;
   RevealedWord: string;
 
@@ -33,6 +34,11 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
 
     this.hide();
   }
+
+  ngOnDestroy(): void {
+    this.CloseConnection();
+  }
+
   getPlayerStatus(): PlayerStatus {
     return PlayerStatus.PassivePlayerWaitingForActivePlayer;
   }
@@ -57,6 +63,7 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
       if (response.success) {
         this.ActivePlayerNumber = response.data.activePlayerNumber;
         this.ActivePlayerName = response.data.activePlayerName;
+        this.ActivePlayerEmoji = response.data.activePlayerEmoji;
         this.RevealedWord = response.data.wordToGuess;
       }
       return response;
@@ -110,14 +117,15 @@ export class JustOnePassivePlayerWaitingForActivePlayerComponent extends JustOne
     return this._hubConnection.start().catch(err => { this.HandleGenericError(); console.error(err) });
   }
   CloseConnection() {
-    if (this._hubConnection) {
-      this._hubConnection.off("roundOutcomeAvailable");
-      this._hubConnection.off("activePlayerResponseVoteRequired");
+    var hubConnection = this._hubConnection;
 
-      this._hubConnection.onclose(() => { });
-      this._hubConnection.stop().then(() => {
-        this._hubConnection = null;
-      })
+    if (hubConnection) {
+      this._hubConnection = null;
+      hubConnection.off("roundOutcomeAvailable");
+      hubConnection.off("activePlayerResponseVoteRequired");
+      
+      hubConnection.onclose(() => { });
+      hubConnection.stop()
         .catch(err => {
           console.error(err);
           this.HandleGenericError();

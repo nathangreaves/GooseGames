@@ -7,7 +7,7 @@
     <div class="row" *ngFor="let winningPlayer of WinningPlayers">
       <div class="col-2"></div>
       <div class="col-8 fuji-winner-text">
-        <span class="player-name">{{winningPlayer.name}}</span>
+        <span class="player-name"><gg-emoji [emoji]="winningPlayer.emoji"></gg-emoji> {{winningPlayer.name}}</span>
       </div>
       <div class="col-2"></div>
     </div>
@@ -35,7 +35,7 @@
        }">
 
       <div class="player-name-container col-4">
-        <span class="player-name">{{player.name}}</span>
+        <span class="player-name"><gg-emoji [emoji]="player.emoji"></gg-emoji> {{player.name}}</span>
       </div>
 
       <div class="hand col-4">
@@ -74,7 +74,7 @@
   <div class="active-player-played-card-area" @activePlayerPlayedCardTrigger *ngIf="ActivePlayerPlayedCardAnimation">
     <div class="player-box">
       <div class="player-name-container">
-        <span class="player-name">{{ActivePlayerPlayedCardAnimation.playerName}}:</span>
+        <span class="player-name"><gg-emoji [emoji]="ActivePlayerPlayedCardAnimation.playerEmoji"></gg-emoji> {{ActivePlayerPlayedCardAnimation.playerName}}:</span>
       </div>
       <div class="game-card card-played active-player-played-card" [ngClass]="CardNumberCss.ResolveCardClass(ActivePlayerPlayedCardAnimation.faceValue)">
         <span class="game-card-number">{{ActivePlayerPlayedCardAnimation.faceValue}}</span>

@@ -6,6 +6,7 @@ import { PlayerStatus, PlayerStatusRoutesMap } from '../../models/justone/player
 import { Router } from '@angular/router';
 import { PlayerSessionRoundRequest } from '../../models/justone/round';
 import { PlayerStatusValidationResponse } from '../../models/player';
+import { NavbarService } from '../navbar';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,7 @@ export class JustOnePlayerStatusService {
   private _http: HttpClient;
   private _router: Router;
 
-  constructor(http: HttpClient, router: Router, @Inject('BASE_URL') baseUrl: string) {
+  constructor(http: HttpClient, router: Router, @Inject('BASE_URL') baseUrl: string, private navbarService: NavbarService) {
 
     this._baseUrl = baseUrl;
     this._http = http;
@@ -52,7 +53,15 @@ export class JustOnePlayerStatusService {
           }
         }
         else {
-          component.ErrorMessage = response.errorCode;
+          var errorMessage = response.errorCode;
+          if (errorMessage = "a530d7fa-f842-492b-a0fc-6473af1c907a") {
+            errorMessage = "I don't know how you got here but it looks like you don't exist 😢. Sorry! Go back to the home page and try and join this session again.";
+          }
+          if (errorMessage = "511c0fb3-7d49-4fdf-a1a7-b1281b5ada4b") {
+            errorMessage = "Looks like you've been kicked out by the host 😢. Go back to the home page and try and join this session again.";
+          }
+          component.ErrorMessage = errorMessage;
+          this.navbarService.reset();
         }
         return response;
       })

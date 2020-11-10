@@ -16,23 +16,6 @@ export class WerewordsWaitingForPlayerActionComponent implements OnInit {
   ngOnInit() {
     this.playerWaitingComponent.SetPlayerWaitingComponent(this);
 
-    //var connectionBuilder = this.playerWaitingComponent.CreateHubConnection();
-    //connectionBuilder.withAutomaticReconnect();
-    //this._connection = connectionBuilder.build();
-
-    //this.playerWaitingComponent.SetupHubConnection(this._connection);
-
-    //this._connection.onreconnected(() => {
-    //  this.validateStatus().catch(err => {
-    //    this.playerWaitingComponent.HandleGenericError();
-    //    console.error(err);
-    //  });
-    //});
-
-    //this._connection.onclose(() => {
-    //  this.playerWaitingComponent.HubConnectionFailed();
-    //});
-
     this.playerWaitingComponent.LoadPlayers()
       .then(response => {
         if (response && response.success) {

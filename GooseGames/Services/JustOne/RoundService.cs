@@ -64,6 +64,7 @@ namespace GooseGames.Services.JustOne
             {
                 ActivePlayerName = activePlayer.Name,
                 ActivePlayerNumber = activePlayer.PlayerNumber,
+                ActivePlayerEmoji = activePlayer.Emoji,
                 Word = round.WordToGuess
             });
         }
@@ -117,6 +118,7 @@ namespace GooseGames.Services.JustOne
             {
                 ActivePlayerName = activePlayer.Name,
                 ActivePlayerNumber = activePlayer.PlayerNumber,
+                ActivePlayerEmoji = activePlayer.Emoji,
                 GameEnded = gameEnded,
                 RoundOutcome = (Models.Responses.JustOne.Round.RoundOutcomeEnum)(int)round.Outcome,
                 Score = game.Score,

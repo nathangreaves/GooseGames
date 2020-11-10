@@ -8,7 +8,7 @@ namespace Models.Responses.PlayerDetails
     {
         public Guid Id { get; set; }
         public string PlayerName { get; set; }
-        public int PlayerNumber { get; set; }
+        public string Emoji { get; set; }
         public bool IsSessionMaster { get; set; }
         public bool Ready { get; set; }
     }

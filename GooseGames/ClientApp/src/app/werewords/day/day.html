@@ -8,7 +8,7 @@
     <button class="btn btn-primary" (click)="Start()">Start</button>
   </div>
   <div *ngIf="!RoundStarted && !IsMayor && !Voting" class="start-button-container">
-    Waiting for Mayor {{MayorName}} to start the day
+    Waiting for <span class="mayor-title">Mayor</span><span class="mayor-name"> {{MayorName}} </span><gg-emoji [emoji]="MayorEmoji"></gg-emoji> to start the day
   </div>
   <div *ngIf="Voting">
     <div>
@@ -23,7 +23,7 @@
         </span>
       </div>
       <div *ngIf="!IsWerewolf">
-        Waiting for <span *ngFor="let werewolf of Werewolves; let last = last; let i = index"><span class="werewolf-name">{{werewolf.name}}</span><span *ngIf="!last"> and </span></span> to choose the Seer
+        Waiting for <span *ngFor="let werewolf of Werewolves; let last = last; let i = index"><span class="werewolf-name"><gg-emoji [emoji]="werewolf.emoji"></gg-emoji> {{werewolf.name}}</span><span *ngIf="!last"> and </span></span> to choose the Seer
       </div>
     </div>
     <div *ngIf="CurrentStatus === VotingOnWerewolfStatus">
@@ -47,7 +47,7 @@
               <span [ngClass]="{
                   'werewolf-name' : player.secretRole === WerewolfSecretRole,
                   'werewords-current-player' : player.id.toLowerCase() === PlayerId.toLowerCase()
-                  }">{{player.name}}</span>
+                  }"><gg-emoji [emoji]="player.emoji"></gg-emoji> {{player.name}}</span>
             </div>
             <div class="col-6 col-sm-7 col-md-8 werewords-responses-container">
               <div *ngFor="let response of player.responses" class="werewords-response-container">

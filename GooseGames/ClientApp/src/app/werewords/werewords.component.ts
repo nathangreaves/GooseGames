@@ -64,9 +64,9 @@ export class WerewordsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this._hubConnection) {
       var oldConnection = this._hubConnection;
+      this._hubConnection = null;
       oldConnection.onclose(() => { });
       oldConnection.stop();
-      this._hubConnection = null;
     }
   }
 

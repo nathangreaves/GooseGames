@@ -10,6 +10,7 @@ export interface IGlobalLobbyHubParameters {
   handlePlayerRemoved: (playerId: string) => void;
   handleConnectionError: (error: string) => void;
   handleReconnected: () => void;
+  resolveConnected: () => void;
 }
 
 @Component({
@@ -24,11 +25,7 @@ export class GlobalLobbyHubComponent implements OnInit, OnDestroy {
 
   private setupConnection(): Promise<any> {
 
-    if (this._globalHubConnection) {
-      var oldConnection = this._globalHubConnection;
-      oldConnection.onclose(() => { });
-      oldConnection.stop();
-    }
+    this.closeConnection();
 
     this._globalHubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`/globalhub?sessionId=${this.parameters.sessionId}&playerId=${this.parameters.playerId}`)
@@ -50,6 +47,7 @@ export class GlobalLobbyHubComponent implements OnInit, OnDestroy {
       this._globalHubConnection.on("playerAdded", this.parameters.handlePlayerAdded);
       this._globalHubConnection.on("playerDetailsUpdated", this.parameters.handlePlayerDetailsUpdated);
       this._globalHubConnection.on("playerRemoved", this.parameters.handlePlayerRemoved);
+      this.parameters.resolveConnected();
     });
   }
 
@@ -60,9 +58,12 @@ export class GlobalLobbyHubComponent implements OnInit, OnDestroy {
   closeConnection() {
     var globalConnection = this._globalHubConnection;
     if (globalConnection) {
+      this._globalHubConnection = null;
       globalConnection.off("playerAdded");
       globalConnection.off("playerDetailsUpdated");
       globalConnection.off("playerRemoved");
+
+      globalConnection.stop();
     }
   }
 }

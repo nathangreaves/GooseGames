@@ -193,11 +193,16 @@ div.remove-ws {
       font-size: 1.2em;
       font-weight: bold;
       text-align: center;
+      word-wrap: break-word;
   }
 
   .active-player-played-card-area .player-box {
     padding: 2em;
     padding-top: 1em;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
   }
   .active-player-played-card {
     height: 10em;
@@ -214,10 +219,12 @@ div.remove-ws {
   }
 
 .fuji-winners {
-    justify-content: center;
-    align-items: center;
-    margin-top: 1em;
-    font-size: 2em;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1em;
+  font-size: 2em;
+  display: flex;
+  flex-direction: column;
 }
 
 .fuji-winner-text{

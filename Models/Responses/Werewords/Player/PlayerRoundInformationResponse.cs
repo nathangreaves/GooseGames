@@ -8,6 +8,7 @@ namespace Models.Responses.Werewords.Player
     public class PlayerRoundInformationResponse
     {
         public string Name { get; set; }
+        public string Emoji { get; set; }
         public Guid Id { get; set; }
         public bool Active { get; set; }
         public IEnumerable<PlayerResponse> Responses { get; set; }

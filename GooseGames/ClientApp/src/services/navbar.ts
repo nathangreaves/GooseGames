@@ -20,6 +20,12 @@ export class NavbarService {
     this.AreaTitle = localStorage.getItem('navbar-areaTitle');
   }
 
+  reset() {
+    this.setReadOnly(false);
+    this.setAreaTitle('');
+    this.setAreaContent(null);
+  }
+
   setReadOnly(readOnly: boolean) {
     this.isReadOnly = readOnly;
     localStorage.setItem('navbar-isReadOnly', readOnly ? "true" : "");

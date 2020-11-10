@@ -1,5 +1,6 @@
 export class PlayerDetails {
   playerName: string;
+  emoji: string;
 }
 
 export class UpdatePlayerDetailsRequest extends PlayerDetails {
@@ -24,7 +25,7 @@ export class DeletePlayerRequest {
 export class PlayerDetailsResponse {
   id: string;
   playerName: string;
-  playerNumber: number;
+  emoji: string;
   isSessionMaster: boolean;
   ready: boolean;
 }
@@ -34,6 +35,7 @@ export class GetPlayerDetailsResponse {
   sessionMasterName: string;
   sessionMasterPlayerNumber: number;
   password: string;
+  randomEmoji: string;
   players: PlayerDetailsResponse[]
 }
 
@@ -46,5 +48,6 @@ export class PlayerAction {
   id: string;
   playerName: string;
   playerNumber: number;
+  emoji: string;
   hasTakenAction: boolean;
 }

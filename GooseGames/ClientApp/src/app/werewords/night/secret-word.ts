@@ -15,8 +15,10 @@ export class WerewordsNightSecretWordComponent extends WerewordsComponentBase im
   SecretRole: SecretRole;
   MayorName: string;
   MayorId: string;
+  MayorEmoji: string;
   IsMayor: boolean;
-  DisableButtons: boolean = true;
+  DisableButtons: boolean = false;
+  SecretWordViewed: boolean = false;
   WaitingForMayor: boolean = false;
   SecretWord: string;
   SecretWordHidden: boolean = true;
@@ -39,6 +41,7 @@ export class WerewordsNightSecretWordComponent extends WerewordsComponentBase im
     {
       this.SecretRole = data.secretRole;
       this.MayorName = data.mayorName;
+      this.MayorEmoji = data.mayorEmoji;
       this.MayorId = data.mayorPlayerId;
       this.IsMayor = data.mayorPlayerId.toLowerCase() == this.PlayerId.toLowerCase();
       this.SecretWord = data.secretWord;
@@ -58,7 +61,7 @@ export class WerewordsNightSecretWordComponent extends WerewordsComponentBase im
   }
   show() {
     this.SecretWordHidden = false;
-    this.DisableButtons = false;
+    this.SecretWordViewed = true;
   }
 
   hide() {

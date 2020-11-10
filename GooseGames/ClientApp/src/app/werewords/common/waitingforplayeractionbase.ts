@@ -12,28 +12,4 @@ export abstract class WerewordsWaitingForPlayerActionComponentBase extends Werew
   SetPlayerWaitingComponent(playerWaitingComponent: WerewordsWaitingForPlayerActionComponent) {
     this.PlayerWaitingComponent = playerWaitingComponent;
   }
-
-  //abstract OnCloseHubConnection(connection: signalR.HubConnection);
-  //abstract SetupHubConnection(connection: signalR.HubConnection);
-
-  //constructor(activatedRoute: ActivatedRoute) {
-  //  this.SessionId = activatedRoute.snapshot.params.SessionId;
-  //  this.PlayerId = activatedRoute.snapshot.params.PlayerId;
-  //}
-
-  //OnRedirect() {
-
-  //}
-
-  //CreateHubConnection(): signalR.HubConnectionBuilder {
-  //  var hubConnection = new signalR.HubConnectionBuilder()
-  //    .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`);
-
-  //  return hubConnection;
-  //}
-
-  //HubConnectionFailed() {
-  //  this.HandleGenericError();
-  //}
-
 }

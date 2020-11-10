@@ -6,6 +6,7 @@
 >
 
 </global-lobby-hub-component>
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>
 <div *ngIf="!Loading">
 
   <div class="lobby-header alert alert-info" *ngIf="SessionMaster && Players.length < parameters.minPlayers">
@@ -22,14 +23,21 @@
       </div>
       <div>
         <input id="playerName" [(ngModel)]="PlayerName" name="playername" />
-      </div>
+        <button class="emoji-button btn btn-outline-dark"
+                #emojiToggle
+                (click)="loadEmojiPicker(emojiToggle)">
+          <gg-emoji [emoji]="selectedEmoji"></gg-emoji>
+        </button>
+      </div>  
     </fieldset>
   </form>
 
   <div>
     <table class="player-table">
-      <tr *ngFor="let player of Players;" [ngClass]="{'new-player' : player.playerNumber == 0}">
-        <td class="player-number-cell">{{player.playerNumber}}</td>
+      <tr *ngFor="let player of Players;" [ngClass]="{'new-player' : !player.ready}">
+        <td class="player-emoji-cell">
+          <gg-emoji [emoji]="player.emoji"></gg-emoji>
+        </td>
         <td class="player-name-cell">
           {{player.playerName}}
         </td>
@@ -67,4 +75,3 @@
   </div>
 
 </div>
-<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

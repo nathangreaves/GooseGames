@@ -78,6 +78,7 @@ namespace GooseGames.Services.JustOne
                     PlayerId = p.PlayerId,
                     PlayerName = player.Name,
                     PlayerNumber = player.PlayerNumber,
+                    PlayerEmoji = player.Emoji,
                     Response = isActivePlayer && responseInvalid && round.Status == RoundStatusEnum.WaitingForLeaderResponse ? null : response.Word,
                     ResponseInvalid = responseInvalid
                 };
@@ -91,6 +92,7 @@ namespace GooseGames.Services.JustOne
             {
                 ActivePlayerName = activePlayer.Name,
                 ActivePlayerNumber = activePlayer.PlayerNumber,
+                ActivePlayerEmoji = activePlayer.Emoji,
                 WordToGuess = isActivePlayer ? null : round.WordToGuess,
                 Responses = responses
             });
@@ -114,6 +116,7 @@ namespace GooseGames.Services.JustOne
             {
                 ActivePlayerName = activePlayer.Name,
                 ActivePlayerNumber = activePlayer.PlayerNumber,
+                ActivePlayerEmoji = activePlayer.Emoji,
                 WordToGuess = round.WordToGuess,
                 Responses = new List<PlayerResponse> 
                 { 
@@ -123,6 +126,7 @@ namespace GooseGames.Services.JustOne
                         PlayerId = activePlayer.Id,
                         PlayerName = activePlayer.Name,
                         PlayerNumber = activePlayer.PlayerNumber,
+                        PlayerEmoji = activePlayer.Emoji,
                         Response = activePlayerResponse.Word
                     }
                 }

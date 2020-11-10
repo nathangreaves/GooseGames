@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import { FujiPlayerDetailsService } from '../../services/fujiflush/playerdetails'
 import { FujiSessionService } from '../../services/fujiflush/session'
@@ -17,7 +17,7 @@ const MaxPlayers: number = 8;
   templateUrl: './sessionlobby.component.html',
   styleUrls: ['./sessionlobby.component.css'],
 })
-export class FujiSessionLobbyComponent implements IPlayerSessionComponent, OnInit {
+export class FujiSessionLobbyComponent implements IPlayerSessionComponent, OnInit, OnDestroy {
 
   private _sessionService: FujiSessionService;
   private _router: Router;
@@ -60,11 +60,14 @@ export class FujiSessionLobbyComponent implements IPlayerSessionComponent, OnIni
       startSession: this.startSession
     }
   }
+  ngOnDestroy(): void {
+    this.CloseConnection();
+  }
 
-  startSession = () : Promise<GenericResponseBase> => {
+  startSession = (): Promise<GenericResponseBase> => {
     return this._sessionService.StartSession(this);
   }
-    
+
   private setupConnection(): Promise<any> {
     this._hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`/fujihub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
@@ -92,14 +95,13 @@ export class FujiSessionLobbyComponent implements IPlayerSessionComponent, OnIni
   CloseConnection() {
     var connection = this._hubConnection;
     if (connection) {
+      this._hubConnection = null;
       connection.off("startingSession");
       connection.off("beginSession");
 
       connection.onclose(() => { });
 
-      connection.stop().then(() => {
-        this._hubConnection = null;
-      });
+      connection.stop();
     }
   }
 

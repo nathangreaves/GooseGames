@@ -13,7 +13,7 @@
             'col-4 col-sm-5 col-md-3 col-lg-2' : ReadOnly
            }">
         <span class="player-name-cell just-one-apply-player-color"
-              [ngClass]="PlayerNumberCss.GetClass(clue.playerNumber)"><span [ngClass]="{'clue-invalid' : clue.responseInvalid && !clue.response }">{{clue.playerName}}</span></span>
+              [ngClass]="PlayerNumberCss.GetClass(clue.playerNumber)"><gg-emoji [emoji]="clue.playerEmoji"></gg-emoji><span [ngClass]="{'clue-invalid' : clue.responseInvalid && !clue.response }"> {{clue.playerName}}</span></span>
       </div>
 
       <div class="clue-list-word-wrap clue-list-column col-sm-8"

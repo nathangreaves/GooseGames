@@ -17,7 +17,6 @@ import { CodenamesLandingComponent } from './codenames/landing.component';
 import { BigCodenamesSessionComponent, NormalCodenamesSessionComponent } from './codenames/session.component';
 import { JustOneNavbarHeaderComponent } from './justone/navbarheader.component';
 import { NavbarsModule } from './navbars.module';
-import { GlobalLobbyHubComponent } from './components/lobby/hub';
 
 @NgModule({
   declarations: [
@@ -27,7 +26,7 @@ import { GlobalLobbyHubComponent } from './components/lobby/hub';
     HomeComponent,
     CodenamesLandingComponent,
     BigCodenamesSessionComponent,
-    NormalCodenamesSessionComponent
+    NormalCodenamesSessionComponent    
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

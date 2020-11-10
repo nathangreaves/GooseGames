@@ -1,4 +1,5 @@
-﻿using Entities.Global.Enums;
+﻿using Entities.Global;
+using Entities.Global.Enums;
 using Entities.Werewords;
 using Entities.Werewords.Enums;
 using GooseGames.Hubs;
@@ -346,14 +347,15 @@ namespace GooseGames.Services.Werewords
             var players = await _playerRoundInformationRepository.GetForRoundAsync(round.Id);
             var currentPlayer = players.First(p => p.PlayerId == request.PlayerId);
             var mayor = players.First(p => p.PlayerId == round.MayorId.Value);
-            var mayorPlayerName = await _playerService.GetPlayerNameAsync(mayor.PlayerId);
+            var mayorPlayer = await _playerService.GetAsync(mayor.PlayerId);
 
             return GenericResponse<SecretWordResponse>.Ok(new SecretWordResponse
             {
                 SecretRole = (SecretRole)(int)currentPlayer.SecretRole,
                 SecretWord = currentPlayer.SecretRole != SecretRolesEnum.Villager || currentPlayer.IsMayor ? round.SecretWord : null,
-                MayorName = mayorPlayerName,
-                MayorPlayerId = mayor.PlayerId
+                MayorName = mayorPlayer.Name,
+                MayorPlayerId = mayor.PlayerId,
+                MayorEmoji = mayorPlayer.Emoji
             });
         }
 
@@ -383,8 +385,7 @@ namespace GooseGames.Services.Werewords
             var currentPlayer = players.First(p => p.PlayerId == request.PlayerId);
             var mayor = players.First(p => p.IsMayor);
 
-            var playerNamesDictionary = await _playerService.GetPlayerNamesAsync(players.Select(p => p.PlayerId));
-            var playerNumbersDictionary = await _playerService.GetPlayerNumbersAsync(players.Select(p => p.PlayerId));
+            var playersDictionary = await _playerService.GetPlayersAsync(players.Select(p => p.PlayerId));
 
             var isVote = round.Status == RoundStatusEnum.DayVoteSeer || round.Status == RoundStatusEnum.DayVoteWerewolves;
 
@@ -402,11 +403,14 @@ namespace GooseGames.Services.Werewords
                 } 
             }
 
+            var mayorPlayer = playersDictionary[mayor.PlayerId];
+
             return GenericResponse<DayResponse>.Ok(new DayResponse 
             {
                 RoundId = round.Id,
-                MayorName = playerNamesDictionary[mayor.PlayerId],
-                MayorPlayerId = mayor.PlayerId,
+                MayorName = mayorPlayer.Name,
+                MayorEmoji = mayorPlayer.Emoji,
+                MayorPlayerId = mayorPlayer.Id,
                 SecretRole = (SecretRole)(int)currentPlayer.SecretRole,
                 SecretWord = currentPlayer.SecretRole != SecretRolesEnum.Villager || currentPlayer.IsMayor || isVote ? round.SecretWord : null,
                 IsActive = currentPlayer.Status == Entities.Werewords.Enums.PlayerStatusEnum.DayActive,
@@ -414,17 +418,21 @@ namespace GooseGames.Services.Werewords
                 VoteEndTime = round.VoteStartedUtc != default ? DateTime.SpecifyKind(round.VoteStartedUtc, DateTimeKind.Utc).AddSeconds(round.VoteDurationSeconds) : (DateTime?)null,
                 SoCloseSpent = round.SoCloseSpent,
                 WayOffSpent = round.WayOffSpent,
-                Players = players.OrderBy(p => playerNumbersDictionary[p.PlayerId]).Select(p => new PlayerRoundInformationResponse 
-                {
-                    Id = p.PlayerId,
-                    Name = playerNamesDictionary[p.PlayerId],
-                    Active = p.Status == Entities.Werewords.Enums.PlayerStatusEnum.DayActive,
-                    IsMayor = p.IsMayor,
-                    SecretRole = round.Status == RoundStatusEnum.DayVoteSeer && p.SecretRole == SecretRolesEnum.Werewolf ? (SecretRole)(int)p.SecretRole : (SecretRole?)null,
-                    Responses = p.Responses.OrderBy(r => r.CreatedUtc).Select(r => new Models.Responses.Werewords.Player.PlayerResponse 
+                Players = players.OrderBy(p => playersDictionary[p.PlayerId].PlayerNumber).Select(p => {
+                    var player = playersDictionary[p.PlayerId];
+                    return new PlayerRoundInformationResponse
                     {
-                        ResponseType = (PlayerResponseType)(int)r.ResponseType
-                    })
+                        Id = p.PlayerId,
+                        Name = player.Name,
+                        Emoji = player.Emoji,
+                        Active = p.Status == Entities.Werewords.Enums.PlayerStatusEnum.DayActive,
+                        IsMayor = p.IsMayor,
+                        SecretRole = round.Status == RoundStatusEnum.DayVoteSeer && p.SecretRole == SecretRolesEnum.Werewolf ? (SecretRole)(int)p.SecretRole : (SecretRole?)null,
+                        Responses = p.Responses.OrderBy(r => r.CreatedUtc).Select(r => new Models.Responses.Werewords.Player.PlayerResponse
+                        {
+                            ResponseType = (PlayerResponseType)(int)r.ResponseType
+                        })
+                    };
                 })
             });
         }
@@ -456,19 +464,24 @@ namespace GooseGames.Services.Werewords
                 mostVotedPlayers = await GetMostVotedPlayerIdsAsync(round);
             }
 
-            var playerNamesDictionary = await _playerService.GetPlayerNamesAsync(players.Select(p => p.PlayerId));
+            var playersDictionary = await _playerService.GetPlayersAsync(players.Select(p => p.PlayerId));
 
             return GenericResponse<RoundOutcomeResponse>.Ok(new RoundOutcomeResponse 
             {
                 SecretWord = round.SecretWord,
                 RoundOutcome = (RoundOutcome)(int)round.Outcome,
-                Players = players.Select(p => new RoundOutcomePlayerResponse 
+                Players = players.Select(p =>
                 {
-                    Id = p.PlayerId,
-                    IsMayor = p.IsMayor,
-                    Name = playerNamesDictionary[p.PlayerId],
-                    SecretRole = (SecretRole)(int)p.SecretRole,
-                    WasVoted = mostVotedPlayers.Contains(p.PlayerId)
+                    var player = playersDictionary[p.PlayerId];
+                    return new RoundOutcomePlayerResponse
+                    {
+                        Id = p.PlayerId,
+                        IsMayor = p.IsMayor,
+                        Name = player.Name,
+                        Emoji= player.Emoji,
+                        SecretRole = (SecretRole)(int)p.SecretRole,
+                        WasVoted = mostVotedPlayers.Contains(p.PlayerId)
+                    };
                 })
             });
         }

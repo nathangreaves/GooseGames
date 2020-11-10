@@ -3,11 +3,11 @@
     <tr *ngFor="let player of Players;" [ngClass]="{'new-player' : player.playerNumber == 0}">
       <td [ngClass]="PlayerNumberCss.GetClass(player.playerNumber)"
           class="player-name-cell just-one-apply-player-color">
-        {{player.playerName}}
+        <span>{{player.playerName}}</span>
       </td>
       <td>
         <span class="response-given" *ngIf="player.hasTakenAction">
-          Tick!
+          <gg-emoji [emoji]="player.emoji"></gg-emoji>
         </span>
         <span class="waiting-for-response" *ngIf="!player.hasTakenAction">
           ...

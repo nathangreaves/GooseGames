@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import { PlayerDetails, UpdatePlayerDetailsRequest } from '../../../models/player'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
@@ -17,7 +17,7 @@ import { NavbarHeaderEnum } from '../../nav-menu/navbar-header';
   templateUrl: './waiting.component.html'
 })
 
-export class JustOneRoundWaitingComponent implements IPlayerSessionComponent {
+export class JustOneRoundWaitingComponent implements IPlayerSessionComponent, OnDestroy {
   _router: Router;
   _hubConnection: signalR.HubConnection;
   _playerStatusService: JustOnePlayerStatusService
@@ -52,6 +52,10 @@ export class JustOneRoundWaitingComponent implements IPlayerSessionComponent {
       });
   }
 
+  ngOnDestroy(): void {
+    this.CloseConnection();
+  }
+
   private setupConnection() {
     this._hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(`/lobbyhub?sessionId=${this.SessionId}&playerId=${this.PlayerId}`)
@@ -83,11 +87,12 @@ export class JustOneRoundWaitingComponent implements IPlayerSessionComponent {
     var connection = this._hubConnection;
 
     if (connection) {
+      this._hubConnection = null;
       connection.off("beginRoundPassivePlayer");
       connection.off("beginRoundActivePlayer");
 
       connection.onclose(() => { });
-      connection.stop().then(() => { this._hubConnection = null; });
+      connection.stop();
 
     }
   }

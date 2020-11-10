@@ -179,6 +179,11 @@ namespace GooseGames.Services.Global
                 return GenericResponseBase.Error("Not all players are ready");
             }
 
+            if (players.GroupBy(p => p.Emoji).Count() < players.Count)
+            {
+                return GenericResponseBase.Error("Please ensure all players are using a different emoji");
+            }
+
             if (players.Count < minNumberOfPlayersPerSession)
             {
                 return GenericResponseBase.Error("There are not yet enough players to start");
