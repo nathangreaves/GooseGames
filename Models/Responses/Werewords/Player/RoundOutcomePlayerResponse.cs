@@ -9,6 +9,7 @@ namespace Models.Responses.Werewords.Player
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public string Emoji { get; set; }
         public SecretRole SecretRole { get; set; }
         public bool IsMayor { get; set; }
         public bool WasVoted { get; set; }

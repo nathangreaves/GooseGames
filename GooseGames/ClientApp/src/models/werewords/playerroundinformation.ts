@@ -1,6 +1,7 @@
 export class PlayerSecretRoleResponseBase {
   secretRole: SecretRole;
   mayorName: string;
+  mayorEmoji: string;
   mayorPlayerId: string;
 }
 
@@ -12,6 +13,7 @@ export class PlayerSecretRoleResponse extends PlayerSecretRoleResponseBase {
 export class OtherPlayerSecretRoleResponse {
   secretRole: SecretRole;
   playerName: string;
+  playerEmoji: string;
   playerId: string;
 }
 
@@ -21,6 +23,7 @@ export class SecretWordResponse extends PlayerSecretRoleResponseBase {
 
 export class RoundOutcomePlayerInformation {
   name: string;
+  emoji: string;
   id: string;
   secretRole: SecretRole;
   isMayor: boolean;
@@ -29,6 +32,7 @@ export class RoundOutcomePlayerInformation {
 
 export class PlayerRoundInformation {
   name: string;
+  emoji: string;
   id: string;
   active: boolean;
   responses: PlayerResponse[];

@@ -4,6 +4,7 @@ export class DayResponse {
   roundId: string;
   mayorPlayerId: string;
   mayorName: string;
+  mayorEmoji: string;
   secretWord: string;
   isActive: boolean;
   players: PlayerRoundInformation[];

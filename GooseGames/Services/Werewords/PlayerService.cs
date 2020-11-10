@@ -63,12 +63,13 @@ namespace GooseGames.Services.Werewords
                 return GenericResponse<PlayerSecretRoleResponse>.Error("Could not find the mayor!");
             }
 
-            var mayorName = await _playerService.GetPlayerNameAsync(mayorPlayerId.Value);
+            var mayorPlayer = await _playerService.GetAsync(mayorPlayerId.Value);
 
             return GenericResponse<PlayerSecretRoleResponse>.Ok(new PlayerSecretRoleResponse 
             {
-                MayorName = mayorName,
+                MayorName = mayorPlayer.Name,
                 MayorPlayerId = mayorPlayerId.Value,
+                MayorEmoji = mayorPlayer.Emoji,
                 SecretRole = (SecretRole)(int)playerInformation.SecretRole
             });
         }

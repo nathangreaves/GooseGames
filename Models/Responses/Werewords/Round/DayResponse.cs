@@ -11,6 +11,7 @@ namespace Models.Responses.Werewords.Round
         public Guid RoundId { get; set; }
         public Guid MayorPlayerId { get; set; }
         public string MayorName { get; set; }
+        public string MayorEmoji { get; set; }
         public IEnumerable<PlayerRoundInformationResponse> Players { get; set; }
         public string SecretWord { get; set; }
         public bool IsActive { get; set; }

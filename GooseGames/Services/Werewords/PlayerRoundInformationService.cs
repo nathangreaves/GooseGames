@@ -57,7 +57,7 @@ namespace GooseGames.Services.Werewords
                 return GenericResponse<PlayerSecretRoleResponse>.Error("Could not find the mayor!");
             }
 
-            var mayorPlayerName = await _playerService.GetPlayerNameAsync(mayorPlayerId.Value);
+            var mayorPlayer = await _playerService.GetAsync(mayorPlayerId.Value);
 
             var knowledgeOfOtherPlayers = new List<OtherPlayerSecretRoleResponse>();
 
@@ -69,19 +69,21 @@ namespace GooseGames.Services.Werewords
                                                         p.PlayerId != request.PlayerId && 
                                                         p.SecretRole == SecretRolesEnum.Werewolf);
 
-                var playerNames = await _playerService.GetPlayerNamesAsync(otherWerewolves.Select(oW => oW.PlayerId));
+                var otherWerewolfPlayers = await _playerService.GetPlayersAsync(otherWerewolves.Select(oW => oW.PlayerId));
 
                 knowledgeOfOtherPlayers.AddRange(otherWerewolves.Select(oW => new OtherPlayerSecretRoleResponse { 
                     PlayerId = oW.PlayerId,
                     SecretRole = (SecretRole)(int)oW.SecretRole,
-                    PlayerName = playerNames[oW.PlayerId]
+                    PlayerName = otherWerewolfPlayers[oW.PlayerId].Name,
+                    PlayerEmoji = otherWerewolfPlayers[oW.PlayerId].Emoji
                 }));
             }
 
             return GenericResponse<PlayerSecretRoleResponse>.Ok(new PlayerSecretRoleResponse
             {
                 SecretRole = (SecretRole)(int)playerRoundInformation.SecretRole,
-                MayorName = mayorPlayerName,
+                MayorName = mayorPlayer.Name,
+                MayorEmoji = mayorPlayer.Emoji,
                 MayorPlayerId = mayorPlayerId.Value,
                 KnowledgeAboutOtherPlayers = knowledgeOfOtherPlayers
             });

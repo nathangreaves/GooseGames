@@ -13,6 +13,7 @@ import { PlayerRoundInformation, PlayerResponseType, PlayerResponse, SecretRole 
 })
 export class WerewordsDayComponent extends WerewordsComponentBase implements OnInit, OnDestroy {
   MayorName: string;
+  MayorEmoji: string;
   MayorId: string;
   IsMayor: boolean;
   DisableButtons: boolean = false;
@@ -182,6 +183,7 @@ export class WerewordsDayComponent extends WerewordsComponentBase implements OnI
     return this.roundService.GetDay(this).then(response => this.HandleGenericResponse(response, data => {
 
       this.MayorName = data.mayorName;
+      this.MayorEmoji = data.mayorEmoji;
       this.MayorId = data.mayorPlayerId;
       this.IsMayor = data.mayorPlayerId.toLowerCase() == this.PlayerId.toLowerCase();
       var players = data.players;

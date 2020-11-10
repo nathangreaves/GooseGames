@@ -3,6 +3,16 @@
   color: maroon;
 }
 
+.mayor-title{
+    font-weight: bold;
+}
+.mayor-name {
+  font-weight: bold;
+}
+
+.seer-name {
+  font-weight: bold;
+}
 
 .secret-word{
     font-size: 2em;

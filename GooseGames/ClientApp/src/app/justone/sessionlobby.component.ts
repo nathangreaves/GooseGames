@@ -11,7 +11,6 @@ import { IPlayerSessionComponent } from '../../models/session';
 import { PlayerNumberCss } from '../../services/justone/ui'
 import { WordListCheckboxListItem, JustOneWordList } from '../../models/justone/wordlistenum';
 import { ILobbyComponentParameters } from '../components/lobby/lobby';
-import { NavbarService } from '../../services/navbar';
 
 const MinPlayers: number = 3;
 const MaxPlayers: number = 7;

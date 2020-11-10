@@ -8,6 +8,7 @@ namespace Models.Responses.Werewords
     public class OtherPlayerSecretRoleResponse
     {
         public string PlayerName { get; set; }
+        public string PlayerEmoji { get; set; }
         public Guid PlayerId { get; set; }
         public SecretRole SecretRole { get; set; }
     }

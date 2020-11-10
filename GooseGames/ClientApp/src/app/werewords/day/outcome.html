@@ -13,15 +13,15 @@
       Victory for Team Werewolf!
       <p>
         <span *ngFor="let werewolf of Werewolves; let last = last; let i = index">
-          <span *ngIf="werewolf.isMayor">Mayor </span>
-          <span class="werewolf-name">{{werewolf.name}}</span>
+          <span *ngIf="werewolf.isMayor" class="mayor-title">Mayor </span>
+          <span class="werewolf-name">{{werewolf.name}} <gg-emoji [emoji]="werewolf.emoji"></gg-emoji></span>
           <span *ngIf="!last"> and </span>
         </span>
         <span *ngIf="RoundOutcome === VillagersVotedWrong">
           went undetected
         </span>
         <span *ngIf="RoundOutcome === WerewolvesVotedSeer">
-          correctly ousted <span *ngIf="Seer.isMayor">Mayor </span><span>{{Seer.name}}</span> as the Seer
+          correctly ousted <span *ngIf="Seer.isMayor" class="mayor-title">Mayor </span><span class="seer-name">{{Seer.name}} <gg-emoji [emoji]="Seer.emoji"></gg-emoji></span> as the Seer
         </span>
       </p>
     </div>
@@ -29,14 +29,16 @@
       Victory for the Villagers!
       <p *ngIf="RoundOutcome === WerewolvesVotedWrong">
         <span *ngFor="let werewolf of Werewolves; let last = last; let i = index">
-          <span class="werewolf-name">{{werewolf.name}}</span>
+          <span *ngIf="werewolf.isMayor" class="mayor-title">Mayor </span>
+          <span class="werewolf-name">{{werewolf.name}} <gg-emoji [emoji]="werewolf.emoji"></gg-emoji></span>
           <span *ngIf="!last"> and </span>
         </span>
-        did not detect <span *ngIf="Seer.isMayor">Mayor </span><span>{{Seer.name}}</span> as the Seer
+        did not detect <span *ngIf="Seer.isMayor" class="mayor-title">Mayor </span><span class="seer-name">{{Seer.name}} <gg-emoji [emoji]="Seer.emoji"></gg-emoji></span> as the Seer
       </p>
       <p *ngIf="RoundOutcome === VillagersVotedWerewolf">
         <span *ngFor="let werewolf of VotedWerewolves; let last = last; let i = index">
-          <span class="werewolf-name">{{werewolf.name}}</span>
+          <span *ngIf="werewolf.isMayor" class="mayor-title">Mayor </span>
+          <span class="werewolf-name">{{werewolf.name}} <gg-emoji [emoji]="werewolf.emoji"></gg-emoji></span>
           <span *ngIf="!last"> and</span>
         </span>
         <span *ngIf="MultipleVotedWerewolves">
