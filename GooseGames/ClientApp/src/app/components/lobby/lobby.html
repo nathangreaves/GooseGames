@@ -6,6 +6,7 @@
 >
 
 </global-lobby-hub-component>
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>
 <div *ngIf="!Loading">
 
   <div class="lobby-header alert alert-info" *ngIf="SessionMaster && Players.length < parameters.minPlayers">
@@ -74,4 +75,3 @@
   </div>
 
 </div>
-<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>

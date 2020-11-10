@@ -164,6 +164,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
       .then(response => {
         if (!response.success) {
           this.ErrorMessage = response.errorCode;
+          this.DisableButtons = false;
         }
       })
       .catch((err) => {
