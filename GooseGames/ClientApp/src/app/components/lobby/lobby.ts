@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, TemplateRef } from '@angular/core';
+import { Component, OnInit, Input, TemplateRef, HostListener, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import { PlayerDetailsResponse } from '../../../models/player';
 import { GlobalSessionService } from '../../../services/session';
@@ -8,6 +8,7 @@ import { GooseGamesLocalStorage } from '../../../services/localstorage';
 import { Router } from '@angular/router';
 import { EmojiButton } from '@joeattardi/emoji-button';
 import * as EmojiRegex from 'emoji-regex/es2015/RGI_Emoji';
+import { PlatformLocation } from '@angular/common';
 
 export interface ILobbyComponentParameters {
   minPlayers: number;
@@ -23,7 +24,7 @@ export interface ILobbyComponentParameters {
   templateUrl: './lobby.html',
   styleUrls: ['./lobby.css'],
 })
-export class LobbyComponent implements OnInit {
+export class LobbyComponent implements OnInit, OnDestroy {
 
   @Input() parameters: ILobbyComponentParameters;
   @Input() gameConfigTemplate: TemplateRef<any>;
@@ -47,7 +48,8 @@ export class LobbyComponent implements OnInit {
 
   picker = new EmojiButton({
     emojisPerRow: 6,
-    style: 'twemoji'
+    style: 'twemoji',
+    autoFocusSearch: false
   });
   emojiRegExp: any;
 
@@ -62,12 +64,33 @@ export class LobbyComponent implements OnInit {
       this.selectedEmoji = selection.emoji;
       this.picker.hidePicker();
     });
+    this.picker.on('hidden', this.onHidden);
 
     this.emojiRegExp = EmojiRegex();
   }
 
+  @HostListener('window:popstate', ['$event'])
+  dismissModal() {
+    if (this.picker.isPickerVisible()) {
+      this.picker.hidePicker();
+    }
+  }
+
+  onHidden = () => {
+    if (window.history.state.modal === true) {
+      window.history.state.modal = false;
+      history.back();
+    }
+  }
+
   loadEmojiPicker(element: any) {
     this.picker.togglePicker(element);
+
+    const modalState = {
+      modal: true,
+      desc: 'fake state for our modal'
+    };
+    history.pushState(modalState, null);
   }
 
   playerAdded = (player: PlayerDetailsResponse) => {
@@ -121,6 +144,11 @@ export class LobbyComponent implements OnInit {
     this.load().then(() => loadingPromise).then(() => {
       this.Loading = false;
     });
+  }
+
+  ngOnDestroy() {
+    this.picker.destroyPicker();
+    this.picker = null;
   }
 
   public StartGame() {

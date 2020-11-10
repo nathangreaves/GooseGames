@@ -302,7 +302,8 @@ export class FujiSessionComponent implements IPlayerSession, OnDestroy {
 
         this.ActivePlayerPlayedCardAnimation = <ActivePlayerPlayedCardAnimation>{
           faceValue: activePlayerCard.faceValue,
-          playerName: currentActivePlayer.name
+          playerName: currentActivePlayer.name,
+          playerEmoji: currentActivePlayer.emoji
         };
         currentActivePlayer.playedCard = <FujiPlayedCard>{
           faceValue: activePlayerCard.faceValue,

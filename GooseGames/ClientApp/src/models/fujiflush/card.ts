@@ -13,4 +13,5 @@ export class FujiHandCard extends FujiCard {
 }
 export class ActivePlayerPlayedCardAnimation extends FujiCard {
   playerName: string;
+  playerEmoji: string;
 }
