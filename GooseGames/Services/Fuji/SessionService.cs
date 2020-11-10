@@ -4,18 +4,14 @@ using GooseGames.Hubs;
 using GooseGames.Logging;
 using GooseGames.Services.Global;
 using Models.Requests;
-using Models.Requests.Sessions;
 using Models.Responses;
 using Models.Responses.Fuji;
 using Models.Responses.Fuji.Hands;
-using Models.Responses.PlayerDetails;
-using Models.Responses.Sessions;
 using RepositoryInterface.Fuji;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Transactions;
 
 namespace GooseGames.Services.Fuji
 {
@@ -114,69 +110,31 @@ namespace GooseGames.Services.Fuji
 
             var cardCombinedValues = _cardService.GetCardCombinedValues(players);
 
-            var playerNamesDictionary = await _playerService.GetPlayerNamesAsync(players.Select(p => p.PlayerId));
-            var playerNumbersDictionary = await _playerService.GetPlayerNumbersAsync(players.Select(p => p.PlayerId));
+            var playersDictionary = await _playerService.GetPlayersAsync(players.Select(p => p.PlayerId));
 
-            return GenericResponse<SessionResponse>.Ok(new SessionResponse 
+            return GenericResponse<SessionResponse>.Ok(new SessionResponse
             { 
-                Players = players.OrderBy(p => playerNumbersDictionary[p.PlayerId]).Select(p => new Models.Responses.Fuji.Players.Player 
-                {
-                    Id = p.PlayerId,
-                    Name = playerNamesDictionary[p.PlayerId],
-                    PlayerNumber = playerNumbersDictionary[p.PlayerId],
-                    PlayedCard = p.PlayedCard != null ? new Models.Responses.Fuji.Cards.PlayedCard 
+                Players = players.OrderBy(p => playersDictionary[p.PlayerId].PlayerNumber).Select(p => {
+                    var player = playersDictionary[p.PlayerId];
+                    return new Models.Responses.Fuji.Players.Player
                     {
-                        FaceValue = p.PlayedCard.FaceValue,
-                        CombinedValue = cardCombinedValues[p.PlayedCard.FaceValue]
-                    } : null,
-                    Hand = new ConcealedHand 
-                    {
-                        NumberOfCards = cards.Where(c => c.PlayerId == p.PlayerId && (p.PlayedCardId == null || p.PlayedCardId != c.Id)).Count()
-                    },
-                    IsActivePlayer = game.ActivePlayerId == p.PlayerId
+                        Id = p.PlayerId,
+                        Name = player.Name,
+                        PlayerNumber = player.PlayerNumber,
+                        Emoji = player.Emoji,
+                        PlayedCard = p.PlayedCard != null ? new Models.Responses.Fuji.Cards.PlayedCard
+                        {
+                            FaceValue = p.PlayedCard.FaceValue,
+                            CombinedValue = cardCombinedValues[p.PlayedCard.FaceValue]
+                        } : null,
+                        Hand = new ConcealedHand
+                        {
+                            NumberOfCards = cards.Where(c => c.PlayerId == p.PlayerId && (p.PlayedCardId == null || p.PlayedCardId != c.Id)).Count()
+                        },
+                        IsActivePlayer = game.ActivePlayerId == p.PlayerId
+                    };
                 })
             });
         }
-
-        //internal async Task<Session> GetSessionAsync(Guid sessionId)
-        //{
-        //    _logger.LogTrace("Fetching Session");
-
-        //    return await _sessionRepository.GetAsync(sessionId);
-        //}
-
-        //private async Task<bool> SessionExistsForPasswordAsync(string password)
-        //{
-        //    _logger.LogTrace($"Checking existance of session with password {password}");
-        //    var found = await GetSessionFromPasswordAsync(password);
-
-        //    return found != null;
-        //}
-
-        //private async Task<Session> GetSessionFromPasswordAsync(string password)
-        //{
-        //    _logger.LogTrace($"Fetching session with password {password}");
-
-        //    return await _sessionRepository.SingleOrDefaultAsync(session =>
-        //        (session.StatusId == SessionStatusEnum.New
-        //        || session.StatusId == SessionStatusEnum.InProgress)
-        //        && session.Password.ToLower() == password.ToLower());
-        //}
-        //public async Task<bool> ValidateSessionStatusAsync(Guid sessionId, SessionStatusEnum status)
-        //{
-        //    _logger.LogTrace("Validating session exists and has status: ", status);
-
-        //    return await _sessionService.ValidateSessionStatusAsync(sessionId, status);
-        //}
-        //internal async Task<bool> ValidateSessionMasterAsync(Guid sessionId, Guid sessionMasterId)
-        //{
-        //    _logger.LogTrace("Validating session master: ", sessionMasterId);
-
-        //    return await _sessionService.ValidateSessionMasterAsync(sessionId, sessionMasterId);
-        //}
-        //private async Task CleanUpExpiredSessions(Guid sessionId)
-        //{
-        //    await _sessionRepository.AbandonSessionsOlderThanAsync(sessionId, DateTime.UtcNow.AddDays(-1));
-        //}
     }
 }
