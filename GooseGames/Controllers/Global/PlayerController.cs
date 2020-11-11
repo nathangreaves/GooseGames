@@ -5,6 +5,7 @@ using Models.Requests;
 using Models.Requests.PlayerDetails;
 using Models.Responses;
 using Models.Responses.PlayerDetails;
+using Models.Responses.Players;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,44 @@ namespace GooseGames.Controllers.Global
         {
             _playerService = playerService;
             _logger = logger;
+        }
+
+        [HttpGet]
+        public async Task<GenericResponse<IEnumerable<PlayerResponse>>> GetPlayersAsync([FromQuery]PlayerSessionRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var players = await _playerService.GetForSessionAsync(request.SessionId);
+
+                if (!players.Any(p => p.Id == request.PlayerId))
+                {
+                    var response = GenericResponse<IEnumerable<PlayerResponse>>.Error("This player does not exist on this session");
+
+                    _logger.LogInformation("Returned result", response);
+
+                    return response;
+                }
+
+                var playerResponses = players.Select(p => new PlayerResponse
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Emoji = p.Emoji,
+                    PlayerNumber = p.PlayerNumber
+                });
+                var result = GenericResponse<IEnumerable<PlayerResponse>>.Ok(playerResponses);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponse<IEnumerable<PlayerResponse>>.Error($"Unknown Error {errorGuid}");
+            }
         }
 
         [HttpGet]

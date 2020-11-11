@@ -6,8 +6,11 @@ namespace Entities.LetterJam.Enums
 {
     public enum GameStatus
     {
-        ProposingClues = 1,
-        ReceivedClue = 2,
-        Finished = 3
+        PreparingStartingWords = 1,
+        ProposingClues = 2,
+        ReceivedClue = 3,
+        PreparingFinalWords = 4,
+        RevealingFinalWords = 5,
+        Finished = 6
     }
 }

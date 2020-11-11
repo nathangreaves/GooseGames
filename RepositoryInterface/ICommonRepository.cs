@@ -20,6 +20,7 @@ namespace RepositoryInterface
         Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> func);
         Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> func);
         Task<TProperty> GetPropertyAsync<TProperty>(Guid id, Expression<Func<T, TProperty>> select);
+        Task<Dictionary<Guid, TProperty>> GetPropertyForFilterAsync<TProperty>(Expression<Func<T, bool>> filter, Expression<Func<T, KeyValuePair<Guid, TProperty>>> select);
         Task<Dictionary<Guid, TProperty>> GetPropertyDictionaryAsync<TProperty>(IEnumerable<Guid> ids, Func<T, TProperty> select);
         Task<bool> SingleResultMatchesAsync(Guid id, Expression<Func<T, bool>> func);
         Task<int> CountAsync(Expression<Func<T, bool>> func);

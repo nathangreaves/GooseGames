@@ -17,6 +17,6 @@ namespace Entities.LetterJam
         public RoundStatus RoundStatus { get; set; }
         public Guid? ClueGiverPlayerId { get; set; }
         public Guid? ClueId { get; set; }
-        public Clue Clue { get; set; }
+        //public Clue Clue { get; set; }
     }
 }

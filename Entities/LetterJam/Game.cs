@@ -16,6 +16,8 @@ namespace Entities.LetterJam
         public int GreenCluesRemaining { get; set; }    
         public int LockedCluesRemaining { get; set; }   //TODO: Locked By? Probs don't actually need
         public GameStatus GameStatus { get; set; }
+        public Guid? CurrentRoundId { get; set; }
+        public Round CurrentRound { get; set; }
         public int? Points { get; set; }
 
         //TODO: Players

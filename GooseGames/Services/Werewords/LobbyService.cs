@@ -65,7 +65,7 @@ namespace GooseGames.Services.Werewords
 
             await _sessionService.UpdateAllPlayersToStatusAsync(request.SessionId, Entities.Global.Enums.PlayerStatusEnum.InGame);
 
-            return GenericResponse<bool>.Ok(true);
+            return GenericResponseBase.Ok();
         }
     }
 }

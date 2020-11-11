@@ -13,6 +13,7 @@ namespace Entities.LetterJam
         public DateTime CreatedUtc { get; set; }
         public DateTime LastUpdatedUtc { get; set; }
         public Guid? PlayerId { get; set; }
+        public Guid? NonPlayerCharacterId { get; set; }
         public Guid? LetterId { get; set; }
         public char? Letter { get; set; }
         public bool BonusLetter { get; set; }

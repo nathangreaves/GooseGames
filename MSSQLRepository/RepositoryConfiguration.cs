@@ -68,6 +68,10 @@ namespace MSSQLRepository
             services.AddScoped<RepositoryInterface.Werewords.IPlayerResponseRepository, Werewords.PlayerResponseRepository>();
 
             services.AddScoped<RepositoryInterface.LetterJam.IGameRepository, LetterJam.GameRepository>();
+            services.AddScoped<RepositoryInterface.LetterJam.IPlayerStateRepository, LetterJam.PlayerStateRepository>();
+            services.AddScoped<RepositoryInterface.LetterJam.ILetterCardRepository, LetterJam.LetterCardRepository>();
+            services.AddScoped<RepositoryInterface.LetterJam.IRoundRepository, LetterJam.RoundRepository>();
+            services.AddScoped<RepositoryInterface.LetterJam.INonPlayerCharacterRepository, LetterJam.NonPlayerCharacterRepository>();
         }
     }
 }
