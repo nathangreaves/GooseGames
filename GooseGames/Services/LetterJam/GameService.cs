@@ -104,7 +104,6 @@ namespace GooseGames.Services.LetterJam
                     await _letterCardRepository.ReserveLettersForNonPlayerCharacterAsync(npcEntity);
                 }
             }
-
             await _playerStatusService.UpdateAllPlayersForGameAsync(gameId, PlayerStatus.ProposingClues);
             await _letterJamHubContext.SendBeginNewRoundAsync(sessionId, round.Id);
 

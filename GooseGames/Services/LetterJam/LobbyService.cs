@@ -92,6 +92,8 @@ namespace GooseGames.Services.LetterJam
 
             await _letterCardService.GenerateDeckForGameAsync(game.Id);
 
+            await _sessionService.SetGameSessionIdentifierAsync(request.SessionId, Entities.Global.Enums.GameEnum.LetterJam, game.Id);
+
             _logger.LogTrace("Sending update to clients");
             await _letterJamHubContext.SendBeginSessionAsync(request.SessionId, game.Id);
 

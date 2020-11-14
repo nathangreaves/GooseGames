@@ -51,3 +51,24 @@ export class PlayerAction {
   emoji: string;
   hasTakenAction: boolean;
 }
+
+export interface IGooseGamesPlayer {
+  id: string;
+  name: string;
+  emoji: string;
+  playerNumber: number;
+}
+
+export interface IGooseGamesPlayerAction {
+  playerId: string;
+  hasTakenAction: boolean;
+}
+
+export class GooseGamesPlayerAction implements IGooseGamesPlayer {
+  id: string;
+  name: string;
+  emoji: string;
+  playerNumber: number;
+  hasTakenAction: boolean;
+}
+

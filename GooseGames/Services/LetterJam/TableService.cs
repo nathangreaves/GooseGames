@@ -1,5 +1,6 @@
 ﻿using Entities.LetterJam;
 using GooseGames.Logging;
+using GooseGames.Services.Global;
 using Models.Requests;
 using Models.Responses;
 using Models.Responses.LetterJam;
@@ -13,17 +14,20 @@ namespace GooseGames.Services.LetterJam
 {
     public class TableService
     {
+        private readonly PlayerService _playerService;
         private readonly IGameRepository _gameRepository;
         private readonly IPlayerStateRepository _playerStateRepository;
         private readonly INonPlayerCharacterRepository _nonPlayerCharacterRepository;
         private readonly RequestLogger<TableService> _logger;
 
         public TableService(
+            PlayerService playerService,
             IGameRepository gameRepository,
             IPlayerStateRepository playerStateRepository,
             INonPlayerCharacterRepository nonPlayerCharacterRepository,
             RequestLogger<TableService> logger)
         {
+            _playerService = playerService;
             _gameRepository = gameRepository;
             _playerStateRepository = playerStateRepository;
             _nonPlayerCharacterRepository = nonPlayerCharacterRepository;
@@ -53,6 +57,7 @@ namespace GooseGames.Services.LetterJam
             {
                 nonPlayerCharacters = await _nonPlayerCharacterRepository.FilterAsync(nPC => nPC.GameId == request.GameId);
             }
+            var playerNumbers = await _playerService.GetPlayerNumbersAsync(playerStates.Select(p => p.PlayerId));
 
             return GenericResponse<TableResponse>.Ok(new TableResponse
             {
@@ -60,7 +65,7 @@ namespace GooseGames.Services.LetterJam
                 GreenCluesRemaining = game.GreenCluesRemaining,
                 RedCluesRemaining = game.RedCluesRemaining,
                 LockedCluesRemaining = game.LockedCluesRemaining,
-                Players = new List<TablePlayerResponse>(playerStates.Select(p => 
+                Players = new List<TablePlayerResponse>(playerStates.OrderBy(p => playerNumbers[p.PlayerId]).Select(p => 
                 {
                     return new TablePlayerResponse
                     {
@@ -72,7 +77,7 @@ namespace GooseGames.Services.LetterJam
                         CurrentLetterId = p.CurrentLetterId.Value
                     };
                 })),
-                NonPlayerCharacters = new List<TableNonPlayerCharacterResponse>(nonPlayerCharacters.Select(p =>
+                NonPlayerCharacters = new List<TableNonPlayerCharacterResponse>(nonPlayerCharacters.OrderBy(nPC => nPC.PlayerNumber).Select(p =>
                 {
                     return new TableNonPlayerCharacterResponse
                     {

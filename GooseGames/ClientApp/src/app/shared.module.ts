@@ -4,12 +4,14 @@ import { LobbyComponent } from './components/lobby/lobby';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmojiComponent } from './components/emoji/emoji.component';
+import { PlayerWaitingComponent } from './components/playerwaiting/player-waiting.component';
 
 @NgModule({
   declarations: [
     LobbyComponent,
     GlobalLobbyHubComponent,
-    EmojiComponent
+    EmojiComponent,
+    PlayerWaitingComponent
   ],
   imports: [
     CommonModule,
@@ -18,7 +20,8 @@ import { EmojiComponent } from './components/emoji/emoji.component';
   exports: [
     LobbyComponent,
     GlobalLobbyHubComponent,
-    EmojiComponent
+    EmojiComponent,
+    PlayerWaitingComponent
   ],
   entryComponents: [
   ]

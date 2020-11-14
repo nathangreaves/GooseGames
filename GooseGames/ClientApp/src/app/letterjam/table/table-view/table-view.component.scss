@@ -1,0 +1,113 @@
+.table-view{
+
+}
+
+.table-player-container{
+
+}
+
+.player-row {
+    width: 100%;
+}
+
+.real-player{
+
+}
+
+.non-player-character {
+
+}
+
+.player-cards-container{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+.player-card {
+  background: #fff;
+  width: 1.5em;
+  height: 2em;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 4px;
+  border-color: #ddd;
+  text-align: center;
+  box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
+}
+
+
+/*.player-card-container:not(:first-child) {
+  margin-left: -0.5em;
+  z-index: 0;
+}
+.player-card-container:first-child {  
+  z-index: 1;
+}*/
+
+.player-shown-card {  
+  border-color: #000;
+}
+.player-hidden-card {
+  background: #000;
+}
+
+.npc-hidden-cards{
+    color: #fff;
+}
+
+.token-box {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+.token-display{
+    display: flex;
+    flex-direction: row;
+}
+.token-display-item{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    
+
+}
+
+.red-tokens-display {
+
+}
+.green-tokens-display {
+
+}
+.locked-tokens-display {
+
+}
+.npc-locked-clue{
+    margin-left: 0.5em;
+}
+
+.token{
+    border-radius: 50%;
+    height: 0.7em;
+    width: 0.7em;
+}
+
+.red-token{
+    background: #f33;
+}
+
+
+.green-token{
+    background: #3f3;
+}
+
+.locked-token{
+    opacity: 0.5;
+    border: 1px solid #333
+}
+
+.token-amount{
+    margin-left: 0.5em;
+    margin-right: 1em;
+}

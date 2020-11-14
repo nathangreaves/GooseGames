@@ -1,20 +1,20 @@
 import { Type } from '@angular/core';
 import { Directive, ViewContainerRef } from '@angular/core';
-import { WerewordsPlayerStatus } from "../../../models/werewords/content";
+import { LetterJamPlayerStatus } from "../../../models/letterjam/content";
 import { GenericResponseBase } from '../../../models/genericresponse';
 
 @Directive({
-  selector: '[werewords-content]',
+  selector: '[letterjam-content]',
 })
-export class WerewordsContentDirective {
+export class LetterJamContentDirective {
   constructor(public viewContainerRef: ViewContainerRef) { }
 }
 
-export class WerewordsContent {
-  constructor(public Key: WerewordsPlayerStatus, public component: Type<any>) { }
+export class LetterJamContent {
+  constructor(public Key: LetterJamPlayerStatus, public component: Type<any>) { }
 }
 
-export type WerewordsRouter = (status: WerewordsPlayerStatus, validated: boolean) => void;
+export type LetterJamRouter = (status: LetterJamPlayerStatus, validated: boolean) => void;
 export type SetSessionData = (sessionId: string, playerId: string, gameId: string) => void;
 export type ReadSessionData = (gameIdentifier: string) => boolean;
 export type GenericResponseHandler<T> = (data: T) => Promise<GenericResponseBase> | GenericResponseBase;

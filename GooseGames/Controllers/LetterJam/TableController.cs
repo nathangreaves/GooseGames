@@ -27,7 +27,7 @@ namespace GooseGames.Controllers.LetterJam
         }
 
         [HttpGet]
-        public async Task<GenericResponse<TableResponse>> GetTableAsync(PlayerSessionGameRequest request)
+        public async Task<GenericResponse<TableResponse>> GetTableAsync([FromQuery]PlayerSessionGameRequest request)
         {
             try
             {

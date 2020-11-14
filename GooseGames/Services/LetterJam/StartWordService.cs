@@ -96,10 +96,12 @@ namespace GooseGames.Services.LetterJam
         {
             if (await ReserveLettersAsync(request.GameId, request.ForPlayerId, request.StartWord))
             {
+                await _playerStatusService.UpdatePlayerToStatusAsync(request.PlayerId, request.GameId, PlayerStatus.WaitingForFirstRound);
                 await _letterJamHubContext.SendPlayerHasChosenStartingWordAsync(request.SessionId, request.PlayerId);
 
                 if (await _playerStatusService.AllPlayersMatchStatusAsync(request.GameId, PlayerStatus.WaitingForFirstRound))
                 {
+
                     var players = await _playerStateRepository.FilterAsync(p => p.GameId == request.GameId);
                     var playerIds = players.Select(p => p.PlayerId).ToList();
                     var letters = await _letterCardRepository.FilterAsync(p => p.GameId == request.GameId && p.PlayerId.HasValue && playerIds.Contains(p.PlayerId.Value));
@@ -115,9 +117,9 @@ namespace GooseGames.Services.LetterJam
 
                             return GenericResponseBase.Error("Not all players had correct word length");
                         }
-
-                        await _gameService.FinishGameSetupAsync(request.SessionId, request.GameId);
                     }
+
+                    await _gameService.FinishGameSetupAsync(request.SessionId, request.GameId);
                 }
 
                 return GenericResponseBase.Ok();
@@ -134,7 +136,8 @@ namespace GooseGames.Services.LetterJam
         
         private async Task<bool> ReserveLettersAsync(Guid gameId, Guid reserveForPlayerId, string word)
         {
-            var matchingLetters = await _letterCardRepository.FilterAsync(lC => lC.GameId == gameId && word.Contains(lC.Letter) && !lC.PlayerId.HasValue);
+            var listOfChars = word.ToList();
+            var matchingLetters = await _letterCardRepository.FilterAsync(lC => lC.GameId == gameId && listOfChars.Contains(lC.Letter) && lC.PlayerId == null);
 
             var reservedLetters = new List<LetterCard>();
 
@@ -162,10 +165,10 @@ namespace GooseGames.Services.LetterJam
             await _letterCardRepository.UpdateRangeAsync(reservedLetters);
 
             var firstLetter = reservedLetters.First(l => l.LetterIndex == 0);
-            var playerState = await _playerStateRepository.GetAsync(reserveForPlayerId);
+            var playerState = await _playerStateRepository.SingleOrDefaultAsync(pS => pS.PlayerId == reserveForPlayerId);
             playerState.CurrentLetterId = firstLetter.Id;
             playerState.CurrentLetterIndex = firstLetter.LetterIndex;
-            playerState.Status = PlayerStatus.WaitingForFirstRound;
+            await _playerStateRepository.UpdateAsync(playerState);
 
             return true;
         }

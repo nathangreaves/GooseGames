@@ -1,0 +1,12 @@
+<form *ngIf="ForPlayer">
+  <div>
+    <label for="lj-initial-word">Please submit a {{NumberOfLetters}} letter word for <gg-emoji [emoji]="ForPlayer.emoji"></gg-emoji> {{ForPlayer.name}}</label>
+    <input id="lj-initial-word" [(ngModel)]="Word" name="lj-initial-word" />
+  </div>
+  <div>
+    <button class="btn btn-primary" type="submit" [disabled]="!ButtonsEnabled" (click)="SubmitWord()">Submit Word</button>
+  </div>
+</form>
+<div>
+  <button class="btn btn-primary" type="button" [disabled]="!ButtonsEnabled" (click)="GetRandomWord()">Random Word</button>
+</div>

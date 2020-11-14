@@ -16,6 +16,24 @@ namespace Entities.LetterJam.Enums
             };
         }
 
+        public static bool operator ==(PlayerStatusId a, PlayerStatusId b)
+        {
+            if (ReferenceEquals(a, null))
+            {
+                return ReferenceEquals(b, null);
+            }
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(PlayerStatusId a, PlayerStatusId b)
+        {
+            if (ReferenceEquals(a, null))
+            {
+                return !ReferenceEquals(b, null);
+            }
+            return !a.Equals(b);
+        }
+
         // override object.Equals
         public override bool Equals(object obj)
         {

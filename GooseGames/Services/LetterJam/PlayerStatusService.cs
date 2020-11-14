@@ -2,6 +2,7 @@
 using GooseGames.Services.Global;
 using Models.Requests;
 using Models.Responses;
+using Models.Responses.LetterJam;
 using Models.Responses.PlayerStatus;
 using RepositoryInterface.LetterJam;
 using System;
@@ -69,16 +70,17 @@ namespace GooseGames.Services.LetterJam
             return players.All(p => p.Status == playerStatusId);
         }
 
-        internal async Task<GenericResponse<PlayerStatusValidationResponse>> ValidatePlayerStatusAsync(PlayerSessionGameRequest request, PlayerStatusId status)
+        internal async Task<GenericResponse<LetterJamPlayerStatusValidationResponse>> ValidatePlayerStatusAsync(PlayerSessionPossibleGameRequest request, PlayerStatusId status)
         {
             var globalResponse = await _playerStatusService.ValidatePlayerStatusAsync(request, Entities.Global.Enums.GameEnum.LetterJam);
             if (!globalResponse.Success)
             {
-                return GenericResponse<PlayerStatusValidationResponse>.Error(globalResponse.ErrorCode);
+                return GenericResponse<LetterJamPlayerStatusValidationResponse>.Error(globalResponse.ErrorCode);
             }
             var globalPlayerStatus = globalResponse.Data;
 
             PlayerStatusId playerStatus;
+            Guid? gameId = request.GameId;
             if (globalPlayerStatus == Entities.Global.Enums.PlayerStatusEnum.Lobby)
             {
                 playerStatus = PlayerStatus.InLobby;
@@ -88,20 +90,31 @@ namespace GooseGames.Services.LetterJam
                 playerStatus = PlayerStatus.InLobby;
             }
             else
-            {
-                var session = await _sessionService.GetAsync(request.SessionId);
-
-                var player = await _playerStateRepository.SingleOrDefaultAsync(p => p.PlayerId == request.PlayerId && p.GameId == request.GameId);
+            {                
+                if (!gameId.HasValue)
+                {
+                    gameId = await _sessionService.GetGameIdAsync(request.SessionId, Entities.Global.Enums.GameEnum.LetterJam);
+                }
+                if (gameId == null)
+                {
+                    return GenericResponse<LetterJamPlayerStatusValidationResponse>.Error("Could not find game");
+                }
+                var player = await _playerStateRepository.SingleOrDefaultAsync(p => p.PlayerId == request.PlayerId && p.GameId == gameId.Value);
+                if (player == null)
+                {
+                    return GenericResponse<LetterJamPlayerStatusValidationResponse>.Error("Could not find letter jam player");
+                }
 
                 playerStatus = player.Status;
             }
 
-            var response = new PlayerStatusValidationResponse
+            var response = new LetterJamPlayerStatusValidationResponse
             {
                 RequiredStatus = PlayerStatus.GetDescription(playerStatus),
-                StatusCorrect = playerStatus == status
+                StatusCorrect = playerStatus == status,
+                GameId = gameId
             };
-            return GenericResponse<PlayerStatusValidationResponse>.Ok(response);
+            return GenericResponse<LetterJamPlayerStatusValidationResponse>.Ok(response);
         }
 
         internal async Task<GenericResponse<IEnumerable<Models.Responses.LetterJam.PlayerActionResponse>>> GetPlayerActionsAsync(PlayerSessionGameRequest request, PlayerStatusId desiredPlayerStatus)

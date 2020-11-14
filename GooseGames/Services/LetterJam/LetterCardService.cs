@@ -1,6 +1,7 @@
 ﻿using Entities.LetterJam;
 using GooseGames.Logging;
 using Models.Requests;
+using Models.Requests.LetterJam;
 using Models.Responses;
 using Models.Responses.LetterJam;
 using RepositoryInterface.LetterJam;
@@ -32,6 +33,7 @@ namespace GooseGames.Services.LetterJam
             _nonPlayerCharacterRepository = nonPlayerCharacterRepository;
             _requestLogger = requestLogger;
         }
+
 
         public static Dictionary<char, int> s_LetterConfiguration = new Dictionary<char, int>
         {
@@ -101,6 +103,22 @@ namespace GooseGames.Services.LetterJam
             return GenericResponse<IEnumerable<LetterCardResponse>>.Ok(cards.Select(c => 
             { 
                 return new LetterCardResponse 
+                {
+                    CardId = c.Id,
+                    BonusLetter = c.BonusLetter,
+                    Letter = c.Letter
+                };
+            }));
+        }
+        internal async Task<GenericResponse<IEnumerable<LetterCardResponse>>> GetLettersAsync(LetterCardsRequest request)
+        {
+            var listOfCardIds = request.CardIds.ToList();
+
+            var cards = await _letterCardRepository.FilterAsync(l => l.GameId == request.GameId && listOfCardIds.Contains(l.Id));
+
+            return GenericResponse<IEnumerable<LetterCardResponse>>.Ok(cards.Select(c =>
+            {
+                return new LetterCardResponse
                 {
                     CardId = c.Id,
                     BonusLetter = c.BonusLetter,

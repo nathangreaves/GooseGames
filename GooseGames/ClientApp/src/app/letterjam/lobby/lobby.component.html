@@ -1,0 +1,26 @@
+
+<global-lobby-component [parameters]="lobbyParameters"
+                        [gameConfigTemplate]="gameConfigTemplate"
+                        [readOnlyGameConfigTemplate]="readOnlyGameConfigTemplate">
+
+</global-lobby-component>
+
+<ng-template #gameConfigTemplate>
+
+  <form>
+    <label for="lj-lobby-numletters">Number of Letters:</label>
+    <input id="lj-lobby-numletters" type="number" [(ngModel)]="NumberOfLetters" [max]="MaximumNumberOfLetters" [min]="MinimumNumberOfLetters" name="lj-lobby-numletters"/>
+  </form>
+
+</ng-template>
+
+<ng-template #readOnlyGameConfigTemplate>
+
+  <!--<p>If we need some game specific content we can put it here</p>-->
+  <!--<div>
+    <input type="checkbox"
+           [checked]="configYes"
+           (change)="flickConfig()" />
+  </div>-->
+
+</ng-template>

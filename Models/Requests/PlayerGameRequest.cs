@@ -8,4 +8,9 @@ namespace Models.Requests
     {
         public Guid GameId { get; set; }
     }
+
+    public class PlayerSessionPossibleGameRequest : PlayerSessionRequest
+    {
+        public Guid? GameId { get; set; }
+    }
 }

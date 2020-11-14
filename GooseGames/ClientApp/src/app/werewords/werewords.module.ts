@@ -60,7 +60,6 @@ const routes: Routes = [
     WerewordsDayOutcomeComponent,
 
     WerewordsLandingComponent,
-    WerewordsNewPlayerDetailsComponent,
     WerewordsLobbyComponent
   ]
 })

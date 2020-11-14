@@ -40,6 +40,7 @@
     <None Remove="ClientApp\src\app\codenames\session.component.ts" />
     <None Remove="ClientApp\src\app\components\hub.ts" />
     <None Remove="ClientApp\src\app\components\lobby.ts" />
+    <None Remove="ClientApp\src\app\components\playerwaiting\player-waiting.component.ts" />
     <None Remove="ClientApp\src\app\fujiflush\disclaimer.component.ts" />
     <None Remove="ClientApp\src\app\fujiflush\fujiflush.module.ts" />
     <None Remove="ClientApp\src\app\fujiflush\landing.component.ts" />
@@ -69,6 +70,10 @@
     <None Remove="ClientApp\src\app\justone\round\waiting.component.ts" />
     <None Remove="ClientApp\src\app\justone\round\waitingforround.component.ts" />
     <None Remove="ClientApp\src\app\justone\sessionlobby.component.ts" />
+    <None Remove="ClientApp\src\app\letterjam\letterjam.module.ts" />
+    <None Remove="ClientApp\src\app\letterjam\registered-content.ts" />
+    <None Remove="ClientApp\src\app\letterjam\scaffolding\content.ts" />
+    <None Remove="ClientApp\src\app\letterjam\table\table-base.component.ts" />
     <None Remove="ClientApp\src\app\nav-menu\navbar-header-content.ts" />
     <None Remove="ClientApp\src\app\nav-menu\navbar-header-directive.ts" />
     <None Remove="ClientApp\src\app\nav-menu\navbar-header.ts" />
@@ -103,6 +108,11 @@
     <None Remove="ClientApp\src\models\justone\round.ts" />
     <None Remove="ClientApp\src\models\justone\session.ts" />
     <None Remove="ClientApp\src\models\justone\wordlistenum.ts" />
+    <None Remove="ClientApp\src\models\letterjam\content.ts" />
+    <None Remove="ClientApp\src\models\letterjam\letters.ts" />
+    <None Remove="ClientApp\src\models\letterjam\playerStatus.ts" />
+    <None Remove="ClientApp\src\models\letterjam\startWord.ts" />
+    <None Remove="ClientApp\src\models\letterjam\table.ts" />
     <None Remove="ClientApp\src\models\werewords\playerroundinformation.ts" />
     <None Remove="ClientApp\src\models\werewords\registered-content.ts" />
     <None Remove="ClientApp\src\models\werewords\round.ts" />
@@ -116,8 +126,14 @@
     <None Remove="ClientApp\src\services\justone\playerstatus.ts" />
     <None Remove="ClientApp\src\services\justone\round.ts" />
     <None Remove="ClientApp\src\services\justone\ui.ts" />
+    <None Remove="ClientApp\src\services\letterjam\letterCard.ts" />
+    <None Remove="ClientApp\src\services\letterjam\playerStatus.ts" />
+    <None Remove="ClientApp\src\services\letterjam\session.ts" />
+    <None Remove="ClientApp\src\services\letterjam\startWord.ts" />
+    <None Remove="ClientApp\src\services\letterjam\table.ts" />
     <None Remove="ClientApp\src\services\localstorage.ts" />
     <None Remove="ClientApp\src\services\navbar.ts" />
+    <None Remove="ClientApp\src\services\player.ts" />
     <None Remove="ClientApp\src\services\session.ts" />
     <None Remove="ClientApp\src\services\werewords\playerroundinformation.ts" />
     <None Remove="ClientApp\src\services\werewords\playerstatus.ts" />
@@ -142,6 +158,9 @@
     <TypeScriptCompile Include="ClientApp\src\app\codenames\session.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\components\lobby\hub.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\components\lobby\lobby.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\components\playerwaiting\player-waiting.component.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\app\fujiflush\disclaimer.component.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
@@ -161,6 +180,12 @@
     <TypeScriptCompile Include="ClientApp\src\app\fujiflush\fujiflush.module.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\app\letterjam\letterjam.module.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\letterjam\scaffolding\registered-content.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\app\letterjam\scaffolding\content.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\letterjam\table\table-base.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\navbars.module.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
@@ -217,6 +242,13 @@
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\player.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\session.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\justone\wordlistenum.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\letterjam\content.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\models\letterjam\letters.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\letterjam\playerStatus.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\letterjam\startWord.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\letterjam\table.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\werewords\content.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\werewords\playerroundinformation.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\werewords\registered-content.ts" />
@@ -246,8 +278,18 @@
     <TypeScriptCompile Include="ClientApp\src\services\justone\playerstatus.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\session.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\ui.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\letterjam\letterCard.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\letterjam\playerStatus.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\letterjam\session.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\services\letterjam\startWord.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\letterjam\table.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\localstorage.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\navbar.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\player.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\services\session.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\werewords\playerroundinformation.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\werewords\playerstatus.ts" />
@@ -255,6 +297,11 @@
     <TypeScriptCompile Include="ClientApp\src\services\werewords\session.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ClientApp\src\app\letterjam\lobby\" />
+    <Folder Include="ClientApp\src\app\letterjam\landing\" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
