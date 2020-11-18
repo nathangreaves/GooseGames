@@ -18,7 +18,7 @@ export class EmojiComponent implements OnInit {
     if (emoji) {
       return twemoji.parse(emoji);
     }
-    return null;
+    return "&nbsp;";
   }
 
   ngOnInit(): void {

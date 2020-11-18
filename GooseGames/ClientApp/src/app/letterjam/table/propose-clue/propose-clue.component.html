@@ -1,0 +1,55 @@
+<div class="word-box letter-display">
+  <div *ngFor="let letter of BuiltWord;" class="letter-display-item">
+
+    <gg-emoji [emoji]="letter.player?.emoji"></gg-emoji>
+
+    <div class="player-card player-shown-card">
+      {{letter.letter}}
+    </div>
+
+  </div>
+  <div class="letter-display-item">
+
+    <gg-emoji [emoji]="null"></gg-emoji>
+
+    <div class="player-card player-shown-card caret" @caretAnimation>
+      
+    </div>
+
+  </div>
+</div>
+
+<div class="letter-box letter-display">
+  <div *ngFor="let letter of RelevantLetters;" class="letter-display-item">
+
+    <gg-emoji [emoji]="letter.player?.emoji"></gg-emoji>
+
+    <button class="player-card player-shown-card" (click)="AddLetterToWord(letter)">
+      {{letter.letter}}
+    </button>
+
+  </div>
+
+  <div class="letter-display-item">
+
+    <gg-emoji [emoji]="null"></gg-emoji>
+
+    <button class="player-card player-shown-card delete-card" (click)="DeleteLastLetter()">
+      <gg-emoji emoji="⬅️"></gg-emoji>
+    </button>
+
+  </div>
+</div>
+
+<div>
+  <span>View As: </span>
+  <div *ngFor="let player of HumanPlayers;">
+    <gg-emoji [emoji]="player.emoji"></gg-emoji>
+  </div>
+</div>
+
+<div>
+  <button class="btn btn-primary" (click)="SubmitClue()">
+    Submit
+  </button>
+</div>

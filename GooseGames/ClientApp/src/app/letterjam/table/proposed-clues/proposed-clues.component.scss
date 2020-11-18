@@ -1,0 +1,48 @@
+.proposed-clues {
+
+  .proposed-clues-container {
+
+    .proposed-clue-row {
+      width: 100%;
+    }
+  }
+}
+
+.filler{
+    height: 122px;
+}
+
+.letter-box {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8em;
+  font-weight: bold;
+  position: fixed;
+  left: 0;
+  bottom: 70px;
+  width: 100%;
+  height: 122px;
+  background: #fff;
+  border-top: 1px solid black;
+}
+
+.letter-display {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.letter-display-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .player-card{
+      margin-left: 0.25rem;
+      margin-right: 0.25rem;
+  }
+}
+
+.filler {
+  height: 112px;
+}
+

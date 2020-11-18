@@ -3,6 +3,7 @@ using Entities.LetterJam.Enums;
 using GooseGames.Hubs;
 using GooseGames.Logging;
 using GooseGames.Services.Global;
+using Models.Requests.LetterJam;
 using Models.Responses;
 using RepositoryInterface.LetterJam;
 using System;
@@ -21,6 +22,8 @@ namespace GooseGames.Services.LetterJam
         private readonly PlayerService _playerService;
         private readonly PlayerStatusService _playerStatusService;
         private readonly LetterJamHubContext _letterJamHubContext;
+
+
         private readonly RequestLogger<GameService> _logger;
 
         public GameService(
@@ -77,6 +80,7 @@ namespace GooseGames.Services.LetterJam
             {
                 List<NonPlayerCharacter> nPCs = new List<NonPlayerCharacter>();
 
+                int playerNumber = 0;
                 foreach (var npc in gameConfiguration.NonPlayerCharacters)
                 {
                     string emoji = null;
@@ -97,8 +101,9 @@ namespace GooseGames.Services.LetterJam
                         Emoji = emoji,
                         Name = "NPC",
                         NumberOfLettersRemaining = npc.NumberOfLetters,
-                        PlayerNumber = await _playerService.GetNextPlayerNumberForSessionAsync(sessionId)
+                        PlayerNumber = await _playerService.GetNextPlayerNumberForSessionAsync(sessionId) + playerNumber
                     };
+                    playerNumber++;
                     await _nonPlayerCharacterRepository.InsertAsync(npcEntity);
 
                     await _letterCardRepository.ReserveLettersForNonPlayerCharacterAsync(npcEntity);
@@ -108,6 +113,10 @@ namespace GooseGames.Services.LetterJam
             await _letterJamHubContext.SendBeginNewRoundAsync(sessionId, round.Id);
 
             return GenericResponseBase.Ok();
+        }
+        internal async Task<Guid?> GetRoundIdAsync(RoundRequest request)
+        {
+            return await _gameRepository.GetPropertyAsync(request.GameId, g => g.CurrentRoundId);
         }
     }
 }

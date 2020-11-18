@@ -108,6 +108,7 @@
     <None Remove="ClientApp\src\models\justone\round.ts" />
     <None Remove="ClientApp\src\models\justone\session.ts" />
     <None Remove="ClientApp\src\models\justone\wordlistenum.ts" />
+    <None Remove="ClientApp\src\models\letterjam\clues.ts" />
     <None Remove="ClientApp\src\models\letterjam\content.ts" />
     <None Remove="ClientApp\src\models\letterjam\letters.ts" />
     <None Remove="ClientApp\src\models\letterjam\playerStatus.ts" />
@@ -126,7 +127,9 @@
     <None Remove="ClientApp\src\services\justone\playerstatus.ts" />
     <None Remove="ClientApp\src\services\justone\round.ts" />
     <None Remove="ClientApp\src\services\justone\ui.ts" />
+    <None Remove="ClientApp\src\services\letterjam\clues.ts" />
     <None Remove="ClientApp\src\services\letterjam\letterCard.ts" />
+    <None Remove="ClientApp\src\services\letterjam\nonPlayerCharacter.ts" />
     <None Remove="ClientApp\src\services\letterjam\playerStatus.ts" />
     <None Remove="ClientApp\src\services\letterjam\session.ts" />
     <None Remove="ClientApp\src\services\letterjam\startWord.ts" />
@@ -242,6 +245,7 @@
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\player.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\session.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\justone\wordlistenum.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\letterjam\clues.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\letterjam\content.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
@@ -278,7 +282,9 @@
     <TypeScriptCompile Include="ClientApp\src\services\justone\playerstatus.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\session.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\ui.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\letterjam\clues.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\letterjam\letterCard.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\letterjam\nonPlayerCharacter.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\letterjam\playerStatus.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\letterjam\session.ts">
       <SubType>Code</SubType>

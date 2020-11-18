@@ -12,7 +12,9 @@ import { LetterJamLandingComponent } from './landing/landing.component';
 import { LetterJamSubmitWordComponent } from './submit-word/submit-word.component';
 import { LetterJamWaitingForFirstRoundComponent } from './waiting-for-first-round/waiting-for-first-round.component';
 import { LetterJamTableComponent } from './table/table.component';
-import { TableViewComponent } from './table/table-view/table-view.component';
+import { LetterJamTableViewComponent } from './table/table-view/table-view.component';
+import { LetterJamProposedCluesComponent } from './table/proposed-clues/proposed-clues.component';
+import { LetterJamProposeClueComponent } from './table/propose-clue/propose-clue.component';
 
 
 const routes: Routes = [
@@ -29,7 +31,9 @@ const routes: Routes = [
     LetterJamSubmitWordComponent,
     LetterJamWaitingForFirstRoundComponent,
     LetterJamTableComponent,
-    TableViewComponent
+    LetterJamTableViewComponent,
+    LetterJamProposedCluesComponent,
+    LetterJamProposeClueComponent
   ],
   imports: [
     RouterModule.forChild(routes),

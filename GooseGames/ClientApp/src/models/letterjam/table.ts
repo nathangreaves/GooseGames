@@ -40,8 +40,8 @@ export interface ITable {
   nonPlayerCharacters: ITableNonPlayerCharacter[];
 }
 
-export class TablePlayerBase {
-  id: string;
+export class TablePlayerBase  {
+  playerId: string;
   currentLetterId: string;
   currentLetter: ILetterCard;
   player: IGooseGamesPlayer;
@@ -50,7 +50,7 @@ export class TablePlayerBase {
   cards: number[];
 }
 
-export class TablePlayer extends TablePlayerBase implements ITablePlayerBase {
+export class TablePlayer extends TablePlayerBase implements ITablePlayer {
   numberOfRedCluesGiven: number;
   numberOfGreenCluesGiven: number;
   numberOfLetters: number;
@@ -63,5 +63,6 @@ export class TableNonPlayerCharacter extends TablePlayerBase implements ITableNo
 }
 
 export interface ICardsRequest {
-  cardIds: string[];
+  cardIds: string[] | null;
+  relevantCards: boolean | null;
 }

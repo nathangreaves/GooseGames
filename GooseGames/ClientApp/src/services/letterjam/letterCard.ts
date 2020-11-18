@@ -14,11 +14,11 @@ export class LetterJamLetterCardService {
 
   }
 
-  public GetReleventLetters(playerSessionGameRequest: IPlayerSessionGame): Promise<GenericResponse<ILetterCard[]>> {
+  public GetRelevantLetters(playerSessionGameRequest: IPlayerSessionGame): Promise<GenericResponse<ILetterCard[]>> {
     var request = ConvertToPlayerSessionGameRequest(playerSessionGameRequest);
     var parameters = Object.keys(request).map(key => key + '=' + request[key]).join('&');
 
-    return this._http.get<GenericResponse<ILetterCard[]>>(`${this._baseUrl}LetterJamLetterCard/ReleventLetters?${parameters}`).toPromise();
+    return this._http.get<GenericResponse<ILetterCard[]>>(`${this._baseUrl}LetterJamLetterCard/RelevantLetters?${parameters}`).toPromise();
   }
 
   public GetLetters(playerSessionGameRequest: IPlayerSessionGame, letterCardsRequest: ICardsRequest): Promise<GenericResponse<ILetterCard[]>> {

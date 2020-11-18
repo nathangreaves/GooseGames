@@ -1,0 +1,64 @@
+.word-box {
+  width: 100%;
+  font-size: 1rem;
+  min-height: 56px;
+  margin-left: 0.25rem;
+}
+
+.letter-box {
+  margin-top: 20px;
+  width: 100%;
+  font-size: 2rem;
+
+  .player-card {
+    font-size: 2rem;
+    height: 4rem;
+    width: 3rem;
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+  }
+
+  .delete-card {
+    font-size: 1.5rem;
+  }
+}
+
+.letter-display {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.letter-display-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@keyframes caretAnimation {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+
+.caret {
+  animation-duration: 0.5s;
+  animation-name: caretAnimation;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+
+  border-radius: 0;
+  box-shadow: none;
+  border-top: 0px;
+  border-left: 0px;
+  border-right: 0px;
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+  width: 1rem;
+}

@@ -12,7 +12,7 @@ import * as signalR from '@microsoft/signalr';
 import { LetterJamPlayerStatusService } from '../../services/letterjam/playerStatus';
 import { IGooseGamesPlayer } from '../../models/player';
 import { GlobalPlayerService } from '../../services/player';
-import { LetterJamTableService } from '../../services/letterjam/table';
+import { LetterJamNonPlayerCharacterService } from '../../services/letterjam/nonPlayerCharacter';
 
 @Component({
   selector: 'app-letter-jam',
@@ -82,7 +82,7 @@ export class LetterJamComponent implements OnInit {
     private router: Router,
     private globalStorage: GooseGamesLocalStorage,
     private _playerService: GlobalPlayerService,
-    private _nonPlayerCharacterService: LetterJamTableService) {
+    private _nonPlayerCharacterService: LetterJamNonPlayerCharacterService) {
 
     this.GamePassword = activatedRoute.snapshot.params.id;
     if (this.GamePassword) {

@@ -80,6 +80,7 @@ namespace GooseGames
             AddKeyedServices<Services.Werewords.PlayerStatus.IPlayerStatusKeyedService>(services);
 
             //Letter Jam
+            services.AddScoped<Services.LetterJam.CluesService>();
             services.AddScoped<Services.LetterJam.GameService>();
             services.AddScoped<Services.LetterJam.LetterCardService>();
             services.AddScoped<Services.LetterJam.LobbyService>();

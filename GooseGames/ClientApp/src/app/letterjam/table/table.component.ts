@@ -5,6 +5,17 @@ import { ILetterCard } from '../../../models/letterjam/letters';
 import { ICardsRequest } from '../../../models/letterjam/table';
 import { LetterJamLetterCardService } from '../../../services/letterjam/letterCard';
 import _ from 'lodash';
+import { IProposedCluesComponentParameters } from './proposed-clues/proposed-clues.component';
+import { IProposeClueComponentParameters } from './propose-clue/propose-clue.component';
+import { ITableComponentParameters } from './table-base.component';
+
+export enum TableComponentTabs {
+  Table = 0,
+  ProposedClues = 1,
+  ProposeClue = 2
+}
+
+const LocalStorageTabKey = "goose-games-letter-jam-table-tab";
 
 @Component({
   selector: 'letterjam-table',
@@ -14,35 +25,115 @@ import _ from 'lodash';
 export class LetterJamTableComponent extends LetterJamComponentBase implements OnInit {
 
   tableViewParameters: ITableViewParameters;
+  proposedCluesParameters: IProposedCluesComponentParameters;
+  proposeClueParameters: IProposeClueComponentParameters;
 
   letterCards: ILetterCard[] = [];
+  CurrentRoundId: string;
+
+  CurrentTabId: number = null;
+  TableLoaded: boolean;
+  ProposedCluesLoaded: boolean;
+  ProposeClueLoaded: boolean;
 
   constructor(private letterCardService: LetterJamLetterCardService) {
     super();
   }
 
-  ngOnInit(): void {
+  Table = () => {
+    this.TableLoaded = true;
+    this.CurrentTabId = TableComponentTabs.Table;
+    this.setTabIdInLocalStorage();
+  }
 
-    this.tableViewParameters = <ITableViewParameters>{
-      request: this,
-      getCardsFromCache: this.getCardsFromCache,
-      getPlayersFromCache: this.GetPlayersFromCache
+  ProposedClues = () => {
+    this.ProposedCluesLoaded = true;
+    this.CurrentTabId = TableComponentTabs.ProposedClues;
+    this.setTabIdInLocalStorage();
+  }
+
+  ProposeClue = () => {
+    this.ProposeClueLoaded = true;
+    this.CurrentTabId = TableComponentTabs.ProposeClue;
+    this.setTabIdInLocalStorage();
+  }
+
+    private setTabIdInLocalStorage() {
+        localStorage.setItem(LocalStorageTabKey, this.CurrentTabId.toString());
     }
 
-    this.getRelevantCards();
-  }
-  getRelevantCards() {
-    this.letterCardService.GetReleventLetters(this)
-      .then(response => this.HandleGenericResponse(response, r =>
-      {
-        _.each(r, this.addLetterCardToCache);
+  ngOnInit(): void {
 
-        return response;
-      }))
-      .catch(this.HandleGenericError);
+    var baseTableParameters = <ITableComponentParameters>{
+      request: this,
+      getCardsFromCache: this.getCardsFromCache,
+      getPlayersFromCache: this.GetPlayersFromCache,
+      setCurrentRoundId: this.setCurrentRoundId,
+      getCurrentRoundId: this.getCurrentRoundId
+    }
+
+    this.tableViewParameters = <ITableViewParameters>{
+      ...baseTableParameters
+    };
+    this.proposedCluesParameters = <IProposedCluesComponentParameters>{
+      ...baseTableParameters,
+      proposeClue: this.ProposeClue
+    };
+    this.proposeClueParameters = <IProposeClueComponentParameters>{
+      ...baseTableParameters,
+      proposedClues: this.ProposedClues
+    }
+
+    var tabItem = localStorage.getItem(LocalStorageTabKey);
+    if (tabItem !== null && tabItem !== undefined) {
+      this.CurrentTabId = parseInt(tabItem);
+    }
+
+    switch (this.CurrentTabId) {
+      case TableComponentTabs.ProposeClue:
+        this.ProposeClueLoaded = true;
+        break;
+      case TableComponentTabs.ProposedClues:
+        this.ProposedCluesLoaded = true;
+        break;
+      default:
+        this.CurrentTabId = TableComponentTabs.Table;
+        this.TableLoaded = true;
+        break;
+    }
+
+    this.getRelevantLetters();
+  }
+
+  getCurrentRoundId = (): string => {
+    return this.CurrentRoundId;
+  }
+  setCurrentRoundId = (currentRoundId: string): void => {
+    this.CurrentRoundId = currentRoundId;
+  }
+
+  getRelevantLetters(): Promise<ILetterCard[]> {
+    return this.letterCardService.GetRelevantLetters(this)
+      .then(response => {
+        if (response.success) {
+          _.each(response.data, this.addLetterCardToCache);
+
+          return response.data;
+        }
+        this.SetErrorMessage(response.errorCode);
+        return [];
+      })
+      .catch(err => {
+        this.HandleGenericError(err);
+        return [];
+      });
   }
 
   getCardsFromCache = (request: ICardsRequest): Promise<ILetterCard[]> => {
+
+    if (request.relevantCards) {
+      return this.getRelevantLetters();
+    }
 
     var response = [];
     var newRequest = <ICardsRequest>{

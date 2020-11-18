@@ -85,7 +85,7 @@ namespace GooseGames.Services.LetterJam
             }
         }
 
-        public async Task<GenericResponse<IEnumerable<LetterCardResponse>>> GetReleventLettersAsync(PlayerSessionGameRequest request)
+        public async Task<GenericResponse<IEnumerable<LetterCardResponse>>> GetRelevantLettersAsync(PlayerSessionGameRequest request)
         {
             var currentRoundId = await _gameRepository.GetPropertyAsync(request.GameId, g => g.CurrentRoundId);
             if (!currentRoundId.HasValue)
@@ -93,20 +93,22 @@ namespace GooseGames.Services.LetterJam
                 return GenericResponse<IEnumerable<LetterCardResponse>>.Error("Unable to find current round id");
             }
 
-            var playerCardIds = (await _playerStateRepository.GetPropertyForFilterAsync(p => p.GameId == request.GameId,
+            var playerCardIds = (await _playerStateRepository.GetPropertyForFilterAsync(p => p.GameId == request.GameId && p.PlayerId != request.PlayerId,
                 p => new KeyValuePair<Guid, Guid>(p.Id, p.CurrentLetterId.Value))).Select(p => p.Value).ToList();
             var nonPlayerCardIds = (await _nonPlayerCharacterRepository.GetPropertyForFilterAsync(p => p.GameId == request.GameId,
                 p => new KeyValuePair<Guid, Guid>(p.Id, p.CurrentLetterId.Value))).Select(p => p.Value).ToList();
 
             var cards = await _letterCardRepository.FilterAsync(l => l.GameId == request.GameId && (playerCardIds.Contains(l.Id) || nonPlayerCardIds.Contains(l.Id) || l.BonusLetter));
 
-            return GenericResponse<IEnumerable<LetterCardResponse>>.Ok(cards.Select(c => 
+            return GenericResponse<IEnumerable<LetterCardResponse>>.Ok(cards.OrderBy(c => c.PlayerId.HasValue ? 0 : c.NonPlayerCharacterId.HasValue ? 10 : 20).Select(c => 
             { 
                 return new LetterCardResponse 
                 {
                     CardId = c.Id,
                     BonusLetter = c.BonusLetter,
-                    Letter = c.Letter
+                    Letter = c.Letter,
+                    PlayerId = c.PlayerId,
+                    NonPlayerCharacterId = c.NonPlayerCharacterId
                 };
             }));
         }

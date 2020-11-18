@@ -1,4 +1,47 @@
-<letterjam-table-view
-    [parameters]="tableViewParameters">
+<div *ngIf="TableLoaded" [hidden]="CurrentTabId !== 0" class="table-content">
+  <letterjam-table-view [parameters]="tableViewParameters">
 
-</letterjam-table-view>
+  </letterjam-table-view>
+</div>
+<div *ngIf="ProposedCluesLoaded" [hidden]="CurrentTabId !== 1" class="table-content">
+  <letterjam-proposed-clues [parameters]="proposedCluesParameters">
+
+  </letterjam-proposed-clues>
+</div>
+<div *ngIf="ProposeClueLoaded" [hidden]="CurrentTabId !== 2" class="table-content">
+  <letterjam-propose-clue [parameters]="proposeClueParameters">
+
+  </letterjam-propose-clue>
+</div>
+
+
+<div class="filler">
+
+</div>
+
+<div class="tabs-bar">
+
+  <div class="container">
+    <div class="row">
+      <div class="col col-sm-1 col-md-3"></div>
+
+      <div class="tabs-bar-buttons col-12 col-sm-10 col-md-6">
+
+        <button class="tab-button" (click)="Table()"
+                [ngClass]="{
+                'current-tab' : CurrentTabId === 0
+                }">
+          Table
+        </button>
+        <button class="tab-button" (click)="ProposedClues()"
+                [ngClass]="{
+                'current-tab' : CurrentTabId === 1 || CurrentTabId === 2
+                }">
+          Clues
+        </button>
+      </div>
+
+      <div class="col col-sm-1 col-md-3"></div>
+    </div>
+  </div>
+</div>

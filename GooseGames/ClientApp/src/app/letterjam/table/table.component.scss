@@ -1,0 +1,38 @@
+
+.filler {
+  height: 70px;
+}
+
+.tabs-bar {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 70px;
+  background: #fcfcf7;
+}
+
+.tabs-bar-buttons {
+  height: 100%;
+  padding: 0px;
+}
+
+.tabs-bar .container {
+  height: 100%;
+}
+
+.tabs-bar .row {
+  height: 100%;
+}
+
+.tab-button{
+    height: 100%;
+    width: 25%;
+}
+.tab-button.current-tab {
+  background: red;
+}
+
+.table-content{
+    height: 100%;
+}

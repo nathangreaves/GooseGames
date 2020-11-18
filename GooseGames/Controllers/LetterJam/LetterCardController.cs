@@ -49,14 +49,14 @@ namespace GooseGames.Controllers.LetterJam
         }
 
         [HttpGet]
-        [Route("ReleventLetters")]
-        public async Task<GenericResponse<IEnumerable<LetterCardResponse>>> GetReleventLettersAsync([FromQuery]PlayerSessionGameRequest request)
+        [Route("RelevantLetters")]
+        public async Task<GenericResponse<IEnumerable<LetterCardResponse>>> GetRelevantLettersAsync([FromQuery]PlayerSessionGameRequest request)
         {
             try
             {
                 _logger.LogInformation("Received request", request);
 
-                var result = await _letterCardService.GetReleventLettersAsync(request);
+                var result = await _letterCardService.GetRelevantLettersAsync(request);
 
                 _logger.LogInformation("Returned result", result);
 

@@ -1,5 +1,5 @@
 
-import { IPlayerSession } from '../../models/session';
+import { IPlayerSessionGame, IPlayerSession } from '../../models/session';
 import { GenericResponseBase, GenericResponse } from '../../models/genericresponse';
 import { LetterJamRouter, GenericResponseHandler, GenericResponseBaseHandler, ReadSessionData, SetSessionData } from '../../app/letterjam/scaffolding/content';
 import { IGooseGamesPlayer } from '../player';
@@ -43,6 +43,10 @@ export interface IGetPlayersFromCacheRequest {
   allPlayers: boolean | null;
   includeReal: boolean;
   includeNPC: boolean;
+}
+
+export interface ILetterJamRoundRequest extends IPlayerSessionGame {
+  roundId: string;
 }
 
 export abstract class PlayersFromCacheRequestBase {
