@@ -21,7 +21,6 @@ export class WerewordsLobbyComponent extends WerewordsComponentBase implements O
   lobbyParameters: ILobbyComponentParameters;
 
   DisableButtons: boolean;
-  StatusText: string;
 
   constructor(private _sessionService: WerewordsSessionService, private _router: Router, activatedRoute: ActivatedRoute) {
     super();
@@ -40,9 +39,6 @@ export class WerewordsLobbyComponent extends WerewordsComponentBase implements O
 
   ngOnInit(): void {
 
-    this.HubConnection.on("startingSession", () => {
-      this.StatusText = "Setting up the game...";
-    });
     this.HubConnection.on("secretRole", () => {      
       this.Route(WerewordsPlayerStatus.NightRevealSecretRole);
     });
@@ -53,14 +49,14 @@ export class WerewordsLobbyComponent extends WerewordsComponentBase implements O
       maxPlayers: MaxPlayers,
       playerId: this.PlayerId,
       sessionId: this.SessionId,
-      startSession: this.startSession
+      startSession: this.startSession,
+      startingSessionMessage: "Starting session. WEREWORDS moment please."
     }
   }
 
   ngOnDestroy(): void {
     var connection = this.HubConnection;
     if (connection) {
-      connection.off("startingSession");
       connection.off("secretRole");
     }
   }

@@ -84,9 +84,6 @@ namespace GooseGames.Services.Fuji
             _logger.LogTrace("Updating global session to game");
             await _sessionService.SetGameSessionIdentifierAsync(request.SessionId, GameEnum.FujiFlush, game.Id);
 
-            _logger.LogTrace("Sending update to clients");
-            await _fujiHubContext.SendStartingSessionAsync(request.SessionId);
-
             await _deckService.PrepareDeckAsync(game.Id);
 
             await _fujiHubContext.SendBeginSessionAsync(request.SessionId);

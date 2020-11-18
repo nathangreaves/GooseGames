@@ -1,6 +1,9 @@
 <div class="loading" *ngIf="Loading && !ErrorMessage">
   I am loading...
 </div>
+<div class="alert alert-info" *ngIf="!Loading && InfoMessage">
+  {{InfoMessage}}
+</div>
 <global-lobby-hub-component
   [parameters]="globalHubConnectionParameters"
 >
