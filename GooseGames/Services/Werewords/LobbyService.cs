@@ -25,7 +25,6 @@ namespace GooseGames.Services.Werewords
         private readonly Global.PlayerService _playerService;
         private readonly RoundService _roundService;
         private readonly RequestLogger<LobbyService> _logger;
-        private readonly WerewordsHubContext _werewordsHubContext;
         private const int MinNumberOfPlayersPerSession = 4;
         private const int MaxNumberOfPlayersPerSession = 10;
 
@@ -33,14 +32,12 @@ namespace GooseGames.Services.Werewords
             SessionService sessionService,
             Global.PlayerService playerService,
             RoundService roundService,
-            RequestLogger<LobbyService> logger,
-            WerewordsHubContext lobbyHub)
+            RequestLogger<LobbyService> logger)
         {
             _sessionService = sessionService;
             _playerService = playerService;
             _roundService = roundService;
             _logger = logger;
-            _werewordsHubContext = lobbyHub;
         }
 
         internal async Task<GenericResponseBase> StartSessionAsync(PlayerSessionRequest request)
@@ -54,12 +51,8 @@ namespace GooseGames.Services.Werewords
             _logger.LogTrace("Session cleared to start");
 
             _logger.LogTrace("Removing unready players");
-            await _sessionService.StartSessionAsync(request.SessionId);
-          
-            _logger.LogTrace("Sending update to clients");
-            await _werewordsHubContext.SendStartingSessionAsync(request.SessionId);
 
-            await Task.Delay(TimeSpan.FromSeconds(2));
+            await _sessionService.StartSessionAsync(request.SessionId);          
 
             await _roundService.CreateNewRoundAsync(request.SessionId);
 

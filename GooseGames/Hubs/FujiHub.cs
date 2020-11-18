@@ -50,12 +50,6 @@ namespace GooseGames.Hubs
             _logger = logger;
         }
 
-        public async Task SendStartingSessionAsync(Guid sessionId)
-        {
-            _logger.LogInformation($"Sending startingSession: to {sessionId}");
-            await _hub.Clients.Group(sessionId.ToString()).SendAsync("startingSession");
-        }
-
         internal async Task SendBeginSessionAsync(Guid sessionId)
         {
             _logger.LogInformation($"Sending beginSession: to {sessionId}");

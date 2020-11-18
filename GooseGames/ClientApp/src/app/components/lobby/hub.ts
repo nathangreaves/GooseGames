@@ -11,6 +11,7 @@ export interface IGlobalLobbyHubParameters {
   handleConnectionError: (error: string) => void;
   handleReconnected: () => void;
   resolveConnected: () => void;
+  sessionStarting: () => void;
 }
 
 @Component({
@@ -47,6 +48,7 @@ export class GlobalLobbyHubComponent implements OnInit, OnDestroy {
       this._globalHubConnection.on("playerAdded", this.parameters.handlePlayerAdded);
       this._globalHubConnection.on("playerDetailsUpdated", this.parameters.handlePlayerDetailsUpdated);
       this._globalHubConnection.on("playerRemoved", this.parameters.handlePlayerRemoved);
+      this._globalHubConnection.on("sessionStarting", this.parameters.sessionStarting);
       this.parameters.resolveConnected();
     });
   }
@@ -62,6 +64,7 @@ export class GlobalLobbyHubComponent implements OnInit, OnDestroy {
       globalConnection.off("playerAdded");
       globalConnection.off("playerDetailsUpdated");
       globalConnection.off("playerRemoved");
+      globalConnection.off("sessionStarting");
 
       globalConnection.stop();
     }
