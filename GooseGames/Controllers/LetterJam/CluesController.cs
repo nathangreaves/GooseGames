@@ -52,5 +52,26 @@ namespace GooseGames.Controllers.LetterJam
                 return GenericResponse<IEnumerable<ProposedClueResponse>>.Error($"Unknown Error {errorGuid}");
             }
         }
+
+        [HttpPost]
+        public async Task<GenericResponseBase> PostAsync(SubmitClueRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _cluesService.SubmitClueAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
     }
 }

@@ -3,22 +3,12 @@ import { TableComponentBase, ITableComponentParameters } from '../table-base.com
 import { LetterCard } from '../../../../models/letterjam/letters';
 import { AllPlayersFromCacheRequest } from '../../../../models/letterjam/content';
 import _ from 'lodash';
-import {
-  trigger,
-  state,
-  style,
-  animate,
-  transition,
-  keyframes
-} from '@angular/animations';
 import { IGooseGamesPlayer } from '../../../../models/player';
-import { request } from 'https';
+import { LetterJamCluesService } from '../../../../services/letterjam/clues';
 
 export interface IProposeClueComponentParameters extends ITableComponentParameters {
   proposedClues: () => void;
 }
-
-const WildCardId: string = "dd4750cc-07cf-497e-867d-6f434938677e";
 
 
 //animations: [
@@ -46,9 +36,12 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
   RelevantLetters: LetterCard[] = [];
   HumanPlayers: IGooseGamesPlayer[] = [];
   ShowAsPlayerId: string = null;
+  DisableButtons: boolean = false;
+  WildCardId: string;
 
-  constructor() {
+  constructor(private clueService: LetterJamCluesService) {
     super();
+    this.WildCardId = clueService.WildCardId;
   }
 
   ngOnInit(): void {
@@ -68,13 +61,13 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
 
         this.RelevantLetters.push({
           bonusLetter: false,
-          cardId: WildCardId,
+          cardId: this.WildCardId,
           letter: "*",
           nonPlayerCharacterId: null,
-          playerId: WildCardId,
+          playerId: this.WildCardId,
           loadingPlayer: false,
           player: {
-            id: WildCardId,
+            id: this.WildCardId,
             name: null,
             emoji: null,
             playerNumber: 100
@@ -87,7 +80,7 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
     return this.parameters.getPlayersFromCache(new AllPlayersFromCacheRequest(true, true)).then(r => {
 
       _.each(this.RelevantLetters, l => {
-        if (!l.bonusLetter && l.cardId !== WildCardId) {
+        if (!l.bonusLetter && l.cardId !== this.WildCardId) {
           l.player = _.find(r, fP => fP.id == l.playerId || fP.id == l.nonPlayerCharacterId);
         }
         l.loadingPlayer = false;
@@ -127,7 +120,23 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
   }
 
   SubmitClue = () => {
+    if (this.BuiltWord.length < 1) {
+      this.ErrorMessage = "Please submit a word with at least 1 letter!"
+    }
+    this.DisableButtons = true;
 
+    this.clueService.SubmitClue(this.parameters.request,
+      this.parameters.getCurrentRoundId(),
+      this.BuiltWord)
+      .then(response => this.HandleGenericResponseBase(response, () => {
+        this.parameters.proposedClues();
+        this.BuiltWord = [];
+        return response;
+      }))
+      .catch(this.HandleGenericError)
+      .finally(() => {
+        this.DisableButtons = false;
+      });
   }
 
   Back = () => {

@@ -15,18 +15,30 @@ namespace GooseGames.Services.LetterJam
     {
         private readonly GameService _gameService;
         private readonly IClueRepository _clueRepository;
+        private readonly IClueLetterRepository _clueLetterRepository;
         private readonly IClueVoteRepository _clueVoteRepository;
+        private readonly ILetterCardRepository _letterCardRepository;
+        private readonly IGameRepository _gameRepository;
+        private readonly IRoundRepository _roundRepository;
         private readonly RequestLogger<CluesService> _logger;
 
         public CluesService(
             GameService gameService,
             IClueRepository clueRepository,
+            IClueLetterRepository clueLetterRepository,
             IClueVoteRepository clueVoteRepository,
+            ILetterCardRepository letterCardRepository,
+            IGameRepository gameRepository,
+            IRoundRepository roundRepository,
             RequestLogger<CluesService> logger)
         {
             _gameService = gameService;
             _clueRepository = clueRepository;
+            _clueLetterRepository = clueLetterRepository;
             _clueVoteRepository = clueVoteRepository;
+            _letterCardRepository = letterCardRepository;
+            _gameRepository = gameRepository;
+            _roundRepository = roundRepository;
             _logger = logger;
         }
 
@@ -69,6 +81,90 @@ namespace GooseGames.Services.LetterJam
                     Votes = votes
                 };
             }));
+        }
+
+        internal async Task<GenericResponseBase> SubmitClueAsync(SubmitClueRequest request)
+        {
+            var roundId = request.RoundId;
+            if (roundId == null)
+            {
+                var game = await _gameRepository.GetAsync(request.GameId);
+                roundId = game.CurrentRoundId;
+            }
+            if (roundId == null)
+            {
+                return GenericResponseBase.Error("Unable to find current round id");
+            }
+
+            Round round = await _roundRepository.GetAsync(roundId.Value);
+            if (round == null)
+            {
+                return GenericResponseBase.Error("Unable to find round");
+            }
+
+            var requestedClueLetters = request.ClueLetters;
+            var clue = new Clue
+            {
+                Id = Guid.NewGuid(),
+                ClueGiverPlayerId = request.PlayerId,
+                RoundId = round.Id,
+                RoundNumber = round.RoundNumber,
+                WildcardUsed = requestedClueLetters.Any(c => c.IsWildCard)
+            };
+            var clueLetters = new List<ClueLetter>();
+
+            var actualLetterIds = request.ClueLetters.Where(x => x.LetterId.HasValue).Select(x => x.LetterId).ToList();
+
+            var letters = await _letterCardRepository.FilterAsync(c => actualLetterIds.Contains(c.Id));
+
+            var letterIndex = 0;
+            foreach (var clueLetter in requestedClueLetters)
+            {
+                LetterCard letter = null;
+                if (!clueLetter.IsWildCard)                
+                {
+                    letter = letters.FirstOrDefault(l => l.Id == clueLetter.LetterId);
+                    if (letter == null)
+                    {
+                        return GenericResponseBase.Error("Unable to find letter");
+                    }
+                }
+
+                clueLetters.Add(new ClueLetter
+                {
+                    Id = Guid.NewGuid(),
+                    Clue = clue,
+                    Letter = letter?.Letter,
+                    PlayerId = letter?.PlayerId,
+                    NonPlayerCharacterId = letter?.NonPlayerCharacterId,
+                    LetterId = letter?.Id,
+                    BonusLetter = letter?.BonusLetter ?? false,
+                    LetterIndex = letterIndex,
+                    IsWildCard = clueLetter.IsWildCard
+                });
+                letterIndex++;
+            }
+
+            foreach (var letter in letters)
+            {
+                if (letter.PlayerId.HasValue)
+                {
+                    clue.NumberOfPlayerLetters += 1;
+                }
+                else if (letter.NonPlayerCharacterId.HasValue)
+                {
+                    clue.NumberOfNonPlayerLetters += 1;
+                }
+                else if (letter.BonusLetter)
+                {
+                    clue.NumberOfBonusLetters += 1;
+                }
+            }
+
+            await _clueRepository.InsertAsync(clue);
+            await _clueLetterRepository.InsertRangeAsync(clueLetters);
+
+            return GenericResponseBase.Ok();
         }
     }
 }

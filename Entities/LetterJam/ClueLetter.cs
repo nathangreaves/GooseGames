@@ -17,5 +17,7 @@ namespace Entities.LetterJam
         public Guid? LetterId { get; set; }
         public char? Letter { get; set; }
         public bool BonusLetter { get; set; }
+        public bool IsWildCard { get; set; }
+        public int LetterIndex { get; set; }
     }
 }
