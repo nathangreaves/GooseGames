@@ -2,6 +2,10 @@
 
   <div class="proposed-clues-container">
 
+    <div *ngIf="ProposedClues.length < 1">
+      No-one has proposed a clue yet!
+    </div>
+
     <div *ngFor="let clue of ProposedClues;" class="row proposed-clue-row">
       <div class="row" *ngIf="!clue.loadingPlayer && clue.player">
         <div class="col-5">
@@ -33,7 +37,10 @@
               <gg-emoji [emoji]="letter.player.emoji"></gg-emoji>
             </div>
 
-            <div class="player-card player-shown-card">
+            <div class="player-card player-shown-card" [ngClass]="{
+         'non-player-card' : letter.nonPlayerCharacterId,
+         'bonus-card' : letter.bonusLetter
+         }">
               <div>
                 {{letter.letter}}
               </div>

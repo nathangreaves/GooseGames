@@ -18,7 +18,7 @@ export interface IProposeClueComponentParameters extends ITableComponentParamete
   proposedClues: () => void;
 }
 
-const WildCardId = "dd4750cc-07cf-497e-867d-6f434938677e";
+const WildCardId: string = "dd4750cc-07cf-497e-867d-6f434938677e";
 
 
 //animations: [
@@ -37,7 +37,7 @@ const WildCardId = "dd4750cc-07cf-497e-867d-6f434938677e";
   selector: 'letterjam-propose-clue',
   templateUrl: './propose-clue.component.html',
   styleUrls: ['../../common/letterjam.common.scss',
-    './propose-clue.component.scss'] 
+    './propose-clue.component.scss']
 })
 export class LetterJamProposeClueComponent extends TableComponentBase implements OnInit {
   @Input() parameters: IProposeClueComponentParameters;
@@ -45,6 +45,7 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
   BuiltWord: LetterCard[] = [];
   RelevantLetters: LetterCard[] = [];
   HumanPlayers: IGooseGamesPlayer[] = [];
+  ShowAsPlayerId: string = null;
 
   constructor() {
     super();
@@ -70,9 +71,14 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
           cardId: WildCardId,
           letter: "*",
           nonPlayerCharacterId: null,
-          playerId: null,
+          playerId: WildCardId,
           loadingPlayer: false,
-          player: null
+          player: {
+            id: WildCardId,
+            name: null,
+            emoji: null,
+            playerNumber: 100
+          }
         })
       });
   }
@@ -81,7 +87,7 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
     return this.parameters.getPlayersFromCache(new AllPlayersFromCacheRequest(true, true)).then(r => {
 
       _.each(this.RelevantLetters, l => {
-        if (!l.bonusLetter) {
+        if (!l.bonusLetter && l.cardId !== WildCardId) {
           l.player = _.find(r, fP => fP.id == l.playerId || fP.id == l.nonPlayerCharacterId);
         }
         l.loadingPlayer = false;
@@ -102,6 +108,14 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
     });
   }
 
+  show(playerId: string) {
+    this.ShowAsPlayerId = playerId;
+  }
+
+  hide() {
+    this.ShowAsPlayerId = null;
+  }
+
   DeleteLastLetter = () => {
     if (this.BuiltWord.length > 0) {
       this.BuiltWord = this.BuiltWord.slice(0, this.BuiltWord.length - 1);
@@ -110,5 +124,13 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
 
   AddLetterToWord = (letter: LetterCard) => {
     this.BuiltWord.push(letter);
+  }
+
+  SubmitClue = () => {
+
+  }
+
+  Back = () => {
+    this.parameters.proposedClues();
   }
 }

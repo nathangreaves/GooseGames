@@ -1,31 +1,17 @@
-<div class="word-box letter-display">
-  <div *ngFor="let letter of BuiltWord;" class="letter-display-item">
-
-    <gg-emoji [emoji]="letter.player?.emoji"></gg-emoji>
-
-    <div class="player-card player-shown-card">
-      {{letter.letter}}
-    </div>
-
-  </div>
-  <div class="letter-display-item">
-
-    <gg-emoji [emoji]="null"></gg-emoji>
-
-    <div class="player-card player-shown-card caret" @caretAnimation>
-      
-    </div>
-
-  </div>
-</div>
 
 <div class="letter-box letter-display">
   <div *ngFor="let letter of RelevantLetters;" class="letter-display-item">
 
-    <gg-emoji [emoji]="letter.player?.emoji"></gg-emoji>
+    <gg-emoji [emoji]="letter.player?.emoji"
+              (mousedown)="show(letter.playerId)" (mouseup)="hide()" (touchstart)="show(letter.playerId)" (touchend)="hide()"></gg-emoji>
 
-    <button class="player-card player-shown-card" (click)="AddLetterToWord(letter)">
-      {{letter.letter}}
+    <button class="player-card player-shown-card"  [ngClass]="{
+         'non-player-card' : letter.nonPlayerCharacterId,
+         'bonus-card' : letter.bonusLetter
+         }"
+        (click)="AddLetterToWord(letter)">
+      <span *ngIf="!(ShowAsPlayerId === letter.player?.id)">{{letter.letter}}</span>
+      <span *ngIf="(ShowAsPlayerId === letter.player?.id)">?</span>
     </button>
 
   </div>
@@ -41,15 +27,47 @@
   </div>
 </div>
 
-<div>
-  <span>View As: </span>
-  <div *ngFor="let player of HumanPlayers;">
-    <gg-emoji [emoji]="player.emoji"></gg-emoji>
+<div class="word-box letter-display">
+  <div *ngFor="let letter of BuiltWord;" class="letter-display-item">
+
+    <gg-emoji [emoji]="letter.player?.emoji"
+              (mousedown)="show(letter.playerId)" (mouseup)="hide()" (touchstart)="show(letter.playerId)" (touchend)="hide()"></gg-emoji>
+
+    <div class="player-card player-shown-card" [ngClass]="{
+         'non-player-card' : letter.nonPlayerCharacterId,
+         'bonus-card' : letter.bonusLetter
+         }">
+      <span *ngIf="!(ShowAsPlayerId === letter.player?.id)">{{letter.letter}}</span>
+      <span *ngIf="(ShowAsPlayerId === letter.player?.id)">?</span>
+    </div>
+
+  </div>
+  <div class="letter-display-item">
+
+    <gg-emoji [emoji]="null"></gg-emoji>
+
+    <div class="player-card player-shown-card caret">
+
+    </div>
+
   </div>
 </div>
 
-<div>
-  <button class="btn btn-primary" (click)="SubmitClue()">
-    Submit
-  </button>
+
+<div class="view-as-box">
+  <span>Click a letter to add it to the word</span><br/>
+  <span>Click a player's Emoji to see what they'd see</span>
+</div>
+
+<div class="row buttons-box">
+  <div class="col-6 back-container">
+    <button class="btn btn-secondary back-button" (click)="Back()">
+      Cancel
+    </button>
+  </div>
+  <div class="col-6 submit-container">
+    <button class="btn btn-primary submit-button" (click)="SubmitClue()">
+      Submit
+    </button>
+  </div>
 </div>

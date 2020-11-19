@@ -2,24 +2,26 @@
   width: 100%;
   font-size: 1rem;
   min-height: 56px;
-  margin-left: 0.25rem;
+  margin-top: 10px;
 }
 
 .letter-box {
-  margin-top: 20px;
+  margin-top: -10px;
   width: 100%;
   font-size: 2rem;
 
-  .player-card {
-    font-size: 2rem;
-    height: 4rem;
-    width: 3rem;
-    margin-left: 0.25rem;
+  .letter-display-item {
     margin-right: 0.25rem;
-  }
 
-  .delete-card {
-    font-size: 1.5rem;
+    .player-card {
+      font-size: 2rem;
+      height: 4rem;
+      width: 3rem;
+    }
+
+    .delete-card {
+      font-size: 1.5rem;
+    }
   }
 }
 
@@ -59,6 +61,40 @@
   border-left: 0px;
   border-right: 0px;
   margin-left: 0.25rem;
-  margin-right: 0.25rem;
   width: 1rem;
+}
+
+.view-as-box {
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-top: 5px;
+  margin-bottom: 5px;
+
+  .emoji-box {
+    font-size: 1.5rem;
+  }
+
+}
+
+.buttons-box {
+
+  .submit-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    .btn-primary {
+      margin-top: 0;
+    }
+  }
+
+  .back-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    .btn-secondary {
+      margin-top: 0;
+    }
+  }
 }

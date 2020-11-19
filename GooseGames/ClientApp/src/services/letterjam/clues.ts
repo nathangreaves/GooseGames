@@ -21,7 +21,7 @@ export class LetterJamCluesService {
       roundId: roundId
     };
 
-    var parameters = Object.keys(newRequest).map(key => key + '=' + newRequest[key]).join('&');
+    var parameters = Object.keys(newRequest).map(key => newRequest[key] ? key + '=' + newRequest[key] : '').join('&');
 
     return this._http.get<GenericResponse<IProposedClue[]>>(`${this._baseUrl}LetterJamClues/Proposed?${parameters}`).toPromise();
   }

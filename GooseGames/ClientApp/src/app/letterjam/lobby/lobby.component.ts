@@ -59,7 +59,8 @@ export class LetterJamLobbyComponent extends LetterJamComponentBase implements O
       maxPlayers: MaxPlayers,
       playerId: this.PlayerId,
       sessionId: this.SessionId,
-      startSession: this.startSession
+      startSession: this.startSession,
+      startingSessionMessage: "Starting game. LETTER JAM moment please."
     }
   }
 

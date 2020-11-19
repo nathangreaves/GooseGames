@@ -28,9 +28,11 @@
 .tab-button{
     height: 100%;
     width: 25%;
+    background: #fff
 }
 .tab-button.current-tab {
-  background: red;
+  background: black;
+  color: white;
 }
 
 .table-content{

@@ -12,7 +12,8 @@
           <div class="col-7 player-cards-container">
             <div *ngFor="let playerCard of player.cards;let i = index;" class="player-card" [ngClass]="{
                  'player-shown-card' : shownCard(player, i),
-                 'player-hidden-card' : hiddenCard(player, i)
+                 'player-hidden-card' : hiddenCard(player, i),
+                 'bonus-card' : playerCard.bonusLetter
                  }">
               <div *ngIf="shownCard(player, i)">
                 <div *ngIf="player.loadingCard">
@@ -41,7 +42,7 @@
           </div>
           <div class="col-7 player-cards-container">
 
-            <div class="player-card player-shown-card">
+            <div class="player-card player-shown-card non-player-card">
               <div *ngIf="!player.loadingCard && player.currentLetter">
                 {{player.currentLetter.letter}}
               </div>
