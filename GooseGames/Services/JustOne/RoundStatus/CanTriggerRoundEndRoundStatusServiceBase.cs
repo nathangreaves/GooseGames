@@ -52,12 +52,11 @@ namespace GooseGames.Services.JustOne.RoundStatus
             {
                 game.Score = game.Score + score;
 
-                if (sessionEnded)
-                {
-                    await _sessionService.SetToLobbyAsync(game.SessionId);
-                }
-
                 await _gameRepository.UpdateAsync(game);
+            }
+            if (sessionEnded)
+            {
+                await _sessionService.SetToLobbyAsync(game.SessionId);
             }
 
             await _playerStatusRepository.UpdatePlayerStatusesForRoundAsync(round.Id, PlayerStatusEnum.PassivePlayerOutcome, PlayerStatusEnum.ActivePlayerOutcome);

@@ -28,6 +28,7 @@ export class FujiLandingComponent {
     this._fujiLocalStorage = fujiLocalStorage;
     this._router = router;
 
+    this._navbarService.reset();
     this._navbarService.setAreaTitle("Fuji Flush");
 
     if (this._fujiLocalStorage.GetPlayerDetails()) {

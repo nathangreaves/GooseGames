@@ -11,6 +11,7 @@ import { IPlayerSessionComponent } from '../../models/session';
 import { PlayerNumberCss } from '../../services/justone/ui'
 import { WordListCheckboxListItem, JustOneWordList } from '../../models/justone/wordlistenum';
 import { ILobbyComponentParameters } from '../components/lobby/lobby';
+import { NavbarService } from '../../services/navbar';
 
 const MinPlayers: number = 3;
 const MaxPlayers: number = 7;
@@ -45,7 +46,8 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent, On
   lobbyParameters: ILobbyComponentParameters;
 
   constructor(sessionService: JustOneSessionService,
-              playerStatusService: JustOnePlayerStatusService,
+    playerStatusService: JustOnePlayerStatusService,
+    private navbarService: NavbarService,
               router: Router,
     activatedRoute: ActivatedRoute) {
     this._playerStatusService = playerStatusService;
@@ -62,6 +64,10 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent, On
   }
 
   ngOnInit(): void {
+
+    this.navbarService.reset();
+    this.navbarService.setAreaTitle("Just One");
+
     this.lobbyParameters = {
       canStartSession: this.canStartSession,
       maxPlayers: MaxPlayers,

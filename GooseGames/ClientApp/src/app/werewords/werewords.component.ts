@@ -58,6 +58,7 @@ export class WerewordsComponent implements OnInit, OnDestroy {
       }
     }
 
+    this.navbarService.reset();
     this.navbarService.setAreaTitle("Werewords");
   }
 
