@@ -1,5 +1,8 @@
 ﻿using GooseGames.Logging;
 using Microsoft.AspNetCore.SignalR;
+using Models.Requests;
+using Models.Requests.LetterJam;
+using Models.Responses.LetterJam;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,6 +56,7 @@ namespace GooseGames.Hubs
             _logger.LogInformation($"Sending startingSession: to {sessionId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("startingSession");
         }
+
         public async Task SendBeginSessionAsync(Guid sessionId, Guid gameId)
         {
             _logger.LogInformation($"Sending beginSession: to {sessionId} : gameId={gameId}");
@@ -67,6 +71,26 @@ namespace GooseGames.Hubs
         {
             _logger.LogInformation($"Sending beginNewRound: to {sessionId} : roundId={roundId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("beginNewRound", roundId);
+        }
+        internal async Task SendRemoveVoteAsync(PlayerSessionRequest request, Guid clueId)
+        {
+            _logger.LogInformation($"Sending removeVote: to {request.SessionId} : playerId={request.PlayerId}, clueId={clueId}");
+            await _hub.Clients.Group(request.SessionId.ToString()).SendAsync("removeVote", request.PlayerId, clueId);
+        }
+        internal async Task SendAddVoteAsync(PlayerSessionRequest request, Guid clueId)
+        {
+            _logger.LogInformation($"Sending addVote: to {request.SessionId} : playerId={request.PlayerId}, clueId={clueId}");
+            await _hub.Clients.Group(request.SessionId.ToString()).SendAsync("addVote", request.PlayerId, clueId);
+        }
+        internal async Task SendNewClueAsync(Guid sessionId, ProposedClueResponse proposedClue)
+        {
+            _logger.LogInformation($"Sending newClue: to {sessionId}", proposedClue);
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("newClue", proposedClue);
+        }
+        internal async Task SendClueRemovedAsync(Guid sessionId, Guid clueId)
+        {
+            _logger.LogInformation($"Sending removeClue: to {sessionId} : clueId={clueId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("removeClue", clueId);
         }
     }
 }

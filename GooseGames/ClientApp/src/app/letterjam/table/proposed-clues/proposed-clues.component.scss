@@ -1,15 +1,66 @@
 .proposed-clues {
+  margin: 0px;
+  padding: 0px;
 
   .proposed-clues-container {
 
     .proposed-clue-row {
       width: 100%;
-      .row{
-          width: 100%;
+      border-radius: 0.25rem;
+      margin-top: 0.25rem;
+      margin-bottom: 0.25rem;
+      margin-right: 0px;
+      border: 0.1em solid #000;
+      padding: 0.3em;
+      padding-top: 0.4em;
+      padding-bottom: 0.4em;
+
+      .row {
+        width: 100%;
       }
+
+      .player-cards-container {
+        margin-left: 0px;
+        padding-left: 5px;
+        padding-right: 0px;
+      }
+
+      .clue-name {
+        padding-right: 0px;
+      }
+    }
+
+    .proposed-clue-row.voted {
+      box-shadow: inset 0px 0px 0.2em 0.2em rgba(55,55,55,1);
+      border-color: transparent;
+      border-width: 0px;
+      padding: 0.4em;
+      padding-top: 0.5em;
+      padding-bottom: 0.5em;
     }
   }
 }
+
+.clue-votes-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  .clue-votes {
+    margin-left: 0px;
+    padding-left: 5px;
+    padding-right: 0px;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .votes-label {
+    padding-right: 0px;
+    text-align: right;
+    font-size: 0.7rem;
+    font-weight: bold;
+  }
+}
+
 
 .filler{
     height: 125px;
@@ -40,8 +91,7 @@
   flex-direction: column;
   align-items: center;
   .player-card{
-      margin-left: 0.25rem;
-      margin-right: 0.25rem;
+      margin-right: 0.5rem;
   }
 }
 
@@ -49,3 +99,8 @@
   height: 112px;
 }
 
+.player-cards-container{
+    .player-card{
+        margin-right: 0.25rem;
+    }
+}

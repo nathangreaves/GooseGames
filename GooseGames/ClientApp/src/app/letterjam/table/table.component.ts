@@ -69,7 +69,8 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
       getCardsFromCache: this.getCardsFromCache,
       getPlayersFromCache: this.GetPlayersFromCache,
       setCurrentRoundId: this.setCurrentRoundId,
-      getCurrentRoundId: this.getCurrentRoundId
+      getCurrentRoundId: this.getCurrentRoundId,
+      hubConnection: this.HubConnection
     }
 
     this.tableViewParameters = <ITableViewParameters>{

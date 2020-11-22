@@ -12,6 +12,7 @@ export interface ITableComponentParameters {
   getCardsFromCache: (request: ICardsRequest) => Promise<ILetterCard[]>;
   getCurrentRoundId: () => string;
   setCurrentRoundId: (currentRoundId: string) => void;
+  hubConnection: signalR.HubConnection;
 }
 
 export class TableComponentBase {

@@ -2,21 +2,55 @@
 
   <div class="proposed-clues-container">
 
-    <div *ngIf="ProposedClues.length < 1">
+    <div class="alert alert-info" *ngIf="ProposedClues.length < 1">
       No-one has proposed a clue yet!
     </div>
+    <div class="proposed-clue-header" *ngIf="ProposedClues.length > 0">
+      <h5>Proposed Clues</h5>
+    </div>
 
-    <div *ngFor="let clue of ProposedClues;" class="row proposed-clue-row">
+    <div *ngFor="let clue of ProposedClues;" class="proposed-clue-row" [ngClass]="{
+          'voted' : clue.voted
+         }" (click)="Vote(clue)">
       <div class="row" *ngIf="!clue.loadingPlayer && clue.player">
-        <div class="col-5">
+        <div class="col-6 clue-name">
           <span class="player-name"><gg-emoji [emoji]="clue.player.emoji"></gg-emoji> {{clue.player.name}}</span>
         </div>
-        <div class="col-7 clue-info-container">
+        <div class="col-6 player-cards-container">
 
+          <div class="player-card player-hidden-card">
+            {{clue.numberOfLetters}}
+          </div>
+
+          <div class="player-card player-shown-card">
+            {{clue.numberOfPlayerLetters}}
+          </div>
+          <div class="player-card player-shown-card non-player-card">
+            {{clue.numberOfNonPlayerLetters}}
+          </div>
+          <div class="player-card player-shown-card bonus-card" *ngIf="numberOfBonusLetters">
+            {{clue.numberOfBonusLetters}}
+          </div>
+          <div class="player-card player-shown-card wild-card" *ngIf="clue.wildcardUsed">
+            *
+          </div>
         </div>
       </div>
       <div class="row" *ngIf="clue.loadingPlayer">
         Loading...
+      </div>
+      <div class="row clue-votes-row">
+        <div class="col-6 votes-label">
+          Votes:
+        </div>
+        <div class="col-6 clue-votes">
+          <div *ngFor="let vote of clue.votes;">
+            <gg-emoji [emoji]="vote?.player?.emoji"></gg-emoji>
+          </div>
+          <div *ngIf="clue.votes.length < 1">
+            <gg-emoji [emoji]="null"></gg-emoji>
+          </div>
+        </div>
       </div>
     </div>
   </div>

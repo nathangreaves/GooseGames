@@ -16,13 +16,20 @@
   text-align: center;
   box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
   border-color: #000;
+
+  
 }
 
-
-.non-player-card{
-    background: #ddd;
+.non-player-card {
+  background: #ddd;
 }
 
 .player-shown-card.bonus-card {
   background: #b5eeff;
+}
+
+.player-hidden-card {
+  background: #000;
+  border-color: #ddd;
+  color: #fff;
 }

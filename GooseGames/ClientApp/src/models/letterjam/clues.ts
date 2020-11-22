@@ -30,6 +30,7 @@ export class ProposedClue implements IProposedClueBase {
   player: IGooseGamesPlayer;
   votes: ProposedClueVote[];
   loadingPlayer: boolean;
+  voted: boolean;
 }
 
 export class ProposedClueVote implements IProposedClueVote {

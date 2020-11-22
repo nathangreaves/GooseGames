@@ -1,8 +1,8 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { TableComponentBase, ITableComponentParameters } from '../table-base.component';
 import { LetterJamCluesService } from '../../../../services/letterjam/clues';
-import { AllPlayersFromCacheRequest } from '../../../../models/letterjam/content';
-import { ProposedClue } from '../../../../models/letterjam/clues';
+import { AllPlayersFromCacheRequest, PlayersFromCacheRequest } from '../../../../models/letterjam/content';
+import { ProposedClue, ProposedClueVote } from '../../../../models/letterjam/clues';
 import _ from 'lodash';
 import { ILetterCard, LetterCard } from '../../../../models/letterjam/letters';
 
@@ -16,7 +16,8 @@ export interface IProposedCluesComponentParameters extends ITableComponentParame
   styleUrls: ['../../common/letterjam.common.scss',
     './proposed-clues.component.scss']
 })
-export class LetterJamProposedCluesComponent extends TableComponentBase implements OnInit {
+export class LetterJamProposedCluesComponent extends TableComponentBase implements OnInit, OnDestroy {
+
   @Input() parameters: IProposedCluesComponentParameters;
 
   ProposedClues: ProposedClue[] = [];
@@ -40,20 +41,63 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
             player: null,
             votes: []
           };
+
+          var iVoted = false;
+
           _.each(proposedClue.votes, v => {
             clue.votes.push({
               ...v,
               player: null,
               loadingPlayer: true
-            })
+            });
+            if (v.playerId === this.parameters.request.PlayerId) {
+              iVoted = true;
+            }
           });
+
+          clue.voted = iVoted;
           this.ProposedClues.push(clue);
         });
         return response;
       }))
       .then(response => this.HandleGenericResponseBase(response, () => {
+        this.subscribe();
         return this.loadRelevantLetters().then(() => this.loadPlayers()).then(() => response);
       }));
+  }
+
+  onAddVote = (playerId: string, clueId: string) => {
+    this.parameters.getPlayersFromCache(new PlayersFromCacheRequest([playerId], true, false))
+      .then(player => {
+        var clue = _.find(this.ProposedClues, clue => clue.id === clueId);
+        if (clue) {
+          clue.votes.push(<ProposedClueVote>{
+            id: '',
+            loadingPlayer: false,
+            player: player[0],
+            playerId: playerId
+          });
+        }
+      })
+
+  };
+
+  onRemoveVote = (playerId: string, clueId: string) => {
+    var clue = _.find(this.ProposedClues, clue => clue.id === clueId);
+    if (clue) {
+      var voteIndex = _.findIndex(clue.votes, v => v.playerId === playerId);
+      clue.votes.splice(voteIndex, 1);
+    }
+  };
+
+  subscribe() {
+    this.parameters.hubConnection.on("addVote", this.onAddVote);
+    this.parameters.hubConnection.on("removeVote", this.onRemoveVote);
+  }
+
+  ngOnDestroy() {
+    this.parameters.hubConnection.off("addVote", this.onAddVote);
+    this.parameters.hubConnection.off("removeVote", this.onRemoveVote);
   }
 
   loadRelevantLetters = (): Promise<any> => {
@@ -94,5 +138,23 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
 
   ProposeClue = () => {
     this.parameters.proposeClue();
+  }
+
+  Vote(clue: ProposedClue) {
+
+    if (clue.voted) {
+      clue.voted = false;
+
+      this.cluesService.Vote(this.parameters.request, this.parameters.getCurrentRoundId(), null);
+    }
+    else {
+      _.each(this.ProposedClues, c => {
+        c.voted = false;
+      });
+
+      clue.voted = true;
+
+      this.cluesService.Vote(this.parameters.request, this.parameters.getCurrentRoundId(), clue.id);
+    }
   }
 }

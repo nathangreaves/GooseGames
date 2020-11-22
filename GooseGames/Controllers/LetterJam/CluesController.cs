@@ -73,5 +73,26 @@ namespace GooseGames.Controllers.LetterJam
                 return GenericResponseBase.Error($"Unknown Error {errorGuid}");
             }
         }
+
+        [HttpDelete]
+        public async Task<GenericResponseBase> DeleteAsync(ClueRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _cluesService.DeleteClueAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
     }
 }

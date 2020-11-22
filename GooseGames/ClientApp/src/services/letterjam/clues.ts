@@ -47,4 +47,15 @@ export class LetterJamCluesService {
 
     return this._http.post<GenericResponseBase>(`${this._baseUrl}LetterJamClues`, postRequest).toPromise();
   }
+
+  public Vote(request: IPlayerSessionGame, roundId: string, clueId: string): Promise<GenericResponseBase> {
+
+    var postRequest = {
+      ...ConvertToPlayerSessionGameRequest(request),
+      roundId: roundId,
+      clueId: clueId
+    }
+
+    return this._http.post<GenericResponseBase>(`${this._baseUrl}LetterJamClueVote`, postRequest).toPromise();
+  }
 }

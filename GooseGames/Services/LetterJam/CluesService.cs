@@ -1,4 +1,5 @@
 ﻿using Entities.LetterJam;
+using GooseGames.Hubs;
 using GooseGames.Logging;
 using Models.Requests.LetterJam;
 using Models.Responses;
@@ -20,6 +21,7 @@ namespace GooseGames.Services.LetterJam
         private readonly ILetterCardRepository _letterCardRepository;
         private readonly IGameRepository _gameRepository;
         private readonly IRoundRepository _roundRepository;
+        private readonly LetterJamHubContext _letterJamHubContext;
         private readonly RequestLogger<CluesService> _logger;
 
         public CluesService(
@@ -30,6 +32,7 @@ namespace GooseGames.Services.LetterJam
             ILetterCardRepository letterCardRepository,
             IGameRepository gameRepository,
             IRoundRepository roundRepository,
+            LetterJamHubContext letterJamHubContext,
             RequestLogger<CluesService> logger)
         {
             _gameService = gameService;
@@ -39,6 +42,7 @@ namespace GooseGames.Services.LetterJam
             _letterCardRepository = letterCardRepository;
             _gameRepository = gameRepository;
             _roundRepository = roundRepository;
+            _letterJamHubContext = letterJamHubContext;
             _logger = logger;
         }
 
@@ -82,6 +86,7 @@ namespace GooseGames.Services.LetterJam
                 };
             }));
         }
+
 
         internal async Task<GenericResponseBase> SubmitClueAsync(SubmitClueRequest request)
         {
@@ -145,7 +150,7 @@ namespace GooseGames.Services.LetterJam
                 letterIndex++;
             }
 
-            foreach (var letter in letters)
+            foreach (var letter in clueLetters)
             {
                 if (letter.PlayerId.HasValue)
                 {
@@ -160,9 +165,55 @@ namespace GooseGames.Services.LetterJam
                     clue.NumberOfBonusLetters += 1;
                 }
             }
+            clue.NumberOfLetters = requestedClueLetters.Count();
 
             await _clueRepository.InsertAsync(clue);
             await _clueLetterRepository.InsertRangeAsync(clueLetters);
+
+            await _letterJamHubContext.SendNewClueAsync(request.SessionId, new ProposedClueResponse
+            {
+                Id = clue.Id,
+                PlayerId = clue.ClueGiverPlayerId,
+                NumberOfLetters = clue.NumberOfLetters,
+                NumberOfPlayerLetters = clue.NumberOfPlayerLetters,
+                NumberOfNonPlayerLetters = clue.NumberOfNonPlayerLetters,
+                NumberOfBonusLetters = clue.NumberOfNonPlayerLetters,
+                WildcardUsed = clue.WildcardUsed
+            });
+
+            return GenericResponseBase.Ok();
+        }
+        internal async Task<GenericResponseBase> DeleteClueAsync(ClueRequest request)
+        {
+            if (!request.ClueId.HasValue)
+            {
+                return GenericResponseBase.Error("Clue id not provided");
+            }
+
+            var clue = await _clueRepository.GetAsync(request.ClueId.Value);
+            if (clue.ClueGiverPlayerId != request.PlayerId)
+            {
+                return GenericResponseBase.Error("Unable to remove clue of another player");
+            }
+            if (request.RoundId.HasValue && request.RoundId != clue.RoundId)
+            {
+                return GenericResponseBase.Error("Incorrect round id");
+            }
+            await _letterJamHubContext.SendClueRemovedAsync(request.SessionId, request.ClueId.Value);
+
+            var clueLetters = await _clueLetterRepository.FilterAsync(cL => cL.ClueId == clue.Id);
+            foreach (var clueLetter in clueLetters)
+            {
+                await _clueLetterRepository.DeleteAsync(clueLetter);
+            }
+
+            var clueVotes = await _clueVoteRepository.FilterAsync(cV => cV.ClueId == clue.Id);
+            foreach (var clueVote in clueVotes)
+            {
+                await _clueVoteRepository.DeleteAsync(clueVote);
+            }
+
+            await _clueRepository.DeleteAsync(clue);
 
             return GenericResponseBase.Ok();
         }
