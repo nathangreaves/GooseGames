@@ -118,7 +118,8 @@ export abstract class JustOneRoundOutcomeComponentBase extends JustOneClueListCo
   Again = () => {
     this._playerStatusService.Set(this.PlayerId, this.SessionId, PlayerStatus.InLobby)
       .then(response => {
-      if (response.success) {
+        if (response.success) {
+          this._navbarService.reset();
         this._router.navigate([
           PlayerStatusRoutesMap.InLobby, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
       }
