@@ -1,0 +1,39 @@
+<div class="container">
+
+  <div *ngIf="ErrorMessage" class="row alert alert-danger">
+    {{ErrorMessage}}
+  </div>
+
+  <div class="row word-box letter-display">
+    <div *ngFor="let letter of ClueLetters;" class="letter-display-item">
+
+      <gg-emoji [emoji]="letter.player?.emoji"
+                (mousedown)="show(letter.playerId)" (mouseup)="hide()" (touchstart)="show(letter.playerId)" (touchend)="hide()"></gg-emoji>
+
+      <div class="player-card player-shown-card" [ngClass]="{
+         'non-player-card' : letter.nonPlayerCharacterId,
+         'bonus-card' : letter.bonusLetter,
+         'wild-card' : letter.isWildCard
+         }">
+        <span *ngIf="!letter.isWildCard && !(ShowAsPlayerId === letter.player?.id)">{{letter.letter}}</span>
+        <span *ngIf="!letter.isWildCard && (ShowAsPlayerId === letter.player?.id)">?</span>
+        <span *ngIf="letter.isWildCard">*</span>
+      </div>
+
+    </div>   
+  </div>
+
+  <div class="row clue-buttons">
+    <div class="clue-delete-button">
+      <button class="btn btn-danger" (click)="Delete()">
+        Delete
+      </button>
+    </div>
+    <div class="clue-back-button">
+      <button class="btn btn-secondary" (click)="Back()">
+        Back
+      </button>
+    </div>
+  </div>
+
+</div>

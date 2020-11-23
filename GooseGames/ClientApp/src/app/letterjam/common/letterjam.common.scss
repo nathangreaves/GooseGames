@@ -33,3 +33,17 @@
   border-color: #ddd;
   color: #fff;
 }
+
+.letter-display {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.letter-display-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

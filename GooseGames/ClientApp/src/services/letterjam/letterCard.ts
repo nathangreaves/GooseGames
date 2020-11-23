@@ -10,6 +10,7 @@ import { ICardsRequest } from "../../models/letterjam/table";
 })
 export class LetterJamLetterCardService {
 
+
   constructor(private _http: HttpClient, @Inject('BASE_URL') private _baseUrl: string) {
 
   }

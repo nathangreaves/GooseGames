@@ -217,5 +217,29 @@ namespace GooseGames.Services.LetterJam
 
             return GenericResponseBase.Ok();
         }
+
+
+        internal async Task<GenericResponse<IEnumerable<ClueLetterResponse>>> GetLettersForClueAsync(ClueRequest request)
+        {
+            if (!request.ClueId.HasValue)
+            {
+                return GenericResponse<IEnumerable<ClueLetterResponse>>.Error("Clue id not provided");
+            }
+            var cards = await _clueLetterRepository.FilterAsync(l => l.ClueId == request.ClueId.Value);
+            var orderedCards = cards.OrderBy(c => c.LetterIndex);
+            
+            return GenericResponse<IEnumerable<ClueLetterResponse>>.Ok(orderedCards.Select(c =>
+            {
+                return new ClueLetterResponse
+                {
+                    CardId = c.LetterId,
+                    BonusLetter = c.BonusLetter,
+                    Letter = c.Letter,
+                    IsWildCard = c.IsWildCard,
+                    PlayerId = c.PlayerId,
+                    NonPlayerCharacterId = c.NonPlayerCharacterId                    
+                };
+            }));
+        }
     }
 }

@@ -75,7 +75,7 @@ namespace GooseGames.Controllers.LetterJam
         }
 
         [HttpDelete]
-        public async Task<GenericResponseBase> DeleteAsync(ClueRequest request)
+        public async Task<GenericResponseBase> DeleteAsync([FromQuery]ClueRequest request)
         {
             try
             {
@@ -92,6 +92,28 @@ namespace GooseGames.Controllers.LetterJam
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
                 return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpGet]
+        [Route("GetLettersForClue")]
+        public async Task<GenericResponse<IEnumerable<ClueLetterResponse>>> GetLettersForClueAsync([FromQuery]ClueRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _cluesService.GetLettersForClueAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponse<IEnumerable<ClueLetterResponse>>.Error($"Unknown Error {errorGuid}");
             }
         }
     }

@@ -1,10 +1,13 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy, HostListener } from '@angular/core';
 import { TableComponentBase, ITableComponentParameters } from '../table-base.component';
 import { LetterJamCluesService } from '../../../../services/letterjam/clues';
 import { AllPlayersFromCacheRequest, PlayersFromCacheRequest } from '../../../../models/letterjam/content';
-import { ProposedClue, ProposedClueVote } from '../../../../models/letterjam/clues';
+import { ProposedClue, ProposedClueVote, IProposedClue } from '../../../../models/letterjam/clues';
 import _ from 'lodash';
 import { ILetterCard, LetterCard } from '../../../../models/letterjam/letters';
+
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { ILetterJamProposedClueModalComponentParameters } from './clue-modal/clue-modal.component';
 
 export interface IProposedCluesComponentParameters extends ITableComponentParameters {
   proposeClue: () => void;
@@ -23,7 +26,10 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
   ProposedClues: ProposedClue[] = [];
   RelevantLetters: LetterCard[] = [];
 
-  constructor(private cluesService: LetterJamCluesService) {
+  clueModalParameters: ILetterJamProposedClueModalComponentParameters;
+
+  constructor(private cluesService: LetterJamCluesService,
+    private modalService: NgbModal) {
     super();
   }
 
@@ -39,7 +45,8 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
             ...proposedClue,
             loadingPlayer: true,
             player: null,
-            votes: []
+            votes: [],
+            letters: []
           };
 
           var iVoted = false;
@@ -56,6 +63,7 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
           });
 
           clue.voted = iVoted;
+          clue.myClue = clue.playerId === this.parameters.request.PlayerId;
           this.ProposedClues.push(clue);
         });
         return response;
@@ -64,6 +72,34 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
         this.subscribe();
         return this.loadRelevantLetters().then(() => this.loadPlayers()).then(() => response);
       }));
+  }
+
+  onAddClue = (proposedClue: IProposedClue) => {
+    var clue = <ProposedClue>{
+      ...proposedClue,
+      loadingPlayer: true,
+      player: null,
+      votes: [],
+      letters: []
+    };
+    clue.myClue = clue.playerId === this.parameters.request.PlayerId;
+
+    this.ProposedClues.push(clue);
+
+    this.parameters.getPlayersFromCache(new PlayersFromCacheRequest([clue.playerId], true, false))
+      .then(player => {
+        clue.player = player[0];
+        clue.loadingPlayer = false;
+      });
+  }
+
+  onRemoveClue = (clueId: string) => {
+    var indexOf = _.findIndex(this.ProposedClues, c => {
+      return c.id === clueId;
+    });
+    if (indexOf >= 0) {
+      this.ProposedClues.splice(indexOf, 1);
+    }
   }
 
   onAddVote = (playerId: string, clueId: string) => {
@@ -78,26 +114,31 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
             playerId: playerId
           });
         }
-      })
-
+      });
   };
 
   onRemoveVote = (playerId: string, clueId: string) => {
     var clue = _.find(this.ProposedClues, clue => clue.id === clueId);
     if (clue) {
       var voteIndex = _.findIndex(clue.votes, v => v.playerId === playerId);
-      clue.votes.splice(voteIndex, 1);
+      if (voteIndex >= 0) {
+        clue.votes.splice(voteIndex, 1);
+      }
     }
   };
 
   subscribe() {
     this.parameters.hubConnection.on("addVote", this.onAddVote);
     this.parameters.hubConnection.on("removeVote", this.onRemoveVote);
+    this.parameters.hubConnection.on("newClue", this.onAddClue);
+    this.parameters.hubConnection.on("removeClue", this.onRemoveClue);
   }
 
   ngOnDestroy() {
     this.parameters.hubConnection.off("addVote", this.onAddVote);
     this.parameters.hubConnection.off("removeVote", this.onRemoveVote);
+    this.parameters.hubConnection.off("newClue", this.onAddClue);
+    this.parameters.hubConnection.off("removeClue", this.onRemoveClue);
   }
 
   loadRelevantLetters = (): Promise<any> => {
@@ -155,6 +196,54 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
       clue.voted = true;
 
       this.cluesService.Vote(this.parameters.request, this.parameters.getCurrentRoundId(), clue.id);
+    }
+  }
+
+  onDeleteClue = (clueId: string) => {
+
+
+    this.modalService.dismissAll();
+    this.cluesService.DeleteClue(this.parameters.request, clueId)
+      .then(response => this.HandleGenericResponseBase(response, () => response));
+  }
+
+  OpenClue(e: Event, clue: ProposedClue, content: any) {
+
+    e.stopPropagation();
+
+    this.clueModalParameters = <ILetterJamProposedClueModalComponentParameters>{
+      request: this.parameters.request,
+      getCardsFromCache: this.parameters.getCardsFromCache,
+      getPlayersFromCache: this.parameters.getPlayersFromCache,
+      onDeleteClue: this.onDeleteClue,
+      onBack: () => this.modalService.dismissAll(),
+      clue: clue
+    }; 
+
+    const modalState = {
+      modal: true,
+      desc: 'fake state for our modal'
+    };
+    history.pushState(modalState, null);
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.finally(() => {
+      this.clueModalParameters = null;
+      this.onHidden();
+    });
+  }
+
+
+  @HostListener('window:popstate', ['$event'])
+  dismissModal(event: Event) {
+    if (this.modalService.hasOpenModals()) {
+      this.modalService.dismissAll();
+      event.stopPropagation();
+    }
+  }
+
+  onHidden = () => {
+    if (window.history.state.modal === true) {
+      window.history.state.modal = false;
+      history.back();
     }
   }
 }

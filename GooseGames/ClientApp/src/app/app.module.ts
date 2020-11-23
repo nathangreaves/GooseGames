@@ -17,6 +17,7 @@ import { CodenamesLandingComponent } from './codenames/landing.component';
 import { BigCodenamesSessionComponent, NormalCodenamesSessionComponent } from './codenames/session.component';
 import { JustOneNavbarHeaderComponent } from './justone/navbarheader.component';
 import { NavbarsModule } from './navbars.module';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { NavbarsModule } from './navbars.module';
       { path: 'codenames/big/:id', component: BigCodenamesSessionComponent },
 
 
-    ])
+    ]),
+    NgbModule
   ],
   entryComponents: [
     JustOneNavbarHeaderComponent

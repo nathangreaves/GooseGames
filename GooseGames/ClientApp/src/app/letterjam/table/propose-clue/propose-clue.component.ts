@@ -10,19 +10,6 @@ export interface IProposeClueComponentParameters extends ITableComponentParamete
   proposedClues: () => void;
 }
 
-
-//animations: [
-//  trigger('caretAnimation', [
-//    state('*', style({
-//      opacity: 0
-//    })),
-//    transition('* <=> *', animate(5000, keyframes([
-//      style({ opacity: 0, offset: 0 }),
-//      style({ opacity: 1, offset: 0.2 }),
-//      style({ opacity: 0, offset: 0.5 })])
-//    ))],
-//  )]  
-
 @Component({
   selector: 'letterjam-propose-clue',
   templateUrl: './propose-clue.component.html',

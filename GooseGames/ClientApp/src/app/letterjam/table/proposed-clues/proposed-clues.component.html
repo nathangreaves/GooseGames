@@ -1,3 +1,17 @@
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Clue</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <letterjam-clue-modal *ngIf="clueModalParameters" [parameters]="clueModalParameters">
+
+    </letterjam-clue-modal>
+  </div>
+</ng-template>
+
 <div class="container proposed-clues">
 
   <div class="proposed-clues-container">
@@ -36,11 +50,25 @@
           </div>
         </div>
       </div>
+      <!--<div class="row" *ngIf="!clue.loadingPlayer && clue.myClue">
+        <div class="col-6">
+          <button class="btn btn-primary" (click)="OpenClue($event, clue, content)">
+            More...
+          </button>
+        </div>
+      </div>-->
       <div class="row" *ngIf="clue.loadingPlayer">
-        Loading...
+        <div class="col-12">
+          Loading...
+        </div>
       </div>
       <div class="row clue-votes-row">
-        <div class="col-6 votes-label">
+        <div class="col-2">
+          <button class="btn btn-primary" (click)="OpenClue($event, clue, content)">
+            <i class="fas fa-info-circle"></i>
+          </button>
+        </div>
+        <div class="col-4 votes-label">
           Votes:
         </div>
         <div class="col-6 clue-votes">
@@ -62,7 +90,7 @@
       <div class="col col-sm-1 col-md-3"></div>
       <div class="col-12 col-sm-10 col-md-6">
         <div>
-          Letters:
+          Available Letters:
         </div>
         <div class="letter-display" *ngIf="RelevantLetters">
           <div *ngFor="let letter of RelevantLetters;" class="letter-display-item">

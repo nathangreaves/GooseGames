@@ -1,4 +1,5 @@
 import { IGooseGamesPlayer } from "../player";
+import { ILetterCard } from "./letters";
 
 export interface IProposedClueBase {
   id: string;
@@ -19,6 +20,26 @@ export interface IProposedClueVote {
   playerId: string;
 }
 
+export interface IClueLetter {
+  cardId: string;
+  letter: string;
+  bonusLetter: boolean;
+  playerId: string;
+  nonPlayerCharacterId: string;
+  isWildCard: boolean;
+}
+
+export class ClueLetter implements IClueLetter {
+  cardId: string;
+  letter: string;
+  bonusLetter: boolean;
+  playerId: string;
+  nonPlayerCharacterId: string;
+  isWildCard: boolean;
+  player: IGooseGamesPlayer;
+  loadingPlayer: boolean;
+}
+
 export class ProposedClue implements IProposedClueBase {
   id: string;
   playerId: string;
@@ -29,6 +50,8 @@ export class ProposedClue implements IProposedClueBase {
   numberOfBonusLetters: number;
   player: IGooseGamesPlayer;
   votes: ProposedClueVote[];
+  letters: ClueLetter[];
+  myClue: boolean;
   loadingPlayer: boolean;
   voted: boolean;
 }
