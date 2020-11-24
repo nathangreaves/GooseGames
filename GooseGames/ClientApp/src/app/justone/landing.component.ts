@@ -29,6 +29,7 @@ export class JustOneLandingComponent {
     this._justOneLocalStorage = justOneLocalStorage;
     this._router = router;
 
+    this._navbarService.reset();
     this._navbarService.setAreaTitle("Just One");
     localStorage.removeItem('just-one-navbar-round-info');
 
