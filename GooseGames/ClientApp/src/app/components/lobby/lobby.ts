@@ -17,6 +17,7 @@ export interface ILobbyComponentParameters {
   playerId: string;
   canStartSession: () => boolean;
   startSession: (sessionId: string, playerId: string) => Promise<GenericResponseBase>;
+  startingSessionMessage: string;
 }
 
 @Component({
@@ -32,6 +33,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   public Loading: boolean;
   public ErrorMessage: string;
+  public InfoMessage: string;
   public SessionMaster: boolean;
   public SessionMasterName: string;
   public SessionMasterPlayerNumber: number;
@@ -119,6 +121,10 @@ export class LobbyComponent implements OnInit, OnDestroy {
     }
   }
 
+  sessionStarting = () => {
+    this.InfoMessage = this.parameters.startingSessionMessage;
+  }
+
   handleGenericError(err: string) {
     this.ErrorMessage = err;
   }
@@ -138,7 +144,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
       handleReconnected: () => { },
       handlePlayerAdded: this.playerAdded,
       handlePlayerDetailsUpdated: this.playerDetailsUpdated,
-      handlePlayerRemoved: this.playerRemoved
+      handlePlayerRemoved: this.playerRemoved,
+      sessionStarting: this.sessionStarting
     };
 
     this.load().then(() => loadingPromise).then(() => {

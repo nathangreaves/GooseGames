@@ -6,7 +6,7 @@ import { PlayerDetailsResponse } from '../../models/player'
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import * as signalR from "@microsoft/signalr";
 import { JustOnePlayerStatusService } from '../../services/justone/playerstatus'
-import { PlayerStatus } from '../../models/justone/playerstatus'
+import { PlayerStatus, PlayerStatusRoutesMap } from '../../models/justone/playerstatus'
 import { IPlayerSessionComponent } from '../../models/session';
 import { PlayerNumberCss } from '../../services/justone/ui'
 import { WordListCheckboxListItem, JustOneWordList } from '../../models/justone/wordlistenum';
@@ -74,7 +74,8 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent, On
       minPlayers: MinPlayers,
       playerId: this.PlayerId,
       sessionId: this.SessionId,
-      startSession: this.startGame
+      startSession: this.startGame,
+      startingSessionMessage: "Starting session. JUST ONE moment please."
     }
 
     this.AvailableWordLists = [
@@ -136,9 +137,13 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent, On
       this.HandleGenericError();
     });
 
-    this._hubConnection.on("startingSession", () => {
+    this._hubConnection.on("beginRoundPassivePlayer", () => {
       this.CloseConnection();
-      this._router.navigate(['/justone/waitingforgame', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+      this._router.navigate([PlayerStatusRoutesMap.PassivePlayerClue, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
+    });
+    this._hubConnection.on("beginRoundActivePlayer", () => {
+      this.CloseConnection();
+      this._router.navigate([PlayerStatusRoutesMap.ActivePlayerWaitingForClues, { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
     });
     return this._hubConnection.start().catch(err => console.error(err));
   }
@@ -147,7 +152,8 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent, On
     var connection = this._hubConnection;
     if (connection) {
       this._hubConnection = null;
-      connection.off("startingSession");
+      connection.off("beginRoundPassivePlayer");
+      connection.off("beginRoundActivePlayer");
 
       connection.onclose(() => { });
 

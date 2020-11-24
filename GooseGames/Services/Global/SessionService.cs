@@ -214,6 +214,8 @@ namespace GooseGames.Services.Global
 
             await UpdateAllPlayersToStatusAsync(sessionId, PlayerStatusEnum.WaitingForGame);
 
+            await _globalHubContext.SendStartingSessionAsync(sessionId);
+
             return GenericResponseBase.Ok();
         }
 

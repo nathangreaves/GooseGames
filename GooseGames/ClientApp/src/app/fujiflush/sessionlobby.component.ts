@@ -57,7 +57,8 @@ export class FujiSessionLobbyComponent implements IPlayerSessionComponent, OnIni
       maxPlayers: MaxPlayers,
       playerId: this.PlayerId,
       sessionId: this.SessionId,
-      startSession: this.startSession
+      startSession: this.startSession,
+      startingSessionMessage: "Starting session. FUJI FLUSH moment please."
     }
   }
   ngOnDestroy(): void {
@@ -81,10 +82,6 @@ export class FujiSessionLobbyComponent implements IPlayerSessionComponent, OnIni
       this.HandleGenericError();
     });
 
-    this._hubConnection.on("startingSession", () => {
-      this.CloseConnection();
-      this._router.navigate(['/fujiflush/waiting', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
-    });
     this._hubConnection.on("beginSession", () => {
       this.CloseConnection();
       this._router.navigate(['/fujiflush/session', { SessionId: this.SessionId, PlayerId: this.PlayerId }]);
@@ -96,7 +93,6 @@ export class FujiSessionLobbyComponent implements IPlayerSessionComponent, OnIni
     var connection = this._hubConnection;
     if (connection) {
       this._hubConnection = null;
-      connection.off("startingSession");
       connection.off("beginSession");
 
       connection.onclose(() => { });

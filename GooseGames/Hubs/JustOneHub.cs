@@ -83,12 +83,6 @@ namespace GooseGames.Hubs
             _logger.LogInformation($"Sending playerRemoved: to {sessionId} :: {playerId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerRemoved", playerId);
         }
-        public async Task SendStartingSessionAsync(Guid sessionId)
-        {
-            _logger.LogInformation($"Sending startingSession: to {sessionId}");
-            await _hub.Clients.Group(sessionId.ToString()).SendAsync("startingSession");
-        }
-
         public async Task SendBeginRoundAsync(Guid sessionId, string activePlayerConnectionId)
         {
             _logger.LogInformation($"Sending beginRoundPassivePlayer: to {sessionId}");

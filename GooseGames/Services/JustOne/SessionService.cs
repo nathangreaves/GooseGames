@@ -67,7 +67,6 @@ namespace GooseGames.Services.JustOne
             _logger.LogTrace("Fetching players");
             var globalPlayers = await _playerService.GetForSessionAsync(request.SessionId);
 
-
             _logger.LogTrace("Inserting game");
             var game = new Game
             {
@@ -87,10 +86,7 @@ namespace GooseGames.Services.JustOne
 
             _logger.LogTrace("Updating global session to game");
             await _sessionService.SetGameSessionIdentifierAsync(request.SessionId, GameEnum.JustOne, game.Id);
-
-            _logger.LogTrace("Sending update to clients");
-            await _lobbyHub.SendStartingSessionAsync(request.SessionId);
-            
+                        
             await _roundService.PrepareRoundsAsync(game.Id, request.IncludedWordLists);
 
             return GenericResponse<bool>.Ok(true);
