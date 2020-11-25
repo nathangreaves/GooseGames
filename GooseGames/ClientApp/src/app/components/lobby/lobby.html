@@ -58,7 +58,7 @@
   </div>
 
   <div>
-    <button class="btn btn-primary" type="submit" (click)="Ready()"><span *ngIf="!playerReady">Ready</span><span *ngIf="playerReady">Not Ready</span></button>
+    <button class="btn btn-primary" type="submit" [disabled]="DisableButtons" (click)="Ready()"><span *ngIf="!playerReady">Ready</span><span *ngIf="playerReady">Not Ready</span></button>
   </div>
   <div *ngIf="!SessionMaster">
     <ng-container [ngTemplateOutlet]="readOnlyGameConfigTemplate" [ngTemplateOutletContext]="{}">

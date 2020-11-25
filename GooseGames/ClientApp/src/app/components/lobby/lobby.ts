@@ -8,7 +8,6 @@ import { GooseGamesLocalStorage } from '../../../services/localstorage';
 import { Router } from '@angular/router';
 import { EmojiButton } from '@joeattardi/emoji-button';
 import * as EmojiRegex from 'emoji-regex/es2015/RGI_Emoji';
-import { PlatformLocation } from '@angular/common';
 
 export interface ILobbyComponentParameters {
   minPlayers: number;
@@ -122,6 +121,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   }
 
   sessionStarting = () => {
+    this.DisableButtons = true;
     this.InfoMessage = this.parameters.startingSessionMessage;
   }
 
