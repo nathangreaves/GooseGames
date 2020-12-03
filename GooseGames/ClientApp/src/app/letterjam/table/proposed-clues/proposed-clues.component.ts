@@ -4,10 +4,10 @@ import { LetterJamCluesService } from '../../../../services/letterjam/clues';
 import { AllPlayersFromCacheRequest, PlayersFromCacheRequest } from '../../../../models/letterjam/content';
 import { ProposedClue, ProposedClueVote, IProposedClue } from '../../../../models/letterjam/clues';
 import _ from 'lodash';
-import { ILetterCard, LetterCard } from '../../../../models/letterjam/letters';
+import { LetterCard } from '../../../../models/letterjam/letters';
 
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { ILetterJamProposedClueModalComponentParameters } from './clue-modal/clue-modal.component';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ILetterJamClueComponentParameters } from '../clue/clue.component';
 
 export interface IProposedCluesComponentParameters extends ITableComponentParameters {
   proposeClue: () => void;
@@ -26,7 +26,10 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
   ProposedClues: ProposedClue[] = [];
   RelevantLetters: LetterCard[] = [];
 
-  clueModalParameters: ILetterJamProposedClueModalComponentParameters;
+  clueModalParameters: ILetterJamClueComponentParameters;
+  disableProposeClue: boolean;
+  modalClueId: string;
+  modalRef: NgbModalRef;
 
   constructor(private cluesService: LetterJamCluesService,
     private modalService: NgbModal) {
@@ -59,6 +62,7 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
             });
             if (v.playerId === this.parameters.request.PlayerId) {
               iVoted = true;
+              this.disableProposeClue = true;
             }
           });
 
@@ -113,6 +117,7 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
             player: player[0],
             playerId: playerId
           });
+          this.disableProposeClue = true;
         }
       });
   };
@@ -123,6 +128,10 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
       var voteIndex = _.findIndex(clue.votes, v => v.playerId === playerId);
       if (voteIndex >= 0) {
         clue.votes.splice(voteIndex, 1);
+        this.disableProposeClue = false;
+        if (playerId === this.parameters.request.PlayerId) {
+          clue.voted = false;
+        }
       }
     }
   };
@@ -199,38 +208,47 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
     }
   }
 
-  onDeleteClue = (clueId: string) => {
+  DeleteClue = () => {
+    var clueId = this.modalClueId;
 
-
-    this.modalService.dismissAll();
+    this.modalRef.dismiss();
     this.cluesService.DeleteClue(this.parameters.request, clueId)
       .then(response => this.HandleGenericResponseBase(response, () => response));
   }
 
-  OpenClue(e: Event, clue: ProposedClue, content: any) {
-
-    e.stopPropagation();
-
-    this.clueModalParameters = <ILetterJamProposedClueModalComponentParameters>{
-      request: this.parameters.request,
-      getCardsFromCache: this.parameters.getCardsFromCache,
-      getPlayersFromCache: this.parameters.getPlayersFromCache,
-      onDeleteClue: this.onDeleteClue,
-      onBack: () => this.modalService.dismissAll(),
-      clue: clue
-    }; 
-
-    const modalState = {
-      modal: true,
-      desc: 'fake state for our modal'
-    };
-    history.pushState(modalState, null);
-    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.finally(() => {
-      this.clueModalParameters = null;
-      this.onHidden();
-    });
+  CloseClueModal = () => {
+    this.modalRef.dismiss();
   }
 
+  OpenClue(e: Event, clue: ProposedClue, content: any) {
+
+    if (clue.playerId === this.parameters.request.PlayerId) {
+      e.stopPropagation();
+
+      this.modalClueId = clue.id;
+      this.clueModalParameters = <ILetterJamClueComponentParameters>{
+        request: this.parameters.request,
+        getCardsFromCache: this.parameters.getCardsFromCache,
+        getPlayersFromCache: this.parameters.getPlayersFromCache,
+        clue: clue
+      };
+
+      const modalState = {
+        modal: true,
+        desc: 'fake state for our modal'
+      };
+      history.pushState(modalState, null);
+      var modalRef = this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' });
+      this.modalRef = modalRef;
+
+      modalRef.result.finally(() => {
+        this.clueModalParameters = null;
+        this.modalRef = null;
+        this.onHidden();
+        this.modalClueId = null;
+      });
+    }
+  }
 
   @HostListener('window:popstate', ['$event'])
   dismissModal(event: Event) {

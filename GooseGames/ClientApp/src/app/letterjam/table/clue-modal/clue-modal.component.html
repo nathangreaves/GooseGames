@@ -1,0 +1,16 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+  <button type="button" class="close" aria-label="Close" (click)="dismiss()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <ng-container [ngTemplateOutlet]="templates.clueInfoTemplate" [ngTemplateOutletContext]="{}">
+  </ng-container>
+  <letterjam-clue [parameters]="parameters">
+  </letterjam-clue>
+</div>
+<div class="modal-footer">
+  <ng-container [ngTemplateOutlet]="templates.buttonsTemplate" [ngTemplateOutletContext]="{}">
+  </ng-container>  
+</div>

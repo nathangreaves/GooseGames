@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, HostListener } from '@angular/core';
 import { LetterJamComponentBase } from '../../../models/letterjam/content';
 import { ITableViewParameters } from './table-view/table-view.component';
 import { ILetterCard } from '../../../models/letterjam/letters';
@@ -8,6 +8,10 @@ import _ from 'lodash';
 import { IProposedCluesComponentParameters } from './proposed-clues/proposed-clues.component';
 import { IProposeClueComponentParameters } from './propose-clue/propose-clue.component';
 import { ITableComponentParameters } from './table-base.component';
+
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ILetterJamClueComponentParameters } from './clue/clue.component';
+import { LetterJamCluesService } from '../../../services/letterjam/clues';
 
 export enum TableComponentTabs {
   Table = 0,
@@ -22,7 +26,9 @@ const LocalStorageTabKey = "goose-games-letter-jam-table-tab";
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss']
 })
-export class LetterJamTableComponent extends LetterJamComponentBase implements OnInit {
+export class LetterJamTableComponent extends LetterJamComponentBase implements OnInit, OnDestroy {
+
+  @ViewChild('giveClueModal') giveClueModal;
 
   tableViewParameters: ITableViewParameters;
   proposedCluesParameters: IProposedCluesComponentParameters;
@@ -36,7 +42,13 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   ProposedCluesLoaded: boolean;
   ProposeClueLoaded: boolean;
 
-  constructor(private letterCardService: LetterJamLetterCardService) {
+  clueModalParameters: ILetterJamClueComponentParameters;
+  giveClueModalRef: NgbModalRef;
+  giveClueModalClueId: string;
+
+  constructor(private letterCardService: LetterJamLetterCardService,
+    private clueService: LetterJamCluesService,
+    private modalService: NgbModal) {
     super();
   }
 
@@ -58,9 +70,9 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
     this.setTabIdInLocalStorage();
   }
 
-    private setTabIdInLocalStorage() {
-        localStorage.setItem(LocalStorageTabKey, this.CurrentTabId.toString());
-    }
+  private setTabIdInLocalStorage() {
+    localStorage.setItem(LocalStorageTabKey, this.CurrentTabId.toString());
+  }
 
   ngOnInit(): void {
 
@@ -72,6 +84,8 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
       getCurrentRoundId: this.getCurrentRoundId,
       hubConnection: this.HubConnection
     }
+
+    this.HubConnection.on('promptGiveClue', this.promptGiveClue)
 
     this.tableViewParameters = <ITableViewParameters>{
       ...baseTableParameters
@@ -104,6 +118,75 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
     }
 
     this.getRelevantLetters();
+  }
+
+  ngOnDestroy() {
+    this.HubConnection.off('promptGiveClue', this.promptGiveClue)
+  }
+
+  promptGiveClue = (clueGiverId: string, clueId: string) => {
+    if (clueGiverId === this.PlayerId) {
+      this.clueModalParameters = <ILetterJamClueComponentParameters>{
+        request: this,
+        getCardsFromCache: this.getCardsFromCache,
+        getPlayersFromCache: this.GetPlayersFromCache,
+        clue: {
+          id: clueId,
+          letters: []
+        }
+      };
+
+      const modalState = {
+        modal: true,
+        desc: 'fake state for our modal'
+      };
+      history.pushState(modalState, null);
+      var modalRef = this.modalService.open(this.giveClueModal, { ariaLabelledBy: 'modal-basic-title' });
+      this.giveClueModalRef = modalRef;
+
+      modalRef.result
+        .then(reason => {
+          if (reason != "ClueGiven") {
+            this.undoClueVote();
+          }
+        })
+        .catch(() => {
+          this.undoClueVote();
+        })
+        .finally(() => {
+          this.clueModalParameters = null;
+          this.giveClueModalRef = null;
+          this.giveClueModalClueId = null;
+          this.onGiveClueModalDismissed();
+        });
+    }
+  }
+
+  @HostListener('window:popstate', ['$event'])
+  dismissModal(event: Event) {
+    if (this.modalService.hasOpenModals()) {
+      this.modalService.dismissAll();
+      event.stopPropagation();
+    }
+  }
+
+  onGiveClueModalDismissed = () => {
+    if (window.history.state.modal === true) {
+      window.history.state.modal = false;
+      history.back();
+    }
+  }
+
+  undoClueVote() {
+    this.clueService.Vote(this, this.getCurrentRoundId(), null);
+  }
+
+  dismissGiveClueModal() {
+    this.giveClueModalRef.dismiss();
+  }
+
+  giveClue() {
+    this.giveClueModalRef.close("ClueGiven");
   }
 
   getCurrentRoundId = (): string => {

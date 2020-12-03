@@ -77,6 +77,7 @@ namespace GooseGames.Hubs
             _logger.LogInformation($"Sending removeVote: to {request.SessionId} : playerId={request.PlayerId}, clueId={clueId}");
             await _hub.Clients.Group(request.SessionId.ToString()).SendAsync("removeVote", request.PlayerId, clueId);
         }
+
         internal async Task SendAddVoteAsync(PlayerSessionRequest request, Guid clueId)
         {
             _logger.LogInformation($"Sending addVote: to {request.SessionId} : playerId={request.PlayerId}, clueId={clueId}");
@@ -91,6 +92,12 @@ namespace GooseGames.Hubs
         {
             _logger.LogInformation($"Sending removeClue: to {sessionId} : clueId={clueId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("removeClue", clueId);
+        }
+
+        internal async Task PromptGiveClueAsync(Guid sessionId, Guid cluePlayerId, Guid clueId)
+        {
+            _logger.LogInformation($"Sending promptGiveClue: to {sessionId} : playerId={cluePlayerId}, clueId={clueId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("promptGiveClue", cluePlayerId, clueId);
         }
     }
 }

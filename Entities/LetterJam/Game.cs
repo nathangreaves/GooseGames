@@ -19,6 +19,7 @@ namespace Entities.LetterJam
         public Guid? CurrentRoundId { get; set; }
         public Round CurrentRound { get; set; }
         public int? Points { get; set; }
+        public int NumberOfPlayers { get; set; }
 
         //TODO: Players
         //TODO: NPCs

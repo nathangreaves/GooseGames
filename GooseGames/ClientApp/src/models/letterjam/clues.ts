@@ -40,6 +40,11 @@ export class ClueLetter implements IClueLetter {
   loadingPlayer: boolean;
 }
 
+export class IClue {
+  id: string;
+  letters: ClueLetter[];
+}
+
 export class ProposedClue implements IProposedClueBase {
   id: string;
   playerId: string;

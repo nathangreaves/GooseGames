@@ -45,3 +45,29 @@
     </div>
   </div>
 </div>
+
+<ng-template #giveClueModal let-modal>
+  <letterjam-clue-modal *ngIf="clueModalParameters" [parameters]="clueModalParameters" [templates]="{
+                          buttonsTemplate: giveClueButtonsTemplate,
+                          clueInfoTemplate: giveClueInfoTemplate
+                        }"
+                        [dismiss]="modal.dismiss"
+                        [title]="'Clue Successful'"
+                        >
+  </letterjam-clue-modal>
+</ng-template>
+
+<ng-template #giveClueInfoTemplate>
+  <div class="alert alert-success">
+    All players have voted for this clue
+  </div>
+</ng-template>
+
+<ng-template #giveClueButtonsTemplate>
+  <button class="btn btn-danger mr-auto" (click)="dismissGiveClueModal()">
+    Undo
+  </button>
+  <button class="btn btn-success" (click)="giveClue()">
+    Give Clue
+  </button>
+</ng-template>

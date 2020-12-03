@@ -1,15 +1,15 @@
 <ng-template #content let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Clue</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <letterjam-clue-modal *ngIf="clueModalParameters" [parameters]="clueModalParameters">
+  <letterjam-clue-modal *ngIf="clueModalParameters" [parameters]="clueModalParameters" [templates]="{buttonsTemplate: buttonsTemplate}" [dismiss]="modal.dismiss" [title]="'Clue'">
+  </letterjam-clue-modal>
+</ng-template>
 
-    </letterjam-clue-modal>
-  </div>
+<ng-template #buttonsTemplate>
+  <button class="btn btn-danger mr-auto" (click)="DeleteClue()">
+    Delete Clue
+  </button>
+  <button class="btn btn-secondary" (click)="CloseClueModal()">
+    Back
+  </button>
 </ng-template>
 
 <div class="container proposed-clues">
@@ -64,8 +64,8 @@
       </div>
       <div class="row clue-votes-row">
         <div class="col-2">
-          <button class="btn btn-primary" (click)="OpenClue($event, clue, content)">
-            <i class="fas fa-info-circle"></i>
+          <button *ngIf="parameters.request.PlayerId === clue.playerId" class="btn btn-primary clue-info-button" (click)="OpenClue($event, clue, content)">
+            <i class="fas fa-search"></i>
           </button>
         </div>
         <div class="col-4 votes-label">
@@ -83,6 +83,7 @@
     </div>
   </div>
 </div>
+<div class="filler"></div>
 <div class="letter-box">
   <div class="container">
     <div class="row">

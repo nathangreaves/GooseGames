@@ -28,6 +28,11 @@
       .clue-name {
         padding-right: 0px;
       }
+
+      .clue-info-button {
+          margin-top: 0px;
+          font-size: 0.8rem;
+      }
     }
 
     .proposed-clue-row.voted {
@@ -62,8 +67,8 @@
 }
 
 
-.filler{
-    height: 125px;
+.filler {
+  height: 125px;
 }
 
 .letter-box {
@@ -96,7 +101,7 @@
 }
 
 .filler {
-  height: 112px;
+  height: 125px;
 }
 
 .player-cards-container{

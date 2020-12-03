@@ -76,7 +76,8 @@ namespace GooseGames.Services.LetterJam
                 SessionId = request.SessionId,
                 GreenCluesRemaining = gameConfiguration.NumberOfGreenClues,
                 RedCluesRemaining = gameConfiguration.NumberOfRedClues,
-                LockedCluesRemaining = gameConfiguration.NumberOfLockedGreenClues                
+                LockedCluesRemaining = gameConfiguration.NumberOfLockedGreenClues,
+                NumberOfPlayers = gameConfiguration.NumberOfPlayers
             };
             await _gameRepository.InsertAsync(game);
 

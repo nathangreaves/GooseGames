@@ -13,16 +13,19 @@ namespace GooseGames.Services.LetterJam
     public class ClueVoteService
     {
         private readonly IClueVoteRepository _clueVoteRepository;
+        private readonly IClueRepository _clueRepository;
         private readonly IGameRepository _gameRepository;
         private readonly LetterJamHubContext _letterJamHubContext;
         private readonly RequestLogger<ClueVoteService> _logger;
 
         public ClueVoteService(IClueVoteRepository clueVoteRepository,
+            IClueRepository clueRepository,
             IGameRepository gameRepository,
             LetterJamHubContext letterJamHubContext,
             RequestLogger<ClueVoteService> logger)
         {
             _clueVoteRepository = clueVoteRepository;
+            _clueRepository = clueRepository;
             _gameRepository = gameRepository;
             _letterJamHubContext = letterJamHubContext;
             _logger = logger;
@@ -57,6 +60,16 @@ namespace GooseGames.Services.LetterJam
                     RoundId = roundId.Value
                 });
                 await _letterJamHubContext.SendAddVoteAsync(request, request.ClueId.Value);
+
+                var clueCount = await _clueVoteRepository.CountAsync(c => c.ClueId == request.ClueId.Value);
+
+                var numberOfPlayers = await _gameRepository.GetPropertyAsync(request.GameId, g => g.NumberOfPlayers);
+
+                if (clueCount == numberOfPlayers)
+                {
+                    var cluePlayer = await _clueRepository.GetPropertyAsync(request.ClueId.Value, c => c.ClueGiverPlayerId);
+                    await _letterJamHubContext.PromptGiveClueAsync(request.SessionId, cluePlayer, request.ClueId.Value);
+                }
             }
             return GenericResponseBase.Ok();
         }
