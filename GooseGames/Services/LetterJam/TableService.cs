@@ -18,6 +18,7 @@ namespace GooseGames.Services.LetterJam
         private readonly IGameRepository _gameRepository;
         private readonly IPlayerStateRepository _playerStateRepository;
         private readonly INonPlayerCharacterRepository _nonPlayerCharacterRepository;
+        private readonly IRoundRepository _roundRepository;
         private readonly RequestLogger<TableService> _logger;
 
         public TableService(
@@ -25,13 +26,32 @@ namespace GooseGames.Services.LetterJam
             IGameRepository gameRepository,
             IPlayerStateRepository playerStateRepository,
             INonPlayerCharacterRepository nonPlayerCharacterRepository,
+            IRoundRepository roundRepository,
             RequestLogger<TableService> logger)
         {
             _playerService = playerService;
             _gameRepository = gameRepository;
             _playerStateRepository = playerStateRepository;
             _nonPlayerCharacterRepository = nonPlayerCharacterRepository;
+            _roundRepository = roundRepository;
             _logger = logger;
+        }
+
+        internal async Task<GenericResponse<RoundResponse>> GetCurrentRoundAsync(PlayerSessionGameRequest request)
+        {
+            var game = await _gameRepository.GetAsync(request.GameId);
+            if (!game.CurrentRoundId.HasValue)
+            {
+                return GenericResponse<RoundResponse>.Error("Unable to find current round");
+            }
+
+            var round = await _roundRepository.GetAsync(game.CurrentRoundId.Value);
+
+            return GenericResponse<RoundResponse>.Ok(new RoundResponse 
+            { 
+                RoundId = round.Id,
+                RoundStatus = (RoundStatusEnum)(int)round.RoundStatus
+            });
         }
 
         internal async Task<GenericResponse<TableResponse>> GetTableAsync(PlayerSessionGameRequest request)

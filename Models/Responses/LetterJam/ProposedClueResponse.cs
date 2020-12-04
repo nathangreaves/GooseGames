@@ -21,5 +21,19 @@ namespace Models.Responses.LetterJam
         public bool WildcardUsed { get; set; }
         public int NumberOfBonusLetters { get; set; }
         public IEnumerable<ClueVoteResponse> Votes { get; set; }
+        public bool VoteSuccess { get; set; }
+    }
+
+    public class ProposedCluesResponse
+    {
+        public IEnumerable<ProposedClueResponse> Clues { get; set; }
+
+        public RoundStatusEnum RoundStatus { get; set; }
+    }
+
+    public enum RoundStatusEnum
+    {
+        ProposingClues = 1,
+        ReceivedClue = 2
     }
 }

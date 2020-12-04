@@ -16,8 +16,11 @@
 
   <div class="proposed-clues-container">
 
-    <div class="alert alert-info" *ngIf="ProposedClues.length < 1">
+    <div class="alert alert-info" *ngIf="ProposedClues.length < 1 && RoundStatus == 1">
       No-one has proposed a clue yet!
+    </div>
+    <div class="alert alert-info" *ngIf="ProposedClues.length < 1 && RoundStatus == 2">
+      A clue has already been given this round!
     </div>
     <div class="proposed-clue-header" *ngIf="ProposedClues.length > 0">
       <h5>Proposed Clues</h5>
@@ -51,12 +54,12 @@
         </div>
       </div>
       <!--<div class="row" *ngIf="!clue.loadingPlayer && clue.myClue">
-        <div class="col-6">
-          <button class="btn btn-primary" (click)="OpenClue($event, clue, content)">
-            More...
-          </button>
-        </div>
-      </div>-->
+      <div class="col-6">
+        <button class="btn btn-primary" (click)="OpenClue($event, clue, content)">
+          More...
+        </button>
+      </div>
+    </div>-->
       <div class="row" *ngIf="clue.loadingPlayer">
         <div class="col-12">
           Loading...

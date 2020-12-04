@@ -13,6 +13,11 @@
 
   </letterjam-propose-clue>
 </div>
+<div *ngIf="MyJamLoaded" [hidden]="CurrentTabId !== 3" class="table-content">
+  <letterjam-my-jam [parameters]="myJamParameters">
+
+  </letterjam-my-jam>
+</div>
 
 
 <div class="filler">
@@ -27,18 +32,33 @@
 
       <div class="tabs-bar-buttons col-12 col-sm-10 col-md-6">
 
-        <button class="tab-button" (click)="Table()"
+        <button class="tab-button-base tab-button" (click)="Table()"
                 [ngClass]="{
                 'current-tab' : CurrentTabId === 0
                 }">
           Table
         </button>
-        <button class="tab-button" (click)="ProposedClues()"
+        <button class="tab-button-base tab-button" (click)="ProposedClues()"
                 [ngClass]="{
                 'current-tab' : CurrentTabId === 1 || CurrentTabId === 2
                 }">
           Clues
         </button>
+        <button class="tab-button-base tab-button" (click)="MyJam()"
+                [ngClass]="{
+                'current-tab' : CurrentTabId === 3
+                }">
+          My Jam
+        </button>
+
+        <div class="tab-button-base">
+          <button [disabled]="DisableNextRoundButton" *ngIf="RoundStatus == 2 && !WaitingForNextRound" class="btn btn-primary" (click)="ReadyForNextRound()">
+            Next Round
+          </button>
+          <button [disabled]="DisableNextRoundButton" *ngIf="RoundStatus == 2 && WaitingForNextRound" class="btn btn-primary" (click)="NotReadyForNextRound()">
+            Not Ready
+          </button>
+        </div>
       </div>
 
       <div class="col col-sm-1 col-md-3"></div>
@@ -52,8 +72,7 @@
                           clueInfoTemplate: giveClueInfoTemplate
                         }"
                         [dismiss]="modal.dismiss"
-                        [title]="'Clue Successful'"
-                        >
+                        [title]="'Clue Successful'">
   </letterjam-clue-modal>
 </ng-template>
 

@@ -2,7 +2,7 @@ import { Component, OnInit, Input, OnDestroy, HostListener } from '@angular/core
 import { TableComponentBase, ITableComponentParameters } from '../table-base.component';
 import { LetterJamCluesService } from '../../../../services/letterjam/clues';
 import { AllPlayersFromCacheRequest, PlayersFromCacheRequest } from '../../../../models/letterjam/content';
-import { ProposedClue, ProposedClueVote, IProposedClue } from '../../../../models/letterjam/clues';
+import { ProposedClue, ProposedClueVote, IProposedClue, RoundStatusEnum } from '../../../../models/letterjam/clues';
 import _ from 'lodash';
 import { LetterCard } from '../../../../models/letterjam/letters';
 
@@ -25,6 +25,7 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
 
   ProposedClues: ProposedClue[] = [];
   RelevantLetters: LetterCard[] = [];
+  RoundStatus: RoundStatusEnum;
 
   clueModalParameters: ILetterJamClueComponentParameters;
   disableProposeClue: boolean;
@@ -43,7 +44,10 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
   load = () => {
     this.cluesService.GetClues(this.parameters.request, this.parameters.getCurrentRoundId())
       .then(response => this.HandleGenericResponse(response, r => {
-        _.each(r, proposedClue => {
+
+        this.RoundStatus = r.roundStatus;
+
+        _.each(r.clues, proposedClue => {
           var clue = <ProposedClue>{
             ...proposedClue,
             loadingPlayer: true,

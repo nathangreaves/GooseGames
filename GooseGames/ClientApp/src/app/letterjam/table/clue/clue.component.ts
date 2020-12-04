@@ -79,6 +79,13 @@ export class LetterJamClueComponent implements OnInit {
 
   }
 
+  getLetter(letter: ClueLetter) {
+    if (!letter.letter) {
+      return letter.isWildCard ? "*" : "?";
+    }
+    return letter.letter;
+  }
+
   show(playerId: string) {
     this.ShowAsPlayerId = playerId;
   }

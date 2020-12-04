@@ -53,6 +53,61 @@ namespace GooseGames.Controllers.LetterJam
         {
             return await ValidateStatus(request, PlayerStatus.ProposingClues);
         }
+        [HttpGet]
+        [Route(nameof(PlayerStatus.ReceivedClue))]
+        public async Task<GenericResponse<LetterJamPlayerStatusValidationResponse>> ValidateReceivedClueAsync([FromQuery]PlayerSessionPossibleGameRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatus.ReceivedClue);
+        }
+        [HttpGet]
+        [Route(nameof(PlayerStatus.ReadyForNextRound))]
+        public async Task<GenericResponse<LetterJamPlayerStatusValidationResponse>> ValidateReadyForNextRoundAsync([FromQuery]PlayerSessionPossibleGameRequest request)
+        {
+            return await ValidateStatus(request, PlayerStatus.ReadyForNextRound);
+        }
+
+
+        [HttpPost]
+        [Route("WaitingForNextRound")]
+        public async Task<GenericResponseBase> SetWaitingForNextRoundAsync(PlayerSessionGameRequest request)
+        {
+            try
+            {
+                _logger.LogInformation($"Received request", request);
+
+                var result = await _playerStatusService.SetWaitingForNextRoundAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [Route("UndoWaitingForNextRound")]
+        public async Task<GenericResponseBase> UndoWaitingForNextRoundAsync(PlayerSessionGameRequest request)
+        {
+            try
+            {
+                _logger.LogInformation($"Received request", request);
+
+                var result = await _playerStatusService.SetUndoWaitingForNextRoundAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
 
         private async Task<GenericResponse<LetterJamPlayerStatusValidationResponse>> ValidateStatus(PlayerSessionPossibleGameRequest request, PlayerStatusId lobbyStatus)
         {

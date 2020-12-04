@@ -1,0 +1,53 @@
+<div class="container proposed-clues">
+
+  <div class="proposed-clues-container">
+
+    <div class="alert alert-info" *ngIf="!Rounds.length">
+      No Clues have been given yet!
+    </div>
+
+    <div *ngFor="let round of Rounds;" class="proposed-clue-row">
+      <div class="row" *ngIf="!round.loadingPlayer && round.player">
+        <div class="col-12 col-sm-4 clue-name">
+          <span class="player-name"><gg-emoji [emoji]="round.player.emoji"></gg-emoji> {{round.player.name}}</span>
+        </div>
+        <letterjam-clue class="col-12 col-sm-8 w-100" [parameters]="getClueComponentProperties(round)">
+
+        </letterjam-clue>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+<div class="filler"></div>
+
+<div class="letter-box">
+  <div class="container">
+    <div class="row">
+
+      <div class="col col-sm-1 col-md-3"></div>
+      <div class="col-12 col-sm-10 col-md-6">
+        <div>
+          My Letters:
+        </div>
+        <div class="letter-display" *ngIf="MyLetters">
+          <div *ngFor="let letter of MyLetters; let i=index;" class="letter-display-item">
+
+            <div class="player-card player-shown-card" [ngClass]="{
+         'bonus-card' : letter.bonusLetter
+         }">
+              <span *ngIf="letter.playerLetterGuess">{{letter.playerLetterGuess}}</span>
+              <span *ngIf="!letter.playerLetterGuess && i === CurrentLetterIndex">?</span>
+            </div>
+
+          </div>
+          <button class="btn btn-primary edit-letters-button" (click)="EditMyLetters()">
+            <i class="fas fa-edit"></i>
+          </button>
+        </div>
+      </div>
+      <div class="col col-sm-1 col-md-3"></div>
+    </div>
+  </div>
+</div>

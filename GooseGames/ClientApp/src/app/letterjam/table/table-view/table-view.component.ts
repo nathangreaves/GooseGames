@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { TablePlayer, TableNonPlayerCharacter, ITable, ITablePlayerBase, ITableNonPlayerCharacterBase, ICardsRequest } from '../../../../models/letterjam/table';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { TablePlayer, TableNonPlayerCharacter, ITable, ITablePlayerBase, ITableNonPlayerCharacterBase, ICardsRequest, ITokenUpdate } from '../../../../models/letterjam/table';
 import { LetterJamTableService } from '../../../../services/letterjam/table';
 import { IPlayerSessionGame } from '../../../../models/session';
 import { TableComponentBase, ITableComponentParameters } from '../table-base.component';
@@ -18,7 +18,7 @@ export interface ITableViewParameters extends ITableComponentParameters {
     './table-view.component.scss'
   ]
 })
-export class LetterJamTableViewComponent extends TableComponentBase implements OnInit {
+export class LetterJamTableViewComponent extends TableComponentBase implements OnInit, OnDestroy {
   @Input() parameters: ITableViewParameters;
 
   TableData: ITable;
@@ -32,7 +32,38 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
   ngOnInit(): void {
     this.load();
 
-    //TODO: Subscribe to some stuff
+    this.parameters.hubConnection.on("tokenUpdate", this.processTokenUpdate);
+  }
+  ngOnDestroy(): void {
+    this.parameters.hubConnection.off("tokenUpdate", this.processTokenUpdate);
+  }
+
+  processTokenUpdate = (tokenUpdate: ITokenUpdate) => {
+
+    if (tokenUpdate.unlockTokensFromSupply) {
+      this.TableData.lockedCluesRemaining -= tokenUpdate.unlockTokensFromSupply;
+      this.TableData.greenCluesRemaining += tokenUpdate.unlockTokensFromSupply;
+    }
+
+    if (tokenUpdate.addGreenTokenToPlayerId) {
+      this.TableData.greenCluesRemaining -= 1;
+      var player = _.find(this.Players, p => p.playerId == tokenUpdate.addGreenTokenToPlayerId);
+      player.numberOfGreenCluesGiven += 1;
+    }
+    if (tokenUpdate.addRedTokenToPlayerId) {
+      this.TableData.redCluesRemaining -= 1;
+      var player = _.find(this.Players, p => p.playerId == tokenUpdate.addRedTokenToPlayerId);
+      player.numberOfRedCluesGiven += 1;
+    }
+    if (tokenUpdate.unlockTokensFromNonPlayerCharacterIds && tokenUpdate.unlockTokensFromNonPlayerCharacterIds.length) {
+
+      _.each(tokenUpdate.unlockTokensFromNonPlayerCharacterIds, nonPlayerCharachterId => {
+        this.TableData.lockedCluesRemaining -= 1;
+        this.TableData.greenCluesRemaining += 1;
+        var nPC = _.find(this.NonPlayerCharacters, p => p.playerId == nonPlayerCharachterId);
+        nPC.clueReleased = true;
+      });
+    }
   }
 
   shownCard = (player: TablePlayer, index: number) => {

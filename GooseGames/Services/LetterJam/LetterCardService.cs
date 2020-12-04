@@ -106,7 +106,7 @@ namespace GooseGames.Services.LetterJam
                 {
                     CardId = c.Id,
                     BonusLetter = c.BonusLetter,
-                    Letter = c.Letter,
+                    Letter = c.PlayerId != request.PlayerId ? c.Letter : (char?)null,
                     PlayerId = c.PlayerId,
                     NonPlayerCharacterId = c.NonPlayerCharacterId
                 };
@@ -124,7 +124,7 @@ namespace GooseGames.Services.LetterJam
                 {
                     CardId = c.Id,
                     BonusLetter = c.BonusLetter,
-                    Letter = c.Letter
+                    Letter = c.PlayerId != request.PlayerId ? c.Letter : (char?)null,
                 };
             }));
         }

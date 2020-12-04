@@ -1,5 +1,6 @@
 import { IGooseGamesPlayer } from "../player";
 import { ILetterCard } from "./letters";
+import { RoundStatusEnum } from "./clues";
 
 export interface ITablePlayerBase {
   numberOfRedCluesGiven: number;
@@ -40,6 +41,11 @@ export interface ITable {
   nonPlayerCharacters: ITableNonPlayerCharacter[];
 }
 
+export interface IRound {
+  roundStatus: RoundStatusEnum,
+  roundId: string;
+}
+
 export class TablePlayerBase  {
   playerId: string;
   currentLetterId: string;
@@ -65,4 +71,11 @@ export class TableNonPlayerCharacter extends TablePlayerBase implements ITableNo
 export interface ICardsRequest {
   cardIds: string[] | null;
   relevantCards: boolean | null;
+}
+
+export interface ITokenUpdate {
+  addRedTokenToPlayerId: string;
+  addGreenTokenToPlayerId: string;
+  unlockTokensFromNonPlayerCharacterIds: string[];
+  unlockTokensFromSupply: number;
 }

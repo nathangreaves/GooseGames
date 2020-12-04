@@ -1,4 +1,6 @@
-﻿using Entities.LetterJam.Enums;
+﻿using Entities.LetterJam;
+using Entities.LetterJam.Enums;
+using GooseGames.Hubs;
 using GooseGames.Services.Global;
 using Models.Requests;
 using Models.Responses;
@@ -17,16 +19,25 @@ namespace GooseGames.Services.LetterJam
     {
         private readonly Global.SessionService _sessionService;
         private readonly GlobalPlayerStatusService _playerStatusService;
+        private readonly IRoundRepository _roundRepository;
+        private readonly IGameRepository _gameRepository;
         private readonly IPlayerStateRepository _playerStateRepository;
+        private readonly LetterJamHubContext _letterJamHubContext;
 
         public PlayerStatusService(
             Global.SessionService sessionService,
-            Global.GlobalPlayerStatusService playerStatusService,
-            IPlayerStateRepository playerStateRepository)
+            Global.GlobalPlayerStatusService playerStatusService,       
+            IRoundRepository roundRepository,
+            IGameRepository gameRepository,
+            IPlayerStateRepository playerStateRepository,
+            LetterJamHubContext letterJamHubContext)
         {
             _sessionService = sessionService;
             _playerStatusService = playerStatusService;
+            _roundRepository = roundRepository;
+            _gameRepository = gameRepository;
             _playerStateRepository = playerStateRepository;
+            _letterJamHubContext = letterJamHubContext;
         }
 
         internal async Task UpdateAllPlayersForGameAsync(Guid gameId, PlayerStatusId playerStatus)
@@ -115,6 +126,43 @@ namespace GooseGames.Services.LetterJam
                 GameId = gameId
             };
             return GenericResponse<LetterJamPlayerStatusValidationResponse>.Ok(response);
+        }
+
+        internal async Task<GenericResponseBase> SetUndoWaitingForNextRoundAsync(PlayerSessionGameRequest request)
+        {
+            await UpdatePlayerToStatusAsync(request.PlayerId, request.GameId, PlayerStatus.ReceivedClue);
+            return GenericResponseBase.Ok();
+        }
+
+        internal async Task<GenericResponseBase> SetWaitingForNextRoundAsync(PlayerSessionGameRequest request)
+        {
+            await UpdatePlayerToStatusAsync(request.PlayerId, request.GameId, PlayerStatus.ReadyForNextRound);
+
+            if (await AllPlayersMatchStatusAsync(request.GameId, PlayerStatus.ReadyForNextRound))
+            {
+                //TODO: Should really check here whether anyone's got any letters left to guess!
+
+                var game = await _gameRepository.GetAsync(request.GameId);
+
+                var currentRound = await _roundRepository.GetAsync(game.CurrentRoundId.Value);
+
+                var newRound = new Round
+                {
+                    Id = Guid.NewGuid(),
+                    GameId = game.Id,
+                    RoundNumber = currentRound.RoundNumber + 1,
+                    RoundStatus = RoundStatus.ProposingClues
+                };
+                await _roundRepository.InsertAsync(newRound);
+
+                game.CurrentRoundId = newRound.Id;
+                await _gameRepository.UpdateAsync(game);
+
+                await UpdateAllPlayersForGameAsync(game.Id, PlayerStatus.ProposingClues);
+
+                await _letterJamHubContext.SendBeginNewRoundAsync(request.SessionId, newRound.Id);
+            }
+            return GenericResponseBase.Ok();
         }
 
         internal async Task<GenericResponse<IEnumerable<Models.Responses.LetterJam.PlayerActionResponse>>> GetPlayerActionsAsync(PlayerSessionGameRequest request, PlayerStatusId desiredPlayerStatus)

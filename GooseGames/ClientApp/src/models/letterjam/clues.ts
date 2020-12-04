@@ -11,6 +11,17 @@ export interface IProposedClueBase {
   numberOfBonusLetters: number;
 }
 
+export enum RoundStatusEnum {
+
+  ProposingClues = 1,
+  ReceivedClue = 2
+}
+
+export interface IProposedClues {
+  clues: IProposedClue[];
+  roundStatus: RoundStatusEnum;
+}
+
 export interface IProposedClue {
   votes: IProposedClueVote[];
 }

@@ -17,6 +17,7 @@ import { LetterJamProposedCluesComponent } from './table/proposed-clues/proposed
 import { LetterJamProposeClueComponent } from './table/propose-clue/propose-clue.component';
 import { LetterJamClueComponent } from './table/clue/clue.component';
 import { LetterJamProposedClueModalComponent } from './table/clue-modal/clue-modal.component';
+import { LetterJamMyJamComponent } from './table/my-jam/my-jam.component';
 
 
 const routes: Routes = [
@@ -37,7 +38,8 @@ const routes: Routes = [
     LetterJamProposedCluesComponent,
     LetterJamProposeClueComponent,
     LetterJamProposedClueModalComponent,
-    LetterJamClueComponent
+    LetterJamClueComponent,
+    LetterJamMyJamComponent
   ],
   imports: [
     RouterModule.forChild(routes),

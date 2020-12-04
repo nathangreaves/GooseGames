@@ -1,5 +1,6 @@
 ﻿using GooseGames.Logging;
 using Microsoft.AspNetCore.SignalR;
+using Models.HubMessages.LetterJam;
 using Models.Requests;
 using Models.Requests.LetterJam;
 using Models.Responses.LetterJam;
@@ -98,6 +99,18 @@ namespace GooseGames.Hubs
         {
             _logger.LogInformation($"Sending promptGiveClue: to {sessionId} : playerId={cluePlayerId}, clueId={clueId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("promptGiveClue", cluePlayerId, clueId);
+        }
+
+        internal async Task GiveClueAsync(ClueRequest request, Guid clueGiverPlayerId)
+        {
+            _logger.LogInformation($"Sending giveClue: to {request.SessionId} : clueId={request.ClueId}");
+            await _hub.Clients.Group(request.SessionId.ToString()).SendAsync("giveClue", request.ClueId, clueGiverPlayerId);
+        }
+
+        internal async Task SendTokenUpdate(Guid sessionId, TokenUpdate update)
+        {
+            _logger.LogInformation($"Sending tokenUpdate: to {sessionId}", update);
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("tokenUpdate", update);
         }
     }
 }

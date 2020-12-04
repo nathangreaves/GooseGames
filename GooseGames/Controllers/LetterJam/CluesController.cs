@@ -29,11 +29,9 @@ namespace GooseGames.Controllers.LetterJam
             _logger = logger;
         }
 
-
-
         [HttpGet]
         [Route("Proposed")]
-        public async Task<GenericResponse<IEnumerable<ProposedClueResponse>>> GetProposedCluesAsync([FromQuery]RoundRequest request)
+        public async Task<GenericResponse<ProposedCluesResponse>> GetProposedCluesAsync([FromQuery]RoundRequest request)
         {
             try
             {
@@ -49,7 +47,7 @@ namespace GooseGames.Controllers.LetterJam
             {
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return GenericResponse<IEnumerable<ProposedClueResponse>>.Error($"Unknown Error {errorGuid}");
+                return GenericResponse<ProposedCluesResponse>.Error($"Unknown Error {errorGuid}");
             }
         }
 
@@ -114,6 +112,28 @@ namespace GooseGames.Controllers.LetterJam
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
                 return GenericResponse<IEnumerable<ClueLetterResponse>>.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [Route("GiveClue")]
+        public async Task<GenericResponseBase> GiveClueAsync(ClueRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _cluesService.GiveClueAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
             }
         }
     }

@@ -14,7 +14,7 @@ export interface ILetterJamClueComponentTemplates {
 })
 export class LetterJamProposedClueModalComponent {
 
-  @Input title: string;
+  @Input() title: string;
   @Input() parameters: ILetterJamClueComponentParameters;
   @Input() templates: ILetterJamClueComponentTemplates;
   @Input() dismiss: () => void;

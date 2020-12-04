@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { GenericResponse } from '../../models/genericresponse';
+import { GenericResponse, GenericResponseBase } from '../../models/genericresponse';
 import { IPlayerSession, ConvertToPlayerSessionRequest, IPlayerSessionGame, ConvertToPlayerSessionGameRequest } from '../../models/session'
 import { LetterJamPlayerStatus, ILetterJamComponentBase } from '../../models/letterjam/content';
 import { PlayerStatusValidationResponse, PlayerAction, IGooseGamesPlayerAction } from '../../models/player';
@@ -64,6 +64,13 @@ export class LetterJamPlayerStatusService {
       });
   }
 
+  public SetWaitingForNextRound(request: IPlayerSessionGame): Promise<GenericResponseBase> {    
+    return this._http.post<GenericResponseBase>(this._baseUrl + `LetterJamPlayerStatus/WaitingForNextRound`, ConvertToPlayerSessionGameRequest(request)).toPromise();
+  }
+
+  public SetUndoWaitingForNextRound(request: IPlayerSessionGame): Promise<GenericResponseBase> {
+    return this._http.post<GenericResponseBase>(this._baseUrl + `LetterJamPlayerStatus/UndoWaitingForNextRound`, ConvertToPlayerSessionGameRequest(request)).toPromise();
+  }
 
   PlayersWaitingForFirstRound(request: IPlayerSessionGame): Promise<GenericResponse<IGooseGamesPlayerAction[]>> {
 

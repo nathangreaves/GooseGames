@@ -15,6 +15,16 @@
 .tabs-bar-buttons {
   height: 100%;
   padding: 0px;
+  display: flex;
+  flex-direction: row;
+
+  button {
+  }
+
+  .btn-primary {
+    margin: 5px;
+    font-size: 0.9rem;
+  }
 }
 
 .tabs-bar .container {
@@ -25,9 +35,12 @@
   height: 100%;
 }
 
+.tab-button-base {
+  height: 100%;
+  width: 25%;
+}
+
 .tab-button{
-    height: 100%;
-    width: 25%;
     background: #fff
 }
 .tab-button.current-tab {

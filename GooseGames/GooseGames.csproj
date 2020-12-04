@@ -111,6 +111,7 @@
     <None Remove="ClientApp\src\models\letterjam\clues.ts" />
     <None Remove="ClientApp\src\models\letterjam\content.ts" />
     <None Remove="ClientApp\src\models\letterjam\letters.ts" />
+    <None Remove="ClientApp\src\models\letterjam\myJam.ts" />
     <None Remove="ClientApp\src\models\letterjam\playerStatus.ts" />
     <None Remove="ClientApp\src\models\letterjam\startWord.ts" />
     <None Remove="ClientApp\src\models\letterjam\table.ts" />
@@ -129,6 +130,7 @@
     <None Remove="ClientApp\src\services\justone\ui.ts" />
     <None Remove="ClientApp\src\services\letterjam\clues.ts" />
     <None Remove="ClientApp\src\services\letterjam\letterCard.ts" />
+    <None Remove="ClientApp\src\services\letterjam\myJam.ts" />
     <None Remove="ClientApp\src\services\letterjam\nonPlayerCharacter.ts" />
     <None Remove="ClientApp\src\services\letterjam\playerStatus.ts" />
     <None Remove="ClientApp\src\services\letterjam\session.ts" />
@@ -250,6 +252,7 @@
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\models\letterjam\letters.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\letterjam\myJam.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\letterjam\playerStatus.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\letterjam\startWord.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\letterjam\table.ts" />
@@ -284,6 +287,7 @@
     <TypeScriptCompile Include="ClientApp\src\services\justone\ui.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\letterjam\clues.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\letterjam\letterCard.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\letterjam\myJam.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\letterjam\nonPlayerCharacter.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\letterjam\playerStatus.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\letterjam\session.ts">

@@ -3,7 +3,7 @@ import { HttpClient } from "@angular/common/http";
 import { IPlayerSessionGame, ConvertToPlayerSessionGameRequest } from "../../models/session";
 import { GenericResponse, GenericResponseBase } from "../../models/genericresponse";
 import { ILetterJamRoundRequest } from "../../models/letterjam/content";
-import { IProposedClue, IClueLetter } from "../../models/letterjam/clues";
+import { IProposedClue, IClueLetter, IProposedClues } from "../../models/letterjam/clues";
 import { LetterCard } from "../../models/letterjam/letters";
 import _ from "lodash";
 
@@ -21,7 +21,7 @@ export class LetterJamCluesService {
 
   }
 
-  public GetClues(request: IPlayerSessionGame, roundId: string): Promise<GenericResponse<IProposedClue[]>> {
+  public GetClues(request: IPlayerSessionGame, roundId: string): Promise<GenericResponse<IProposedClues>> {
     var newRequest = <ILetterJamRoundRequest>{
       ...ConvertToPlayerSessionGameRequest(request),
       roundId: roundId
@@ -29,7 +29,7 @@ export class LetterJamCluesService {
 
     var parameters = Object.keys(newRequest).map(key => newRequest[key] ? key + '=' + newRequest[key] : '').join('&');
 
-    return this._http.get<GenericResponse<IProposedClue[]>>(`${this._baseUrl}LetterJamClues/Proposed?${parameters}`).toPromise();
+    return this._http.get<GenericResponse<IProposedClues>>(`${this._baseUrl}LetterJamClues/Proposed?${parameters}`).toPromise();
   }
 
   public SubmitClue(request: IPlayerSessionGame, roundId: string, letterCards: LetterCard[]): Promise<GenericResponseBase> {
@@ -58,6 +58,17 @@ export class LetterJamCluesService {
     }
 
     return this._http.post<GenericResponseBase>(`${this._baseUrl}LetterJamClueVote`, postRequest).toPromise();
+  }
+
+  public GiveClue(request: IPlayerSessionGame, roundId: string, clueId: string): Promise<GenericResponseBase> {
+
+    var postRequest = {
+      ...ConvertToPlayerSessionGameRequest(request),
+      roundId: roundId,
+      clueId: clueId
+    }
+
+    return this._http.post<GenericResponseBase>(`${this._baseUrl}LetterJamClues/GiveClue`, postRequest).toPromise();
   }
 
   public GetLettersForClue(request: IPlayerSessionGame, clueId: string): Promise<GenericResponse<IClueLetter[]>> {

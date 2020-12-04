@@ -27,6 +27,28 @@ namespace GooseGames.Controllers.LetterJam
         }
 
         [HttpGet]
+        [Route("CurrentRound")]
+        public async Task<GenericResponse<RoundResponse>> GetCurrentRoundAsync([FromQuery]PlayerSessionGameRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _tableService.GetCurrentRoundAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponse<RoundResponse>.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpGet]
         public async Task<GenericResponse<TableResponse>> GetTableAsync([FromQuery]PlayerSessionGameRequest request)
         {
             try

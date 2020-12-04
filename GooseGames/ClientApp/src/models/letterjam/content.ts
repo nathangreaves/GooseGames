@@ -8,7 +8,9 @@ export enum LetterJamPlayerStatus {
   InLobby,
   ConstructingWord,
   WaitingForFirstRound,
-  ProposingClues
+  ProposingClues,
+  ReceivedClue,
+  ReadyForNextRound
 }
 
 export interface ILetterJamComponentBase extends IPlayerSession {

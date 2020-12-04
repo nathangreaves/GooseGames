@@ -73,6 +73,8 @@ namespace Entities.LetterJam.Enums
         public static readonly PlayerStatusId ConstructingWord = PlayerStatusId.Construct("A0465731-9BD5-4042-A19A-304F987AEBDB");
         public static readonly PlayerStatusId WaitingForFirstRound = PlayerStatusId.Construct("28A8674D-025E-484B-A5D0-58ED0AEBC923");
         public static readonly PlayerStatusId ProposingClues = PlayerStatusId.Construct("F56B427C-4357-4D41-BBFB-BA2C6A5182A5");
+        public static readonly PlayerStatusId ReceivedClue = PlayerStatusId.Construct("B3A55203-5F59-4C4F-8830-7244974727BF");
+        public static readonly PlayerStatusId ReadyForNextRound = PlayerStatusId.Construct("76B04091-EF39-4339-8C92-7C04A87249FF");
 
         private static readonly Dictionary<PlayerStatusId, string> s_Instances = new Dictionary<PlayerStatusId, string>
         {
@@ -80,6 +82,8 @@ namespace Entities.LetterJam.Enums
             { ConstructingWord, nameof(ConstructingWord) },
             { WaitingForFirstRound, nameof(WaitingForFirstRound) },
             { ProposingClues, nameof(ProposingClues) },
+            { ReceivedClue, nameof(ReceivedClue) },
+            { ReadyForNextRound, nameof(ReadyForNextRound) },
         };
         public static string GetDescription(PlayerStatusId guid)
         {
@@ -103,8 +107,8 @@ namespace Entities.LetterJam.Enums
 //
 //
 //
-//PlayerStatusId.Construct("B3A55203-5F59-4C4F-8830-7244974727BF");
-//PlayerStatusId.Construct("76B04091-EF39-4339-8C92-7C04A87249FF");
+//
+//
 //PlayerStatusId.Construct("31AABF51-845B-458D-9FD6-DFCE674F6BEF");
 //PlayerStatusId.Construct("94832875-2F14-48F5-8943-D09348CBF1E6");
 //PlayerStatusId.Construct("3E5C01C8-312B-4C84-8DB2-3E2A218C8325");
