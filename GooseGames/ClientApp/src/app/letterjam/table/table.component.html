@@ -38,7 +38,7 @@
                 }">
           Table
         </button>
-        <button class="tab-button-base tab-button" (click)="ProposedClues()"
+        <button *ngIf="RoundStatus == 1" class="tab-button-base tab-button" (click)="ProposedClues()"
                 [ngClass]="{
                 'current-tab' : CurrentTabId === 1 || CurrentTabId === 2
                 }">
@@ -51,11 +51,11 @@
           My Jam
         </button>
 
-        <div class="tab-button-base">
-          <button [disabled]="DisableNextRoundButton" *ngIf="RoundStatus == 2 && !WaitingForNextRound" class="btn btn-primary" (click)="ReadyForNextRound()">
+        <div class="tab-button-base p-2">
+          <button [disabled]="DisableNextRoundButton" *ngIf="RoundStatus == 2 && PlayerStatus != 5" class="btn btn-primary" (click)="ReadyForNextRound()">
             Next Round
           </button>
-          <button [disabled]="DisableNextRoundButton" *ngIf="RoundStatus == 2 && WaitingForNextRound" class="btn btn-primary" (click)="NotReadyForNextRound()">
+          <button [disabled]="DisableNextRoundButton" *ngIf="RoundStatus == 2 && PlayerStatus == 5" class="btn btn-danger" (click)="NotReadyForNextRound()">
             Not Ready
           </button>
         </div>

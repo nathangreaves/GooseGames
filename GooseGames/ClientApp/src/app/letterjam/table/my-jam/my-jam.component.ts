@@ -12,7 +12,7 @@ export interface IMyJamComponentParameters extends ITableComponentParameters {
 
 @Component({
   selector: 'letterjam-my-jam',
-  templateUrl: './my-jam.component.html',
+  templateUrl: './my-jam.component.html',  
   styleUrls: ['../../common/letterjam.common.scss',
     './my-jam.component.scss']
 })

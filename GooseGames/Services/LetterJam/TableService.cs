@@ -47,10 +47,13 @@ namespace GooseGames.Services.LetterJam
 
             var round = await _roundRepository.GetAsync(game.CurrentRoundId.Value);
 
+            var playerState = await _playerStateRepository.SingleOrDefaultAsync(s => s.PlayerId == request.PlayerId);
+
             return GenericResponse<RoundResponse>.Ok(new RoundResponse 
             { 
                 RoundId = round.Id,
-                RoundStatus = (RoundStatusEnum)(int)round.RoundStatus
+                RoundStatus = (RoundStatusEnum)(int)round.RoundStatus,
+                PlayerStatus = playerState.StatusDescription
             });
         }
 

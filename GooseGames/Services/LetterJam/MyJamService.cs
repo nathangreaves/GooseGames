@@ -44,7 +44,7 @@ namespace GooseGames.Services.LetterJam
 
             return GenericResponse<MyJamResponse>.Ok(new MyJamResponse
             {
-                Rounds = rounds.Select(r => {
+                Rounds = rounds.OrderBy(r => r.RoundNumber).Select(r => {
                     return new MyJamRound 
                     {
                         ClueGiverPlayerId = r.ClueGiverPlayerId.Value,

@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, OnDestroy, HostListener } from '@angular/core';
-import { LetterJamComponentBase } from '../../../models/letterjam/content';
+import { LetterJamComponentBase, LetterJamPlayerStatus } from '../../../models/letterjam/content';
 import { ITableViewParameters } from './table-view/table-view.component';
 import { ILetterCard } from '../../../models/letterjam/letters';
 import { ICardsRequest } from '../../../models/letterjam/table';
@@ -49,8 +49,8 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   ProposeClueLoaded: boolean;
   MyJamLoaded: boolean;
 
-  RoundStatus: RoundStatusEnum;
-  WaitingForNextRound: boolean;
+  PlayerStatus: LetterJamPlayerStatus;
+  RoundStatus: RoundStatusEnum;  
   DisableNextRoundButton: boolean;
 
   clueModalParameters: ILetterJamClueComponentParameters;
@@ -92,7 +92,8 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
     this.DisableNextRoundButton = true;
     this.playerStatusService.SetWaitingForNextRound(this)
       .then(response => this.HandleGenericResponseBase(response, () => {
-        this.WaitingForNextRound = true;
+
+        this.PlayerStatus = LetterJamPlayerStatus.ReadyForNextRound;
         this.Table();
 
         return response;
@@ -107,7 +108,7 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
     this.playerStatusService.SetUndoWaitingForNextRound(this)
       .then(response => this.HandleGenericResponseBase(response, () => {
 
-        this.WaitingForNextRound = false;
+        this.PlayerStatus = LetterJamPlayerStatus.ReceivedClue;
         this.MyJam();
 
         return response;
@@ -134,6 +135,7 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
 
     this.HubConnection.on('promptGiveClue', this.promptGiveClue);
     this.HubConnection.on('giveClue', this.clueGiven);
+    this.HubConnection.on('beginNewRound', this.beginNewRound);
 
     this.tableViewParameters = <ITableViewParameters>{
       ...baseTableParameters
@@ -178,6 +180,7 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   ngOnDestroy() {
     this.HubConnection.off('promptGiveClue', this.promptGiveClue);
     this.HubConnection.off('giveClue', this.clueGiven);
+    this.HubConnection.off('beginNewRound', this.beginNewRound);
   }
 
   loadRound() {
@@ -186,6 +189,7 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
 
         this.RoundStatus = r.roundStatus;
         this.setCurrentRoundId(r.roundId);
+        this.PlayerStatus = LetterJamPlayerStatus[r.playerStatus];
 
         return response;
       }));
@@ -257,11 +261,18 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
     });
   }
 
+  beginNewRound = (roundId: string) => {
+    this.setCurrentRoundId(roundId);
+    this.RoundStatus = RoundStatusEnum.ProposingClues;
+    this.PlayerStatus = LetterJamPlayerStatus.ProposingClues;
+  }
+
   clueGiven = () => {
     if (this.CurrentTabId !== TableComponentTabs.MyJam) {
       this.MyJam();
     }
     this.RoundStatus = RoundStatusEnum.ReceivedClue;
+    this.PlayerStatus = LetterJamPlayerStatus.ReceivedClue;
   }
 
   getCurrentRoundId = (): string => {

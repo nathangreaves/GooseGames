@@ -142,6 +142,8 @@ namespace GooseGames.Services.LetterJam
             {
                 //TODO: Should really check here whether anyone's got any letters left to guess!
 
+                //TODO: Need to move any NPC letters used on to next letter.
+
                 var game = await _gameRepository.GetAsync(request.GameId);
 
                 var currentRound = await _roundRepository.GetAsync(game.CurrentRoundId.Value);

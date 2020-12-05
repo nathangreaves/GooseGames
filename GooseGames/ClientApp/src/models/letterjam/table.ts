@@ -44,6 +44,7 @@ export interface ITable {
 export interface IRound {
   roundStatus: RoundStatusEnum,
   roundId: string;
+  playerStatus: string;
 }
 
 export class TablePlayerBase  {

@@ -286,7 +286,7 @@ namespace GooseGames.Services.LetterJam
 
             var clue = await _clueRepository.GetAsync(request.ClueId.Value);
 
-            var playerState = await _playerStateRepository.GetAsync(clue.ClueGiverPlayerId);
+            var playerState = await _playerStateRepository.SingleOrDefaultAsync(s => s.PlayerId == clue.ClueGiverPlayerId);
 
             var tokenUpdate = new TokenUpdate();
 

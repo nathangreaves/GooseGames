@@ -8,10 +8,10 @@
 
     <div *ngFor="let round of Rounds;" class="proposed-clue-row">
       <div class="row" *ngIf="!round.loadingPlayer && round.player">
-        <div class="col-12 col-sm-4 clue-name">
-          <span class="player-name"><gg-emoji [emoji]="round.player.emoji"></gg-emoji> {{round.player.name}}</span>
+        <div class="col-2 clue-name">
+          <gg-emoji [emoji]="round.player.emoji"></gg-emoji>&nbsp;:
         </div>
-        <letterjam-clue class="col-12 col-sm-8 w-100" [parameters]="getClueComponentProperties(round)">
+        <letterjam-clue class="col-10 w-100" [parameters]="getClueComponentProperties(round)">
 
         </letterjam-clue>
       </div>
