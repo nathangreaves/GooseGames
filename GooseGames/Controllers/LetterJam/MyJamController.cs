@@ -6,6 +6,7 @@ using GooseGames.Logging;
 using GooseGames.Services.LetterJam;
 using Microsoft.AspNetCore.Mvc;
 using Models.Requests;
+using Models.Requests.LetterJam;
 using Models.Responses;
 using Models.Responses.LetterJam;
 
@@ -45,6 +46,29 @@ namespace GooseGames.Controllers.LetterJam
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
                 return GenericResponse<MyJamResponse>.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [Route("LetterGuesses")]
+        public async Task<GenericResponseBase> PostLetterGuessesAsync(MyJamLetterGuessesRequest request)
+        {
+
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _myJamService.PostLetterGuessesAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
             }
         }
     }

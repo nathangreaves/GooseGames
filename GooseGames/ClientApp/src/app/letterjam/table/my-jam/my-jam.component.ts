@@ -1,10 +1,12 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ViewChild, HostListener } from '@angular/core';
 import { TableComponentBase, ITableComponentParameters } from '../table-base.component';
 import { LetterJamMyJamService } from '../../../../services/letterjam/myJam';
 import { MyJamRound, IMyJamLetterCard } from '../../../../models/letterjam/myJam';
 import _ from 'lodash';
 import { ILetterJamClueComponentParameters } from '../clue/clue.component';
 import { AllPlayersFromCacheRequest } from '../../../../models/letterjam/content';
+import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { IMyLettersComponentParameters } from './my-letters/my-letters.component';
 
 export interface IMyJamComponentParameters extends ITableComponentParameters {
   proposeClue: () => void;
@@ -12,11 +14,17 @@ export interface IMyJamComponentParameters extends ITableComponentParameters {
 
 @Component({
   selector: 'letterjam-my-jam',
-  templateUrl: './my-jam.component.html',  
+  templateUrl: './my-jam.component.html',
   styleUrls: ['../../common/letterjam.common.scss',
     './my-jam.component.scss']
 })
 export class LetterJamMyJamComponent extends TableComponentBase implements OnInit, OnDestroy {
+
+  @ViewChild('myLettersModal') myLettersModal;
+  myLettersModalRef: NgbModalRef;
+  myLettersModalParameters: IMyLettersComponentParameters;
+
+  shouldMoveOnToNextLetter: boolean;
 
   @Input() parameters: IMyJamComponentParameters;
 
@@ -24,7 +32,8 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
   MyLetters: IMyJamLetterCard[];
   CurrentLetterIndex: number;
 
-  constructor(private myJamService: LetterJamMyJamService) {
+  constructor(private myJamService: LetterJamMyJamService,
+    private modalService: NgbModal) {
     super();
   }
 
@@ -77,7 +86,7 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
       }));
   }
 
-  loadPlayers= () => {
+  loadPlayers = () => {
     return this.parameters.getPlayersFromCache(new AllPlayersFromCacheRequest(true, true)).then(r => {
       _.each(this.Rounds, round => {
         round.player = _.find(r, fP => fP.id == round.clueGiverPlayerId);
@@ -99,7 +108,77 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
     this.Rounds.push(roundViewModel);
   }
 
+
+  moveOnToNextLetter = () => {
+    this.shouldMoveOnToNextLetter = true;
+  }
+
   EditMyLetters = () => {
-    //TODO: Open modal to edit letters and potentially move on to next letter?
+
+    this.myLettersModalParameters = {
+      myLetters: this.MyLetters.map(l => {
+        return {
+          ...l
+        }
+      }),
+      currentLetterIndex: this.CurrentLetterIndex,
+      moveOnToNextLetter: this.moveOnToNextLetter
+    }
+
+    const modalState = {
+      modal: true,
+      desc: 'fake state for our modal'
+    };
+    history.pushState(modalState, null);
+    var modalRef = this.modalService.open(this.myLettersModal, { ariaLabelledBy: 'modal-basic-title' });
+    this.myLettersModalRef = modalRef;
+
+    modalRef.result
+      .finally(() => {
+        this.myLettersModalParameters = null;
+        this.myLettersModalRef = null;
+        this.onGiveClueModalDismissed();
+      });
+  }
+
+  UpdateLetterGuesses() {
+
+    var myLetters = this.myLettersModalParameters.myLetters;
+
+    var letterGuessRequest = myLetters.map(l => {
+      return {
+        cardId: l.cardId,
+        playerLetterGuess: l.playerLetterGuess
+      }
+    });
+
+    this.myJamService.PostLetterGuesses(this.parameters.request, letterGuessRequest, this.shouldMoveOnToNextLetter)
+      .then(response => this.HandleGenericResponseBase(response, () => {
+        this.MyLetters = myLetters;
+        this.shouldMoveOnToNextLetter = false;
+        this.myLettersModalRef.close();
+
+        return response;
+      }))
+      .catch(this.HandleGenericError);
+  }
+
+  @HostListener('window:popstate', ['$event'])
+  dismissModal(event: Event) {
+    if (this.myLettersModalRef) {
+      this.myLettersModalRef.dismiss();
+      event.stopPropagation();
+    }
+  }
+
+  onGiveClueModalDismissed = () => {
+    if (window.history.state.modal === true) {
+      window.history.state.modal = false;
+      history.back();
+    }
+  }
+
+  indexGreaterThanCurrentLetterIndex(index: number, currentLetterIndex: number) {
+    return index > currentLetterIndex;
   }
 }

@@ -1,0 +1,42 @@
+<form>
+  <div class="container">
+    <div class="row my-letters-container player-cards-container">
+      <div *ngFor="let letter of parameters.myLetters; let i=index;">
+        <input class="player-card"
+               [ngClass]="{
+                  'bonus-letter' : letter.bonusLetter,
+                  'player-hidden-card' : IndexGreaterThanCurrentLetterIndex(i),
+                  'confirming-move' : ConfirmingMove && IndexOf(i, parameters.currentLetterIndex + 1)
+               }"
+               [(ngModel)]="letter.playerLetterGuess"
+               [name]="letter.cardId"
+               [id]="letter.cardId"
+               maxlength="1"
+               [disabled]="IndexGreaterThanCurrentLetterIndex(i)"
+               #letterInput
+               oninput="this.value = this.value.toUpperCase()" />
+      </div>
+    </div>
+    <div class="row" *ngIf="!ConfirmingMove && !MoveConfirmed && CanMoveOn">
+      <button class="btn btn-success" (click)="ConfirmingMove = true">
+        Next Letter
+      </button>
+    </div>
+    <div class="row" *ngIf="ConfirmingMove && !MoveConfirmed">
+      <div class="alert alert-warning">
+        <strong>Move on to Next Letter</strong>
+        <br/>You will not receive any more clues for the current letter card.
+        <br/><br /><strong>Are you sure?</strong>
+      </div>
+    </div>
+    <div class="row" *ngIf="ConfirmingMove && !MoveConfirmed">
+      <button class="btn btn-danger mr-auto" (click)="ConfirmingMove = false">
+        No
+      </button>
+      <button class="btn btn-success" (click)="ConfirmMove()">
+        Yes
+      </button>
+    </div>
+
+  </div>
+</form>

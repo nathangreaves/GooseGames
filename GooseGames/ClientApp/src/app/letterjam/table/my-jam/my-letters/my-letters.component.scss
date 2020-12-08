@@ -1,0 +1,34 @@
+.my-letters-container {
+    margin-bottom: 10px;
+}
+
+
+.letter-input {
+  width: auto;
+  width: 1.5rem;
+  border-width: 0;
+  background: #00000000;
+}
+
+.player-card {
+  margin-right: 0.5rem;
+}
+
+
+@keyframes movingOnLetterAnimation {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+.confirming-move {
+  animation-duration: 0.5s;
+  animation-name: movingOnLetterAnimation;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}

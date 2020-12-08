@@ -14,7 +14,8 @@ namespace Entities.LetterJam
         public DateTime LastUpdatedUtc { get; set; }
         public Guid? PlayerId { get; set; }
         public Guid? NonPlayerCharacterId { get; set; }
-        public Guid? LetterId { get; set; }
+        public Guid? LetterCardId { get; set; }
+        public LetterCard LetterCard { get; set; }
         public char? Letter { get; set; }
         public bool BonusLetter { get; set; }
         public bool IsWildCard { get; set; }

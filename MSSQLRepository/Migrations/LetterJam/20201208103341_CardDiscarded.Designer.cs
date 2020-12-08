@@ -4,14 +4,16 @@ using MSSQLRepository.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MSSQLRepository.Migrations.LetterJam
 {
     [DbContext(typeof(LetterJamContext))]
-    partial class LetterJamContextModelSnapshot : ModelSnapshot
+    [Migration("20201208103341_CardDiscarded")]
+    partial class CardDiscarded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,7 +92,7 @@ namespace MSSQLRepository.Migrations.LetterJam
                     b.Property<string>("Letter")
                         .HasColumnType("nvarchar(1)");
 
-                    b.Property<Guid?>("LetterCardId")
+                    b.Property<Guid?>("LetterId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("LetterIndex")
@@ -105,8 +107,6 @@ namespace MSSQLRepository.Migrations.LetterJam
                     b.HasKey("Id");
 
                     b.HasIndex("ClueId");
-
-                    b.HasIndex("LetterCardId");
 
                     b.ToTable("ClueLetters");
                 });
@@ -378,10 +378,6 @@ namespace MSSQLRepository.Migrations.LetterJam
                         .HasForeignKey("ClueId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Entities.LetterJam.LetterCard", "LetterCard")
-                        .WithMany()
-                        .HasForeignKey("LetterCardId");
                 });
 
             modelBuilder.Entity("Entities.LetterJam.ClueVote", b =>

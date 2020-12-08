@@ -26,6 +26,19 @@ namespace MSSQLRepository.LetterJam
 
         }
 
+        public async Task<LetterCard> GetNextNpcCardAsync(Guid npcId, Guid currentLetterId)
+        {
+            var currentLetterIndex = await GetPropertyAsync(currentLetterId, p => p.LetterIndex);
+
+            var npcLetter = await Context.LetterCards
+                .Where(c => c.NonPlayerCharacterId == npcId && c.LetterIndex > currentLetterIndex)
+                .OrderBy(x => x.LetterIndex)
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
+
+            return npcLetter;
+        }
+
         public async Task ReserveLettersForNonPlayerCharacterAsync(NonPlayerCharacter npcEntity)
         {            
             var lettersForGame = await GetUnreservedCardsForGameQueryable(npcEntity.GameId)
@@ -72,6 +85,36 @@ namespace MSSQLRepository.LetterJam
 
             await UpdateRangeAsync(lettersForGame)
                 .ConfigureAwait(false);
+        }
+
+        public async Task<LetterCard> GetNextUndiscardedCardAsync(Guid gameId)
+        {
+            var card = await Context.LetterCards
+                .Where(x => x.Discarded == false && x.NonPlayerCharacterId == null && x.PlayerId == null && x.BonusLetter == false)
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
+
+            if (card == null)
+            {
+                var discardedCards = await Context.LetterCards
+                .Where(x => x.Discarded == true && x.NonPlayerCharacterId == null && x.PlayerId == null && x.BonusLetter == false)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+                foreach (var c in discardedCards)
+                {
+                    c.Discarded = false;
+                }
+
+                await UpdateRangeAsync(discardedCards);
+
+                card = await Context.LetterCards
+                .Where(x => x.Discarded == false && x.NonPlayerCharacterId == null && x.PlayerId == null && x.BonusLetter == false)
+                .FirstOrDefaultAsync()
+                .ConfigureAwait(false);
+            }
+
+            return card;
         }
     }
 }

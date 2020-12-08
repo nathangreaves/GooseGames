@@ -166,7 +166,7 @@ namespace GooseGames.Services.LetterJam
                     Letter = letter?.Letter,
                     PlayerId = letter?.PlayerId,
                     NonPlayerCharacterId = letter?.NonPlayerCharacterId,
-                    LetterId = letter?.Id,
+                    LetterCardId = letter?.Id,
                     BonusLetter = letter?.BonusLetter ?? false,
                     LetterIndex = letterIndex,
                     IsWildCard = clueLetter.IsWildCard
@@ -256,7 +256,7 @@ namespace GooseGames.Services.LetterJam
             {
                 return new ClueLetterResponse
                 {
-                    CardId = c.LetterId,
+                    CardId = c.LetterCardId,
                     BonusLetter = c.BonusLetter,
                     Letter = c.PlayerId != request.PlayerId ? c.Letter : null,
                     IsWildCard = c.IsWildCard,

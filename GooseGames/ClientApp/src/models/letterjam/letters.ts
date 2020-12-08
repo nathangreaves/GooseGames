@@ -17,3 +17,11 @@ export class LetterCard implements ILetterCard {
   player: IGooseGamesPlayer;
   loadingPlayer: boolean;
 }
+
+export interface IBonusLetterGuess {
+  playerId: string;
+  cardId: string;
+  guessedLetter: string;
+  actualLetter: string;
+  correct: boolean;
+}

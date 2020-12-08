@@ -10,5 +10,7 @@ namespace RepositoryInterface.LetterJam
     {
         Task ReserveLettersForNonPlayerCharacterAsync(NonPlayerCharacter npcEntity);
         Task UnreserveAllCardsForGameAsync(Guid gameId);
+        Task<LetterCard> GetNextNpcCardAsync(Guid npcId, Guid currentLetterId);
+        Task<LetterCard> GetNextUndiscardedCardAsync(Guid gameId);
     }
 }

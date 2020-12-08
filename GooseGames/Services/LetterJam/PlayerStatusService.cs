@@ -2,6 +2,7 @@
 using Entities.LetterJam.Enums;
 using GooseGames.Hubs;
 using GooseGames.Services.Global;
+using Microsoft.EntityFrameworkCore.Storage;
 using Models.Requests;
 using Models.Responses;
 using Models.Responses.LetterJam;
@@ -22,6 +23,9 @@ namespace GooseGames.Services.LetterJam
         private readonly IRoundRepository _roundRepository;
         private readonly IGameRepository _gameRepository;
         private readonly IPlayerStateRepository _playerStateRepository;
+        private readonly IClueLetterRepository _clueLetterRepository;
+        private readonly ILetterCardRepository _letterCardRepository;
+        private readonly INonPlayerCharacterRepository _nonPlayerCharacterRepository;
         private readonly LetterJamHubContext _letterJamHubContext;
 
         public PlayerStatusService(
@@ -30,6 +34,9 @@ namespace GooseGames.Services.LetterJam
             IRoundRepository roundRepository,
             IGameRepository gameRepository,
             IPlayerStateRepository playerStateRepository,
+            IClueLetterRepository clueLetterRepository,
+            ILetterCardRepository letterCardRepository,
+            INonPlayerCharacterRepository nonPlayerCharacterRepository,
             LetterJamHubContext letterJamHubContext)
         {
             _sessionService = sessionService;
@@ -37,6 +44,9 @@ namespace GooseGames.Services.LetterJam
             _roundRepository = roundRepository;
             _gameRepository = gameRepository;
             _playerStateRepository = playerStateRepository;
+            _clueLetterRepository = clueLetterRepository;
+            _letterCardRepository = letterCardRepository;
+            _nonPlayerCharacterRepository = nonPlayerCharacterRepository;
             _letterJamHubContext = letterJamHubContext;
         }
 
@@ -140,31 +150,112 @@ namespace GooseGames.Services.LetterJam
 
             if (await AllPlayersMatchStatusAsync(request.GameId, PlayerStatus.ReadyForNextRound))
             {
-                //TODO: Should really check here whether anyone's got any letters left to guess!
-
-                //TODO: Need to move any NPC letters used on to next letter.
-
                 var game = await _gameRepository.GetAsync(request.GameId);
 
                 var currentRound = await _roundRepository.GetAsync(game.CurrentRoundId.Value);
 
-                var newRound = new Round
+                var currentRoundId = game.CurrentRoundId.Value;
+                var currentRoundClueId = currentRound.ClueId.Value;
+                
+                await UpdateNpcCardsForClueAsync(request, currentRoundClueId);                
+
+                var players = await _playerStateRepository.GetPlayerStatesAndCardsForGame(request.GameId);
+
+                if (players.All(p => p.CurrentLetterId == null || p.CurrentLetter.BonusLetter))
                 {
-                    Id = Guid.NewGuid(),
-                    GameId = game.Id,
-                    RoundNumber = currentRound.RoundNumber + 1,
-                    RoundStatus = RoundStatus.ProposingClues
-                };
-                await _roundRepository.InsertAsync(newRound);
+                    //TODO: Trigger game end
+                }
+                else
+                {
+                    //TODO: Give players without a letter a new bonus letter.
+                    await AssignNewBonusLettersAsync(request, players);
 
-                game.CurrentRoundId = newRound.Id;
-                await _gameRepository.UpdateAsync(game);
 
-                await UpdateAllPlayersForGameAsync(game.Id, PlayerStatus.ProposingClues);
+                    var newRound = new Round
+                    {
+                        Id = Guid.NewGuid(),
+                        GameId = game.Id,
+                        RoundNumber = currentRound.RoundNumber + 1,
+                        RoundStatus = RoundStatus.ProposingClues
+                    };
+                    await _roundRepository.InsertAsync(newRound);
 
-                await _letterJamHubContext.SendBeginNewRoundAsync(request.SessionId, newRound.Id);
+                    game.CurrentRoundId = newRound.Id;
+                    await _gameRepository.UpdateAsync(game);
+
+                    await UpdateAllPlayersForGameAsync(game.Id, PlayerStatus.ProposingClues);
+
+                    await _letterJamHubContext.SendBeginNewRoundAsync(request.SessionId, newRound.Id);
+                }
+
             }
             return GenericResponseBase.Ok();
+        }
+
+        private async Task AssignNewBonusLettersAsync(PlayerSessionGameRequest request, IList<PlayerState> players)
+        {
+            var cards = new List<LetterCard>();
+            foreach (var player in players.Where(p => p.CurrentLetterId == null))
+            {
+                var card = await _letterCardRepository.GetNextUndiscardedCardAsync(request.GameId);
+                card.PlayerId = player.PlayerId;
+                card.BonusLetter = true;
+                await _letterCardRepository.UpdateAsync(card);
+
+                player.CurrentLetter = card;
+                player.CurrentLetterId = card.Id;
+                player.CurrentLetterIndex = null;
+
+                await _playerStateRepository.UpdateAsync(player);
+                await _letterJamHubContext.SendNewBonusCardAsync(request.SessionId, new LetterCardResponse { 
+                    BonusLetter = true,
+                    CardId = card.Id,
+                    Letter = card.Letter, 
+                    PlayerId = player.PlayerId
+                });
+            }
+        }
+
+        private async Task UpdateNpcCardsForClueAsync(PlayerSessionGameRequest request, Guid currentRoundClueId)
+        {
+            var currentClueNpcLetters = await _clueLetterRepository.GetNonPlayerCharacterLettersUsedForClueAsync(currentRoundClueId);
+            var npcLetterCards = currentClueNpcLetters.Select(s => s.LetterCard).Distinct();
+            var npcIds = currentClueNpcLetters.Select(s => s.NonPlayerCharacterId.Value).Distinct();
+
+            foreach (var npcCard in npcLetterCards)
+            {
+                npcCard.NonPlayerCharacterId = null;
+                npcCard.Discarded = true;
+            }
+            await _letterCardRepository.UpdateRangeAsync(npcLetterCards);
+
+            var npcs = new List<NonPlayerCharacter>();
+            foreach (var npcId in npcIds)
+            {
+                var npc = await _nonPlayerCharacterRepository.GetAsync(npcId);
+                if (!npc.ClueReleased)
+                {
+                    var nextNpcCard = await _letterCardRepository.GetNextNpcCardAsync(npcId, npc.CurrentLetterId.Value);
+
+                    npc.CurrentLetterId = nextNpcCard.Id;
+                    npc.NumberOfLettersRemaining -= 1;
+                    if (npc.NumberOfLettersRemaining == 0)
+                    {
+                        npc.ClueReleased = true;
+                    }
+                }
+                else
+                {
+                    var nextNpcCard = await _letterCardRepository.GetNextUndiscardedCardAsync(request.GameId);
+                    nextNpcCard.NonPlayerCharacterId = npc.Id;
+
+                    await _letterCardRepository.UpdateAsync(nextNpcCard);
+
+                    npc.CurrentLetterId = nextNpcCard.Id;
+                }
+                npcs.Add(npc);
+            }
+            await _nonPlayerCharacterRepository.UpdateRangeAsync(npcs);
         }
 
         internal async Task<GenericResponse<IEnumerable<Models.Responses.LetterJam.PlayerActionResponse>>> GetPlayerActionsAsync(PlayerSessionGameRequest request, PlayerStatusId desiredPlayerStatus)

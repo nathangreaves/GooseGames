@@ -35,7 +35,8 @@
           <div *ngFor="let letter of MyLetters; let i=index;" class="letter-display-item">
 
             <div class="player-card player-shown-card" [ngClass]="{
-         'bonus-card' : letter.bonusLetter
+         'bonus-card' : letter.bonusLetter,
+         'player-hidden-card' : indexGreaterThanCurrentLetterIndex(i, CurrentLetterIndex)
          }">
               <span *ngIf="letter.playerLetterGuess">{{letter.playerLetterGuess}}</span>
               <span *ngIf="!letter.playerLetterGuess && i === CurrentLetterIndex">?</span>
@@ -51,3 +52,25 @@
     </div>
   </div>
 </div>
+
+<ng-template #myLettersModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">My Letters</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body" *ngIf="myLettersModalParameters">
+    <letterjam-my-letters [parameters]="myLettersModalParameters">
+    </letterjam-my-letters>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary mr-auto" (click)="modal.dismiss()">
+      Cancel
+    </button>
+    <button class="btn btn-primary" (click)="UpdateLetterGuesses()">
+      Save
+    </button>
+  </div>
+
+</ng-template>

@@ -1,6 +1,8 @@
 ﻿using Entities.LetterJam.Enums;
+using GooseGames.Hubs;
 using GooseGames.Logging;
 using Models.Requests;
+using Models.Requests.LetterJam;
 using Models.Responses;
 using Models.Responses.LetterJam;
 using RepositoryInterface.LetterJam;
@@ -17,6 +19,7 @@ namespace GooseGames.Services.LetterJam
         private readonly IClueRepository _clueRepository;
         private readonly IPlayerStateRepository _playerStateRepository;
         private readonly ILetterCardRepository _letterCardRepository;
+        private readonly LetterJamHubContext _letterJamHubContext;
         private readonly RequestLogger<MyJamService> _logger;
 
         public MyJamService(
@@ -24,12 +27,14 @@ namespace GooseGames.Services.LetterJam
             IClueRepository clueRepository,
             IPlayerStateRepository playerStateRepository,
             ILetterCardRepository letterCardRepository,
+            LetterJamHubContext letterJamHubContext,
             RequestLogger<MyJamService> logger)
         {
             _roundRepository = roundRepository;
             _clueRepository = clueRepository;
             _playerStateRepository = playerStateRepository;
             _letterCardRepository = letterCardRepository;
+            _letterJamHubContext = letterJamHubContext;
             _logger = logger;
         }
 
@@ -62,6 +67,83 @@ namespace GooseGames.Services.LetterJam
                     };
                 })
             });
+        }
+
+        internal async Task<GenericResponseBase> PostLetterGuessesAsync(MyJamLetterGuessesRequest request)
+        {
+            var cardList = request.LetterGuesses.Select(x => x.CardId).ToList();
+
+            var cards = await _letterCardRepository.FilterAsync(c => cardList.Contains(c.Id));
+
+            var playerState = await _playerStateRepository.SingleOrDefaultAsync(p => p.PlayerId == request.PlayerId);
+
+            foreach (var card in cards)
+            {
+                var guess = request.LetterGuesses.Single(g => g.CardId == card.Id);
+                card.PlayerLetterGuess = guess.PlayerLetterGuess;
+
+                if (card.BonusLetter && guess.PlayerLetterGuess.HasValue)
+                {
+                    var correct = card.Letter == guess.PlayerLetterGuess;
+                    await _letterJamHubContext.SendBonusLetterGuessedAsync(request.SessionId, new Models.HubMessages.LetterJam.BonusLetterGuessMessage 
+                    { 
+                        ActualLetter = card.Letter,
+                        GuessedLetter = guess.PlayerLetterGuess.Value,
+                        CardId = card.Id,
+                        Correct = correct,
+                        PlayerId = request.PlayerId
+                    });
+                    card.PlayerId = null;
+                    //Either way card no longer belongs to player
+
+                    if (card.Letter == guess.PlayerLetterGuess)
+                    {
+                        //TODO: ?
+                    }
+                    else
+                    {
+                        card.BonusLetter = false;
+                        card.Discarded = true;
+                    }
+
+                    playerState.CurrentLetterId = null;
+                    playerState.CurrentLetterIndex = null;
+                    await _playerStateRepository.UpdateAsync(playerState);
+                }
+            }
+
+            if (request.MoveOnToNextLetter)
+            {
+                var nextCard = cards.Where(c => c.LetterIndex > playerState.CurrentLetterIndex).OrderBy(c => c.LetterIndex).FirstOrDefault();
+
+                if (nextCard != null)
+                {
+                    playerState.CurrentLetterIndex = nextCard.LetterIndex;
+                    playerState.CurrentLetterId = nextCard.Id;
+
+                    await _letterJamHubContext.SendPlayerMovedOnToNextCard(request.SessionId, request.PlayerId, new LetterCardResponse
+                    {
+                        CardId = nextCard.Id,
+                        PlayerId = playerState.PlayerId,
+                        BonusLetter = false,
+                        Letter = nextCard.Letter,
+                        NonPlayerCharacterId = null
+                    });
+                }
+                else
+                {
+                    playerState.CurrentLetterIndex = null;
+                    playerState.CurrentLetterId = null;
+
+                    await _letterJamHubContext.SendPlayerMovedOnToNextCard(request.SessionId, request.PlayerId, null);
+                }
+
+                await _playerStateRepository.UpdateAsync(playerState);
+            }
+
+            await _letterCardRepository.UpdateRangeAsync(cards);
+
+            return GenericResponseBase.Ok();
         }
     }
 }

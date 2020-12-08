@@ -1,9 +1,13 @@
 ﻿using Entities.LetterJam;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using MSSQLRepository.Contexts;
 using RepositoryInterface.LetterJam;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MSSQLRepository.LetterJam
 {
@@ -21,6 +25,17 @@ namespace MSSQLRepository.LetterJam
             : base(context)
         {
 
+        }
+
+        public async Task<IList<ClueLetter>> GetNonPlayerCharacterLettersUsedForClueAsync(Guid clueId)
+        {
+            var clueLetters = await Context.ClueLetters.AsQueryable()
+                .Include(x => x.LetterCard)
+                .Where(x => x.ClueId == clueId && x.NonPlayerCharacterId.HasValue)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return clueLetters;
         }
     }
 }

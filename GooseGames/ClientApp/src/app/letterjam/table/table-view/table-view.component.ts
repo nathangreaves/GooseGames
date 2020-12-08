@@ -5,6 +5,8 @@ import { IPlayerSessionGame } from '../../../../models/session';
 import { TableComponentBase, ITableComponentParameters } from '../table-base.component';
 import _ from 'lodash';
 import { AllPlayersFromCacheRequest } from '../../../../models/letterjam/content';
+import { IClueLetter } from '../../../../models/letterjam/clues';
+import { IBonusLetterGuess, ILetterCard } from '../../../../models/letterjam/letters';
 
 
 
@@ -33,9 +35,15 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
     this.load();
 
     this.parameters.hubConnection.on("tokenUpdate", this.processTokenUpdate);
+    this.parameters.hubConnection.on("playerMovedOnToNextCard", this.onPlayerMovedOnToNextCard);
+    this.parameters.hubConnection.on("newBonusCard", this.onNewBonusCard);
+    this.parameters.hubConnection.on("bonusLetterGuessed", this.onBonusLetterGuessed);
   }
   ngOnDestroy(): void {
     this.parameters.hubConnection.off("tokenUpdate", this.processTokenUpdate);
+    this.parameters.hubConnection.off("playerMovedOnToNextCard", this.onPlayerMovedOnToNextCard);
+    this.parameters.hubConnection.off("newBonusCard", this.onNewBonusCard);
+    this.parameters.hubConnection.off("bonusLetterGuessed", this.onBonusLetterGuessed);
   }
 
   processTokenUpdate = (tokenUpdate: ITokenUpdate) => {
@@ -63,6 +71,44 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
         var nPC = _.find(this.NonPlayerCharacters, p => p.playerId == nonPlayerCharachterId);
         nPC.clueReleased = true;
       });
+    }
+  }
+
+  onPlayerMovedOnToNextCard = (playerId: string, nextCard: ILetterCard) => {
+
+    if (playerId !== this.parameters.request.PlayerId) {
+      var player = _.find(this.Players, p => p.playerId === playerId);
+      if (player) {        
+        player.currentLetterIndex = player.currentLetterIndex + 1;
+        player.currentLetterId = nextCard.cardId;
+        player.currentLetter = nextCard;
+      }
+    }
+  }
+  onNewBonusCard = (newBonusCard: ILetterCard) => {
+    if (newBonusCard.playerId !== this.parameters.request.PlayerId) {
+      var player = _.find(this.Players, p => p.playerId === newBonusCard.playerId);
+      if (player) {
+        player.currentLetterIndex = null;
+        player.currentLetterId = newBonusCard.cardId;
+        player.currentLetter = newBonusCard;
+        if (player.cards.length == player.numberOfLetters) {
+          player.cards.push(player.cards.length);
+        }
+      }
+    }
+  }
+  onBonusLetterGuessed = (bonusLetterGuess: IBonusLetterGuess) => {
+    if (bonusLetterGuess.playerId !== this.parameters.request.PlayerId) {
+      var player = _.find(this.Players, p => p.playerId === bonusLetterGuess.playerId);
+      if (player) {
+        player.currentLetterIndex = null;
+        player.currentLetterId = null;
+        player.currentLetter = null;
+        if (player.cards.length >= player.numberOfLetters) {
+          player.cards.pop();
+        }
+      }
     }
   }
 

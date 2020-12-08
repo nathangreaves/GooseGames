@@ -38,6 +38,7 @@ namespace MSSQLRepository.Contexts
             modelBuilder.Entity<ClueVote>().HasOne(c => c.Round).WithMany().HasForeignKey(c => c.RoundId).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<ClueVote>().HasOne(c => c.Clue).WithMany().HasForeignKey(c => c.ClueId);
             modelBuilder.Entity<ClueLetter>().HasOne(c => c.Clue).WithMany().HasForeignKey(c => c.ClueId);
+            modelBuilder.Entity<ClueLetter>().HasOne(c => c.LetterCard).WithMany().HasForeignKey(c => c.LetterCardId);
         }
 
         public DbSet<Game> Games { get; set; }

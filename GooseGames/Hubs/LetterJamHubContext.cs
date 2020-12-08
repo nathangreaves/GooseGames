@@ -1,4 +1,5 @@
-﻿using GooseGames.Logging;
+﻿using Entities.LetterJam;
+using GooseGames.Logging;
 using Microsoft.AspNetCore.SignalR;
 using Models.HubMessages.LetterJam;
 using Models.Requests;
@@ -89,6 +90,8 @@ namespace GooseGames.Hubs
             _logger.LogInformation($"Sending newClue: to {sessionId}", proposedClue);
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("newClue", proposedClue);
         }
+
+
         internal async Task SendClueRemovedAsync(Guid sessionId, Guid clueId)
         {
             _logger.LogInformation($"Sending removeClue: to {sessionId} : clueId={clueId}");
@@ -111,6 +114,23 @@ namespace GooseGames.Hubs
         {
             _logger.LogInformation($"Sending tokenUpdate: to {sessionId}", update);
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("tokenUpdate", update);
+        }
+        
+        internal async Task SendPlayerMovedOnToNextCard(Guid sessionId, Guid playerId, LetterCardResponse letterCardResponse)
+        {
+            _logger.LogInformation($"Sending playerMovedOnToNextCard: to {sessionId} : playerId: {playerId}", letterCardResponse);
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerMovedOnToNextCard", playerId, letterCardResponse);
+        }
+
+        internal async Task SendNewBonusCardAsync(Guid sessionId, LetterCardResponse letterCardResponse)
+        {
+            _logger.LogInformation($"Sending newBonusCard: to {sessionId}", letterCardResponse);
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("newBonusCard", letterCardResponse);
+        }
+        internal async Task SendBonusLetterGuessedAsync(Guid sessionId, BonusLetterGuessMessage message)
+        {
+            _logger.LogInformation($"Sending bonusLetterGuessed: to {sessionId}", message);
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("bonusLetterGuessed", message);
         }
     }
 }

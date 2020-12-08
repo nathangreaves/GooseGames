@@ -4,14 +4,16 @@ using MSSQLRepository.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MSSQLRepository.Migrations.LetterJam
 {
     [DbContext(typeof(LetterJamContext))]
-    partial class LetterJamContextModelSnapshot : ModelSnapshot
+    [Migration("20201208230250_ClueLetterCardRelationship")]
+    partial class ClueLetterCardRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

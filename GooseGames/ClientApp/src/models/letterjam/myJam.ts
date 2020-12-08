@@ -27,3 +27,8 @@ export class MyJamRound implements IMyJamRound {
   loadingPlayer: boolean;
   loadingLetters: boolean;
 }
+
+export interface ILetterGuess {
+  cardId: string;
+  playerLetterGuess: string;
+}

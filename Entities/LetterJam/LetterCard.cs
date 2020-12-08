@@ -18,5 +18,6 @@ namespace Entities.LetterJam
         public int? LetterIndex { get; set; }
         public char? PlayerLetterGuess { get; set; }
         public bool BonusLetter { get; set; }
+        public bool Discarded { get; set; }
     }
 }
