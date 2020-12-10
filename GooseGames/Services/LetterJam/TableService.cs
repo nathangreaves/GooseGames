@@ -97,7 +97,7 @@ namespace GooseGames.Services.LetterJam
                         NumberOfGreenCluesGiven = (p.NumberOfCluesGiven > numberOfRedCluesPerPlayer) ? p.NumberOfCluesGiven - numberOfRedCluesPerPlayer : 0,
                         NumberOfLetters = p.OriginalWordLength,
                         CurrentLetterIndex = p.CurrentLetterIndex,
-                        CurrentLetterId = p.CurrentLetterId.Value
+                        CurrentLetterId = p.CurrentLetterId
                     };
                 })),
                 NonPlayerCharacters = new List<TableNonPlayerCharacterResponse>(nonPlayerCharacters.OrderBy(nPC => nPC.PlayerNumber).Select(p =>

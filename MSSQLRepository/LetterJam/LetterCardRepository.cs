@@ -51,7 +51,8 @@ namespace MSSQLRepository.LetterJam
             {
                 if (letterIndex == 0)
                 {
-                    npcEntity.CurrentLetterId = letter.Id;                    
+                    npcEntity.CurrentLetterId = letter.Id;
+                    npcEntity.NumberOfLettersRemaining -= 1;
                 }
                 letter.NonPlayerCharacterId = npcEntity.Id;
                 letter.LetterIndex = letterIndex;

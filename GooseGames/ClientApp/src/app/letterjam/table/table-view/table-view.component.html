@@ -5,7 +5,7 @@
 
     <div *ngFor="let player of Players;" class="row">
       <div class="player-row real-player">
-        <div class="row" *ngIf="!player.loadingPlayer && player.player">
+        <div *ngIf="!player.loadingPlayer && player.player" class="row">
           <div class="col-5">
             <span class="player-name"><gg-emoji [emoji]="player.player.emoji"></gg-emoji> {{player.player.name}}</span>
           </div>
@@ -29,14 +29,21 @@
             </div>
           </div>
         </div>
-      </div>
-      <div class="row" *ngIf="player.loadingPlayer">
-        Loading...
-      </div>
+        <div *ngIf="player.loadingPlayer">
+          Loading...
+        </div>
+        <div class="row">
+          <div class="col-5"></div>
+          <div class="col-7 token-display mt-1 mb-1">
+            <div *ngFor="let token of tokenList(player.numberOfRedCluesGiven)" class="token red-token"></div>
+            <div *ngFor="let token of tokenList(player.numberOfGreenCluesGiven)" class="token green-token"></div>
+          </div>
+        </div>
+      </div>      
     </div>
     <div *ngFor="let player of NonPlayerCharacters;" class="row">
       <div class="player-row non-player-character">
-        <div class="row" *ngIf="!player.loadingPlayer && player.player">
+        <div *ngIf="!player.loadingPlayer && player.player" class="row">
           <div class="col-5">
             <span class="player-name"><gg-emoji [emoji]="player.player.emoji"></gg-emoji> {{player.player.name}}</span>
           </div>

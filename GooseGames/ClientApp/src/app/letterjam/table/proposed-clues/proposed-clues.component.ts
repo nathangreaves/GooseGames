@@ -4,7 +4,7 @@ import { LetterJamCluesService } from '../../../../services/letterjam/clues';
 import { AllPlayersFromCacheRequest, PlayersFromCacheRequest } from '../../../../models/letterjam/content';
 import { ProposedClue, ProposedClueVote, IProposedClue, RoundStatusEnum } from '../../../../models/letterjam/clues';
 import _ from 'lodash';
-import { LetterCard } from '../../../../models/letterjam/letters';
+import { LetterCard, ILetterCard } from '../../../../models/letterjam/letters';
 
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ILetterJamClueComponentParameters } from '../clue/clue.component';
@@ -39,6 +39,40 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
 
   ngOnInit(): void {
     this.load();
+    //this.parameters.hubConnection.on("tokenUpdate", this.processTokenUpdate);
+    //this.parameters.hubConnection.on("bonusLetterGuessed", this.onBonusLetterGuessed);
+
+  }
+
+
+  onPlayerMovedOnToNextCard = (playerId: string, nextCard: ILetterCard) => {
+    if (playerId !== this.parameters.request.PlayerId && nextCard) {
+      var relevantCard = _.find(this.RelevantLetters, p => p.playerId === playerId);
+      if (relevantCard) {
+
+        relevantCard.bonusLetter = nextCard.bonusLetter;
+        relevantCard.cardId = nextCard.cardId;
+        relevantCard.letter = nextCard.letter;
+      }
+    }
+  }
+  onNewBonusCard = (newBonusCard: ILetterCard) => {
+    if (newBonusCard.playerId !== this.parameters.request.PlayerId) {
+      var relevantCard = _.find(this.RelevantLetters, p => p.playerId === newBonusCard.playerId);
+      if (relevantCard) {
+
+        relevantCard.bonusLetter = newBonusCard.bonusLetter;
+        relevantCard.cardId = newBonusCard.cardId;
+        relevantCard.letter = newBonusCard.letter;
+      }
+    }
+  }
+  onNewNpcCard = (newNpcCard: ILetterCard) => {
+    var relevantCard = _.find(this.RelevantLetters, p => p.nonPlayerCharacterId === newNpcCard.nonPlayerCharacterId);
+    if (relevantCard) {
+      relevantCard.cardId = newNpcCard.cardId;
+      relevantCard.letter = newNpcCard.letter;
+    }
   }
 
   load = () => {
@@ -145,6 +179,11 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
     this.parameters.hubConnection.on("removeVote", this.onRemoveVote);
     this.parameters.hubConnection.on("newClue", this.onAddClue);
     this.parameters.hubConnection.on("removeClue", this.onRemoveClue);
+    this.parameters.hubConnection.on("playerMovedOnToNextCard", this.onPlayerMovedOnToNextCard);
+    this.parameters.hubConnection.on("newBonusCard", this.onNewBonusCard);
+    this.parameters.hubConnection.on("newNpcCard", this.onNewNpcCard);
+    this.parameters.hubConnection.on('giveClue', this.onGiveClue);
+    this.parameters.hubConnection.on('beginNewRound', this.onBeginNewRound);
   }
 
   ngOnDestroy() {
@@ -152,6 +191,17 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
     this.parameters.hubConnection.off("removeVote", this.onRemoveVote);
     this.parameters.hubConnection.off("newClue", this.onAddClue);
     this.parameters.hubConnection.off("removeClue", this.onRemoveClue);
+    this.parameters.hubConnection.off("playerMovedOnToNextCard", this.onPlayerMovedOnToNextCard);
+    this.parameters.hubConnection.off("newBonusCard", this.onNewBonusCard);
+    this.parameters.hubConnection.off("newNpcCard", this.onNewNpcCard);
+    this.parameters.hubConnection.off("giveClue", this.onGiveClue);
+    this.parameters.hubConnection.off('beginNewRound', this.onBeginNewRound);
+  }
+  onGiveClue = () => {
+    this.ProposedClues = [];
+  }
+  onBeginNewRound = () => {
+    this.ProposedClues = [];
   }
 
   loadRelevantLetters = (): Promise<any> => {
@@ -180,7 +230,7 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
       });
 
       _.each(this.RelevantLetters, l => {
-        if (!l.bonusLetter) {
+        if (!(l.bonusLetter && !l.playerId)) {
           l.player = _.find(r, fP => fP.id == l.playerId || fP.id == l.nonPlayerCharacterId);
         }
         l.loadingPlayer = false;

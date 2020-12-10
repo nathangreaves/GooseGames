@@ -122,6 +122,11 @@ namespace GooseGames.Hubs
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerMovedOnToNextCard", playerId, letterCardResponse);
         }
 
+        internal async Task SendNewNpcCardAsync(Guid sessionId, LetterCardResponse letterCardResponse)
+        {
+            _logger.LogInformation($"Sending newNpcCard: to {sessionId}", letterCardResponse);
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("newNpcCard", letterCardResponse);
+        }
         internal async Task SendNewBonusCardAsync(Guid sessionId, LetterCardResponse letterCardResponse)
         {
             _logger.LogInformation($"Sending newBonusCard: to {sessionId}", letterCardResponse);

@@ -3,6 +3,7 @@ using Entities.LetterJam.Enums;
 using GooseGames.Hubs;
 using GooseGames.Services.Global;
 using Microsoft.EntityFrameworkCore.Storage;
+using Models.HubMessages.LetterJam;
 using Models.Requests;
 using Models.Responses;
 using Models.Responses.LetterJam;
@@ -157,7 +158,7 @@ namespace GooseGames.Services.LetterJam
                 var currentRoundId = game.CurrentRoundId.Value;
                 var currentRoundClueId = currentRound.ClueId.Value;
                 
-                await UpdateNpcCardsForClueAsync(request, currentRoundClueId);                
+                await UpdateNpcCardsForClueAsync(request, currentRoundClueId, game);                
 
                 var players = await _playerStateRepository.GetPlayerStatesAndCardsForGame(request.GameId);
 
@@ -216,7 +217,7 @@ namespace GooseGames.Services.LetterJam
             }
         }
 
-        private async Task UpdateNpcCardsForClueAsync(PlayerSessionGameRequest request, Guid currentRoundClueId)
+        private async Task UpdateNpcCardsForClueAsync(PlayerSessionGameRequest request, Guid currentRoundClueId, Game game)
         {
             var currentClueNpcLetters = await _clueLetterRepository.GetNonPlayerCharacterLettersUsedForClueAsync(currentRoundClueId);
             var npcLetterCards = currentClueNpcLetters.Select(s => s.LetterCard).Distinct();
@@ -229,33 +230,58 @@ namespace GooseGames.Services.LetterJam
             }
             await _letterCardRepository.UpdateRangeAsync(npcLetterCards);
 
+            var unlockTokensFromNonPlayerCharacterIds = new List<Guid>();
+
             var npcs = new List<NonPlayerCharacter>();
             foreach (var npcId in npcIds)
             {
                 var npc = await _nonPlayerCharacterRepository.GetAsync(npcId);
+                LetterCard nextNpcCard;
                 if (!npc.ClueReleased)
                 {
-                    var nextNpcCard = await _letterCardRepository.GetNextNpcCardAsync(npcId, npc.CurrentLetterId.Value);
+                    nextNpcCard = await _letterCardRepository.GetNextNpcCardAsync(npcId, npc.CurrentLetterId.Value);
 
                     npc.CurrentLetterId = nextNpcCard.Id;
                     npc.NumberOfLettersRemaining -= 1;
                     if (npc.NumberOfLettersRemaining == 0)
                     {
                         npc.ClueReleased = true;
+
+                        game.LockedCluesRemaining -= 1;
+                        game.GreenCluesRemaining += 1;
+
+                        unlockTokensFromNonPlayerCharacterIds.Add(npc.Id);
                     }
                 }
                 else
                 {
-                    var nextNpcCard = await _letterCardRepository.GetNextUndiscardedCardAsync(request.GameId);
+                    nextNpcCard = await _letterCardRepository.GetNextUndiscardedCardAsync(request.GameId);
                     nextNpcCard.NonPlayerCharacterId = npc.Id;
 
                     await _letterCardRepository.UpdateAsync(nextNpcCard);
 
                     npc.CurrentLetterId = nextNpcCard.Id;
                 }
+
+                await _letterJamHubContext.SendNewNpcCardAsync(request.SessionId, new LetterCardResponse
+                {
+                    BonusLetter = true,
+                    CardId = nextNpcCard.Id,
+                    Letter = nextNpcCard.Letter,
+                    NonPlayerCharacterId = npc.Id
+                });
+
                 npcs.Add(npc);
             }
             await _nonPlayerCharacterRepository.UpdateRangeAsync(npcs);
+            if (unlockTokensFromNonPlayerCharacterIds.Any())
+            {
+                var tokenUpdate = new TokenUpdate
+                {
+                    UnlockTokensFromNonPlayerCharacterIds = unlockTokensFromNonPlayerCharacterIds
+                };
+                await _letterJamHubContext.SendTokenUpdate(request.SessionId, tokenUpdate); 
+            }
         }
 
         internal async Task<GenericResponse<IEnumerable<Models.Responses.LetterJam.PlayerActionResponse>>> GetPlayerActionsAsync(PlayerSessionGameRequest request, PlayerStatusId desiredPlayerStatus)

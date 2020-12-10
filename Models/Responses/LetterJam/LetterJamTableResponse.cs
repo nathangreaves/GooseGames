@@ -21,7 +21,7 @@ namespace Models.Responses.LetterJam
         public int NumberOfGreenCluesGiven { get; set; }
         public int NumberOfLetters { get; set; }
         public int? CurrentLetterIndex { get; set; }
-        public Guid CurrentLetterId { get; set; }
+        public Guid? CurrentLetterId { get; set; }
     }
 
     public class TableNonPlayerCharacterResponse

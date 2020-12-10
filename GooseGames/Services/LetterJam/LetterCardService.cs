@@ -98,7 +98,7 @@ namespace GooseGames.Services.LetterJam
             var nonPlayerCardIds = (await _nonPlayerCharacterRepository.GetPropertyForFilterAsync(p => p.GameId == request.GameId,
                 p => new KeyValuePair<Guid, Guid>(p.Id, p.CurrentLetterId.Value))).Select(p => p.Value).ToList();
 
-            var cards = await _letterCardRepository.FilterAsync(l => l.GameId == request.GameId && (playerCardIds.Contains(l.Id) || nonPlayerCardIds.Contains(l.Id) || l.BonusLetter));
+            var cards = await _letterCardRepository.FilterAsync(l => l.GameId == request.GameId && (playerCardIds.Contains(l.Id) || nonPlayerCardIds.Contains(l.Id) || (l.BonusLetter && l.PlayerId == null)));
 
             return GenericResponse<IEnumerable<LetterCardResponse>>.Ok(cards.OrderBy(c => c.PlayerId.HasValue ? 0 : c.NonPlayerCharacterId.HasValue ? 10 : 20).Select(c => 
             { 

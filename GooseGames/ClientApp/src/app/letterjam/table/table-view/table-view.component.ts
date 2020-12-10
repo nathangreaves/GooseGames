@@ -38,12 +38,14 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
     this.parameters.hubConnection.on("playerMovedOnToNextCard", this.onPlayerMovedOnToNextCard);
     this.parameters.hubConnection.on("newBonusCard", this.onNewBonusCard);
     this.parameters.hubConnection.on("bonusLetterGuessed", this.onBonusLetterGuessed);
+    this.parameters.hubConnection.on("newNpcCard", this.onNewNpcCard);
   }
   ngOnDestroy(): void {
     this.parameters.hubConnection.off("tokenUpdate", this.processTokenUpdate);
     this.parameters.hubConnection.off("playerMovedOnToNextCard", this.onPlayerMovedOnToNextCard);
     this.parameters.hubConnection.off("newBonusCard", this.onNewBonusCard);
     this.parameters.hubConnection.off("bonusLetterGuessed", this.onBonusLetterGuessed);
+    this.parameters.hubConnection.off("newNpcCard", this.onNewNpcCard);
   }
 
   processTokenUpdate = (tokenUpdate: ITokenUpdate) => {
@@ -75,8 +77,7 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
   }
 
   onPlayerMovedOnToNextCard = (playerId: string, nextCard: ILetterCard) => {
-
-    if (playerId !== this.parameters.request.PlayerId) {
+    if (playerId !== this.parameters.request.PlayerId && nextCard) {
       var player = _.find(this.Players, p => p.playerId === playerId);
       if (player) {        
         player.currentLetterIndex = player.currentLetterIndex + 1;
@@ -96,6 +97,17 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
           player.cards.push(player.cards.length);
         }
       }
+    }
+  }
+  onNewNpcCard = (newNpcCard: ILetterCard) => {
+    var npc = _.find(this.NonPlayerCharacters, p => p.playerId == newNpcCard.nonPlayerCharacterId);
+    if (npc) {
+      if (npc.numberOfLettersRemaining > 0) {
+        npc.numberOfLettersRemaining -= 1;
+        npc.cards.pop();
+      }
+      npc.currentLetter = newNpcCard;
+      npc.currentLetterId = newNpcCard.cardId;
     }
   }
   onBonusLetterGuessed = (bonusLetterGuess: IBonusLetterGuess) => {
@@ -192,5 +204,9 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
         p.loadingCard = false;
       });
     });
+  }
+
+  tokenList(numberOfTokens: number) {
+    return Array(numberOfTokens).fill(0).map((val, index) => index + val);
   }
 }

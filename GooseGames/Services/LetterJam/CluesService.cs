@@ -147,6 +147,11 @@ namespace GooseGames.Services.LetterJam
             var letters = await _letterCardRepository.FilterAsync(c => actualLetterIds.Contains(c.Id));
 
             var letterIndex = 0;
+
+            HashSet<Guid> playerIds = new HashSet<Guid>();
+            HashSet<Guid> nonPlayerIds = new HashSet<Guid>();
+            HashSet<Guid> bonusLetterIds = new HashSet<Guid>();
+
             foreach (var clueLetter in requestedClueLetters)
             {
                 LetterCard letter = null;
@@ -159,7 +164,7 @@ namespace GooseGames.Services.LetterJam
                     }
                 }
 
-                clueLetters.Add(new ClueLetter
+                ClueLetter newClueLetter = new ClueLetter
                 {
                     Id = Guid.NewGuid(),
                     Clue = clue,
@@ -170,25 +175,27 @@ namespace GooseGames.Services.LetterJam
                     BonusLetter = letter?.BonusLetter ?? false,
                     LetterIndex = letterIndex,
                     IsWildCard = clueLetter.IsWildCard
-                });
+                };
+                clueLetters.Add(newClueLetter);
+                
+                if (newClueLetter.PlayerId.HasValue)
+                {
+                    playerIds.Add(newClueLetter.PlayerId.Value);
+                }
+                else if (newClueLetter.NonPlayerCharacterId.HasValue)
+                {
+                    nonPlayerIds.Add(newClueLetter.NonPlayerCharacterId.Value);
+                }
+                else if (newClueLetter.BonusLetter)
+                {
+                    bonusLetterIds.Add(newClueLetter.LetterCardId.Value);
+                }
                 letterIndex++;
             }
 
-            foreach (var letter in clueLetters)
-            {
-                if (letter.PlayerId.HasValue)
-                {
-                    clue.NumberOfPlayerLetters += 1;
-                }
-                else if (letter.NonPlayerCharacterId.HasValue)
-                {
-                    clue.NumberOfNonPlayerLetters += 1;
-                }
-                else if (letter.BonusLetter)
-                {
-                    clue.NumberOfBonusLetters += 1;
-                }
-            }
+            clue.NumberOfPlayerLetters = playerIds.Count;
+            clue.NumberOfNonPlayerLetters = nonPlayerIds.Count;
+            clue.NumberOfBonusLetters = bonusLetterIds.Count;
             clue.NumberOfLetters = requestedClueLetters.Count();
 
             await _clueRepository.InsertAsync(clue);

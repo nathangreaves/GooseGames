@@ -1,6 +1,6 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { TableComponentBase, ITableComponentParameters } from '../table-base.component';
-import { LetterCard } from '../../../../models/letterjam/letters';
+import { LetterCard, ILetterCard } from '../../../../models/letterjam/letters';
 import { AllPlayersFromCacheRequest } from '../../../../models/letterjam/content';
 import _ from 'lodash';
 import { IGooseGamesPlayer } from '../../../../models/player';
@@ -16,7 +16,7 @@ export interface IProposeClueComponentParameters extends ITableComponentParamete
   styleUrls: ['../../common/letterjam.common.scss',
     './propose-clue.component.scss']
 })
-export class LetterJamProposeClueComponent extends TableComponentBase implements OnInit {
+export class LetterJamProposeClueComponent extends TableComponentBase implements OnInit, OnDestroy {
   @Input() parameters: IProposeClueComponentParameters;
 
   BuiltWord: LetterCard[] = [];
@@ -33,6 +33,54 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
 
   ngOnInit(): void {
     this.loadRelevantLetters().then(this.loadPlayers).then(this.loadHumanPlayers);
+    this.parameters.hubConnection.on("playerMovedOnToNextCard", this.onPlayerMovedOnToNextCard);
+    this.parameters.hubConnection.on("newBonusCard", this.onNewBonusCard);
+    this.parameters.hubConnection.on("newNpcCard", this.onNewNpcCard);
+    this.parameters.hubConnection.on('giveClue', this.onGiveClue);
+    this.parameters.hubConnection.on('beginNewRound', this.onBeginNewRound);
+  }
+  ngOnDestroy(): void {
+    this.parameters.hubConnection.off("playerMovedOnToNextCard", this.onPlayerMovedOnToNextCard);
+    this.parameters.hubConnection.off("newBonusCard", this.onNewBonusCard);
+    this.parameters.hubConnection.off("newNpcCard", this.onNewNpcCard);
+    this.parameters.hubConnection.off('giveClue', this.onGiveClue);
+    this.parameters.hubConnection.off('beginNewRound', this.onBeginNewRound);
+  }
+  onPlayerMovedOnToNextCard = (playerId: string, nextCard: ILetterCard) => {
+    if (playerId !== this.parameters.request.PlayerId && nextCard) {
+      var relevantCard = _.find(this.RelevantLetters, p => p.playerId === playerId);
+      if (relevantCard) {
+        this.BuiltWord = [];
+        relevantCard.bonusLetter = nextCard.bonusLetter;
+        relevantCard.cardId = nextCard.cardId;
+        relevantCard.letter = nextCard.letter;
+      }
+    }
+  }
+  onNewBonusCard = (newBonusCard: ILetterCard) => {
+    if (newBonusCard.playerId !== this.parameters.request.PlayerId) {
+      var relevantCard = _.find(this.RelevantLetters, p => p.playerId === newBonusCard.playerId);
+      if (relevantCard) {
+        this.BuiltWord = [];
+        relevantCard.bonusLetter = newBonusCard.bonusLetter;
+        relevantCard.cardId = newBonusCard.cardId;
+        relevantCard.letter = newBonusCard.letter;
+      }
+    }
+  }
+  onNewNpcCard = (newNpcCard: ILetterCard) => {
+    var relevantCard = _.find(this.RelevantLetters, p => p.nonPlayerCharacterId === newNpcCard.nonPlayerCharacterId);
+    if (relevantCard) {
+      this.BuiltWord = [];
+      relevantCard.cardId = newNpcCard.cardId;
+      relevantCard.letter = newNpcCard.letter;
+    }
+  }
+  onGiveClue = () => {
+    this.BuiltWord = [];
+  }
+  onBeginNewRound = () => {
+    this.BuiltWord = [];
   }
 
   loadRelevantLetters = (): Promise<any> => {
@@ -67,7 +115,7 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
     return this.parameters.getPlayersFromCache(new AllPlayersFromCacheRequest(true, true)).then(r => {
 
       _.each(this.RelevantLetters, l => {
-        if (!l.bonusLetter && l.cardId !== this.WildCardId) {
+        if (!(l.bonusLetter && !l.playerId) && l.cardId !== this.WildCardId) {
           l.player = _.find(r, fP => fP.id == l.playerId || fP.id == l.nonPlayerCharacterId);
         }
         l.loadingPlayer = false;
@@ -127,6 +175,7 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
   }
 
   Back = () => {
+    this.BuiltWord = [];
     this.parameters.proposedClues();
   }
 }
