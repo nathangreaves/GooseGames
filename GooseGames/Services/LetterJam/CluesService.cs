@@ -321,7 +321,6 @@ namespace GooseGames.Services.LetterJam
 
             playerState.NumberOfCluesGiven += 1;
 
-            //TODO: Give token update via SignalR
             await _letterJamHubContext.SendTokenUpdate(request.SessionId, tokenUpdate);
             await _playerStateRepository.UpdateAsync(playerState);
 
@@ -333,7 +332,24 @@ namespace GooseGames.Services.LetterJam
 
             await _playerStatusService.UpdateAllPlayersForGameAsync(request.GameId, PlayerStatus.ReceivedClue);
 
-            await _letterJamHubContext.GiveClueAsync(request, clue.ClueGiverPlayerId);
+            var letters = await _clueLetterRepository.GetForCluesAsync(new[] { clue.Id });
+
+            await _letterJamHubContext.GiveClueAsync(request.SessionId, new MyJamRound { 
+                ClueGiverPlayerId = clue.ClueGiverPlayerId,
+                ClueId = clue.Id,
+                RequestingPlayerReceivedClue = null,
+                Letters = letters[clue.Id].OrderBy(l => l.LetterIndex).Select(s => {
+                    return new ClueLetterResponse
+                    {
+                        CardId = s.LetterCardId,
+                        Letter = s.Letter,
+                        PlayerId = s.PlayerId,
+                        NonPlayerCharacterId = s.NonPlayerCharacterId,
+                        BonusLetter = s.BonusLetter,
+                        IsWildCard = s.IsWildCard
+                    };
+                })
+            });
 
             return GenericResponseBase.Ok();
         }

@@ -19,6 +19,7 @@ namespace GooseGames.Services.LetterJam
         private readonly IClueRepository _clueRepository;
         private readonly IPlayerStateRepository _playerStateRepository;
         private readonly ILetterCardRepository _letterCardRepository;
+        private readonly IClueLetterRepository _clueLetterRepository;
         private readonly LetterJamHubContext _letterJamHubContext;
         private readonly RequestLogger<MyJamService> _logger;
 
@@ -27,6 +28,7 @@ namespace GooseGames.Services.LetterJam
             IClueRepository clueRepository,
             IPlayerStateRepository playerStateRepository,
             ILetterCardRepository letterCardRepository,
+            IClueLetterRepository clueLetterRepository,
             LetterJamHubContext letterJamHubContext,
             RequestLogger<MyJamService> logger)
         {
@@ -34,6 +36,7 @@ namespace GooseGames.Services.LetterJam
             _clueRepository = clueRepository;
             _playerStateRepository = playerStateRepository;
             _letterCardRepository = letterCardRepository;
+            _clueLetterRepository = clueLetterRepository;
             _letterJamHubContext = letterJamHubContext;
             _logger = logger;
         }
@@ -47,13 +50,26 @@ namespace GooseGames.Services.LetterJam
             var letters = await _letterCardRepository.FilterAsync(lC => lC.PlayerId == request.PlayerId);
             var orderedLetters = letters.OrderBy(l => l.LetterIndex.GetValueOrDefault(int.MaxValue));
 
+            var clueLetters = await _clueLetterRepository.GetForCluesAsync(rounds.Select(r => r.ClueId.Value));
+
             return GenericResponse<MyJamResponse>.Ok(new MyJamResponse
             {
                 Rounds = rounds.OrderBy(r => r.RoundNumber).Select(r => {
+                    var roundClueLetters = clueLetters[r.ClueId.Value];
                     return new MyJamRound 
                     {
                         ClueGiverPlayerId = r.ClueGiverPlayerId.Value,
-                        ClueId = r.ClueId.Value
+                        ClueId = r.ClueId.Value,
+                        Letters = roundClueLetters.OrderBy(c => c.LetterIndex).Select(c => new ClueLetterResponse
+                        { 
+                            CardId = c.LetterCardId,
+                            Letter = c.Letter,
+                            BonusLetter = c.BonusLetter,
+                            IsWildCard = c.IsWildCard,
+                            PlayerId = c.PlayerId,
+                            NonPlayerCharacterId = c.NonPlayerCharacterId
+                        }),
+                        RequestingPlayerReceivedClue = roundClueLetters.Any(c => c.PlayerId == request.PlayerId)
                     };
                 }),
                 NumberOfLetters = player.OriginalWordLength,

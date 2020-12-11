@@ -1,5 +1,5 @@
 import { IGooseGamesPlayer } from "../player";
-import { ClueLetter } from "./clues";
+import { ClueLetter, IClueLetter } from "./clues";
 
 export interface IMyJam {
   rounds: IMyJamRound[];
@@ -11,6 +11,8 @@ export interface IMyJam {
 export interface IMyJamRound {
   clueGiverPlayerId: string;
   clueId: string;
+  requestingPlayerReceivedClue: boolean;
+  letters: IClueLetter[];
 }
 
 export interface IMyJamLetterCard {
@@ -26,6 +28,8 @@ export class MyJamRound implements IMyJamRound {
   letters: ClueLetter[];
   loadingPlayer: boolean;
   loadingLetters: boolean;
+  requestingPlayerReceivedClue: boolean;
+  letterIndex: number;
 }
 
 export interface ILetterGuess {

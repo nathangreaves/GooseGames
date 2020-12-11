@@ -13,7 +13,7 @@
             <div *ngFor="let playerCard of player.cards;let i = index;" class="player-card" [ngClass]="{
                  'player-shown-card' : shownCard(player, i),
                  'player-hidden-card' : hiddenCard(player, i),
-                 'bonus-card' : playerCard.bonusLetter
+                 'bonus-card' : player.currentLetter?.bonusLetter
                  }">
               <div *ngIf="shownCard(player, i)">
                 <div *ngIf="player.loadingCard">
@@ -55,8 +55,8 @@
               </div>
             </div>
 
-            <div *ngIf="player.numberOfLettersRemaining && player.numberOfLettersRemaining - 1" class="player-card player-hidden-card npc-hidden-cards">
-              {{player.numberOfLettersRemaining - 1}}
+            <div *ngIf="player.numberOfLettersRemaining" class="player-card player-hidden-card npc-hidden-cards">
+              {{player.numberOfLettersRemaining}}
             </div>
 
             <div *ngIf="!player.clueReleased" class="token-display-item npc-locked-clue">

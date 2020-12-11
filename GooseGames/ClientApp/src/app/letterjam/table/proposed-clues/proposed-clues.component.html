@@ -99,8 +99,8 @@
         <div class="letter-display" *ngIf="RelevantLetters">
           <div *ngFor="let letter of RelevantLetters;" class="letter-display-item">
 
-            <div *ngIf="letter.player">
-              <gg-emoji [emoji]="letter.player.emoji"></gg-emoji>
+            <div class="emoji-container">
+              <gg-emoji [emoji]="letter.player?.emoji"></gg-emoji>
             </div>
 
             <div class="player-card player-shown-card" [ngClass]="{

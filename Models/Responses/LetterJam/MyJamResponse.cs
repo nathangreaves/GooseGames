@@ -16,6 +16,8 @@ namespace Models.Responses.LetterJam
     {
         public Guid ClueGiverPlayerId { get; set; }
         public Guid ClueId { get; set; }
+        public bool? RequestingPlayerReceivedClue { get; set; }
+        public IEnumerable<ClueLetterResponse> Letters { get; set; }
     }
 
     public class MyJamLetterCard

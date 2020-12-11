@@ -129,6 +129,7 @@
     <None Remove="ClientApp\src\services\justone\round.ts" />
     <None Remove="ClientApp\src\services\justone\ui.ts" />
     <None Remove="ClientApp\src\services\letterjam\clues.ts" />
+    <None Remove="ClientApp\src\services\letterjam\colour.ts" />
     <None Remove="ClientApp\src\services\letterjam\letterCard.ts" />
     <None Remove="ClientApp\src\services\letterjam\myJam.ts" />
     <None Remove="ClientApp\src\services\letterjam\nonPlayerCharacter.ts" />
@@ -286,6 +287,7 @@
     <TypeScriptCompile Include="ClientApp\src\services\justone\session.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\justone\ui.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\letterjam\clues.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\letterjam\colour.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\letterjam\letterCard.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\letterjam\myJam.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\letterjam\nonPlayerCharacter.ts" />

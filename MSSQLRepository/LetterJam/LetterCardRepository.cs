@@ -91,14 +91,14 @@ namespace MSSQLRepository.LetterJam
         public async Task<LetterCard> GetNextUndiscardedCardAsync(Guid gameId)
         {
             var card = await Context.LetterCards
-                .Where(x => x.Discarded == false && x.NonPlayerCharacterId == null && x.PlayerId == null && x.BonusLetter == false)
+                .Where(x => x.GameId == gameId && x.Discarded == false && x.NonPlayerCharacterId == null && x.PlayerId == null && x.BonusLetter == false)
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
 
             if (card == null)
             {
                 var discardedCards = await Context.LetterCards
-                .Where(x => x.Discarded == true && x.NonPlayerCharacterId == null && x.PlayerId == null && x.BonusLetter == false)
+                .Where(x => x.GameId == gameId && x.Discarded == true && x.NonPlayerCharacterId == null && x.PlayerId == null && x.BonusLetter == false)
                 .ToListAsync()
                 .ConfigureAwait(false);
 
@@ -110,7 +110,7 @@ namespace MSSQLRepository.LetterJam
                 await UpdateRangeAsync(discardedCards);
 
                 card = await Context.LetterCards
-                .Where(x => x.Discarded == false && x.NonPlayerCharacterId == null && x.PlayerId == null && x.BonusLetter == false)
+                .Where(x => x.GameId == gameId && x.Discarded == false && x.NonPlayerCharacterId == null && x.PlayerId == null && x.BonusLetter == false)
                 .FirstOrDefaultAsync()
                 .ConfigureAwait(false);
             }

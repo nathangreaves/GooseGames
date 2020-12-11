@@ -13,6 +13,7 @@ export interface ILetterJamClueComponentParameters {
   getPlayersFromCache: (request: IGetPlayersFromCacheRequest) => Promise<IGooseGamesPlayer[]>;
   getCardsFromCache: (request: ICardsRequest) => Promise<ILetterCard[]>;
   clue: IClue;
+  highlightColour: string;
 }
 
 @Component({
@@ -92,5 +93,16 @@ export class LetterJamClueComponent implements OnInit {
 
   hide() {
     this.ShowAsPlayerId = null;
+  }
+
+  styleLetterCard = (letter: ClueLetter) => {
+    if (letter.playerId == this.parameters.request.PlayerId && this.parameters.highlightColour) {
+      var color = this.parameters.highlightColour;
+      return {
+        'border-color': color,
+        'box-shadow': `1px 1px 2px 0px ${color}`
+      }
+    }
+    return {};
   }
 }

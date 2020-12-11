@@ -1,12 +1,14 @@
 import { Component, OnInit, OnDestroy, Input, ViewChild, HostListener } from '@angular/core';
 import { TableComponentBase, ITableComponentParameters } from '../table-base.component';
 import { LetterJamMyJamService } from '../../../../services/letterjam/myJam';
-import { MyJamRound, IMyJamLetterCard } from '../../../../models/letterjam/myJam';
+import { MyJamRound, IMyJamLetterCard, IMyJamRound } from '../../../../models/letterjam/myJam';
 import _ from 'lodash';
 import { ILetterJamClueComponentParameters } from '../clue/clue.component';
-import { AllPlayersFromCacheRequest } from '../../../../models/letterjam/content';
+import { AllPlayersFromCacheRequest, PlayersFromCacheRequest } from '../../../../models/letterjam/content';
 import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { IMyLettersComponentParameters } from './my-letters/my-letters.component';
+import { GetColourFromLetterIndex, StyleLetterCardWithColour } from '../../../../services/letterjam/colour';
+import { ILetterCard, IBonusLetterGuess } from '../../../../models/letterjam/letters';
 
 export interface IMyJamComponentParameters extends ITableComponentParameters {
   proposeClue: () => void;
@@ -29,8 +31,10 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
   @Input() parameters: IMyJamComponentParameters;
 
   Rounds: MyJamRound[] = [];
+  FilteredRounds: MyJamRound[] = [];
   MyLetters: IMyJamLetterCard[];
   CurrentLetterIndex: number;
+  OnlyShowCluesForMe: boolean = true;
 
   constructor(private myJamService: LetterJamMyJamService,
     private modalService: NgbModal) {
@@ -39,10 +43,15 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
 
   ngOnInit(): void {
     this.parameters.hubConnection.on("giveClue", this.clueGiven);
+    this.parameters.hubConnection.on("playerMovedOnToNextCard", this.onPlayerMovedOnToNextCard);
+    this.parameters.hubConnection.on("newBonusCard", this.onNewBonusCard);
+    this.parameters.hubConnection.on("bonusLetterGuessed", this.onBonusLetterGuessed);
     this.load();
   }
   ngOnDestroy(): void {
     this.parameters.hubConnection.off("giveClue", this.clueGiven);
+    this.parameters.hubConnection.off("playerMovedOnToNextCard", this.onPlayerMovedOnToNextCard);
+    this.parameters.hubConnection.off("newBonusCard", this.onNewBonusCard);
   }
 
   getClueComponentProperties = (round: MyJamRound) => {
@@ -53,8 +62,17 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
       },
       getCardsFromCache: this.parameters.getCardsFromCache,
       getPlayersFromCache: this.parameters.getPlayersFromCache,
-      request: this.parameters.request
+      request: this.parameters.request,
+      highlightColour: round.requestingPlayerReceivedClue ? GetColourFromLetterIndex(round.letterIndex) : null
     }
+  }
+
+  LetterStyle = (letter: IMyJamLetterCard, index: number) => {
+    if (letter.bonusLetter) {
+      return {};
+    }
+    var color = GetColourFromLetterIndex(index + 1);
+    return StyleLetterCardWithColour(color);
   }
 
   load = () => {
@@ -69,14 +87,23 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
           var roundViewModel = <MyJamRound>{
             clueGiverPlayerId: round.clueGiverPlayerId,
             clueId: round.clueId,
-            letters: [],
+            requestingPlayerReceivedClue: round.requestingPlayerReceivedClue,
+            letters: round.letters,
             loadingLetters: true,
             loadingPlayer: true,
             player: null
           };
+          if (round.requestingPlayerReceivedClue) {
+            var letter = _.find(round.letters, l => l.playerId == this.parameters.request.PlayerId);
+            var indexOf = _.findIndex(this.MyLetters, l => l.cardId == letter.cardId);
+            if (indexOf >= 0) {
+              roundViewModel.letterIndex = indexOf + 1;
+            }
+          }
 
           this.Rounds.push(roundViewModel);
         });
+        this.FilterRounds();
 
         return response;
       }))
@@ -95,19 +122,64 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
     });
   }
 
-  clueGiven = (clueId: string, clueGiverPlayerId: string) => {
+  clueGiven = (round: IMyJamRound) => {
     var roundViewModel = <MyJamRound>{
-      clueGiverPlayerId: clueGiverPlayerId,
-      clueId: clueId,
-      letters: [],
+      clueGiverPlayerId: round.clueGiverPlayerId,
+      clueId: round.clueId,
+      requestingPlayerReceivedClue: round.requestingPlayerReceivedClue,
+      letters: round.letters,
       loadingLetters: true,
       loadingPlayer: true,
       player: null
     };
 
+    var letter = _.find(round.letters, l => l.playerId == this.parameters.request.PlayerId);
+    if (letter) {
+      roundViewModel.requestingPlayerReceivedClue = true;
+      var indexOf = _.findIndex(this.MyLetters, l => l.cardId == letter.cardId);
+      if (indexOf >= 0) {
+        roundViewModel.letterIndex = indexOf + 1;
+      }
+    }
     this.Rounds.push(roundViewModel);
+
+    return this.parameters.getPlayersFromCache(new PlayersFromCacheRequest([roundViewModel.clueGiverPlayerId], true, false)).then(r => {
+      var player = r[0];
+      roundViewModel.player = player;
+      roundViewModel.loadingPlayer = false;
+      this.FilterRounds();
+    });
   }
 
+
+  onPlayerMovedOnToNextCard = (playerId: string, nextCard: ILetterCard) => {
+    if (playerId == this.parameters.request.PlayerId) {
+      if (nextCard) {
+        this.CurrentLetterIndex = _.findIndex(this.MyLetters, c => c.cardId === nextCard.cardId);
+        if (this.CurrentLetterIndex < 0) {
+          this.CurrentLetterIndex = null;
+        }
+      }
+      else
+      {
+        this.CurrentLetterIndex = null;
+      }
+    }
+  }
+  onNewBonusCard = (newBonusCard: ILetterCard) => {
+    if (newBonusCard.playerId === this.parameters.request.PlayerId) {
+      this.MyLetters.push({
+        bonusLetter: true,
+        cardId: newBonusCard.cardId,
+        playerLetterGuess: null
+      });
+    }
+  }
+  onBonusLetterGuessed = (bonusLetterGuess: IBonusLetterGuess) => {
+    if (bonusLetterGuess.playerId === this.parameters.request.PlayerId) {
+      this.MyLetters.pop();
+    }
+  }
 
   moveOnToNextLetter = () => {
     this.shouldMoveOnToNextLetter = true;
@@ -144,6 +216,7 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
   UpdateLetterGuesses() {
 
     var myLetters = this.myLettersModalParameters.myLetters;
+    var originalLetters = this.MyLetters;
 
     var letterGuessRequest = myLetters.map(l => {
       return {
@@ -152,15 +225,18 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
       }
     });
 
+    this.MyLetters = myLetters;
     this.myJamService.PostLetterGuesses(this.parameters.request, letterGuessRequest, this.shouldMoveOnToNextLetter)
-      .then(response => this.HandleGenericResponseBase(response, () => {
-        this.MyLetters = myLetters;
+      .then(response => this.HandleGenericResponseBase(response, () => {        
         this.shouldMoveOnToNextLetter = false;
         this.myLettersModalRef.close();
 
         return response;
       }))
-      .catch(this.HandleGenericError);
+      .catch(() => {
+        this.HandleGenericError;
+        this.MyLetters = originalLetters;
+      });
   }
 
   @HostListener('window:popstate', ['$event'])
@@ -179,6 +255,33 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
   }
 
   indexGreaterThanCurrentLetterIndex(index: number, currentLetterIndex: number) {
-    return index > currentLetterIndex;
+    return currentLetterIndex != null && index > currentLetterIndex;
+  }
+
+  OnToggleCluesForMe = () => {
+    var onlyShowCluesForMe = !this.OnlyShowCluesForMe;
+    this.OnlyShowCluesForMe = onlyShowCluesForMe;
+
+    this.FilterRounds();
+  }
+
+  FilterRounds = () => {
+    if (this.OnlyShowCluesForMe) {
+      this.FilteredRounds = _.filter(this.Rounds, r => {
+
+        if (r.clueGiverPlayerId == this.parameters.request.PlayerId) {
+          return false;
+        }
+        if (!r.requestingPlayerReceivedClue) {
+          return false;
+        }
+
+        return true;
+
+      });
+    }
+    else {
+      this.FilteredRounds = this.Rounds;
+    }
   }
 }

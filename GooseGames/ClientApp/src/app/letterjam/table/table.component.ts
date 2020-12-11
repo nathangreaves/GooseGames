@@ -173,6 +173,7 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
         break;
     }
 
+    this.RefreshCache();
     this.getRelevantLetters();
     this.loadRound();
   }
@@ -204,7 +205,8 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
         clue: {
           id: clueId,
           letters: []
-        }
+        },
+        highlightColour: null
       };
 
       const modalState = {

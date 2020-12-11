@@ -35,6 +35,7 @@ export interface ILetterJamComponent extends ILetterJamComponentBase {
   SetSessionData: SetSessionData;
   ReadSessionData: ReadSessionData;
   GetPlayersFromCache: (request: IGetPlayersFromCacheRequest) => Promise<IGooseGamesPlayer[]>;
+  RefreshCache: () => void;
   //To hook this up, inherit from this interface, create a new enum value in WerewordsContentEnum
   //Then register your new component in module entryComponents in app.module.ts
   //Then add it to the collection RegisteredContent above
@@ -90,6 +91,7 @@ export class LetterJamComponentBase implements ILetterJamComponent {
   SetGameId: (gameId: string) => void;
   ReadSessionData: ReadSessionData;
   GetPlayersFromCache: (request: IGetPlayersFromCacheRequest) => Promise<IGooseGamesPlayer[]>;
+  RefreshCache: () => void;
 
   Route(status: LetterJamPlayerStatus) {
     this.router(status, false);

@@ -151,7 +151,7 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
               ...(<ITablePlayerBase>p),
               ...loadingProps,
               playerId: p.playerId,
-              cards: new Array(p.currentLetterIndex !== null ? p.numberOfLetters : p.numberOfLetters + 1).fill(0).map((a, index) => index)
+              cards: new Array((p.currentLetterIndex === null && p.currentLetterId !== null) ? p.numberOfLetters + 1 : p.numberOfLetters).fill(0).map((a, index) => index)
             };
             this.Players.push(player);
           }
@@ -193,6 +193,7 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
 
   loadCards = (): Promise<any> => {
     var currentLetters = _.map(this.Players, p => p.currentLetterId).concat(_.map(this.NonPlayerCharacters, p => p.currentLetterId));
+    currentLetters = _.filter(currentLetters, l => l != null);
 
     return this.parameters.getCardsFromCache({ cardIds: currentLetters, relevantCards: null }).then(r => {
       _.each(this.Players, p => {

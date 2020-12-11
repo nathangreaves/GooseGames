@@ -37,5 +37,19 @@ namespace MSSQLRepository.LetterJam
 
             return clueLetters;
         }
+
+        public async Task<Dictionary<Guid, IEnumerable<ClueLetter>>> GetForCluesAsync(IEnumerable<Guid> clueIds)
+        {
+            var clueIdsList = clueIds.ToList();
+
+            var clueLetters = await Context.ClueLetters.AsQueryable()
+                .Where(x => clueIdsList.Contains(x.ClueId))
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return clueLetters
+                .GroupBy(x => x.ClueId)
+                .ToDictionary(g => g.Key, g => g as IEnumerable<ClueLetter>);
+        }
     }
 }

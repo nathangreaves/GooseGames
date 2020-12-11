@@ -19,13 +19,26 @@
         width: 100%;
       }
 
-      .clue-name {
-        align-items: center;
-        display: flex;
+      .clue-info{
+          align-items: center;
+          display: flex;
+          padding-left: 10px;
+          padding-right: 5px;
       }
 
     }
   }
+}
+
+.letter-index{
+    font-size: 0.8rem;
+    min-width: 40px;
+}
+
+.my-jam-controls {
+  font-size: 0.8rem;
+  margin: 0;
+  margin-left: 20px;
 }
 
 .letter-box {

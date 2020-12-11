@@ -215,6 +215,7 @@ export class LetterJamComponent implements OnInit {
         (<ILetterJamComponent>componentRef.instance).ReadSessionData = this.ReadSessionData;
         (<ILetterJamComponent>componentRef.instance).SetGameId = this.SetGameId;
         (<ILetterJamComponent>componentRef.instance).GetPlayersFromCache = this.GetPlayersFromCache;
+        (<ILetterJamComponent>componentRef.instance).RefreshCache = this.RefreshCache;
       }
     }
 
@@ -289,7 +290,7 @@ export class LetterJamComponent implements OnInit {
 
   RefreshCache = (): Promise<any> => {
     this.PlayerCache = [];
-    this.NPCCache = []; //TODO: Get npcs
+    this.NPCCache = [];
 
     return Promise.all([this.getPlayers(), this.getNonPlayerCharacters()]);
   }

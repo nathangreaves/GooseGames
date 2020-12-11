@@ -104,10 +104,10 @@ namespace GooseGames.Hubs
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("promptGiveClue", cluePlayerId, clueId);
         }
 
-        internal async Task GiveClueAsync(ClueRequest request, Guid clueGiverPlayerId)
+        internal async Task GiveClueAsync(Guid sessionId, MyJamRound round)
         {
-            _logger.LogInformation($"Sending giveClue: to {request.SessionId} : clueId={request.ClueId}");
-            await _hub.Clients.Group(request.SessionId.ToString()).SendAsync("giveClue", request.ClueId, clueGiverPlayerId);
+            _logger.LogInformation($"Sending giveClue: to {sessionId}", round);
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("giveClue", round);
         }
 
         internal async Task SendTokenUpdate(Guid sessionId, TokenUpdate update)

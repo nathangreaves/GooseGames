@@ -1,19 +1,25 @@
 <div class="container proposed-clues">
 
   <div class="proposed-clues-container">
-
+    <div class="my-jam-controls">
+      <input type="checkbox" class="form-check-input" id="my-clues-toggle" [checked]="OnlyShowCluesForMe"
+           (change)="OnToggleCluesForMe()">
+      <label class="form-check-label" for="my-clues-toggle">Only show clues for me</label>
+    </div>
     <div class="alert alert-info" *ngIf="!Rounds.length">
       No Clues have been given yet!
     </div>
 
-    <div *ngFor="let round of Rounds;" class="proposed-clue-row">
+    <div *ngFor="let round of FilteredRounds;" class="proposed-clue-row">
       <div class="row" *ngIf="!round.loadingPlayer && round.player">
-        <div class="col-2 clue-name">
+        <div class="col-1 clue-info">
           <gg-emoji [emoji]="round.player.emoji"></gg-emoji>&nbsp;:
         </div>
-        <letterjam-clue class="col-10 w-100" [parameters]="getClueComponentProperties(round)">
+        <div class="col-11 pl-3 clue-info">
+          <letterjam-clue class="w-100" [parameters]="getClueComponentProperties(round)">
 
-        </letterjam-clue>
+          </letterjam-clue>
+        </div>
       </div>
 
 
@@ -37,7 +43,9 @@
             <div class="player-card player-shown-card" [ngClass]="{
          'bonus-card' : letter.bonusLetter,
          'player-hidden-card' : indexGreaterThanCurrentLetterIndex(i, CurrentLetterIndex)
-         }">
+         }"
+        [ngStyle]="!indexGreaterThanCurrentLetterIndex(i, CurrentLetterIndex) ? LetterStyle(letter, i) : {}"
+                 >
               <span *ngIf="letter.playerLetterGuess">{{letter.playerLetterGuess}}</span>
               <span *ngIf="!letter.playerLetterGuess && i === CurrentLetterIndex">?</span>
             </div>

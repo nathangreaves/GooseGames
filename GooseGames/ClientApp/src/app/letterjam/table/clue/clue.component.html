@@ -14,7 +14,7 @@
          'non-player-card' : letter.nonPlayerCharacterId,
          'bonus-card' : letter.bonusLetter,
          'wild-card' : letter.isWildCard
-         }">
+         }" [ngStyle]="styleLetterCard(letter)">
         <span *ngIf="letter.isWildCard || !(ShowAsPlayerId === letter.player?.id)">{{getLetter(letter)}}</span>
         <span *ngIf="!letter.isWildCard && (ShowAsPlayerId === letter.player?.id)">?</span>
       </div>

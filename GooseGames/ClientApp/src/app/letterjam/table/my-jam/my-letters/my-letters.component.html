@@ -4,11 +4,13 @@
       <div *ngFor="let letter of parameters.myLetters; let i=index;">
         <input class="player-card"
                [ngClass]="{
-                  'bonus-letter' : letter.bonusLetter,
+                  'bonus-card' : letter.bonusLetter,
                   'player-hidden-card' : IndexGreaterThanCurrentLetterIndex(i),
-                  'confirming-move' : ConfirmingMove && IndexOf(i, parameters.currentLetterIndex + 1)
+                  'player-shown-card' : !IndexGreaterThanCurrentLetterIndex(i),
+                  'confirming-move' : ConfirmingMove && (letter.bonusLetter || (parameters.currentLetterIndex != null && IndexOf(i, parameters.currentLetterIndex + 1)))
                }"
                [(ngModel)]="letter.playerLetterGuess"
+               [ngStyle]="!IndexGreaterThanCurrentLetterIndex(i) ? LetterStyle(letter, i) : {}"
                [name]="letter.cardId"
                [id]="letter.cardId"
                maxlength="1"

@@ -284,7 +284,8 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
         request: this.parameters.request,
         getCardsFromCache: this.parameters.getCardsFromCache,
         getPlayersFromCache: this.parameters.getPlayersFromCache,
-        clue: clue
+        clue: clue,
+        highlightColour: null
       };
 
       const modalState = {

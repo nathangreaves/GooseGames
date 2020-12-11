@@ -2,6 +2,7 @@ import { Component, OnInit, Input, ElementRef, ViewChildren, QueryList } from '@
 import { IMyJamLetterCard } from '../../../../../models/letterjam/myJam';
 import { IMyJamComponentParameters } from '../my-jam.component';
 import _ from 'lodash';
+import { GetColourFromLetterIndex, StyleLetterCardWithColour } from '../../../../../services/letterjam/colour';
 
 export interface IMyLettersComponentParameters {
   myLetters: IMyJamLetterCard[];
@@ -26,25 +27,37 @@ export class LetterJamMyLettersComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this.CanMoveOn = this.parameters.currentLetterIndex + 1 <= this.parameters.myLetters.length;
+    this.CanMoveOn = this.parameters.currentLetterIndex && this.parameters.currentLetterIndex + 1 <= this.parameters.myLetters.length;
   }
 
   ngAfterViewInit(): void{
-    var matchingItem = _.find(this.parameters.myLetters, (c, index) => index === this.parameters.currentLetterIndex);
+    var matchingItem = _.find(this.parameters.myLetters, (c, index) => index === this.parameters.currentLetterIndex || c.bonusLetter);
 
-    this.letterInputs.forEach(div => {
-      if (div.nativeElement.id == matchingItem.cardId) {
-        console.log(div.nativeElement.id);
-        div.nativeElement.focus();
-      }
-    });
+    if (matchingItem) {
+      this.letterInputs.forEach(div => {
+        if (div.nativeElement.id == matchingItem.cardId) {
+          console.log(div.nativeElement.id);
+          div.nativeElement.focus();
+        }
+      });
+    }
+  }
+
+  LetterStyle = (letter: IMyJamLetterCard, index: number) => {
+    if (letter.bonusLetter) {
+      return {};
+    }
+    var color = GetColourFromLetterIndex(index + 1);
+    return StyleLetterCardWithColour(color);
   }
 
   ConfirmMove = () => {
     this.parameters.moveOnToNextLetter();
     this.MoveConfirmed = true;
     this.ConfirmingMove = false;
-    this.parameters.currentLetterIndex += 1;
+    if (this.parameters.currentLetterIndex != null) {
+      this.parameters.currentLetterIndex += 1;
+    }
   }
 
   IndexOf(index: number, indexOf: number) {
@@ -52,6 +65,6 @@ export class LetterJamMyLettersComponent implements OnInit {
   }
 
   IndexGreaterThanCurrentLetterIndex(index: number) {
-    return index > this.parameters.currentLetterIndex;
+    return this.parameters.currentLetterIndex != null && index > this.parameters.currentLetterIndex;
   }
 }
