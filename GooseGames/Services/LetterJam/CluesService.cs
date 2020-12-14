@@ -208,7 +208,7 @@ namespace GooseGames.Services.LetterJam
                 NumberOfLetters = clue.NumberOfLetters,
                 NumberOfPlayerLetters = clue.NumberOfPlayerLetters,
                 NumberOfNonPlayerLetters = clue.NumberOfNonPlayerLetters,
-                NumberOfBonusLetters = clue.NumberOfNonPlayerLetters,
+                NumberOfBonusLetters = clue.NumberOfBonusLetters,
                 WildcardUsed = clue.WildcardUsed
             });
 
@@ -332,13 +332,21 @@ namespace GooseGames.Services.LetterJam
 
             await _playerStatusService.UpdateAllPlayersForGameAsync(request.GameId, PlayerStatus.ReceivedClue);
 
-            var letters = await _clueLetterRepository.GetForCluesAsync(new[] { clue.Id });
+            var letters = (await _clueLetterRepository.GetForCluesAsync(new[] { clue.Id }))[clue.Id];
+
+            foreach (var letter in letters.Where(l => l.LetterCardId.HasValue && l.BonusLetter && l.PlayerId == null))
+            {
+                var card = await _letterCardRepository.GetAsync(letter.LetterCardId.Value);
+                card.Discarded = true;
+                await _letterCardRepository.UpdateAsync(card);
+                await _letterJamHubContext.RemoveBonusCardAsync(request.SessionId, card.Id);
+            }
 
             await _letterJamHubContext.GiveClueAsync(request.SessionId, new MyJamRound { 
                 ClueGiverPlayerId = clue.ClueGiverPlayerId,
                 ClueId = clue.Id,
                 RequestingPlayerReceivedClue = null,
-                Letters = letters[clue.Id].OrderBy(l => l.LetterIndex).Select(s => {
+                Letters = letters.OrderBy(l => l.LetterIndex).Select(s => {
                     return new ClueLetterResponse
                     {
                         CardId = s.LetterCardId,

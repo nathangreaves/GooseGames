@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, OnDestroy, HostListener } from '@angular/core';
-import { LetterJamComponentBase, LetterJamPlayerStatus } from '../../../models/letterjam/content';
+import { LetterJamComponentBase, LetterJamPlayerStatus, PlayersFromCacheRequest } from '../../../models/letterjam/content';
 import { ITableViewParameters } from './table-view/table-view.component';
-import { ILetterCard } from '../../../models/letterjam/letters';
+import { ILetterCard, IBonusLetterGuess } from '../../../models/letterjam/letters';
 import { ICardsRequest } from '../../../models/letterjam/table';
 import { LetterJamLetterCardService } from '../../../services/letterjam/letterCard';
 import _ from 'lodash';
@@ -16,6 +16,7 @@ import { IMyJamComponentParameters } from './my-jam/my-jam.component';
 import { RoundStatusEnum } from '../../../models/letterjam/clues';
 import { LetterJamTableService } from '../../../services/letterjam/table';
 import { LetterJamPlayerStatusService } from '../../../services/letterjam/playerStatus';
+import { ILetterJamBonusLetterGuessedParameters } from './bonus-letter-guessed/bonus-letter-guessed.component';
 
 export enum TableComponentTabs {
   Table = 0,
@@ -34,6 +35,7 @@ const LocalStorageTabKey = "goose-games-letter-jam-table-tab";
 export class LetterJamTableComponent extends LetterJamComponentBase implements OnInit, OnDestroy {
 
   @ViewChild('giveClueModal') giveClueModal;
+  @ViewChild('bonusLetterGuessedModal') bonusLetterGuessedModal;
 
   tableViewParameters: ITableViewParameters;
   proposedCluesParameters: IProposedCluesComponentParameters;
@@ -56,6 +58,9 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   clueModalParameters: ILetterJamClueComponentParameters;
   giveClueModalRef: NgbModalRef;
 
+  bonusLetterGuessedModalParameters: ILetterJamBonusLetterGuessedParameters;
+  bonusLetterGuessedModalRef: NgbModalRef;
+
   constructor(private letterCardService: LetterJamLetterCardService,
     private clueService: LetterJamCluesService,
     private tableService: LetterJamTableService,
@@ -67,25 +72,30 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   Table = () => {
     this.TableLoaded = true;
     this.CurrentTabId = TableComponentTabs.Table;
-    this.setTabIdInLocalStorage();
+    this.onChangeTab();
   }
 
   ProposedClues = () => {
     this.ProposedCluesLoaded = true;
     this.CurrentTabId = TableComponentTabs.ProposedClues;
-    this.setTabIdInLocalStorage();
+    this.onChangeTab();
   }
 
   ProposeClue = () => {
     this.ProposeClueLoaded = true;
     this.CurrentTabId = TableComponentTabs.ProposeClue;
-    this.setTabIdInLocalStorage();
+    this.onChangeTab();
   }
 
   MyJam = () => {
     this.MyJamLoaded = true;
     this.CurrentTabId = TableComponentTabs.MyJam;
+    this.onChangeTab();
+  }
+
+  onChangeTab = () => {
     this.setTabIdInLocalStorage();
+    this.ClearErrorMessage();
   }
 
   ReadyForNextRound = () => {
@@ -130,12 +140,18 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
       getPlayersFromCache: this.GetPlayersFromCache,
       setCurrentRoundId: this.setCurrentRoundId,
       getCurrentRoundId: this.getCurrentRoundId,
-      hubConnection: this.HubConnection
-    }
+      hubConnection: this.HubConnection,
+      handleGenericError: this.HandleGenericError,
+      handleGenericResponse: this.HandleGenericResponse,
+      handleGenericResponseBase: this.HandleGenericResponseBase,
+      setErrorMessage: this.SetErrorMessage
+    };
 
     this.HubConnection.on('promptGiveClue', this.promptGiveClue);
     this.HubConnection.on('giveClue', this.clueGiven);
     this.HubConnection.on('beginNewRound', this.beginNewRound);
+    this.HubConnection.on('bonusLetterGuessed', this.onBonusLetterGuessed);
+    this.HubConnection.on('gameEndTriggered', this.onGameEndTriggered);
 
     this.tableViewParameters = <ITableViewParameters>{
       ...baseTableParameters
@@ -149,7 +165,8 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
       proposedClues: this.ProposedClues
     }
     this.myJamParameters = <IMyJamComponentParameters>{
-      ...baseTableParameters
+      ...baseTableParameters,
+      currentRoundStatus: () => this.RoundStatus
     }
 
     var tabItem = localStorage.getItem(LocalStorageTabKey);
@@ -182,6 +199,8 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
     this.HubConnection.off('promptGiveClue', this.promptGiveClue);
     this.HubConnection.off('giveClue', this.clueGiven);
     this.HubConnection.off('beginNewRound', this.beginNewRound);
+    this.HubConnection.off('bonusLetterGuessed', this.onBonusLetterGuessed);
+    this.HubConnection.off('gameEndTriggered', this.onGameEndTriggered);
   }
 
   loadRound() {
@@ -206,7 +225,8 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
           id: clueId,
           letters: []
         },
-        highlightColour: null
+        highlightColour: null,
+        showEmojis: true
       };
 
       const modalState = {
@@ -229,20 +249,24 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
         .finally(() => {
           this.clueModalParameters = null;
           this.giveClueModalRef = null;
-          this.onGiveClueModalDismissed();
+          this.onModalDismissed();
         });
     }
   }
 
   @HostListener('window:popstate', ['$event'])
-  dismissModal(event: Event) {
-    if (this.modalService.hasOpenModals()) {
-      this.modalService.dismissAll();
+  dismissModal(event: Event) {    
+    if (this.giveClueModalRef) {
+      this.giveClueModalRef.dismiss();
+      event.stopPropagation();
+    }
+    if (this.bonusLetterGuessedModalRef) {
+      this.bonusLetterGuessedModalRef.dismiss();
       event.stopPropagation();
     }
   }
 
-  onGiveClueModalDismissed = () => {
+  onModalDismissed = () => {
     if (window.history.state.modal === true) {
       window.history.state.modal = false;
       history.back();
@@ -261,6 +285,52 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
     this.clueService.GiveClue(this, this.getCurrentRoundId(), this.clueModalParameters.clue.id).then(() => {
       this.giveClueModalRef.close("ClueGiven");
     });
+  }
+
+  onBonusLetterGuessed = (bonusLetterGuess: IBonusLetterGuess) => {
+    if (bonusLetterGuess.playerId !== this.PlayerId && this.modalService.hasOpenModals()) {
+      return;
+    }
+
+    this.GetPlayersFromCache(new PlayersFromCacheRequest([bonusLetterGuess.playerId], true, false))
+      .then(response => {
+        var player = response[0];
+
+        this.bonusLetterGuessedModalParameters = {
+          ...bonusLetterGuess,
+          player: player,
+          sessionInfo: this
+        };
+
+        const modalState = {
+          modal: true,
+          desc: 'fake state for our modal'
+        };
+        history.pushState(modalState, null);
+        var modalRef = this.modalService.open(this.bonusLetterGuessedModal, { ariaLabelledBy: 'modal-basic-title' });
+        this.bonusLetterGuessedModalRef = modalRef;
+
+        return modalRef.result
+          .then(reason => {
+            if (reason != "ClueGiven") {
+              this.undoClueVote();
+            }
+          })
+          .catch(() => {
+            this.undoClueVote();
+          })
+          .finally(() => {
+            this.bonusLetterGuessedModalParameters = null;
+            this.bonusLetterGuessedModalRef = null;
+            this.onModalDismissed();
+          });
+      });
+
+  }
+
+  onGameEndTriggered = () => {
+    this.RoundStatus = RoundStatusEnum.GameEndTriggered;
+    this.PlayerStatus = LetterJamPlayerStatus.PreparingFinalWord;
   }
 
   beginNewRound = (roundId: string) => {

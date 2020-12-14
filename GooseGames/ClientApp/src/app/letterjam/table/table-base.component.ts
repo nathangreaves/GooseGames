@@ -13,39 +13,12 @@ export interface ITableComponentParameters {
   getCurrentRoundId: () => string;
   setCurrentRoundId: (currentRoundId: string) => void;
   hubConnection: signalR.HubConnection;
+  setErrorMessage: (errorMessage: string) => void;
+  handleGenericError: (err: any) => void;
+  handleGenericResponse: <T>(genericResponse: GenericResponse<T>, handleSuccess: GenericResponseHandler<T>) => GenericResponseBase | Promise<GenericResponseBase>;
+  handleGenericResponseBase: (genericResponse: GenericResponseBase, handleSuccess: GenericResponseBaseHandler) => GenericResponseBase | Promise<GenericResponseBase>;
 }
 
 export class TableComponentBase {
-
   Loading: boolean;
-  ErrorMessage: string;
-
-  HandleGenericResponse<T>(genericResponse: GenericResponse<T>, handleSuccess: GenericResponseHandler<T>) {
-    if (genericResponse.success) {
-      return handleSuccess(genericResponse.data);
-    }
-    else {
-      this.SetErrorMessage(genericResponse.errorCode);
-    }
-    return genericResponse;
-  }
-
-  HandleGenericResponseBase(genericResponse: GenericResponseBase, handleSuccess: GenericResponseBaseHandler) {
-    if (genericResponse.success) {
-      return handleSuccess();
-    }
-    else {
-      this.SetErrorMessage(genericResponse.errorCode);
-    }
-    return genericResponse;
-  }
-
-  SetErrorMessage = (err: string) => {
-    this.ErrorMessage = err;
-  }
-
-  HandleGenericError = (err: any) => {
-    console.error(err);
-    this.SetErrorMessage("Unexpected Error");
-  }
 }

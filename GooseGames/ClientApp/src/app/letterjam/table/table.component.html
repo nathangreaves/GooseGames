@@ -1,3 +1,6 @@
+<div class="alert alert-danger mt-2" *ngIf="ErrorMessage" (click)="ClearErrorMessage()">
+  {{ErrorMessage}}
+</div>
 <div *ngIf="TableLoaded" [hidden]="CurrentTabId !== 0" class="table-content">
   <letterjam-table-view [parameters]="tableViewParameters">
 
@@ -66,8 +69,29 @@
   </div>
 </div>
 
+<ng-template #bonusLetterGuessedModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Bonus Letter Guessed</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body" *ngIf="bonusLetterGuessedModalParameters">
+    <letterjam-bonus-letter-guessed [parameters]="bonusLetterGuessedModalParameters">
+
+    </letterjam-bonus-letter-guessed>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary ml-auto" (click)="modal.dismiss()">
+      Ok
+    </button>
+  </div>
+</ng-template>
+
 <ng-template #giveClueModal let-modal>
-  <letterjam-clue-modal *ngIf="clueModalParameters" [parameters]="clueModalParameters" [templates]="{
+  <letterjam-clue-modal *ngIf="clueModalParameters"
+                        [parameters]="clueModalParameters"
+                        [templates]="{
                           buttonsTemplate: giveClueButtonsTemplate,
                           clueInfoTemplate: giveClueInfoTemplate
                         }"

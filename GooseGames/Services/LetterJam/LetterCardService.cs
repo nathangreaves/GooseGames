@@ -128,6 +128,5 @@ namespace GooseGames.Services.LetterJam
                 };
             }));
         }
-
     }
 }

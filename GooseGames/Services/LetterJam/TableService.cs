@@ -19,6 +19,7 @@ namespace GooseGames.Services.LetterJam
         private readonly IPlayerStateRepository _playerStateRepository;
         private readonly INonPlayerCharacterRepository _nonPlayerCharacterRepository;
         private readonly IRoundRepository _roundRepository;
+        private readonly ILetterCardRepository _letterCardRepository;
         private readonly RequestLogger<TableService> _logger;
 
         public TableService(
@@ -27,6 +28,7 @@ namespace GooseGames.Services.LetterJam
             IPlayerStateRepository playerStateRepository,
             INonPlayerCharacterRepository nonPlayerCharacterRepository,
             IRoundRepository roundRepository,
+            ILetterCardRepository letterCardRepository,
             RequestLogger<TableService> logger)
         {
             _playerService = playerService;
@@ -34,6 +36,7 @@ namespace GooseGames.Services.LetterJam
             _playerStateRepository = playerStateRepository;
             _nonPlayerCharacterRepository = nonPlayerCharacterRepository;
             _roundRepository = roundRepository;
+            _letterCardRepository = letterCardRepository;
             _logger = logger;
         }
 
@@ -82,6 +85,12 @@ namespace GooseGames.Services.LetterJam
             }
             var playerNumbers = await _playerService.GetPlayerNumbersAsync(playerStates.Select(p => p.PlayerId));
 
+            var bonusCards = await _letterCardRepository
+                .GetPropertyForFilterAsync(lC => 
+                    lC.GameId == request.GameId && lC.BonusLetter && !lC.Discarded && lC.PlayerId == null,
+                    lC => new KeyValuePair<Guid, Guid>(lC.Id, lC.Id)
+                );
+
             return GenericResponse<TableResponse>.Ok(new TableResponse
             {
                 CurrentRoundId = game.CurrentRoundId.Value,
@@ -109,7 +118,8 @@ namespace GooseGames.Services.LetterJam
                         NumberOfLettersRemaining = p.NumberOfLettersRemaining,
                         ClueReleased = p.ClueReleased
                     };
-                }))
+                })),
+                BonusCardIds = bonusCards.Keys
             });
         }
     }

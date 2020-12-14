@@ -39,6 +39,8 @@ namespace MSSQLRepository.Contexts
             modelBuilder.Entity<ClueVote>().HasOne(c => c.Clue).WithMany().HasForeignKey(c => c.ClueId);
             modelBuilder.Entity<ClueLetter>().HasOne(c => c.Clue).WithMany().HasForeignKey(c => c.ClueId);
             modelBuilder.Entity<ClueLetter>().HasOne(c => c.LetterCard).WithMany().HasForeignKey(c => c.LetterCardId);
+
+            modelBuilder.Entity<FinalWordLetter>().HasOne(c => c.Game).WithMany().HasForeignKey(c => c.GameId);
         }
 
         public DbSet<Game> Games { get; set; }
@@ -49,5 +51,6 @@ namespace MSSQLRepository.Contexts
         public DbSet<Clue> Clues { get; set; }
         public DbSet<ClueVote> ClueVotes { get; set; }
         public DbSet<ClueLetter> ClueLetters { get; set; }
+        public DbSet<FinalWordLetter> FinalWordLetters { get; set; }
     }
 }

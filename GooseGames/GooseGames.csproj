@@ -94,6 +94,7 @@
     <None Remove="ClientApp\src\app\werewords\scaffolding\content.ts" />
     <None Remove="ClientApp\src\app\werewords\werewords.component.ts" />
     <None Remove="ClientApp\src\assets\tristate-switch.component.ts" />
+    <None Remove="ClientApp\src\models\error.ts" />
     <None Remove="ClientApp\src\models\fujiflush\card.ts" />
     <None Remove="ClientApp\src\models\fujiflush\fujiupdate.ts" />
     <None Remove="ClientApp\src\models\fujiflush\hand.ts" />
@@ -242,6 +243,7 @@
     <TypeScriptCompile Include="ClientApp\src\app\werewords\werewords.module.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\werewords\werewords.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\assets\tristate-switch.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\error.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\card.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\fujiupdate.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\hand.ts" />

@@ -39,6 +39,7 @@ export interface ITable {
   lockedCluesRemaining: number;
   players: ITablePlayer[];
   nonPlayerCharacters: ITableNonPlayerCharacter[];
+  bonusCardIds: string[];
 }
 
 export interface IRound {

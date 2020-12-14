@@ -6,7 +6,7 @@ import { TableComponentBase, ITableComponentParameters } from '../table-base.com
 import _ from 'lodash';
 import { AllPlayersFromCacheRequest } from '../../../../models/letterjam/content';
 import { IClueLetter } from '../../../../models/letterjam/clues';
-import { IBonusLetterGuess, ILetterCard } from '../../../../models/letterjam/letters';
+import { IBonusLetterGuess, ILetterCard, LetterCard } from '../../../../models/letterjam/letters';
 
 
 
@@ -26,6 +26,7 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
   TableData: ITable;
   Players: TablePlayer[] = [];
   NonPlayerCharacters: TableNonPlayerCharacter[] = [];
+  BonusCards: LetterCard[] = [];
 
   constructor(private tableService: LetterJamTableService) {
     super();
@@ -39,6 +40,7 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
     this.parameters.hubConnection.on("newBonusCard", this.onNewBonusCard);
     this.parameters.hubConnection.on("bonusLetterGuessed", this.onBonusLetterGuessed);
     this.parameters.hubConnection.on("newNpcCard", this.onNewNpcCard);
+    this.parameters.hubConnection.on('removeBonusCard', this.onRemoveBonusCard);
   }
   ngOnDestroy(): void {
     this.parameters.hubConnection.off("tokenUpdate", this.processTokenUpdate);
@@ -46,6 +48,7 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
     this.parameters.hubConnection.off("newBonusCard", this.onNewBonusCard);
     this.parameters.hubConnection.off("bonusLetterGuessed", this.onBonusLetterGuessed);
     this.parameters.hubConnection.off("newNpcCard", this.onNewNpcCard);
+    this.parameters.hubConnection.off('removeBonusCard', this.onRemoveBonusCard);
   }
 
   processTokenUpdate = (tokenUpdate: ITokenUpdate) => {
@@ -122,6 +125,24 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
         }
       }
     }
+
+    if (bonusLetterGuess.correct) {
+      this.BonusCards.push({
+        bonusLetter: true,
+        cardId: bonusLetterGuess.cardId,
+        letter: bonusLetterGuess.actualLetter,
+        loadingPlayer: false,
+        nonPlayerCharacterId: null,
+        player: null,
+        playerId: null
+      });
+    }
+  }
+  onRemoveBonusCard = (cardId: string) => {
+    var index = _.findIndex(this.BonusCards, b => b.cardId === cardId);
+    if (index >= 0) {
+      this.BonusCards.splice(index, 1);
+    }
   }
 
   shownCard = (player: TablePlayer, index: number) => {
@@ -135,7 +156,7 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
   load = () => {
     this.Loading = true;
     this.tableService.GetTable(this.parameters.request)
-      .then(response => this.HandleGenericResponse(response, r => {
+      .then(response => this.parameters.handleGenericResponse(response, r => {
 
         this.TableData = r;
         this.parameters.setCurrentRoundId(r.currentRoundId);
@@ -167,12 +188,25 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
 
           this.NonPlayerCharacters.push(player);
         });
+        _.each(r.bonusCardIds, c => {
+
+          this.BonusCards.push({
+            cardId: c,
+            bonusLetter: true,
+            letter: null,
+            loadingPlayer: false,
+            player: null,
+            nonPlayerCharacterId: null,
+            playerId: null
+          });
+
+        });
 
         this.Loading = false;
 
         return Promise.resolve(response);
       }))
-      .then(response => this.HandleGenericResponseBase(response, () => {
+      .then(response => this.parameters.handleGenericResponseBase(response, () => {
         return Promise.all([this.loadPlayers(), this.loadCards()]).then(() => response);
       }));
   }
@@ -192,7 +226,9 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
   }
 
   loadCards = (): Promise<any> => {
-    var currentLetters = _.map(this.Players, p => p.currentLetterId).concat(_.map(this.NonPlayerCharacters, p => p.currentLetterId));
+    var currentLetters = _.map(this.Players, p => p.currentLetterId)
+      .concat(_.map(this.NonPlayerCharacters, p => p.currentLetterId))
+      .concat(_.map(this.BonusCards, p => p.cardId));
     currentLetters = _.filter(currentLetters, l => l != null);
 
     return this.parameters.getCardsFromCache({ cardIds: currentLetters, relevantCards: null }).then(r => {
@@ -203,6 +239,10 @@ export class LetterJamTableViewComponent extends TableComponentBase implements O
       _.each(this.NonPlayerCharacters, p => {
         p.currentLetter = _.find(r, fP => fP.cardId == p.currentLetterId);
         p.loadingCard = false;
+      });
+      _.each(this.BonusCards, c => {
+        var letter = _.find(r, fP => fP.cardId == c.cardId);
+        c.letter = letter.letter;
       });
     });
   }

@@ -82,6 +82,7 @@ namespace GooseGames
             //Letter Jam
             services.AddScoped<Services.LetterJam.CluesService>();
             services.AddScoped<Services.LetterJam.ClueVoteService>();
+            services.AddScoped<Services.LetterJam.FinalWordService>();
             services.AddScoped<Services.LetterJam.GameService>();
             services.AddScoped<Services.LetterJam.LetterCardService>();
             services.AddScoped<Services.LetterJam.LobbyService>();

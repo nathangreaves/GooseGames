@@ -12,5 +12,8 @@ export const RegisteredContent: LetterJamContent[] = [
   new LetterJamContent(LetterJamPlayerStatus.WaitingForFirstRound, LetterJamWaitingForFirstRoundComponent),
   new LetterJamContent(LetterJamPlayerStatus.ProposingClues, LetterJamTableComponent),
   new LetterJamContent(LetterJamPlayerStatus.ReceivedClue, LetterJamTableComponent),
-  new LetterJamContent(LetterJamPlayerStatus.ReadyForNextRound, LetterJamTableComponent)
+  new LetterJamContent(LetterJamPlayerStatus.ReadyForNextRound, LetterJamTableComponent),
+  new LetterJamContent(LetterJamPlayerStatus.PreparingFinalWord, LetterJamTableComponent),
+  new LetterJamContent(LetterJamPlayerStatus.ReadyForGameEnd, LetterJamTableComponent),
+  new LetterJamContent(LetterJamPlayerStatus.ReviewingGameEnd, LetterJamTableComponent)
 ];

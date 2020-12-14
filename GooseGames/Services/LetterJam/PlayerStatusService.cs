@@ -162,15 +162,24 @@ namespace GooseGames.Services.LetterJam
 
                 var players = await _playerStateRepository.GetPlayerStatesAndCardsForGame(request.GameId);
 
-                if (players.All(p => p.CurrentLetterId == null || p.CurrentLetter.BonusLetter))
+                if (players.All(p => p.CurrentLetterId == null || p.CurrentLetter.BonusLetter) || (game.GreenCluesRemaining == 0 && game.RedCluesRemaining == 0))
                 {
-                    //TODO: Trigger game end
+                    currentRound.RoundStatus = RoundStatus.GameEndTriggered;
+                    foreach (var player in players)
+                    {
+                        player.CurrentLetterIndex = null;
+                        player.CurrentLetter = null;
+                        player.CurrentLetterId = null;
+                        player.Status = PlayerStatus.PreparingFinalWord;
+                    }
+                    await _playerStateRepository.UpdateRangeAsync(players);
+                    await _roundRepository.UpdateAsync(currentRound);
+
+                    await _letterJamHubContext.SendGameEndTriggeredAsync(request.SessionId);
                 }
                 else
                 {
-                    //TODO: Give players without a letter a new bonus letter.
                     await AssignNewBonusLettersAsync(request, players);
-
 
                     var newRound = new Round
                     {

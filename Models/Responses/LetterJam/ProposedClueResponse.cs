@@ -34,6 +34,7 @@ namespace Models.Responses.LetterJam
     public enum RoundStatusEnum
     {
         ProposingClues = 1,
-        ReceivedClue = 2
+        ReceivedClue = 2,
+        GameEndTriggered = 3
     }
 }

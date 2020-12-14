@@ -1,5 +1,4 @@
 import { IGooseGamesPlayer } from "../player";
-import { ILetterCard } from "./letters";
 
 export interface IProposedClueBase {
   id: string;
@@ -14,7 +13,8 @@ export interface IProposedClueBase {
 export enum RoundStatusEnum {
 
   ProposingClues = 1,
-  ReceivedClue = 2
+  ReceivedClue = 2,
+  GameEndTriggered = 3
 }
 
 export interface IProposedClues {

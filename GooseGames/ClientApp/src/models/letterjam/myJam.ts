@@ -19,6 +19,7 @@ export interface IMyJamLetterCard {
   cardId: string;
   playerLetterGuess: string;
   bonusLetter: boolean;
+  isWildCard: boolean;
 }
 
 export class MyJamRound implements IMyJamRound {
@@ -32,7 +33,16 @@ export class MyJamRound implements IMyJamRound {
   letterIndex: number;
 }
 
+export interface IFinalWordPublicLetter extends IFinalWordLetter {  
+  letter: string;
+}
+
 export interface ILetterGuess {
   cardId: string;
   playerLetterGuess: string;
+}
+
+export interface IFinalWordLetter {
+  cardId: string;
+  isWildCard: boolean;
 }

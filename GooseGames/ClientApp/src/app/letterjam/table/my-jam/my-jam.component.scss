@@ -13,19 +13,26 @@
       /*padding: 0.3em;*/
       padding: 0;
       padding-bottom: 0.4em;
-      border-bottom: 1px solid black;
+      border-bottom: 1px solid #a0b0c080;
 
       .row {
         width: 100%;
+        margin-left: 0;
+        margin-right: 0;
       }
 
-      .clue-info{
-          align-items: center;
-          display: flex;
-          padding-left: 10px;
-          padding-right: 5px;
+      .clue-info {
+        align-items: center;
+        display: flex;
+        padding-left: 10px;
+        padding-right: 5px;
       }
+    }
 
+    .current-clue {
+      background: #a0b0c030;
+      border-radius: 5px;
+      border: 0px solid black;
     }
   }
 }
@@ -50,15 +57,26 @@
   left: 0;
   bottom: 70px;
   width: 100%;
-  height: 75px;
+  height: 85px;
   background: #fff;
   border-top: 1px solid black;
+
+  .my-jam-controls{
+      width: 100%;
+      margin-bottom: 5px;
+  }
+
+  .letter-box-main{
+      padding: 0;
+      margin: 0;
+  }
 }
 
 .letter-display {
   display: flex;
   flex-direction: row;
   align-items: center;
+  margin: 0;
 }
 
 .letter-display-item {
@@ -72,7 +90,7 @@
 }
 
 .filler {
-  height: 75px;
+  height: 85px;
 }
 .edit-letters-button {
   font-size: 0.9em;

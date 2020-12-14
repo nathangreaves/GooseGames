@@ -75,6 +75,9 @@ namespace Entities.LetterJam.Enums
         public static readonly PlayerStatusId ProposingClues = PlayerStatusId.Construct("F56B427C-4357-4D41-BBFB-BA2C6A5182A5");
         public static readonly PlayerStatusId ReceivedClue = PlayerStatusId.Construct("B3A55203-5F59-4C4F-8830-7244974727BF");
         public static readonly PlayerStatusId ReadyForNextRound = PlayerStatusId.Construct("76B04091-EF39-4339-8C92-7C04A87249FF");
+        public static readonly PlayerStatusId PreparingFinalWord = PlayerStatusId.Construct("31AABF51-845B-458D-9FD6-DFCE674F6BEF");
+        public static readonly PlayerStatusId ReadyForGameEnd = PlayerStatusId.Construct("94832875-2F14-48F5-8943-D09348CBF1E6");
+        public static readonly PlayerStatusId ReviewingGameEnd = PlayerStatusId.Construct("3E5C01C8-312B-4C84-8DB2-3E2A218C8325");
 
         private static readonly Dictionary<PlayerStatusId, string> s_Instances = new Dictionary<PlayerStatusId, string>
         {
@@ -84,6 +87,9 @@ namespace Entities.LetterJam.Enums
             { ProposingClues, nameof(ProposingClues) },
             { ReceivedClue, nameof(ReceivedClue) },
             { ReadyForNextRound, nameof(ReadyForNextRound) },
+            { PreparingFinalWord, nameof(PreparingFinalWord) },
+            { ReadyForGameEnd, nameof(ReadyForGameEnd) },
+            { ReviewingGameEnd, nameof(ReviewingGameEnd) },
         };
         public static string GetDescription(PlayerStatusId guid)
         {
@@ -109,9 +115,8 @@ namespace Entities.LetterJam.Enums
 //
 //
 //
-//PlayerStatusId.Construct("31AABF51-845B-458D-9FD6-DFCE674F6BEF");
-//PlayerStatusId.Construct("94832875-2F14-48F5-8943-D09348CBF1E6");
-//PlayerStatusId.Construct("3E5C01C8-312B-4C84-8DB2-3E2A218C8325");
+//
+//
 //PlayerStatusId.Construct("F7222075-AD4D-465F-9A08-787CD08C84E1");
 //PlayerStatusId.Construct("DFE3F08F-CB19-42B8-AC87-C34995DA4F51");
 //PlayerStatusId.Construct("B9273966-6AE4-44FC-A85B-8EFE58AD85D1");
@@ -121,6 +126,4 @@ namespace Entities.LetterJam.Enums
 //PlayerStatusId.Construct("743BDB16-A5A6-4E88-8FD9-0E51335B5B6D");
 //PlayerStatusId.Construct("A76888EC-DF57-40A4-9205-6389B556BC2A");
 //PlayerStatusId.Construct("B104B1A4-9E1E-466A-9B80-008DEB5D8664");
-//PlayerStatusId.Construct("C0FBCE81-207F-4DE6-A953-1D9F66AA9279");
-//PlayerStatusId.Construct("9566FE53-76E7-4F81-A295-9052D7C03CA8");
 }

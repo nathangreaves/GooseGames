@@ -137,5 +137,35 @@ namespace GooseGames.Hubs
             _logger.LogInformation($"Sending bonusLetterGuessed: to {sessionId}", message);
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("bonusLetterGuessed", message);
         }
+        internal async Task RemoveBonusCardAsync(Guid sessionId, Guid clueId)
+        {
+            _logger.LogInformation($"Sending removeBonusCard: to {sessionId} : clueId: {clueId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("removeBonusCard", clueId);
+        }
+        internal async Task SendGameEndTriggeredAsync(Guid sessionId)
+        {
+            _logger.LogInformation($"Sending gameEndTriggered: to {sessionId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("gameEndTriggered");
+        }
+        internal async Task SendFinalWordLetterClaimedAsync(Guid sessionId, Guid? cardId, bool wildCard)
+        {
+            _logger.LogInformation($"Sending finalWordLetterClaimed: to {sessionId} : cardId: {cardId} : wildcard: {wildCard}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("finalWordLetterClaimed", cardId, wildCard);
+        }
+        internal async Task SendFinalWordLetterReturnedAsync(Guid sessionId, Guid? cardId, bool wildCard)
+        {
+            _logger.LogInformation($"Sending finalWordLetterReturned: to {sessionId} : cardId: {cardId} : wildcard: {wildCard}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("finalWordLetterReturned", cardId, wildCard);
+        }
+        internal async Task SendPlayerReadyForEndAsync(Guid sessionId, Guid playerId)
+        {
+            _logger.LogInformation($"Sending playerReadyForEnd: to {sessionId} : playerId: {playerId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerReadyForEnd", playerId);
+        }
+        internal async Task EndGameAsync(Guid sessionId)
+        {
+            _logger.LogInformation($"Sending endGame: to {sessionId}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("endGame");
+        }
     }
 }

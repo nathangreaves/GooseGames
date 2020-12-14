@@ -125,6 +125,7 @@ namespace GooseGames.Services.LetterJam
                 return GenericResponseBase.Ok();
             }
 
+            //Unable to reserve requested letters
             return GenericResponseBase.Error("182ef180-38a9-470f-a217-17566a99ab57");
         }
 

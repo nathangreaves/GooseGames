@@ -39,7 +39,7 @@
             <div *ngFor="let token of tokenList(player.numberOfGreenCluesGiven)" class="token green-token"></div>
           </div>
         </div>
-      </div>      
+      </div>
     </div>
     <div *ngFor="let player of NonPlayerCharacters;" class="row">
       <div class="player-row non-player-character">
@@ -64,6 +64,21 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+    <div class="row bonus-cards" *ngIf="BonusCards.length">
+      <div>
+        Bonus Cards:
+      </div>
+      <div class="letter-display">
+
+        <div *ngFor="let letter of BonusCards;" class="letter-display-item">
+
+          <div class="player-card player-shown-card bonus-card">
+            {{letter.letter}}
+          </div>
+
         </div>
       </div>
     </div>

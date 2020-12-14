@@ -20,6 +20,10 @@ export class LetterJamSubmitWordComponent extends LetterJamComponentBase impleme
 
   constructor(private startWordService: LetterJamStartWordService) {
     super();
+    this.KnownErrorCodes.push({
+      errorCode: "182ef180-38a9-470f-a217-17566a99ab57",
+      errorMessage: "The requested letters cannot be reserved, another player may have already chosen them. Please try a different word"
+    });
   }
 
   ngOnInit() {

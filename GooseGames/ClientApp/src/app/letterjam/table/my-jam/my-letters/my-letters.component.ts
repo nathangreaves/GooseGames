@@ -1,13 +1,18 @@
 import { Component, OnInit, Input, ElementRef, ViewChildren, QueryList } from '@angular/core';
-import { IMyJamLetterCard } from '../../../../../models/letterjam/myJam';
+import { IMyJamLetterCard, IFinalWordPublicLetter, IFinalWordLetter } from '../../../../../models/letterjam/myJam';
 import { IMyJamComponentParameters } from '../my-jam.component';
 import _ from 'lodash';
 import { GetColourFromLetterIndex, StyleLetterCardWithColour } from '../../../../../services/letterjam/colour';
+import { LetterJamMyJamService } from '../../../../../services/letterjam/myJam';
+import { IPlayerSessionGame } from '../../../../../models/session';
 
 export interface IMyLettersComponentParameters {
   myLetters: IMyJamLetterCard[];
+  finalWordLetters: IMyJamLetterCard[]
   currentLetterIndex: number;
   moveOnToNextLetter: () => void;
+  sessionInfo: IPlayerSessionGame;
+  gameEnd: boolean;
 }
 
 @Component({
@@ -23,11 +28,23 @@ export class LetterJamMyLettersComponent implements OnInit {
   ConfirmingMove: boolean;
   MoveConfirmed: boolean;
   CanMoveOn: boolean;
+  PublicLetters: IFinalWordPublicLetter[];
 
-  constructor() { }
+  constructor(private myJamService: LetterJamMyJamService) { }
 
   ngOnInit(): void {
-    this.CanMoveOn = this.parameters.currentLetterIndex && this.parameters.currentLetterIndex + 1 <= this.parameters.myLetters.length;
+    this.CanMoveOn = !this.parameters.gameEnd && this.parameters.currentLetterIndex != null && this.parameters.currentLetterIndex + 1 <= this.parameters.myLetters.length;
+    if (this.parameters.gameEnd) {
+      this.myJamService.GetFinalWordPublicLetters(this.parameters.sessionInfo)
+        .then(response => {
+          if (response.success) {
+            this.PublicLetters = response.data;
+          }
+        });
+    }
+    else {
+      this.PublicLetters = [];
+    }
   }
 
   ngAfterViewInit(): void{
@@ -66,5 +83,31 @@ export class LetterJamMyLettersComponent implements OnInit {
 
   IndexGreaterThanCurrentLetterIndex(index: number) {
     return this.parameters.currentLetterIndex != null && index > this.parameters.currentLetterIndex;
+  }  
+
+  IsPublicLetterInFinalWord(letter: IFinalWordPublicLetter) {
+    if (letter.isWildCard) {
+      return _.find(this.parameters.finalWordLetters, c => c.isWildCard);
+    }
+    return _.find(this.parameters.finalWordLetters, c => c.cardId === letter.cardId);
+  }
+
+  IsLetterInFinalWord(letter: IMyJamLetterCard) {
+    return _.find(this.parameters.finalWordLetters, c => c.cardId === letter.cardId);
+  }
+
+  AddPublicLetterToFinalWord(letter: IFinalWordPublicLetter) {
+    this.parameters.finalWordLetters.push({
+      cardId: letter.cardId,
+      bonusLetter: !letter.isWildCard,
+      isWildCard: letter.isWildCard,
+      playerLetterGuess: letter.letter
+    });
+  }
+  AddLetterToFinalWord(letter: IMyJamLetterCard) {
+    this.parameters.finalWordLetters.push(letter);
+  }
+  DeleteLastLetter() {
+    this.parameters.finalWordLetters.pop();
   }
 }

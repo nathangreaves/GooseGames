@@ -45,7 +45,7 @@
           <div class="player-card player-shown-card non-player-card">
             {{clue.numberOfNonPlayerLetters}}
           </div>
-          <div class="player-card player-shown-card bonus-card" *ngIf="numberOfBonusLetters">
+          <div class="player-card player-shown-card bonus-card" *ngIf="clue.numberOfBonusLetters">
             {{clue.numberOfBonusLetters}}
           </div>
           <div class="player-card player-shown-card wild-card" *ngIf="clue.wildcardUsed">

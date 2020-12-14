@@ -7,7 +7,8 @@
   <div class="row word-box letter-display">
     <div *ngFor="let letter of ClueLetters;" class="letter-display-item">
 
-      <gg-emoji [emoji]="letter.player?.emoji"
+      <gg-emoji *ngIf="parameters.showEmojis"
+                [emoji]="letter.player?.emoji"
                 (mousedown)="show(letter.playerId)" (mouseup)="hide()" (touchstart)="show(letter.playerId)" (touchend)="hide()"></gg-emoji>
 
       <div class="player-card player-shown-card" [ngClass]="{

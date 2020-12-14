@@ -14,6 +14,7 @@ export interface ILetterJamClueComponentParameters {
   getCardsFromCache: (request: ICardsRequest) => Promise<ILetterCard[]>;
   clue: IClue;
   highlightColour: string;
+  showEmojis: boolean;
 }
 
 @Component({

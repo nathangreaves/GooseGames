@@ -3,6 +3,8 @@ import { IPlayerSessionGame, IPlayerSession } from '../../models/session';
 import { GenericResponseBase, GenericResponse } from '../../models/genericresponse';
 import { LetterJamRouter, GenericResponseHandler, GenericResponseBaseHandler, ReadSessionData, SetSessionData } from '../../app/letterjam/scaffolding/content';
 import { IGooseGamesPlayer } from '../player';
+import { IKnownErrorCode } from '../error';
+import _ from 'lodash';
 
 export enum LetterJamPlayerStatus {
   InLobby,
@@ -10,7 +12,10 @@ export enum LetterJamPlayerStatus {
   WaitingForFirstRound,
   ProposingClues,
   ReceivedClue,
-  ReadyForNextRound
+  ReadyForNextRound,
+  PreparingFinalWord,
+  ReadyForGameEnd,
+  ReviewingGameEnd
 }
 
 export interface ILetterJamComponentBase extends IPlayerSession {
@@ -92,6 +97,7 @@ export class LetterJamComponentBase implements ILetterJamComponent {
   ReadSessionData: ReadSessionData;
   GetPlayersFromCache: (request: IGetPlayersFromCacheRequest) => Promise<IGooseGamesPlayer[]>;
   RefreshCache: () => void;
+  KnownErrorCodes: IKnownErrorCode[] = [];
 
   Route(status: LetterJamPlayerStatus) {
     this.router(status, false);
@@ -123,12 +129,22 @@ export class LetterJamComponentBase implements ILetterJamComponent {
 
   SetErrorMessage = (err: string) =>
   {
-    this.ErrorMessage = err;
+    var knownError = _.find(this.KnownErrorCodes, k => k.errorCode === err);
+    if (knownError) {
+      this.ErrorMessage = knownError.errorMessage;
+    }
+    else {
+      this.ErrorMessage = err;
+    }
   }
 
   HandleGenericError = (err: any) =>
   {
     console.error(err);
     this.SetErrorMessage("Unexpected Error");
+  }
+
+  ClearErrorMessage = () => {
+    this.ErrorMessage = null;
   }
 }

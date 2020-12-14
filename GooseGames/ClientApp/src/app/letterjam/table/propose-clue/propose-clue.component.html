@@ -37,8 +37,8 @@
          'non-player-card' : letter.nonPlayerCharacterId,
          'bonus-card' : letter.bonusLetter
          }">
-      <span *ngIf="!(ShowAsPlayerId === letter.player?.id)">{{letter.letter}}</span>
-      <span *ngIf="(ShowAsPlayerId === letter.player?.id)">?</span>
+      <span *ngIf="!(ShowAsPlayerId && ShowAsPlayerId === letter.player?.id)">{{letter.letter}}</span>
+      <span *ngIf="(ShowAsPlayerId && ShowAsPlayerId === letter.player?.id)">?</span>
     </div>
 
   </div>

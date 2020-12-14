@@ -12,6 +12,7 @@ namespace Models.Responses.LetterJam
         public int LockedCluesRemaining { get; set; }
         public List<TablePlayerResponse> Players { get; set; }
         public List<TableNonPlayerCharacterResponse> NonPlayerCharacters { get; set; }
+        public IEnumerable<Guid> BonusCardIds { get; set; }
     }
 
     public class TablePlayerResponse

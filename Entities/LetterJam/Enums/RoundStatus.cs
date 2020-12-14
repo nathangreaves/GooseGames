@@ -7,6 +7,7 @@ namespace Entities.LetterJam.Enums
     public enum RoundStatus
     {
         ProposingClues = 1,
-        ReceivedClue = 2
+        ReceivedClue = 2,
+        GameEndTriggered = 3
     }
 }

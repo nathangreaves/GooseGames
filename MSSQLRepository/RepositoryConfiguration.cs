@@ -75,6 +75,7 @@ namespace MSSQLRepository
             services.AddScoped<RepositoryInterface.LetterJam.IClueRepository, LetterJam.ClueRepository>();
             services.AddScoped<RepositoryInterface.LetterJam.IClueVoteRepository, LetterJam.ClueVoteRepository>();
             services.AddScoped<RepositoryInterface.LetterJam.IClueLetterRepository, LetterJam.ClueLetterRepository>();
+            services.AddScoped<RepositoryInterface.LetterJam.IFinalWordLetterRepository, LetterJam.FinalWordLetterRepository>();
         }
     }
 }

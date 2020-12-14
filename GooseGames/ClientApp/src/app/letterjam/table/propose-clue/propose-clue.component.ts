@@ -38,6 +38,7 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
     this.parameters.hubConnection.on("newNpcCard", this.onNewNpcCard);
     this.parameters.hubConnection.on('giveClue', this.onGiveClue);
     this.parameters.hubConnection.on('beginNewRound', this.onBeginNewRound);
+    this.parameters.hubConnection.on('removeBonusCard', this.onRemoveBonusCard);
   }
   ngOnDestroy(): void {
     this.parameters.hubConnection.off("playerMovedOnToNextCard", this.onPlayerMovedOnToNextCard);
@@ -45,6 +46,7 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
     this.parameters.hubConnection.off("newNpcCard", this.onNewNpcCard);
     this.parameters.hubConnection.off('giveClue', this.onGiveClue);
     this.parameters.hubConnection.off('beginNewRound', this.onBeginNewRound);
+    this.parameters.hubConnection.off('removeBonusCard', this.onRemoveBonusCard);
   }
   onPlayerMovedOnToNextCard = (playerId: string, nextCard: ILetterCard) => {
     if (playerId !== this.parameters.request.PlayerId && nextCard) {
@@ -81,6 +83,12 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
   }
   onBeginNewRound = () => {
     this.BuiltWord = [];
+  }
+  onRemoveBonusCard = (cardId: string) => {
+    var index = _.findIndex(this.RelevantLetters, b => b.cardId === cardId);
+    if (index >= 0) {
+      this.RelevantLetters.splice(index, 1);
+    }
   }
 
   loadRelevantLetters = (): Promise<any> => {
@@ -156,19 +164,19 @@ export class LetterJamProposeClueComponent extends TableComponentBase implements
 
   SubmitClue = () => {
     if (this.BuiltWord.length < 1) {
-      this.ErrorMessage = "Please submit a word with at least 1 letter!"
+      this.parameters.setErrorMessage("Please submit a word with at least 1 letter!");
     }
     this.DisableButtons = true;
 
     this.clueService.SubmitClue(this.parameters.request,
       this.parameters.getCurrentRoundId(),
       this.BuiltWord)
-      .then(response => this.HandleGenericResponseBase(response, () => {
+      .then(response => this.parameters.handleGenericResponseBase(response, () => {
         this.parameters.proposedClues();
         this.BuiltWord = [];
         return response;
       }))
-      .catch(this.HandleGenericError)
+      .catch(this.parameters.handleGenericError)
       .finally(() => {
         this.DisableButtons = false;
       });

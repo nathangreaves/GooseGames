@@ -1,18 +1,17 @@
 <div class="container proposed-clues">
 
   <div class="proposed-clues-container">
-    <div class="my-jam-controls">
-      <input type="checkbox" class="form-check-input" id="my-clues-toggle" [checked]="OnlyShowCluesForMe"
-           (change)="OnToggleCluesForMe()">
-      <label class="form-check-label" for="my-clues-toggle">Only show clues for me</label>
-    </div>
+    
     <div class="alert alert-info" *ngIf="!Rounds.length">
       No Clues have been given yet!
     </div>
 
-    <div *ngFor="let round of FilteredRounds;" class="proposed-clue-row">
+    <div *ngFor="let round of FilteredRounds;" class="proposed-clue-row" [ngClass]="{
+          'current-clue' : CurrentRound && round.clueId == CurrentRound.clueId
+         }"
+         #rounds>
       <div class="row" *ngIf="!round.loadingPlayer && round.player">
-        <div class="col-1 clue-info">
+        <div class="col-1 clue-info pl-1">
           <gg-emoji [emoji]="round.player.emoji"></gg-emoji>&nbsp;:
         </div>
         <div class="col-11 pl-3 clue-info">
@@ -30,22 +29,34 @@
 
 <div class="letter-box">
   <div class="container">
+
     <div class="row">
 
-      <div class="col col-sm-1 col-md-3"></div>
-      <div class="col-12 col-sm-10 col-md-6">
-        <div>
+      <div class="col-sm-1 col-md-3"></div>
+      <div class="col-12 col-sm-10 col-md-6 row letter-box-main">
+        <div class="my-jam-controls row">
+          <div class="col-6">
+            <input type="checkbox" class="form-check-input" id="my-clues-toggle" [checked]="OnlyShowCluesForMe"
+                   (change)="OnToggleCluesForMe()">
+            <label class="form-check-label" for="my-clues-toggle">Hide Unrelated</label>
+          </div>
+          <div class="col-6">
+            <input type="checkbox" class="form-check-input" id="show-emojis-toggle" [checked]="ShowEmojis"
+                   (change)="ShowEmojis = !ShowEmojis">
+            <label class="form-check-label" for="show-emojis-toggle">Show Emojis</label>
+          </div>
+        </div>
+        <div class="col-12">
           My Letters:
         </div>
-        <div class="letter-display" *ngIf="MyLetters">
+        <div class="letter-display col-12" *ngIf="MyLetters">
           <div *ngFor="let letter of MyLetters; let i=index;" class="letter-display-item">
 
             <div class="player-card player-shown-card" [ngClass]="{
          'bonus-card' : letter.bonusLetter,
          'player-hidden-card' : indexGreaterThanCurrentLetterIndex(i, CurrentLetterIndex)
          }"
-        [ngStyle]="!indexGreaterThanCurrentLetterIndex(i, CurrentLetterIndex) ? LetterStyle(letter, i) : {}"
-                 >
+                 [ngStyle]="!indexGreaterThanCurrentLetterIndex(i, CurrentLetterIndex) ? LetterStyle(letter, i) : {}">
               <span *ngIf="letter.playerLetterGuess">{{letter.playerLetterGuess}}</span>
               <span *ngIf="!letter.playerLetterGuess && i === CurrentLetterIndex">?</span>
             </div>
@@ -56,7 +67,7 @@
           </button>
         </div>
       </div>
-      <div class="col col-sm-1 col-md-3"></div>
+      <div class="col-sm-1 col-md-3"></div>
     </div>
   </div>
 </div>

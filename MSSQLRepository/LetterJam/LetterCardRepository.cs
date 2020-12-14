@@ -98,13 +98,18 @@ namespace MSSQLRepository.LetterJam
             if (card == null)
             {
                 var discardedCards = await Context.LetterCards
-                .Where(x => x.GameId == gameId && x.Discarded == true && x.NonPlayerCharacterId == null && x.PlayerId == null && x.BonusLetter == false)
+                .Where(x => x.GameId == gameId && x.Discarded == true)
                 .ToListAsync()
                 .ConfigureAwait(false);
 
                 foreach (var c in discardedCards)
                 {
                     c.Discarded = false;
+                    c.BonusLetter = false;
+                    c.NonPlayerCharacterId = null;
+                    c.PlayerId = null;
+                    c.LetterIndex = null;
+                    c.PlayerLetterGuess = null;
                 }
 
                 await UpdateRangeAsync(discardedCards);

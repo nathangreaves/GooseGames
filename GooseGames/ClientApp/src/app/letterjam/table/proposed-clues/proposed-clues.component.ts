@@ -77,7 +77,7 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
 
   load = () => {
     this.cluesService.GetClues(this.parameters.request, this.parameters.getCurrentRoundId())
-      .then(response => this.HandleGenericResponse(response, r => {
+      .then(response => this.parameters.handleGenericResponse(response, r => {
 
         this.RoundStatus = r.roundStatus;
 
@@ -110,7 +110,7 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
         });
         return response;
       }))
-      .then(response => this.HandleGenericResponseBase(response, () => {
+      .then(response => this.parameters.handleGenericResponseBase(response, () => {
         this.subscribe();
         return this.loadRelevantLetters().then(() => this.loadPlayers()).then(() => response);
       }));
@@ -184,6 +184,7 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
     this.parameters.hubConnection.on("newNpcCard", this.onNewNpcCard);
     this.parameters.hubConnection.on('giveClue', this.onGiveClue);
     this.parameters.hubConnection.on('beginNewRound', this.onBeginNewRound);
+    this.parameters.hubConnection.on('removeBonusCard', this.onRemoveBonusCard);
   }
 
   ngOnDestroy() {
@@ -196,12 +197,20 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
     this.parameters.hubConnection.off("newNpcCard", this.onNewNpcCard);
     this.parameters.hubConnection.off("giveClue", this.onGiveClue);
     this.parameters.hubConnection.off('beginNewRound', this.onBeginNewRound);
+    this.parameters.hubConnection.off('removeBonusCard', this.onRemoveBonusCard);
   }
   onGiveClue = () => {
     this.ProposedClues = [];
   }
   onBeginNewRound = () => {
     this.ProposedClues = [];
+  }
+
+  onRemoveBonusCard = (cardId: string) => {
+    var index = _.findIndex(this.RelevantLetters, b => b.cardId === cardId);
+    if (index >= 0) {
+      this.RelevantLetters.splice(index, 1);
+    }
   }
 
   loadRelevantLetters = (): Promise<any> => {
@@ -267,7 +276,7 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
 
     this.modalRef.dismiss();
     this.cluesService.DeleteClue(this.parameters.request, clueId)
-      .then(response => this.HandleGenericResponseBase(response, () => response));
+      .then(response => this.parameters.handleGenericResponseBase(response, () => response));
   }
 
   CloseClueModal = () => {
@@ -285,7 +294,8 @@ export class LetterJamProposedCluesComponent extends TableComponentBase implemen
         getCardsFromCache: this.parameters.getCardsFromCache,
         getPlayersFromCache: this.parameters.getPlayersFromCache,
         clue: clue,
-        highlightColour: null
+        highlightColour: null,
+        showEmojis: true
       };
 
       const modalState = {

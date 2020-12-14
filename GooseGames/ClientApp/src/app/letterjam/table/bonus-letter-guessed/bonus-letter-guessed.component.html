@@ -1,0 +1,26 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12 flex-div-center">
+      <gg-emoji [emoji]="parameters.player.emoji"></gg-emoji>&nbsp;{{PlayerName()}} guessed bonus letter
+    </div>
+    <div class="col-12 flex-div-center">
+      <div class="player-card player-shown-card bonus-card">
+        {{parameters.actualLetter}}
+      </div>
+    </div>
+  </div>
+  <div class="col-12 flex-div-center">
+    <div *ngIf="parameters.correct">Correctly</div>
+    <div *ngIf="!parameters.correct">Incorrectly</div>
+  </div>
+
+  <div class="col-12 flex-div-center" *ngIf="!parameters.correct">
+    <div><gg-emoji [emoji]="parameters.player.emoji"></gg-emoji>&nbsp;{{PlayerName()}} guessed</div>
+  </div>
+
+  <div class="col-12 flex-div-center" *ngIf="!parameters.correct">
+    <div class="player-card player-shown-card bonus-card">
+      {{parameters.guessedLetter}}
+    </div>
+  </div>
+</div>

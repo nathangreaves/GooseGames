@@ -1,7 +1,10 @@
 <form *ngIf="ForPlayer">
+  <div class="alert alert-info">
+    Please submit a {{NumberOfLetters}} letter word for <gg-emoji [emoji]="ForPlayer.emoji"></gg-emoji> {{ForPlayer.name}}
+  </div>
   <div>
-    <label for="lj-initial-word">Please submit a {{NumberOfLetters}} letter word for <gg-emoji [emoji]="ForPlayer.emoji"></gg-emoji> {{ForPlayer.name}}</label>
-    <input id="lj-initial-word" [(ngModel)]="Word" name="lj-initial-word" />
+    <input id="lj-initial-word" [(ngModel)]="Word" name="lj-initial-word" 
+               oninput="this.value = this.value.toUpperCase()" />
   </div>
   <div>
     <button class="btn btn-primary" type="submit" [disabled]="!ButtonsEnabled" (click)="SubmitWord()">Submit Word</button>
@@ -9,4 +12,7 @@
 </form>
 <div>
   <button class="btn btn-primary" type="button" [disabled]="!ButtonsEnabled" (click)="GetRandomWord()">Random Word</button>
+</div>
+<div class="alert alert-danger mt-2" *ngIf="ErrorMessage">
+  {{ErrorMessage}}
 </div>
