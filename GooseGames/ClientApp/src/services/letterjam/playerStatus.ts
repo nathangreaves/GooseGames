@@ -72,6 +72,15 @@ export class LetterJamPlayerStatusService {
     return this._http.post<GenericResponseBase>(this._baseUrl + `LetterJamPlayerStatus/UndoWaitingForNextRound`, ConvertToPlayerSessionGameRequest(request)).toPromise();
   }
 
+
+  public SetWaitingForGameEnd(request: IPlayerSessionGame): Promise<GenericResponseBase> {
+    return this._http.post<GenericResponseBase>(this._baseUrl + `LetterJamPlayerStatus/WaitingForGameEnd`, ConvertToPlayerSessionGameRequest(request)).toPromise();
+  }
+
+  public SetUndoWaitingForGameEnd(request: IPlayerSessionGame): Promise<GenericResponseBase> {
+    return this._http.post<GenericResponseBase>(this._baseUrl + `LetterJamPlayerStatus/UndoWaitingForGameEnd`, ConvertToPlayerSessionGameRequest(request)).toPromise();
+  }
+
   PlayersWaitingForFirstRound(request: IPlayerSessionGame): Promise<GenericResponse<IGooseGamesPlayerAction[]>> {
 
     var request = ConvertToPlayerSessionGameRequest(request);

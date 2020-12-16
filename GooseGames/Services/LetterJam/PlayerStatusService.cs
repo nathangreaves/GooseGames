@@ -76,13 +76,14 @@ namespace GooseGames.Services.LetterJam
             await _playerStateRepository.UpdateRangeAsync(players);
         }
 
-        internal async Task UpdatePlayerToStatusAsync(Guid playerId, Guid gameId, PlayerStatusId playerStatus)
+        internal async Task UpdatePlayerToStatusAsync(PlayerSessionGameRequest request, PlayerStatusId playerStatus)
         {
-            var player = await _playerStateRepository.SingleOrDefaultAsync(p => p.PlayerId == playerId && p.GameId == gameId);
+            var player = await _playerStateRepository.SingleOrDefaultAsync(p => p.PlayerId == request.PlayerId && p.GameId == request.GameId);
 
             player.Status = playerStatus;
 
             await _playerStateRepository.UpdateAsync(player);
+            await _letterJamHubContext.SendPlayerStatusAsync(request.SessionId, request.PlayerId, PlayerStatus.GetDescription(playerStatus));
         }
 
         internal async Task<bool> AllPlayersMatchStatusAsync(Guid gameId, PlayerStatusId playerStatusId)
@@ -141,13 +142,13 @@ namespace GooseGames.Services.LetterJam
 
         internal async Task<GenericResponseBase> SetUndoWaitingForNextRoundAsync(PlayerSessionGameRequest request)
         {
-            await UpdatePlayerToStatusAsync(request.PlayerId, request.GameId, PlayerStatus.ReceivedClue);
+            await UpdatePlayerToStatusAsync(request, PlayerStatus.ReceivedClue);
             return GenericResponseBase.Ok();
         }
 
         internal async Task<GenericResponseBase> SetWaitingForNextRoundAsync(PlayerSessionGameRequest request)
         {
-            await UpdatePlayerToStatusAsync(request.PlayerId, request.GameId, PlayerStatus.ReadyForNextRound);
+            await UpdatePlayerToStatusAsync(request, PlayerStatus.ReadyForNextRound);
 
             if (await AllPlayersMatchStatusAsync(request.GameId, PlayerStatus.ReadyForNextRound))
             {
@@ -199,6 +200,35 @@ namespace GooseGames.Services.LetterJam
                 }
 
             }
+            return GenericResponseBase.Ok();
+        }
+
+        internal async Task<GenericResponseBase> SetUndoWaitingForGameEndAsync(PlayerSessionGameRequest request)
+        {
+            await UpdatePlayerToStatusAsync(request, PlayerStatus.SubmittedFinalWord);
+            return GenericResponseBase.Ok();
+        }
+
+        internal async Task<GenericResponseBase> SetWaitingForGameEndAsync(PlayerSessionGameRequest request)
+        {
+            await UpdatePlayerToStatusAsync(request, PlayerStatus.ReadyForGameEnd);
+
+            if (await AllPlayersMatchStatusAsync(request.GameId, PlayerStatus.ReadyForGameEnd))
+            {
+                var game = await _gameRepository.GetAsync(request.GameId);
+
+                game.CurrentRound = null;
+                game.CurrentRoundId = null;
+                game.GameStatus = GameStatus.RevealingFinalWords;
+
+                await _gameRepository.UpdateAsync(game);
+
+                await UpdateAllPlayersForGameAsync(request.GameId, PlayerStatus.ReviewingGameEnd);
+                await _letterJamHubContext.SendEndGameAsync(request.SessionId);
+
+                await _sessionService.SetToLobbyAsync(request.SessionId);
+            }
+
             return GenericResponseBase.Ok();
         }
 

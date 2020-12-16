@@ -61,6 +61,13 @@
           <button [disabled]="DisableNextRoundButton" *ngIf="RoundStatus == 2 && PlayerStatus == 5" class="btn btn-danger" (click)="NotReadyForNextRound()">
             Not Ready
           </button>
+
+          <button [disabled]="DisableNextRoundButton" *ngIf="RoundStatus == 3 && PlayerStatus == 7" class="btn btn-primary" (click)="ReadyForGameEnd()">
+            I'm Done
+          </button>
+          <button [disabled]="DisableNextRoundButton" *ngIf="RoundStatus == 3 && PlayerStatus == 8" class="btn btn-danger" (click)="NotReadyForGameEnd()">
+            Undo
+          </button>
         </div>
       </div>
 

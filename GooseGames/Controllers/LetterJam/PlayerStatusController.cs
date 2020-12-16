@@ -109,6 +109,50 @@ namespace GooseGames.Controllers.LetterJam
             }
         }
 
+
+
+        [HttpPost]
+        [Route("WaitingForGameEnd")]
+        public async Task<GenericResponseBase> SetWaitingForGameEndAsync(PlayerSessionGameRequest request)
+        {
+            try
+            {
+                _logger.LogInformation($"Received request", request);
+
+                var result = await _playerStatusService.SetWaitingForGameEndAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+        [HttpPost]
+        [Route("UndoWaitingForGameEnd")]
+        public async Task<GenericResponseBase> SetUndoWaitingForGameEndAsync(PlayerSessionGameRequest request)
+        {
+            try
+            {
+                _logger.LogInformation($"Received request", request);
+
+                var result = await _playerStatusService.SetUndoWaitingForGameEndAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponseBase.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
         private async Task<GenericResponse<LetterJamPlayerStatusValidationResponse>> ValidateStatus(PlayerSessionPossibleGameRequest request, PlayerStatusId lobbyStatus)
         {
             try

@@ -36,7 +36,7 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
   FilteredRounds: MyJamRound[] = [];
   CurrentRound: MyJamRound;
   MyLetters: IMyJamLetterCard[] = [];
-  FinalWordLetters: IMyJamLetterCard[] = [];
+  FinalWordLetters: IMyJamLetterCard[];
   CurrentLetterIndex: number;
   OnlyShowCluesForMe: boolean = true;
   ShowEmojis: boolean = true;
@@ -217,7 +217,7 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
     this.shouldMoveOnToNextLetter = true;
   }
 
-  EditMyLetters = (gameEnd: boolean = null) => {
+  EditMyLetters = (gameEnd: boolean = null, editLettersError = null) => {
 
     this.myLettersModalParameters = {
       myLetters: this.MyLetters.map(l => {
@@ -225,15 +225,17 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
           ...l
         }
       }),
-      finalWordLetters: this.FinalWordLetters.map(l => {
+      finalWordLetters: this.FinalWordLetters != null ? this.FinalWordLetters.map(l => {
         return {
           ...l
         }
-      }),
+      }) : null,
       currentLetterIndex: this.CurrentLetterIndex,
       moveOnToNextLetter: this.moveOnToNextLetter,
       gameEnd: gameEnd != null ? gameEnd : this.parameters.currentRoundStatus() == RoundStatusEnum.GameEndTriggered,
-      sessionInfo: this.parameters.request
+      sessionInfo: this.parameters.request,
+      error: editLettersError,
+      hubConnection: this.parameters.hubConnection
     }
 
     const modalState = {
@@ -280,6 +282,24 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
       this.myJamService.PostLetterGuesses(this.parameters.request, letterGuessRequest, this.shouldMoveOnToNextLetter);
 
     promise
+      .then(response => {
+
+        if (!response.success) {
+          var error = "";
+          if (response.errorCode == "9566FE53-76E7-4F81-A295-9052D7C03CA8") {
+            error = "Another player has already reserved the wildcard";
+          }
+          else if (response.errorCode == "C0FBCE81-207F-4DE6-A953-1D9F66AA9279") {
+            error = "Another player has already reserved a bonus letter you chose";
+          }
+          else {
+            error = response.errorCode;
+          }
+          this.EditMyLetters(this.parameters.currentRoundStatus() == RoundStatusEnum.GameEndTriggered, error);
+        }
+
+        return response;
+      })
       .then(response => this.parameters.handleGenericResponseBase(response, () => {        
         this.shouldMoveOnToNextLetter = false;
 

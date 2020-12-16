@@ -14,6 +14,7 @@ export enum LetterJamPlayerStatus {
   ReceivedClue,
   ReadyForNextRound,
   PreparingFinalWord,
+  SubmittedFinalWord,
   ReadyForGameEnd,
   ReviewingGameEnd
 }

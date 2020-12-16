@@ -1,4 +1,5 @@
 ﻿using Entities.LetterJam;
+using Entities.LetterJam.Enums;
 using GooseGames.Hubs;
 using GooseGames.Logging;
 using Models.Requests;
@@ -19,19 +20,36 @@ namespace GooseGames.Services.LetterJam
         private readonly ILetterCardRepository _letterCardRepository;
         private readonly MyJamService _myJamService;
         private readonly LetterJamHubContext _letterJamHubContext;
+        private readonly PlayerStatusService _playerStatusService;
         private readonly RequestLogger<FinalWordService> _logger;
 
         public FinalWordService(IFinalWordLetterRepository finalWordLetterRepository,
             ILetterCardRepository letterCardRepository,
             MyJamService myJamService,
             LetterJamHubContext letterJamHubContext,
+            PlayerStatusService playerStatusService,
             RequestLogger<FinalWordService> logger)
         {
             _finalWordLetterRepository = finalWordLetterRepository;
             _letterCardRepository = letterCardRepository;
             _myJamService = myJamService;
             _letterJamHubContext = letterJamHubContext;
+            _playerStatusService = playerStatusService;
             _logger = logger;
+        }
+
+        internal async Task<GenericResponse<IEnumerable<FinalWordLetterCardResponse>>> GetFinalWordAsync(PlayerSessionGameRequest request)
+        {
+            var letters = await _finalWordLetterRepository.FilterAsync(fWL => fWL.GameId == request.GameId && fWL.PlayerId == request.PlayerId);
+
+            return GenericResponse<IEnumerable<FinalWordLetterCardResponse>>.Ok(letters.OrderBy(l => l.LetterIndex).Select(fWL => {
+
+                return new FinalWordLetterCardResponse
+                {                    
+                    CardId = fWL.CardId,
+                    IsWildCard = fWL.Wildcard
+                };
+            }));
         }
 
         internal async Task<GenericResponseBase> PostAsync(FinalWordRequest request)
@@ -50,6 +68,13 @@ namespace GooseGames.Services.LetterJam
             }
 
             await RemoveFinalWordLettersAsync(request);
+
+            if (request.FinalWordLetters.Count() == 0)
+            {
+                await _playerStatusService.UpdatePlayerToStatusAsync(request, PlayerStatus.PreparingFinalWord);
+                return GenericResponseBase.Ok();
+            }
+
             bool claimWildcard = false;
             List<Guid> bonusCardsClaimed = new List<Guid>();
 
@@ -104,6 +129,8 @@ namespace GooseGames.Services.LetterJam
                 await _letterJamHubContext.SendFinalWordLetterClaimedAsync(request.SessionId, bonusLetterClaim, false);
             }
 
+            await _playerStatusService.UpdatePlayerToStatusAsync(request, PlayerStatus.SubmittedFinalWord);
+
             return GenericResponseBase.Ok();
         }
 
@@ -114,11 +141,21 @@ namespace GooseGames.Services.LetterJam
             {
                 if (letter.Wildcard)
                 {
-                    await _letterJamHubContext.SendFinalWordLetterReturnedAsync(request.SessionId, null, true);
+                    await _letterJamHubContext.SendFinalWordLetterReturnedAsync(request.SessionId, new FinalWordPublicCardResponse 
+                    {
+                        CardId = null,
+                        IsWildCard = true,
+                        Letter = null
+                    });
                 }
                 if (letter.BonusLetter)
                 {
-                    await _letterJamHubContext.SendFinalWordLetterReturnedAsync(request.SessionId, letter.CardId, false);
+                    await _letterJamHubContext.SendFinalWordLetterReturnedAsync(request.SessionId, new FinalWordPublicCardResponse
+                    {
+                        CardId = letter.CardId,
+                        IsWildCard = false,
+                        Letter = letter.Letter
+                    });
                 }
 
                 await _finalWordLetterRepository.DeleteAsync(letter);
@@ -127,7 +164,7 @@ namespace GooseGames.Services.LetterJam
 
         internal async Task<GenericResponse<IEnumerable<FinalWordPublicCardResponse>>> GetFinalWordBonusCardsAsync(PlayerSessionGameRequest request)
         {
-            var preSelected = await _finalWordLetterRepository.FilterAsync(fW => fW.GameId == request.GameId && (fW.BonusLetter || fW.Wildcard));
+            var preSelected = await _finalWordLetterRepository.FilterAsync(fW => fW.GameId == request.GameId && (fW.BonusLetter || fW.Wildcard) && fW.PlayerId != request.PlayerId);
             var wildcardUsed = preSelected.Any(c => c.Wildcard);
             var preselectedIds = preSelected.Where(x => x.CardId.HasValue).Select(x => x.CardId.Value);
 

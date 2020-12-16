@@ -33,7 +33,12 @@ export class LetterJamMyJamService {
     var request = {
       ...ConvertToPlayerSessionGameRequest(playerSessionGameRequest),
       letterGuesses: letterGuesses,
-      finalWordLetters: finalWordLetters
+      finalWordLetters: finalWordLetters.map(l => {
+        return {
+          letterId: l.cardId,
+          isWildCard: l.isWildCard
+        }
+      })
     };
     return this._http.post<GenericResponseBase>(`${this._baseUrl}LetterJamFinalWord`, request).toPromise();
   }
@@ -42,5 +47,10 @@ export class LetterJamMyJamService {
     var request = ConvertToPlayerSessionGameRequest(playerSessionGameRequest);
     var parameters = Object.keys(request).map(key => key + '=' + request[key]).join('&');
     return this._http.get<GenericResponse<IFinalWordPublicLetter[]>>(`${this._baseUrl}LetterJamFinalWord/PublicLetters?${parameters}`).toPromise();
+  }
+  public GetFinalWord(playerSessionGameRequest: IPlayerSessionGame) {
+    var request = ConvertToPlayerSessionGameRequest(playerSessionGameRequest);
+    var parameters = Object.keys(request).map(key => key + '=' + request[key]).join('&');
+    return this._http.get<GenericResponse<IFinalWordLetter[]>>(`${this._baseUrl}LetterJamFinalWord?${parameters}`).toPromise();
   }
 }

@@ -13,6 +13,8 @@ export interface IMyLettersComponentParameters {
   moveOnToNextLetter: () => void;
   sessionInfo: IPlayerSessionGame;
   gameEnd: boolean;
+  error: string;
+  hubConnection: signalR.HubConnection;
 }
 
 @Component({
@@ -34,11 +36,44 @@ export class LetterJamMyLettersComponent implements OnInit {
 
   ngOnInit(): void {
     this.CanMoveOn = !this.parameters.gameEnd && this.parameters.currentLetterIndex != null && this.parameters.currentLetterIndex + 1 <= this.parameters.myLetters.length;
+
+    this.parameters.hubConnection.on("finalWordLetterReturned", this.onFinalWordLetterReturned);
+
     if (this.parameters.gameEnd) {
       this.myJamService.GetFinalWordPublicLetters(this.parameters.sessionInfo)
         .then(response => {
           if (response.success) {
             this.PublicLetters = response.data;
+          }
+        })
+        .then(() =>
+        {
+          if (this.parameters.finalWordLetters == null)
+          {
+            return this.myJamService.GetFinalWord(this.parameters.sessionInfo);
+          }
+        })
+        .then(response => {
+          if (response && response.success) {
+            this.parameters.finalWordLetters = [];
+            _.each(response.data, m => {
+              if (m.isWildCard) {
+                var wildCard = _.find(this.PublicLetters, p => p.isWildCard);
+                this.AddPublicLetterToFinalWord(wildCard);
+              }
+              else {
+                var letterCard = _.find(this.parameters.myLetters, l => l.cardId == m.cardId);
+                if (letterCard) {
+                  this.AddLetterToFinalWord(letterCard);
+                }
+                else {
+                  var bonusCard = _.find(this.PublicLetters, l => l.cardId == m.cardId);
+                  if (bonusCard) {
+                    this.AddPublicLetterToFinalWord(bonusCard);
+                  }
+                }
+              }
+            });
           }
         });
     }
@@ -60,9 +95,20 @@ export class LetterJamMyLettersComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.parameters.hubConnection.off("finalWordLetterReturned", this.onFinalWordLetterReturned);
+  }
+
+  onFinalWordLetterReturned = (publicLetter: IFinalWordPublicLetter) => {
+    this.PublicLetters.push(publicLetter);
+  }
+
   LetterStyle = (letter: IMyJamLetterCard, index: number) => {
-    if (letter.bonusLetter) {
+    if (letter.bonusLetter || letter.isWildCard) {
       return {};
+    }
+    if (index == null) {
+      index = _.findIndex(this.parameters.myLetters, l => l.cardId == letter.cardId);
     }
     var color = GetColourFromLetterIndex(index + 1);
     return StyleLetterCardWithColour(color);

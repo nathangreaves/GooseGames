@@ -1,3 +1,6 @@
+<div class="alert alert-danger small-font" *ngIf="parameters.error">
+  {{parameters.error}}
+</div>
 <form>
   <div class="container">
     <div class="row my-letters-container player-cards-container">
@@ -20,8 +23,9 @@
       </div>
     </div>
     <div *ngIf="parameters.gameEnd">
-      <div class="row final-word-header">
-        Final Word:
+      <div class="row ">
+        <div class="final-word-header">Final Word:</div>
+        <div class="alert alert-info small-font">Construct your final word using the letters below. Only 1 player may claim a bonus letter or the wildcard.</div>
       </div>
       <div class="row my-letters-container player-cards-container">
         <div *ngFor="let letter of parameters.myLetters; let i=index;">
@@ -35,33 +39,29 @@
       </div>
       <div class="row my-letters-container player-cards-container" *ngIf="parameters.gameEnd">
         <div *ngFor="let letter of PublicLetters; let i=index;">
-          <div *ngIf="!IsPublicLetterInFinalWord(letter)" (click)="AddPublicLetterToFinalWord(letter)">
-            <div class="player-card player-shown-card"
-                 [ngClass]="{
+          <div *ngIf="!IsPublicLetterInFinalWord(letter)" (click)="AddPublicLetterToFinalWord(letter)"
+               class="player-card player-shown-card"
+               [ngClass]="{
                   'bonus-card' : !letter.isWildCard
                }">
-              <span *ngIf="letter.isWildCard">*</span>
-              <span *ngIf="!letter.isWildCard">{{letter.letter}}</span>
-            </div>
+            <span *ngIf="letter.isWildCard">*</span>
+            <span *ngIf="!letter.isWildCard">{{letter.letter}}</span>
           </div>
         </div>
-        <div class="letter-display-item">
 
-          <gg-emoji [emoji]="null"></gg-emoji>
+        <button class="player-card player-shown-card delete-card ml-auto" (click)="DeleteLastLetter()">
+          <gg-emoji emoji="⬅️"></gg-emoji>
+        </button>
 
-          <button class="player-card player-shown-card delete-card" (click)="DeleteLastLetter()">
-            <gg-emoji emoji="⬅️"></gg-emoji>
-          </button>
-
-        </div>
       </div>
-      <div class="word-box letter-display">
-        <div *ngFor="let letter of BuiltWord;" class="letter-display-item">
-          
+      <div class="row word-box letter-display">
+        <div *ngFor="let letter of parameters.finalWordLetters;" class="letter-display-item">
+
           <div class="player-card player-shown-card" [ngClass]="{
          'bonus-card' : letter.bonusLetter
-         }">
-            <span *ngIf="!letter.isWildCard">{{letter.letter}}</span>
+         }"
+               [ngStyle]="LetterStyle(letter, i)">
+            <span *ngIf="!letter.isWildCard">{{letter.playerLetterGuess}}</span>
             <span *ngIf="letter.isWildCard">*</span>
           </div>
 

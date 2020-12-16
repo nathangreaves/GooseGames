@@ -40,7 +40,7 @@
   margin-top: 10px;
 }
 
-.letter-box {
+/*.letter-box {
   margin-top: -10px;
   width: 100%;
   font-size: 2rem;
@@ -53,11 +53,17 @@
       height: 4rem;
       width: 3rem;
     }
-
-    .delete-card {
-      font-size: 1.5rem;
-    }
   }
+}*/
+
+.delete-card {
+  font-size: 0.8rem;
+  padding: 0;
+}
+
+.final-word-header{
+    font-size: 0.8rem;
+    font-weight: bold;
 }
 
 @keyframes caretAnimation {

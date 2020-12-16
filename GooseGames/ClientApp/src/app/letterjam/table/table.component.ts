@@ -128,6 +128,36 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
       });
   }
 
+  ReadyForGameEnd = () => {
+    this.DisableNextRoundButton = true;
+    this.playerStatusService.SetWaitingForGameEnd(this)
+      .then(response => this.HandleGenericResponseBase(response, () => {
+
+        this.PlayerStatus = LetterJamPlayerStatus.ReadyForGameEnd;
+        this.Table();
+
+        return response;
+      }))
+      .finally(() => {
+        this.DisableNextRoundButton = false;
+      });
+  }
+
+  NotReadyForGameEnd = () => {
+    this.DisableNextRoundButton = true;
+    this.playerStatusService.SetUndoWaitingForGameEnd(this)
+      .then(response => this.HandleGenericResponseBase(response, () => {
+
+        this.PlayerStatus = LetterJamPlayerStatus.SubmittedFinalWord;
+        this.MyJam();
+
+        return response;
+      }))
+      .finally(() => {
+        this.DisableNextRoundButton = false;
+      });
+  }
+
   private setTabIdInLocalStorage() {
     localStorage.setItem(LocalStorageTabKey, this.CurrentTabId.toString());
   }
@@ -152,6 +182,8 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
     this.HubConnection.on('beginNewRound', this.beginNewRound);
     this.HubConnection.on('bonusLetterGuessed', this.onBonusLetterGuessed);
     this.HubConnection.on('gameEndTriggered', this.onGameEndTriggered);
+    this.HubConnection.on('playerStatus', this.onPlayerStatus);
+    this.HubConnection.on('endGame', this.onGameEnd);
 
     this.tableViewParameters = <ITableViewParameters>{
       ...baseTableParameters
@@ -201,6 +233,8 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
     this.HubConnection.off('beginNewRound', this.beginNewRound);
     this.HubConnection.off('bonusLetterGuessed', this.onBonusLetterGuessed);
     this.HubConnection.off('gameEndTriggered', this.onGameEndTriggered);
+    this.HubConnection.off('playerStatus', this.onPlayerStatus);
+    this.HubConnection.off('endGame', this.onGameEnd);
   }
 
   loadRound() {
@@ -331,6 +365,16 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   onGameEndTriggered = () => {
     this.RoundStatus = RoundStatusEnum.GameEndTriggered;
     this.PlayerStatus = LetterJamPlayerStatus.PreparingFinalWord;
+  }
+
+  onPlayerStatus = (playerId: string, playerStatus: string) => {
+    if (playerId === this.PlayerId) {
+      this.PlayerStatus = LetterJamPlayerStatus[playerStatus];
+    }
+  }
+
+  onGameEnd = () => {
+    this.RouteToValidated(LetterJamPlayerStatus.ReviewingGameEnd);
   }
 
   beginNewRound = (roundId: string) => {

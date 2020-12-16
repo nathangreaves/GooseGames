@@ -85,6 +85,13 @@ namespace GooseGames.Hubs
             _logger.LogInformation($"Sending addVote: to {request.SessionId} : playerId={request.PlayerId}, clueId={clueId}");
             await _hub.Clients.Group(request.SessionId.ToString()).SendAsync("addVote", request.PlayerId, clueId);
         }
+
+        internal async Task SendPlayerStatusAsync(Guid sessionId, Guid playerId, string playerStatus)
+        {
+            _logger.LogInformation($"Sending playerStatus: to {sessionId} : playerId={playerId}, playerStatus={playerStatus}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerStatus", playerId, playerStatus);
+        }
+
         internal async Task SendNewClueAsync(Guid sessionId, ProposedClueResponse proposedClue)
         {
             _logger.LogInformation($"Sending newClue: to {sessionId}", proposedClue);
@@ -152,17 +159,17 @@ namespace GooseGames.Hubs
             _logger.LogInformation($"Sending finalWordLetterClaimed: to {sessionId} : cardId: {cardId} : wildcard: {wildCard}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("finalWordLetterClaimed", cardId, wildCard);
         }
-        internal async Task SendFinalWordLetterReturnedAsync(Guid sessionId, Guid? cardId, bool wildCard)
+        internal async Task SendFinalWordLetterReturnedAsync(Guid sessionId, FinalWordPublicCardResponse card)
         {
-            _logger.LogInformation($"Sending finalWordLetterReturned: to {sessionId} : cardId: {cardId} : wildcard: {wildCard}");
-            await _hub.Clients.Group(sessionId.ToString()).SendAsync("finalWordLetterReturned", cardId, wildCard);
+            _logger.LogInformation($"Sending finalWordLetterReturned: to {sessionId}", card);
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("finalWordLetterReturned", card);
         }
         internal async Task SendPlayerReadyForEndAsync(Guid sessionId, Guid playerId)
         {
             _logger.LogInformation($"Sending playerReadyForEnd: to {sessionId} : playerId: {playerId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("playerReadyForEnd", playerId);
         }
-        internal async Task EndGameAsync(Guid sessionId)
+        internal async Task SendEndGameAsync(Guid sessionId)
         {
             _logger.LogInformation($"Sending endGame: to {sessionId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("endGame");

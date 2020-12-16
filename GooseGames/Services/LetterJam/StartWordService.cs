@@ -96,7 +96,9 @@ namespace GooseGames.Services.LetterJam
         {
             if (await ReserveLettersAsync(request.GameId, request.ForPlayerId, request.StartWord))
             {
-                await _playerStatusService.UpdatePlayerToStatusAsync(request.PlayerId, request.GameId, PlayerStatus.WaitingForFirstRound);
+                await _playerStatusService.UpdatePlayerToStatusAsync(request, PlayerStatus.WaitingForFirstRound);
+
+                //TODO: this message is now redundant as the above sends the message 'playerStatus'
                 await _letterJamHubContext.SendPlayerHasChosenStartingWordAsync(request.SessionId, request.PlayerId);
 
                 if (await _playerStatusService.AllPlayersMatchStatusAsync(request.GameId, PlayerStatus.WaitingForFirstRound))
