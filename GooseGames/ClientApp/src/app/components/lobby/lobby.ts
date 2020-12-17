@@ -121,6 +121,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   }
 
   sessionStarting = () => {
+    this.DisableButtons = true;
     this.InfoMessage = this.parameters.startingSessionMessage;
   }
 
