@@ -12,12 +12,26 @@ export interface IPlayerSession {
   PlayerId: string;
 }
 
+export interface IPlayerSessionGame {
+  SessionId: string;
+  PlayerId: string;
+  GameId: string;
+}
+
 export function ConvertToPlayerSessionRequest(playerSession: IPlayerSession): IPlayerSession
 {
   return {
     SessionId: playerSession.SessionId,
     PlayerId: playerSession.PlayerId
   }  
+}
+
+export function ConvertToPlayerSessionGameRequest(playerSession: IPlayerSessionGame): IPlayerSessionGame {
+  return {
+    SessionId: playerSession.SessionId,
+    PlayerId: playerSession.PlayerId,
+    GameId: playerSession.GameId
+  }
 }
 
 export interface IPlayerSessionComponent extends IPlayerSession {

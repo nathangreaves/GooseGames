@@ -1,0 +1,25 @@
+<div class="loading" *ngIf="Loading && !ErrorMessage">
+  I am loading...
+</div>
+<form *ngIf="!Loading">
+  <div>
+    <span>Please enter a game identifier</span>
+  </div>
+  <div>
+    <input [(ngModel)]="SessionIdentifier" name="sessionIdentifier" />
+  </div>
+  <div>
+    <button class="btn btn-primary" type="submit" [disabled]="DisableButtons" (click)="EnterGame()">Enter Game</button>
+  </div>
+</form>
+<div *ngIf="ErrorMessage" class="alert alert-danger" role="alert">{{ErrorMessage}}</div>
+<div>
+  <br />
+  <span>
+    To create or join a game, enter a word to identify your game
+    <br />(i.e. <span style="font-weight: bold">DirdlimNosbod</span> or <span style="font-weight: bold">COVID19</span>)
+    <br />then press <span style="font-weight: bold">Enter Game</span>.
+    <br />Share this identifier with your friends to get them to join with you!
+  </span>
+  <br />
+</div>

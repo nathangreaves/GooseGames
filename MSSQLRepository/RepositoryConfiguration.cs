@@ -41,6 +41,10 @@ namespace MSSQLRepository
                 .UseSqlServer(configuration["ConnectionStrings:MSSQL"])
             );
 
+            services.AddDbContext<LetterJamContext>(options => options
+                .UseSqlServer(configuration["ConnectionStrings:MSSQL"])
+            );
+
             services.AddScoped<RepositoryInterface.Global.ISessionRepository, Global.SessionRepository>();
             services.AddScoped<RepositoryInterface.Global.IPlayerRepository, Global.PlayerRepository>();
 
@@ -62,6 +66,16 @@ namespace MSSQLRepository
             services.AddScoped<RepositoryInterface.Werewords.IPlayerRoundInformationRepository, Werewords.PlayerRoundInformationRepository>();
             services.AddScoped<RepositoryInterface.Werewords.IPlayerVoteRepository, Werewords.PlayerVoteRepository>();
             services.AddScoped<RepositoryInterface.Werewords.IPlayerResponseRepository, Werewords.PlayerResponseRepository>();
+
+            services.AddScoped<RepositoryInterface.LetterJam.IGameRepository, LetterJam.GameRepository>();
+            services.AddScoped<RepositoryInterface.LetterJam.IPlayerStateRepository, LetterJam.PlayerStateRepository>();
+            services.AddScoped<RepositoryInterface.LetterJam.ILetterCardRepository, LetterJam.LetterCardRepository>();
+            services.AddScoped<RepositoryInterface.LetterJam.IRoundRepository, LetterJam.RoundRepository>();
+            services.AddScoped<RepositoryInterface.LetterJam.INonPlayerCharacterRepository, LetterJam.NonPlayerCharacterRepository>();
+            services.AddScoped<RepositoryInterface.LetterJam.IClueRepository, LetterJam.ClueRepository>();
+            services.AddScoped<RepositoryInterface.LetterJam.IClueVoteRepository, LetterJam.ClueVoteRepository>();
+            services.AddScoped<RepositoryInterface.LetterJam.IClueLetterRepository, LetterJam.ClueLetterRepository>();
+            services.AddScoped<RepositoryInterface.LetterJam.IFinalWordLetterRepository, LetterJam.FinalWordLetterRepository>();
         }
     }
 }

@@ -75,7 +75,7 @@ export class JustOneSessionLobbyComponent implements IPlayerSessionComponent, On
       playerId: this.PlayerId,
       sessionId: this.SessionId,
       startSession: this.startGame,
-      startingSessionMessage: "Starting session. JUST ONE moment please."
+      startingSessionMessage: "Starting game. JUST ONE moment please."
     }
 
     this.AvailableWordLists = [

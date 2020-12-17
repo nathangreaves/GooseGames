@@ -1,0 +1,92 @@
+.my-letters-container {
+    margin-bottom: 10px;
+}
+
+
+.letter-input {
+  width: auto;
+  width: 1.5rem;
+  border-width: 0;
+  background: #00000000;
+}
+
+.player-card {
+  margin-right: 0.5rem;
+}
+
+
+@keyframes movingOnLetterAnimation {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+.confirming-move {
+  animation-duration: 0.5s;
+  animation-name: movingOnLetterAnimation;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+.word-box {
+  width: 100%;
+  font-size: 1rem;
+  min-height: 56px;
+  margin-top: 10px;
+}
+
+/*.letter-box {
+  margin-top: -10px;
+  width: 100%;
+  font-size: 2rem;
+
+  .letter-display-item {
+    margin-right: 0.25rem;
+
+    .player-card {
+      font-size: 2rem;
+      height: 4rem;
+      width: 3rem;
+    }
+  }
+}*/
+
+.delete-card {
+  font-size: 0.8rem;
+  padding: 0;
+}
+
+.final-word-header{
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+@keyframes caretAnimation {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+.caret {
+  animation-duration: 0.5s;
+  animation-name: caretAnimation;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  border-radius: 0;
+  box-shadow: none;
+  border-top: 0px;
+  border-left: 0px;
+  border-right: 0px;
+  margin-left: 0.25rem;
+  width: 1rem;
+}

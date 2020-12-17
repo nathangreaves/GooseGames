@@ -8,6 +8,7 @@ namespace Entities.Global.Enums
     {
         JustOne = 1,
         FujiFlush = 2,
-        Werewords = 3
+        Werewords = 3,
+        LetterJam = 4
     }
 }

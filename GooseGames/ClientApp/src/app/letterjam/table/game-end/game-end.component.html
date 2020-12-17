@@ -1,0 +1,27 @@
+<div class="alert alert-danger" *ngIf="ErrorMessage" (click)="ClearErrorMessage()">
+  {{ErrorMessage}}
+</div>
+<div class="alert alert-info" *ngIf="Loading">
+  Loading...
+</div>
+<div class="container">
+  <div class="row player-row" *ngFor="let player of Players;">
+    <div *ngIf="player.player">
+      <div class="col-12 player-name">
+        <gg-emoji [emoji]="player.player.emoji"></gg-emoji> {{player.player.name}}
+      </div>
+      <div class="col-12">
+        <span class="small-font">Guessed:</span>
+        <letterjam-clue [parameters]="LetterJamGuessedLetterClueParameters(player)"></letterjam-clue>
+      </div>
+      <div class="col-12">
+        <span class="small-font">Actual:</span>
+        <letterjam-clue [parameters]="LetterJamActualLetterClueParameters(player)"></letterjam-clue>
+      </div>
+      <div class="col-12" *ngIf="player.unusedLetters.length">
+        <span class="small-font">Unused:</span>
+        <letterjam-clue [parameters]="LetterJamUnusedLetterClueParameters(player)"></letterjam-clue>
+      </div>
+    </div>
+  </div>
+</div>

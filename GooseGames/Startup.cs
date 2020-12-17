@@ -79,12 +79,27 @@ namespace GooseGames
             services.AddTransient<Services.Werewords.PlayerStatus.PlayerStatusKeyedServiceProvider>();
             AddKeyedServices<Services.Werewords.PlayerStatus.IPlayerStatusKeyedService>(services);
 
+            //Letter Jam
+            services.AddScoped<Services.LetterJam.CluesService>();
+            services.AddScoped<Services.LetterJam.ClueVoteService>();
+            services.AddScoped<Services.LetterJam.FinalWordService>();
+            services.AddScoped<Services.LetterJam.GameService>();
+            services.AddScoped<Services.LetterJam.GameEndService>();
+            services.AddScoped<Services.LetterJam.LetterCardService>();
+            services.AddScoped<Services.LetterJam.LobbyService>();
+            services.AddScoped<Services.LetterJam.MyJamService>();
+            services.AddScoped<Services.LetterJam.NonPlayerCharacterService>();
+            services.AddScoped<Services.LetterJam.PlayerStatusService>();
+            services.AddScoped<Services.LetterJam.StartWordService>();
+            services.AddScoped<Services.LetterJam.TableService>();
+
             //Hub Contexts
             services.AddScoped<GlobalHubContext>();
             services.AddScoped<JustOneHubContext>();
             services.AddScoped<FujiHubContext>();
             services.AddScoped<CodenamesHubContext>();
             services.AddScoped<WerewordsHubContext>();
+            services.AddScoped<LetterJamHubContext>();
         }
 
         private void AddKeyedServices<T>(IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Transient)
@@ -129,6 +144,7 @@ namespace GooseGames
                 endpoints.MapHub<FujiHub>("/fujihub");
                 endpoints.MapHub<CodenamesHub>("/codenameshub");
                 endpoints.MapHub<WerewordsHub>("/werewordshub");
+                endpoints.MapHub<LetterJamHub>("/letterjamhub");
             });
 
             app.UseSpa(spa =>

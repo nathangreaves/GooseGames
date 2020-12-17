@@ -77,6 +77,10 @@ namespace GooseGames.Services.Global
             return GenericResponseBase.Ok();
         }
 
+        internal string GetRandomEmoji()
+        {
+            return emojis[s_Random.Next(0, emojis.Count)];
+        }
 
         public async Task<GenericResponse<GetPlayerDetailsResponse>> GetPlayerDetailsAsync(PlayerSessionRequest request)
         {
@@ -107,7 +111,7 @@ namespace GooseGames.Services.Global
                 SessionMasterName = sessionMaster?.Name,
                 SessionMasterPlayerNumber = sessionMaster?.PlayerNumber,
                 Password = session.Password,
-                RandomEmoji = emojis[s_Random.Next(0, emojis.Count)],
+                RandomEmoji = GetRandomEmoji(),
                 Players = players.OrderBy(p => p.PlayerNumber == 0 ? int.MaxValue : p.PlayerNumber).Select(p => new PlayerDetailsResponse
                 {
                     Id = p.Id,
@@ -157,7 +161,7 @@ namespace GooseGames.Services.Global
             if (player.PlayerNumber == 0)
             {
                 _logger.LogTrace("Getting player number");
-                int nextPlayerNumber = await _playerRepository.GetNextPlayerNumberAsync(request.SessionId);
+                int nextPlayerNumber = await GetNextPlayerNumberForSessionAsync(request.SessionId);
                 _logger.LogTrace($"Player number = {nextPlayerNumber}");
                 player.PlayerNumber = nextPlayerNumber;
             }
@@ -172,6 +176,11 @@ namespace GooseGames.Services.Global
             _logger.LogTrace("Finished updating player details");
 
             return GenericResponseBase.Ok();
+        }
+
+        internal async Task<int> GetNextPlayerNumberForSessionAsync(Guid sessionId)
+        {
+            return await _playerRepository.GetNextPlayerNumberAsync(sessionId);
         }
 
         internal async Task<GenericResponseBase> UnreadyPlayerAsync(PlayerSessionRequest request)

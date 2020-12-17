@@ -17,6 +17,7 @@ import { CodenamesLandingComponent } from './codenames/landing.component';
 import { BigCodenamesSessionComponent, NormalCodenamesSessionComponent } from './codenames/session.component';
 import { JustOneNavbarHeaderComponent } from './justone/navbarheader.component';
 import { NavbarsModule } from './navbars.module';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -40,12 +41,14 @@ import { NavbarsModule } from './navbars.module';
       { path: 'fujiflush', loadChildren: () => import('./fujiflush/fujiflush.module').then(m => m.FujiFlushModule) },
       { path: 'codenames', component: CodenamesLandingComponent },
       { path: 'werewords', loadChildren: () => import('./werewords/werewords.module').then(m => m.WerewordsModule) },
+      { path: 'letterjam', loadChildren: () => import('./letterjam/letterjam.module').then(m => m.LetterJamModule) },
 
       { path: 'codenames/:id', component: NormalCodenamesSessionComponent },
       { path: 'codenames/big/:id', component: BigCodenamesSessionComponent },
 
 
-    ])
+    ]),
+    NgbModule
   ],
   entryComponents: [
     JustOneNavbarHeaderComponent

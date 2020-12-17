@@ -1,0 +1,134 @@
+<div class="alert alert-danger mt-2" *ngIf="ErrorMessage" (click)="ClearErrorMessage()">
+  {{ErrorMessage}}
+</div>
+<div *ngIf="GameEndLoaded" [hidden]="CurrentTabId !== 4" class="table-content">
+  <letterjam-game-end [parameters]="gameEndParameters">
+
+  </letterjam-game-end>
+</div>
+<div *ngIf="TableLoaded" [hidden]="CurrentTabId !== 0" class="table-content">
+  <letterjam-table-view [parameters]="tableViewParameters">
+
+  </letterjam-table-view>
+</div>
+<div *ngIf="ProposedCluesLoaded" [hidden]="CurrentTabId !== 1" class="table-content">
+  <letterjam-proposed-clues [parameters]="proposedCluesParameters">
+
+  </letterjam-proposed-clues>
+</div>
+<div *ngIf="ProposeClueLoaded" [hidden]="CurrentTabId !== 2" class="table-content">
+  <letterjam-propose-clue [parameters]="proposeClueParameters">
+
+  </letterjam-propose-clue>
+</div>
+<div *ngIf="MyJamLoaded" [hidden]="CurrentTabId !== 3" class="table-content">
+  <letterjam-my-jam [parameters]="myJamParameters">
+
+  </letterjam-my-jam>
+</div>
+
+
+<div class="filler">
+
+</div>
+
+<div class="tabs-bar">
+
+  <div class="container">
+    <div class="row">
+      <div class="col col-sm-1 col-md-3"></div>
+
+      <div class="tabs-bar-buttons col-12 col-sm-10 col-md-6">
+
+        <button *ngIf="RoundStatus != 4" class="tab-button-base tab-button" (click)="Table()"
+                [ngClass]="{
+                'current-tab' : CurrentTabId === 0
+                }">
+          Table
+        </button>
+        <button *ngIf="RoundStatus == 4" class="tab-button-base tab-button" (click)="GameEnd()"
+                [ngClass]="{
+                'current-tab' : CurrentTabId === 4
+                }">
+          Game End
+        </button>
+        <button *ngIf="RoundStatus == 1" class="tab-button-base tab-button" (click)="ProposedClues()"
+                [ngClass]="{
+                'current-tab' : CurrentTabId === 1 || CurrentTabId === 2
+                }">
+          Clues
+        </button>
+        <button class="tab-button-base tab-button" (click)="MyJam()"
+                [ngClass]="{
+                'current-tab' : CurrentTabId === 3
+                }">
+          My Jam
+        </button>
+
+        <div class="tab-button-base p-2">
+          <button [disabled]="DisableNextRoundButton" *ngIf="RoundStatus == 2 && PlayerStatus != 5" class="btn btn-primary" (click)="ReadyForNextRound()">
+            Next Round
+          </button>
+          <button [disabled]="DisableNextRoundButton" *ngIf="RoundStatus == 2 && PlayerStatus == 5" class="btn btn-danger" (click)="NotReadyForNextRound()">
+            Not Ready
+          </button>
+
+          <button [disabled]="DisableNextRoundButton" *ngIf="RoundStatus == 3 && PlayerStatus == 7" class="btn btn-primary" (click)="ReadyForGameEnd()">
+            I'm Done
+          </button>
+          <button [disabled]="DisableNextRoundButton" *ngIf="RoundStatus == 3 && PlayerStatus == 8" class="btn btn-danger" (click)="NotReadyForGameEnd()">
+            Undo
+          </button>
+        </div>
+      </div>
+
+      <div class="col col-sm-1 col-md-3"></div>
+    </div>
+  </div>
+</div>
+
+<ng-template #bonusLetterGuessedModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Bonus Letter Guessed</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body" *ngIf="bonusLetterGuessedModalParameters">
+    <letterjam-bonus-letter-guessed [parameters]="bonusLetterGuessedModalParameters">
+
+    </letterjam-bonus-letter-guessed>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary ml-auto" (click)="modal.dismiss()">
+      Ok
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #giveClueModal let-modal>
+  <letterjam-clue-modal *ngIf="clueModalParameters"
+                        [parameters]="clueModalParameters"
+                        [templates]="{
+                          buttonsTemplate: giveClueButtonsTemplate,
+                          clueInfoTemplate: giveClueInfoTemplate
+                        }"
+                        [dismiss]="modal.dismiss"
+                        [title]="'Clue Successful'">
+  </letterjam-clue-modal>
+</ng-template>
+
+<ng-template #giveClueInfoTemplate>
+  <div class="alert alert-success">
+    All players have voted for this clue
+  </div>
+</ng-template>
+
+<ng-template #giveClueButtonsTemplate>
+  <button class="btn btn-danger mr-auto" (click)="dismissGiveClueModal()">
+    Undo
+  </button>
+  <button class="btn btn-success" (click)="giveClue()">
+    Give Clue
+  </button>
+</ng-template>

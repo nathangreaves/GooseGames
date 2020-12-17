@@ -50,7 +50,7 @@ export class WerewordsLobbyComponent extends WerewordsComponentBase implements O
       playerId: this.PlayerId,
       sessionId: this.SessionId,
       startSession: this.startSession,
-      startingSessionMessage: "Starting session. WEREWORDS moment please."
+      startingSessionMessage: "Starting game. WEREWORDS moment please."
     }
   }
 

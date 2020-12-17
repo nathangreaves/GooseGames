@@ -9,7 +9,7 @@ namespace GooseGames.Services
     {
 
 
-        public static List<string> GetWords(int numberOfWords, IEnumerable<WordListEnum> includedWordLists)
+        public static List<string> GetWords(int numberOfWords, IEnumerable<WordListEnum> includedWordLists, int? wordLength = null)
         {
             List<string> fullList = new List<string>();
 
@@ -49,7 +49,7 @@ namespace GooseGames.Services
             {
                 string item = shuffledList[random.Next(numberOfWordsTotal)].ToUpper();
 
-                if (!results.Contains(item))
+                if (!results.Contains(item) && (!wordLength.HasValue || item.Length == wordLength.Value))
                 {
                     results.Add(item);
                 }

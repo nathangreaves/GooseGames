@@ -57,6 +57,12 @@ namespace MSSQLRepository
             var idsList = ids as List<Guid> ?? ids.ToList();
             return await DbContext.Set<T>().Where(x => idsList.Contains(x.Id)).ToDictionaryAsync(k => k.Id, select).ConfigureAwait(false);
         }
+        
+        public async Task<Dictionary<Guid, TProperty>> GetPropertyForFilterAsync<TProperty>(Expression<Func<T, bool>> filter, Expression<Func<T, KeyValuePair<Guid, TProperty>>> select)
+        {
+            return await DbContext.Set<T>().Where(filter).Select(select).ToDictionaryAsync(k => k.Key, v => v.Value).ConfigureAwait(false);
+        }
+
         public async Task<bool> SingleResultMatchesAsync(Guid id, Expression<Func<T, bool>> func)
         {
             return (await DbContext.Set<T>().Where(x => x.Id == id).Where(func).CountAsync().ConfigureAwait(false)) == 1;

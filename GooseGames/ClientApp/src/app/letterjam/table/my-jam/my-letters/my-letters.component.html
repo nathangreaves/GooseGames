@@ -1,0 +1,97 @@
+<div class="alert alert-danger small-font" *ngIf="parameters.error">
+  {{parameters.error}}
+</div>
+<form>
+  <div class="container">
+    <div class="row my-letters-container player-cards-container">
+      <div *ngFor="let letter of parameters.myLetters; let i=index;">
+        <input class="player-card"
+               [ngClass]="{
+                  'bonus-card' : letter.bonusLetter,
+                  'player-hidden-card' : IndexGreaterThanCurrentLetterIndex(i),
+                  'player-shown-card' : !IndexGreaterThanCurrentLetterIndex(i),
+                  'confirming-move' : ConfirmingMove && (letter.bonusLetter || (parameters.currentLetterIndex != null && IndexOf(i, parameters.currentLetterIndex + 1)))
+               }"
+               [(ngModel)]="letter.playerLetterGuess"
+               [ngStyle]="!IndexGreaterThanCurrentLetterIndex(i) ? LetterStyle(letter, i) : {}"
+               [name]="letter.cardId"
+               [id]="letter.cardId"
+               maxlength="1"
+               [disabled]="IndexGreaterThanCurrentLetterIndex(i)"
+               #letterInput
+               oninput="this.value = this.value.toUpperCase()" />
+      </div>
+    </div>
+    <div *ngIf="parameters.gameEnd">
+      <div class="row ">
+        <div class="final-word-header">Final Word:</div>
+        <div class="alert alert-info small-font">Construct your final word using the letters below. Only 1 player may claim a bonus letter or the wildcard.</div>
+      </div>
+      <div class="row my-letters-container player-cards-container">
+        <div *ngFor="let letter of parameters.myLetters; let i=index;">
+          <div *ngIf="!IsLetterInFinalWord(letter)" (click)="AddLetterToFinalWord(letter)">
+            <div class="player-card player-shown-card"
+                 [ngStyle]="LetterStyle(letter, i)">
+              {{letter.playerLetterGuess}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row my-letters-container player-cards-container" *ngIf="parameters.gameEnd">
+        <div *ngFor="let letter of PublicLetters; let i=index;">
+          <div *ngIf="!IsPublicLetterInFinalWord(letter)" (click)="AddPublicLetterToFinalWord(letter)"
+               class="player-card player-shown-card"
+               [ngClass]="{
+                  'bonus-card' : !letter.isWildCard
+               }">
+            <span *ngIf="letter.isWildCard">*</span>
+            <span *ngIf="!letter.isWildCard">{{letter.letter}}</span>
+          </div>
+        </div>
+
+        <button class="player-card player-shown-card delete-card ml-auto" (click)="DeleteLastLetter()">
+          <gg-emoji emoji="⬅️"></gg-emoji>
+        </button>
+
+      </div>
+      <div class="row word-box letter-display">
+        <div *ngFor="let letter of parameters.finalWordLetters;" class="letter-display-item">
+
+          <div class="player-card player-shown-card" [ngClass]="{
+         'bonus-card' : letter.bonusLetter
+         }"
+               [ngStyle]="LetterStyle(letter, i)">
+            <span *ngIf="!letter.isWildCard">{{letter.playerLetterGuess}}</span>
+            <span *ngIf="letter.isWildCard">*</span>
+          </div>
+
+        </div>
+        <div class="letter-display-item">
+          <div class="player-card player-shown-card caret">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row" *ngIf="!ConfirmingMove && !MoveConfirmed && CanMoveOn">
+      <button class="btn btn-success" (click)="ConfirmingMove = true">
+        Next Letter
+      </button>
+    </div>
+    <div class="row" *ngIf="ConfirmingMove && !MoveConfirmed">
+      <div class="alert alert-warning">
+        <strong>Move on to Next Letter</strong>
+        <br />You will not receive any more clues for the current letter card.
+        <br /><br /><strong>Are you sure?</strong>
+      </div>
+    </div>
+    <div class="row" *ngIf="ConfirmingMove && !MoveConfirmed">
+      <button class="btn btn-danger mr-auto" (click)="ConfirmingMove = false">
+        No
+      </button>
+      <button class="btn btn-success" (click)="ConfirmMove()">
+        Yes
+      </button>
+    </div>
+
+  </div>
+</form>
