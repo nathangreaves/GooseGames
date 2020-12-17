@@ -4,7 +4,6 @@ import { LetterJamLobbyComponent } from "../lobby/lobby.component";
 import { LetterJamSubmitWordComponent } from "../submit-word/submit-word.component";
 import { LetterJamWaitingForFirstRoundComponent } from "../waiting-for-first-round/waiting-for-first-round.component";
 import { LetterJamTableComponent } from "../table/table.component";
-import { LetterJamGameEndComponent } from "../game-end/game-end.component";
 
 
 export const RegisteredContent: LetterJamContent[] = [
@@ -17,5 +16,5 @@ export const RegisteredContent: LetterJamContent[] = [
   new LetterJamContent(LetterJamPlayerStatus.PreparingFinalWord, LetterJamTableComponent),
   new LetterJamContent(LetterJamPlayerStatus.SubmittedFinalWord, LetterJamTableComponent),
   new LetterJamContent(LetterJamPlayerStatus.ReadyForGameEnd, LetterJamTableComponent),
-  new LetterJamContent(LetterJamPlayerStatus.ReviewingGameEnd, LetterJamGameEndComponent)
+  new LetterJamContent(LetterJamPlayerStatus.ReviewingGameEnd, LetterJamTableComponent)
 ];

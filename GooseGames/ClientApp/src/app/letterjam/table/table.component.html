@@ -1,6 +1,11 @@
 <div class="alert alert-danger mt-2" *ngIf="ErrorMessage" (click)="ClearErrorMessage()">
   {{ErrorMessage}}
 </div>
+<div *ngIf="GameEndLoaded" [hidden]="CurrentTabId !== 4" class="table-content">
+  <letterjam-game-end [parameters]="gameEndParameters">
+
+  </letterjam-game-end>
+</div>
 <div *ngIf="TableLoaded" [hidden]="CurrentTabId !== 0" class="table-content">
   <letterjam-table-view [parameters]="tableViewParameters">
 
@@ -35,11 +40,17 @@
 
       <div class="tabs-bar-buttons col-12 col-sm-10 col-md-6">
 
-        <button class="tab-button-base tab-button" (click)="Table()"
+        <button *ngIf="RoundStatus != 4" class="tab-button-base tab-button" (click)="Table()"
                 [ngClass]="{
                 'current-tab' : CurrentTabId === 0
                 }">
           Table
+        </button>
+        <button *ngIf="RoundStatus == 4" class="tab-button-base tab-button" (click)="GameEnd()"
+                [ngClass]="{
+                'current-tab' : CurrentTabId === 4
+                }">
+          Game End
         </button>
         <button *ngIf="RoundStatus == 1" class="tab-button-base tab-button" (click)="ProposedClues()"
                 [ngClass]="{

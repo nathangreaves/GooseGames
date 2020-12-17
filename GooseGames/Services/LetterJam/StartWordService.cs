@@ -151,6 +151,7 @@ namespace GooseGames.Services.LetterJam
             }
             var order = new Stack<int>(list.OrderBy(l => s_Random.Next(0, int.MaxValue)));
 
+            int index = 0;
             foreach (char c in word)
             {
                 var letter = matchingLetters.FirstOrDefault(l => l.Letter == c);
@@ -163,6 +164,7 @@ namespace GooseGames.Services.LetterJam
 
                 letter.PlayerId = reserveForPlayerId;
                 letter.LetterIndex = order.Pop();
+                letter.OriginalLetterIndex = index++;
             }
 
             await _letterCardRepository.UpdateRangeAsync(reservedLetters);

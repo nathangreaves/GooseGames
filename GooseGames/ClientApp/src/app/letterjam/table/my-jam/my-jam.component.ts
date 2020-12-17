@@ -40,6 +40,7 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
   CurrentLetterIndex: number;
   OnlyShowCluesForMe: boolean = true;
   ShowEmojis: boolean = true;
+  DisableEdit: boolean = true;
 
   constructor(private myJamService: LetterJamMyJamService,
     private modalService: NgbModal) {
@@ -52,6 +53,7 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
     this.parameters.hubConnection.on("newBonusCard", this.onNewBonusCard);
     this.parameters.hubConnection.on("bonusLetterGuessed", this.onBonusLetterGuessed);
     this.parameters.hubConnection.on('gameEndTriggered', this.onGameEndTriggered);
+    this.parameters.hubConnection.on('endGame', this.onGameEnd);
     this.load();
   }
   ngOnDestroy(): void {
@@ -59,6 +61,7 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
     this.parameters.hubConnection.off("playerMovedOnToNextCard", this.onPlayerMovedOnToNextCard);
     this.parameters.hubConnection.off("newBonusCard", this.onNewBonusCard);
     this.parameters.hubConnection.off('gameEndTriggered', this.onGameEndTriggered);
+    this.parameters.hubConnection.off('endGame', this.onGameEnd);
   }
 
   getClueComponentProperties = (round: MyJamRound) => {
@@ -122,7 +125,10 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
       .then(response => this.parameters.handleGenericResponseBase(response, () => {
         //this.subscribe();
         return this.loadPlayers().then(() => response);
-      }));
+      }))
+      .finally(() => {
+        this.DisableEdit = this.parameters.currentRoundStatus() == RoundStatusEnum.GameEnd;
+      });
   }
 
   loadPlayers = () => {
@@ -210,7 +216,11 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
     this.CurrentLetterIndex = null;
     this.shouldMoveOnToNextLetter = false;
 
-    this.EditMyLetters(true);
+    this.EditMyLetters(true);    
+  }
+
+  onGameEnd = () => {
+    this.DisableEdit = true;
   }
 
   moveOnToNextLetter = () => {

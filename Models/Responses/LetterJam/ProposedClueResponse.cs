@@ -35,6 +35,7 @@ namespace Models.Responses.LetterJam
     {
         ProposingClues = 1,
         ReceivedClue = 2,
-        GameEndTriggered = 3
+        GameEndTriggered = 3,
+        GameEnd = 4
     }
 }

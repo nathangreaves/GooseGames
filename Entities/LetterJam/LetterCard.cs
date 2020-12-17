@@ -16,6 +16,7 @@ namespace Entities.LetterJam
         public Guid? PlayerId { get; set; }
         public Guid? NonPlayerCharacterId { get; set; }
         public int? LetterIndex { get; set; }
+        public int? OriginalLetterIndex { get; set; }
         public char? PlayerLetterGuess { get; set; }
         public bool BonusLetter { get; set; }
         public bool Discarded { get; set; }

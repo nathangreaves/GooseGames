@@ -14,7 +14,8 @@ export enum RoundStatusEnum {
 
   ProposingClues = 1,
   ReceivedClue = 2,
-  GameEndTriggered = 3
+  GameEndTriggered = 3,
+  GameEnd = 4
 }
 
 export interface IProposedClues {

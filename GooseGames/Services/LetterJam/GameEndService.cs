@@ -13,16 +13,21 @@ namespace GooseGames.Services.LetterJam
     {
         private readonly IFinalWordLetterRepository _finalWordLetterRepository;
         private readonly ILetterCardRepository _letterCardRepository;
+        private readonly IGameRepository _gameRepository;
 
         public GameEndService(IFinalWordLetterRepository finalWordLetterRepository,
-            ILetterCardRepository letterCardRepository)
+            ILetterCardRepository letterCardRepository,
+            IGameRepository gameRepository)
         {
             _finalWordLetterRepository = finalWordLetterRepository;
             _letterCardRepository = letterCardRepository;
+            _gameRepository = gameRepository;
         }
 
         internal async Task<GenericResponse<GameEndResponse>> GetGameEndAsync(PlayerSessionGameRequest request)
         {
+            var game = await _gameRepository.GetAsync(request.GameId);
+
             var allFinalWordLetters = await _finalWordLetterRepository.FilterAsync(l => l.GameId == request.GameId);
             var allPlayerLetters = await _letterCardRepository.FilterAsync(l => l.GameId == request.GameId && l.PlayerId.HasValue);
             var groupedFinalWordLetters = allFinalWordLetters.GroupBy(f => f.PlayerId).ToDictionary(g => g.Key, g => g);
@@ -33,7 +38,7 @@ namespace GooseGames.Services.LetterJam
             foreach (var playerId in groupedPlayerLetters.Keys)
             {
                 var letters = groupedPlayerLetters[playerId];
-                var finalWordLetters = groupedFinalWordLetters[playerId];
+                var finalWordLetters = groupedFinalWordLetters[playerId];                
 
                 var lettersNotInFinalWord = letters.Where(l => !finalWordLetters.Any(f => f.CardId == l.Id));
 
@@ -48,7 +53,20 @@ namespace GooseGames.Services.LetterJam
                             BonusLetter = f.BonusLetter,
                             IsWildCard = f.Wildcard,
                             PlayerLetterGuess = f.PlayerLetterGuess,
-                            Letter = f.Letter
+                            Letter = f.Letter,
+                            LetterIndex = letters.FirstOrDefault(l => f.CardId.HasValue && l.Id == f.CardId)?.LetterIndex
+                        };
+                    }),
+                    OriginalWordLetters = letters.OrderBy(l => l.OriginalLetterIndex).Select(f => {
+
+                        return new GameEndPlayerLetter
+                        {
+                            CardId = f.Id,
+                            BonusLetter = f.BonusLetter,
+                            IsWildCard = false,
+                            PlayerLetterGuess = f.PlayerLetterGuess,
+                            Letter = f.Letter,
+                            LetterIndex = f.LetterIndex
                         };
                     }),
                     UnusedLetters = lettersNotInFinalWord.Select(l => {
@@ -58,7 +76,8 @@ namespace GooseGames.Services.LetterJam
                             BonusLetter = false,
                             IsWildCard = false,
                             PlayerLetterGuess = l.PlayerLetterGuess,
-                            Letter = l.Letter
+                            Letter = l.Letter,
+                            LetterIndex = l.LetterIndex
                         };
                     })
                 });
@@ -66,7 +85,8 @@ namespace GooseGames.Services.LetterJam
 
             return GenericResponse<GameEndResponse>.Ok(new GameEndResponse
             {
-                Players = list
+                Players = list,
+                CluesRemaining = game.GreenCluesRemaining + game.RedCluesRemaining
             });
         }
     }

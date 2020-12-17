@@ -17,12 +17,14 @@ import { RoundStatusEnum } from '../../../models/letterjam/clues';
 import { LetterJamTableService } from '../../../services/letterjam/table';
 import { LetterJamPlayerStatusService } from '../../../services/letterjam/playerStatus';
 import { ILetterJamBonusLetterGuessedParameters } from './bonus-letter-guessed/bonus-letter-guessed.component';
+import { ILetterJamGameEndComponentParameters } from './game-end/game-end.component';
 
 export enum TableComponentTabs {
   Table = 0,
   ProposedClues = 1,
   ProposeClue = 2,
-  MyJam = 3
+  MyJam = 3,
+  GameEnd = 4
 }
 
 const LocalStorageTabKey = "goose-games-letter-jam-table-tab";
@@ -41,6 +43,7 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   proposedCluesParameters: IProposedCluesComponentParameters;
   proposeClueParameters: IProposeClueComponentParameters;
   myJamParameters: IMyJamComponentParameters;
+  gameEndParameters: ILetterJamGameEndComponentParameters;
 
   letterCards: ILetterCard[] = [];
   CurrentRoundId: string;
@@ -50,6 +53,7 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   ProposedCluesLoaded: boolean;
   ProposeClueLoaded: boolean;
   MyJamLoaded: boolean;
+  GameEndLoaded: boolean;
 
   PlayerStatus: LetterJamPlayerStatus;
   RoundStatus: RoundStatusEnum;  
@@ -90,6 +94,12 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   MyJam = () => {
     this.MyJamLoaded = true;
     this.CurrentTabId = TableComponentTabs.MyJam;
+    this.onChangeTab();
+  }
+
+  GameEnd = () => {
+    this.GameEndLoaded = true;
+    this.CurrentTabId = TableComponentTabs.GameEnd;
     this.onChangeTab();
   }
 
@@ -200,6 +210,9 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
       ...baseTableParameters,
       currentRoundStatus: () => this.RoundStatus
     }
+    this.gameEndParameters = <ILetterJamGameEndComponentParameters>{
+      ...baseTableParameters
+    }
 
     var tabItem = localStorage.getItem(LocalStorageTabKey);
     if (tabItem !== null && tabItem !== undefined) {
@@ -215,6 +228,9 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
         break;
       case TableComponentTabs.MyJam:
         this.MyJamLoaded = true;
+        break;
+      case TableComponentTabs.GameEnd:
+        this.GameEndLoaded = true;
         break;
       default:
         this.CurrentTabId = TableComponentTabs.Table;
@@ -374,7 +390,9 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   }
 
   onGameEnd = () => {
-    this.RouteToValidated(LetterJamPlayerStatus.ReviewingGameEnd);
+    this.RoundStatus = RoundStatusEnum.GameEnd;
+    this.PlayerStatus = LetterJamPlayerStatus.ReviewingGameEnd;
+    this.GameEnd();
   }
 
   beginNewRound = (roundId: string) => {

@@ -90,7 +90,7 @@ namespace GooseGames.Services.LetterJam
             var currentRoundId = await _gameRepository.GetPropertyAsync(request.GameId, g => g.CurrentRoundId);
             if (!currentRoundId.HasValue)
             {
-                return GenericResponse<IEnumerable<LetterCardResponse>>.Error("Unable to find current round id");
+                return GenericResponse<IEnumerable<LetterCardResponse>>.Ok(null);
             }
 
             var playerCardIds = (await _playerStateRepository.GetPropertyForFilterAsync(p => p.GameId == request.GameId && p.PlayerId != request.PlayerId,

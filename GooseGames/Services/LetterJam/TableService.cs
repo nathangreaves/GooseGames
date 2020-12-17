@@ -43,19 +43,25 @@ namespace GooseGames.Services.LetterJam
         internal async Task<GenericResponse<RoundResponse>> GetCurrentRoundAsync(PlayerSessionGameRequest request)
         {
             var game = await _gameRepository.GetAsync(request.GameId);
-            if (!game.CurrentRoundId.HasValue)
+
+            if (!(game.GameStatus == Entities.LetterJam.Enums.GameStatus.RevealingFinalWords || game.GameStatus == Entities.LetterJam.Enums.GameStatus.Finished)
+                && !game.CurrentRoundId.HasValue)
             {
                 return GenericResponse<RoundResponse>.Error("Unable to find current round");
             }
-
-            var round = await _roundRepository.GetAsync(game.CurrentRoundId.Value);
-
+            Round round = null;
+            RoundStatusEnum roundStatus = RoundStatusEnum.GameEnd;
+            if (game.CurrentRoundId.HasValue)
+            {
+                round = await _roundRepository.GetAsync(game.CurrentRoundId.Value);
+                roundStatus = (RoundStatusEnum)(int)round.RoundStatus;
+            }
             var playerState = await _playerStateRepository.SingleOrDefaultAsync(s => s.PlayerId == request.PlayerId);
 
             return GenericResponse<RoundResponse>.Ok(new RoundResponse 
             { 
-                RoundId = round.Id,
-                RoundStatus = (RoundStatusEnum)(int)round.RoundStatus,
+                RoundId = round?.Id,
+                RoundStatus = roundStatus,
                 PlayerStatus = playerState.StatusDescription
             });
         }
