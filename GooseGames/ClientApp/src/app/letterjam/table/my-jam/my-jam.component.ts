@@ -276,12 +276,12 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
         playerLetterGuess: l.playerLetterGuess
       }
     });
-    var finalLettersRequest = finalWordLetters.map(l => {
+    var finalLettersRequest = finalWordLetters != null ? finalWordLetters.map(l => {
       return {
         cardId: l.cardId,
         isWildCard: l.isWildCard
       }
-    });
+    }) : null;
 
     this.myLettersModalRef.close();
 

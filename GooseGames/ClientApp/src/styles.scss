@@ -7,13 +7,15 @@
 a {
   color: #0366d6;
 }
+@import url('https://rsms.me/inter/inter.css');
 
-html{
-    height: 100%
+html {
+  height: 100%;
 }
 
-body{
-    height: 100%;
+body {
+  height: 100%;
+  font-family: 'Inter', sans-serif;
 }
 
 code {
