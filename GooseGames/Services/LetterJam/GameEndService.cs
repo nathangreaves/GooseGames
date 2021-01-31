@@ -29,7 +29,7 @@ namespace GooseGames.Services.LetterJam
             var game = await _gameRepository.GetAsync(request.GameId);
 
             var allFinalWordLetters = await _finalWordLetterRepository.FilterAsync(l => l.GameId == request.GameId);
-            var allPlayerLetters = await _letterCardRepository.FilterAsync(l => l.GameId == request.GameId && l.PlayerId.HasValue);
+            var allPlayerLetters = await _letterCardRepository.FilterAsync(l => l.GameId == request.GameId && l.PlayerId.HasValue && !l.BonusLetter);
             var groupedFinalWordLetters = allFinalWordLetters.GroupBy(f => f.PlayerId).ToDictionary(g => g.Key, g => g);
             var groupedPlayerLetters = allPlayerLetters.GroupBy(f => f.PlayerId).ToDictionary(g => g.Key.Value, g => g);
 
