@@ -56,7 +56,7 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   GameEndLoaded: boolean;
 
   PlayerStatus: LetterJamPlayerStatus;
-  RoundStatus: RoundStatusEnum;  
+  RoundStatus: RoundStatusEnum;
   DisableNextRoundButton: boolean;
 
   clueModalParameters: ILetterJamClueComponentParameters;
@@ -140,14 +140,15 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
 
   ReadyForGameEnd = () => {
     this.DisableNextRoundButton = true;
+    this.Table();
+    var previousPlayerStatus = this.PlayerStatus;
+    this.PlayerStatus = LetterJamPlayerStatus.ReadyForGameEnd;
     this.playerStatusService.SetWaitingForGameEnd(this)
-      .then(response => this.HandleGenericResponseBase(response, () => {
-
-        this.PlayerStatus = LetterJamPlayerStatus.ReadyForGameEnd;
-        this.Table();
-
-        return response;
-      }))
+      .then(response => {
+        if (!response.success) {
+          this.PlayerStatus = previousPlayerStatus;
+        }
+      })
       .finally(() => {
         this.DisableNextRoundButton = false;
       });
@@ -250,7 +251,7 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
         if (this.RoundStatus == RoundStatusEnum.GameEnd) {
           this.CurrentTabId = TableComponentTabs.GameEnd;
         }
-        else {
+        else if (this.CurrentTabId == TableComponentTabs.GameEnd) {
           this.CurrentTabId = TableComponentTabs.Table;
         }
 
@@ -317,7 +318,7 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   }
 
   @HostListener('window:popstate', ['$event'])
-  dismissModal(event: Event) {    
+  dismissModal(event: Event) {
     if (this.giveClueModalRef) {
       this.giveClueModalRef.dismiss();
       event.stopPropagation();
@@ -333,7 +334,7 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
       window.history.state.modal = false;
       history.back();
     }
-  }   
+  }
 
   undoClueVote = () => {
     this.clueService.Vote(this, this.getCurrentRoundId(), null);
