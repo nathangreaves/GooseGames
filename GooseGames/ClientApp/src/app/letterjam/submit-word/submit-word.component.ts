@@ -24,6 +24,10 @@ export class LetterJamSubmitWordComponent extends LetterJamComponentBase impleme
       errorCode: "182ef180-38a9-470f-a217-17566a99ab57",
       errorMessage: "The requested letters cannot be reserved, another player may have already chosen them. Please try a different word"
     });
+    this.KnownErrorCodes.push({
+      errorCode: "697a4c1e-d4d8-4cac-9a80-c3927299ee20",
+      errorMessage: "Please submit a word with the correct number of letters."
+    });
   }
 
   ngOnInit() {
