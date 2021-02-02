@@ -100,7 +100,9 @@ export class LetterJamMyLettersComponent implements OnInit {
   }
 
   onFinalWordLetterReturned = (publicLetter: IFinalWordPublicLetter) => {
-    this.PublicLetters.push(publicLetter);
+    if (!_.find(this.PublicLetters, p => p.cardId == publicLetter.cardId)){
+      this.PublicLetters.push(publicLetter);
+    }
   }
 
   LetterStyle = (letter: IMyJamLetterCard, index: number) => {

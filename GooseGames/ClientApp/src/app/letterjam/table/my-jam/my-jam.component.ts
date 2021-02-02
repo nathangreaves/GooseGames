@@ -9,7 +9,8 @@ import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { IMyLettersComponentParameters } from './my-letters/my-letters.component';
 import { GetColourFromLetterIndex, StyleLetterCardWithColour } from '../../../../services/letterjam/colour';
 import { ILetterCard, IBonusLetterGuess } from '../../../../models/letterjam/letters';
-import { RoundStatusEnum } from '../../../../models/letterjam/clues';
+import { RoundStatusEnum, ClueLetter } from '../../../../models/letterjam/clues';
+import { IGooseGamesPlayer } from '../../../../models/player';
 
 export interface IMyJamComponentParameters extends ITableComponentParameters {
   currentRoundStatus: () => RoundStatusEnum;
@@ -60,6 +61,7 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
     this.parameters.hubConnection.off("giveClue", this.clueGiven);
     this.parameters.hubConnection.off("playerMovedOnToNextCard", this.onPlayerMovedOnToNextCard);
     this.parameters.hubConnection.off("newBonusCard", this.onNewBonusCard);
+    this.parameters.hubConnection.off("bonusLetterGuessed", this.onBonusLetterGuessed);
     this.parameters.hubConnection.off('gameEndTriggered', this.onGameEndTriggered);
     this.parameters.hubConnection.off('endGame', this.onGameEnd);
   }
@@ -68,7 +70,7 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
     return <ILetterJamClueComponentParameters>{
       clue: {
         id: round.clueId,
-        letters: []
+        letters: round.letters
       },
       getCardsFromCache: this.parameters.getCardsFromCache,
       getPlayersFromCache: this.parameters.getPlayersFromCache,
@@ -99,7 +101,11 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
             clueGiverPlayerId: round.clueGiverPlayerId,
             clueId: round.clueId,
             requestingPlayerReceivedClue: round.requestingPlayerReceivedClue,
-            letters: round.letters,
+            letters: round.letters.map(l => <ClueLetter>{
+              ...l,
+              player: null,
+              loadingPlayer: true
+            }),
             loadingLetters: true,
             loadingPlayer: true,
             player: null
@@ -136,6 +142,8 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
       _.each(this.Rounds, round => {
         round.player = _.find(r, fP => fP.id == round.clueGiverPlayerId);
         round.loadingPlayer = false;
+
+        this.setPlayersOnRoundLetters(round, r);
       });
     });
   }
@@ -145,24 +153,37 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
       clueGiverPlayerId: round.clueGiverPlayerId,
       clueId: round.clueId,
       requestingPlayerReceivedClue: round.requestingPlayerReceivedClue,
-      letters: round.letters,
+      letters: round.letters.map(l => <ClueLetter>{
+        ...l,
+        player: null,
+        loadingPlayer: true
+      }),
       loadingLetters: true,
       loadingPlayer: true,
       player: null
     };
 
-    var letter = _.find(round.letters, l => l.playerId == this.parameters.request.PlayerId);
-    if (letter) {
+    var letters = _.filter(roundViewModel.letters, l => l.playerId == this.parameters.request.PlayerId);
+    if (letters.length) {
       roundViewModel.requestingPlayerReceivedClue = true;
-      var indexOf = _.findIndex(this.MyLetters, l => l.cardId == letter.cardId);
+      var indexOf = _.findIndex(this.MyLetters, l => l.cardId == letters[0].cardId);
       if (indexOf >= 0) {
         roundViewModel.letterIndex = indexOf + 1;
       }
     }
+
+    _.each(letters, l => {
+      if (!l.bonusLetterGuessed) {
+        l.letter = null;
+      }
+    })
+
     this.Rounds.push(roundViewModel);
 
-    this.parameters.getPlayersFromCache(new PlayersFromCacheRequest([roundViewModel.clueGiverPlayerId], true, false)).then(r => {
-      var player = r[0];
+    this.parameters.getPlayersFromCache(new AllPlayersFromCacheRequest(true, true)).then(r => {
+      this.setPlayersOnRoundLetters(roundViewModel, r);
+
+      var player = r.find(p => p.id == roundViewModel.clueGiverPlayerId);
       roundViewModel.player = player;
       roundViewModel.loadingPlayer = false;
       this.FilterRounds();
@@ -170,6 +191,7 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
       setTimeout(() => {
         this.focusCurrentRound();
       }, 300);
+
     });
   }
 
@@ -206,6 +228,14 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
   onBonusLetterGuessed = (bonusLetterGuess: IBonusLetterGuess) => {
     if (bonusLetterGuess.playerId === this.parameters.request.PlayerId) {
       this.MyLetters.pop();
+
+      _.each(this.Rounds, r => {
+        _.each(r.letters, l => {
+          if (l.bonusLetter && l.cardId == bonusLetterGuess.cardId) {
+            l.letter = bonusLetterGuess.actualLetter;
+          }
+        });
+      });
     }
   }
   onGameEndTriggered = () => {
@@ -264,6 +294,18 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
       });
   }
 
+    private setPlayersOnRoundLetters(round: MyJamRound, r: IGooseGamesPlayer[]) {
+        _.each(round.letters, l => {
+            if (l.playerId) {
+                l.player = _.find(r, lP => lP.id == l.playerId);
+            }
+            else {
+                l.player = _.find(r, lP => lP.id == l.nonPlayerCharacterId);
+            }
+            l.loadingPlayer = false;
+        });
+    }
+
   UpdateLetterGuesses() {
 
     var myLetters = this.myLettersModalParameters.myLetters;
@@ -276,12 +318,12 @@ export class LetterJamMyJamComponent extends TableComponentBase implements OnIni
         playerLetterGuess: l.playerLetterGuess
       }
     });
-    var finalLettersRequest = finalWordLetters.map(l => {
+    var finalLettersRequest = finalWordLetters != null ? finalWordLetters.map(l => {
       return {
         cardId: l.cardId,
         isWildCard: l.isWildCard
       }
-    });
+    }) : null;
 
     this.myLettersModalRef.close();
 

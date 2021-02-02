@@ -60,14 +60,19 @@ namespace GooseGames.Services.LetterJam
                     {
                         ClueGiverPlayerId = r.ClueGiverPlayerId.Value,
                         ClueId = r.ClueId.Value,
-                        Letters = roundClueLetters.OrderBy(c => c.LetterIndex).Select(c => new ClueLetterResponse
-                        { 
-                            CardId = c.LetterCardId,
-                            Letter = c.Letter,
-                            BonusLetter = c.BonusLetter,
-                            IsWildCard = c.IsWildCard,
-                            PlayerId = c.PlayerId,
-                            NonPlayerCharacterId = c.NonPlayerCharacterId
+                        Letters = roundClueLetters.OrderBy(c => c.LetterIndex).Select(c => {
+                            var bonusLetterGuessed = c.BonusLetter && c.LetterCard?.PlayerId == null;
+
+                            return new ClueLetterResponse
+                            {
+                                CardId = c.LetterCardId,
+                                Letter = c.PlayerId != request.PlayerId || bonusLetterGuessed ? c.Letter : null,
+                                BonusLetter = c.BonusLetter,
+                                BonusLetterGuessed = bonusLetterGuessed,
+                                IsWildCard = c.IsWildCard,
+                                PlayerId = c.PlayerId,
+                                NonPlayerCharacterId = c.NonPlayerCharacterId
+                            };
                         }),
                         RequestingPlayerReceivedClue = roundClueLetters.Any(c => c.PlayerId == request.PlayerId)
                     };

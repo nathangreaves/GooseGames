@@ -42,7 +42,9 @@ namespace MSSQLRepository.LetterJam
         {
             var clueIdsList = clueIds.ToList();
 
-            var clueLetters = await Context.ClueLetters.AsQueryable()
+            var clueLetters = await Context.ClueLetters
+                .Include(x => x.LetterCard)
+                .AsQueryable()
                 .Where(x => clueIdsList.Contains(x.ClueId))
                 .ToListAsync()
                 .ConfigureAwait(false);

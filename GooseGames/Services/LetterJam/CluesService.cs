@@ -256,16 +256,18 @@ namespace GooseGames.Services.LetterJam
             {
                 return GenericResponse<IEnumerable<ClueLetterResponse>>.Error("Clue id not provided");
             }
-            var cards = await _clueLetterRepository.FilterAsync(l => l.ClueId == request.ClueId.Value);
+            var cards = (await _clueLetterRepository.GetForCluesAsync(new[] { request.ClueId.Value }))[request.ClueId.Value];
             var orderedCards = cards.OrderBy(c => c.LetterIndex);
             
             return GenericResponse<IEnumerable<ClueLetterResponse>>.Ok(orderedCards.Select(c =>
             {
+                var bonusLetterGuessed = c.BonusLetter && c.LetterCard?.PlayerId == null;
                 return new ClueLetterResponse
                 {
                     CardId = c.LetterCardId,
                     BonusLetter = c.BonusLetter,
-                    Letter = c.PlayerId != request.PlayerId ? c.Letter : null,
+                    BonusLetterGuessed = bonusLetterGuessed,
+                    Letter = c.PlayerId != request.PlayerId || bonusLetterGuessed ? c.Letter : null,
                     IsWildCard = c.IsWildCard,
                     PlayerId = c.PlayerId,
                     NonPlayerCharacterId = c.NonPlayerCharacterId                    

@@ -36,6 +36,7 @@ export interface IClueLetter {
   cardId: string;
   letter: string;
   bonusLetter: boolean;
+  bonusLetterGuessed: boolean;
   playerId: string;
   nonPlayerCharacterId: string;
   isWildCard: boolean;
@@ -45,6 +46,7 @@ export class ClueLetter implements IClueLetter {
   cardId: string;
   letter: string;
   bonusLetter: boolean;
+  bonusLetterGuessed: boolean;
   playerId: string;
   nonPlayerCharacterId: string;
   isWildCard: boolean;

@@ -94,6 +94,13 @@ namespace GooseGames.Services.LetterJam
 
         internal async Task<GenericResponseBase> PostStartWordAsync(StartWordRequest request)
         {
+            var playerState = await _playerStateRepository.SingleOrDefaultAsync(pS => pS.PlayerId == request.ForPlayerId);
+            if (playerState.OriginalWordLength != request.StartWord.Length)
+            {
+                //Incorrect number of letters provided.
+                return GenericResponseBase.Error("697a4c1e-d4d8-4cac-9a80-c3927299ee20");
+            }
+
             if (await ReserveLettersAsync(request.GameId, request.ForPlayerId, request.StartWord))
             {
                 await _playerStatusService.UpdatePlayerToStatusAsync(request, PlayerStatus.WaitingForFirstRound);
@@ -140,6 +147,7 @@ namespace GooseGames.Services.LetterJam
         private async Task<bool> ReserveLettersAsync(Guid gameId, Guid reserveForPlayerId, string word)
         {
             var listOfChars = word.ToList();
+
             var matchingLetters = await _letterCardRepository.FilterAsync(lC => lC.GameId == gameId && listOfChars.Contains(lC.Letter) && lC.PlayerId == null);
 
             var reservedLetters = new List<LetterCard>();

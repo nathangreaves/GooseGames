@@ -56,7 +56,7 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   GameEndLoaded: boolean;
 
   PlayerStatus: LetterJamPlayerStatus;
-  RoundStatus: RoundStatusEnum;  
+  RoundStatus: RoundStatusEnum;
   DisableNextRoundButton: boolean;
 
   clueModalParameters: ILetterJamClueComponentParameters;
@@ -140,14 +140,15 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
 
   ReadyForGameEnd = () => {
     this.DisableNextRoundButton = true;
+    this.Table();
+    var previousPlayerStatus = this.PlayerStatus;
+    this.PlayerStatus = LetterJamPlayerStatus.ReadyForGameEnd;
     this.playerStatusService.SetWaitingForGameEnd(this)
-      .then(response => this.HandleGenericResponseBase(response, () => {
-
-        this.PlayerStatus = LetterJamPlayerStatus.ReadyForGameEnd;
-        this.Table();
-
-        return response;
-      }))
+      .then(response => {
+        if (!response.success) {
+          this.PlayerStatus = previousPlayerStatus;
+        }
+      })
       .finally(() => {
         this.DisableNextRoundButton = false;
       });
@@ -169,7 +170,12 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   }
 
   private setTabIdInLocalStorage() {
-    localStorage.setItem(LocalStorageTabKey, this.CurrentTabId.toString());
+    if (this.RoundStatus !== RoundStatusEnum.GameEnd) {
+      localStorage.setItem(LocalStorageTabKey, this.CurrentTabId.toString());
+    }
+    else {
+      localStorage.removeItem(LocalStorageTabKey);
+    }
   }
 
   ngOnInit(): void {
@@ -214,30 +220,6 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
       ...baseTableParameters
     }
 
-    var tabItem = localStorage.getItem(LocalStorageTabKey);
-    if (tabItem !== null && tabItem !== undefined) {
-      this.CurrentTabId = parseInt(tabItem);
-    }
-
-    switch (this.CurrentTabId) {
-      case TableComponentTabs.ProposeClue:
-        this.ProposeClueLoaded = true;
-        break;
-      case TableComponentTabs.ProposedClues:
-        this.ProposedCluesLoaded = true;
-        break;
-      case TableComponentTabs.MyJam:
-        this.MyJamLoaded = true;
-        break;
-      case TableComponentTabs.GameEnd:
-        this.GameEndLoaded = true;
-        break;
-      default:
-        this.CurrentTabId = TableComponentTabs.Table;
-        this.TableLoaded = true;
-        break;
-    }
-
     this.RefreshCache();
     this.getRelevantLetters();
     this.loadRound();
@@ -260,6 +242,37 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
         this.RoundStatus = r.roundStatus;
         this.setCurrentRoundId(r.roundId);
         this.PlayerStatus = LetterJamPlayerStatus[r.playerStatus];
+
+        var tabItem = localStorage.getItem(LocalStorageTabKey);
+        if (tabItem !== null && tabItem !== undefined) {
+          this.CurrentTabId = parseInt(tabItem);
+        }
+
+        if (this.RoundStatus == RoundStatusEnum.GameEnd) {
+          this.CurrentTabId = TableComponentTabs.GameEnd;
+        }
+        else if (this.CurrentTabId == TableComponentTabs.GameEnd) {
+          this.CurrentTabId = TableComponentTabs.Table;
+        }
+
+        switch (this.CurrentTabId) {
+          case TableComponentTabs.ProposeClue:
+            this.ProposeClueLoaded = true;
+            break;
+          case TableComponentTabs.ProposedClues:
+            this.ProposedCluesLoaded = true;
+            break;
+          case TableComponentTabs.MyJam:
+            this.MyJamLoaded = true;
+            break;
+          case TableComponentTabs.GameEnd:
+            this.GameEndLoaded = true;
+            break;
+          default:
+            this.CurrentTabId = TableComponentTabs.Table;
+            this.TableLoaded = true;
+            break;
+        }
 
         return response;
       }));
@@ -305,7 +318,7 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
   }
 
   @HostListener('window:popstate', ['$event'])
-  dismissModal(event: Event) {    
+  dismissModal(event: Event) {
     if (this.giveClueModalRef) {
       this.giveClueModalRef.dismiss();
       event.stopPropagation();
@@ -321,7 +334,7 @@ export class LetterJamTableComponent extends LetterJamComponentBase implements O
       window.history.state.modal = false;
       history.back();
     }
-  }   
+  }
 
   undoClueVote = () => {
     this.clueService.Vote(this, this.getCurrentRoundId(), null);
