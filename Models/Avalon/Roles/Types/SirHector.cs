@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Models.Avalon.Roles.Types
 {
-    public class LoyalServantOfArthur : GoodRoleWithNoInfoBase
+    public class SirHector : GoodRoleWithNoInfoBase
     {
-        public override GameRoleEnum RoleEnum => GameRoleEnum.LoyalServantOfArthur;
+        public override GameRoleEnum RoleEnum => GameRoleEnum.SirHector;
 
         public override short GetRoleWeight(int numberOfPlayers)
         {

@@ -5,13 +5,13 @@ using System.Text;
 
 namespace Models.Avalon.Roles.Types
 {
-    public class LoyalServantOfArthur : GoodRoleWithNoInfoBase
+    public class AssassinPlus : Assassin
     {
-        public override GameRoleEnum RoleEnum => GameRoleEnum.LoyalServantOfArthur;
+        public override GameRoleEnum RoleEnum => GameRoleEnum.AssassinPlus;
 
         public override short GetRoleWeight(int numberOfPlayers)
         {
-            return 0;
+            return -3;
         }
     }
 }

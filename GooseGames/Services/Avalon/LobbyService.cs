@@ -123,11 +123,14 @@ namespace GooseGames.Services.Avalon
             }).ToList();
             await _playerStateRepository.InsertRangeAsync(playerStates);
 
+            var seatNumbers = await _globalPlayerService.GetPlayerNumbersAsync(playerStates.Select(x => x.PlayerId));
+
             var playersWithRole = playerStates.Select(x => new Player
             {
                 PlayerId = x.PlayerId,
                 RoleEnum = x.GameRole.RoleEnum,
-                Role = AvalonRoleKey.GetRole(x.GameRole.RoleEnum)
+                Role = AvalonRoleKey.GetRole(x.GameRole.RoleEnum),
+                SeatNumber = seatNumbers[x.PlayerId]
             }).ToList();
 
             var intel = new List<Entities.Avalon.PlayerIntel>();

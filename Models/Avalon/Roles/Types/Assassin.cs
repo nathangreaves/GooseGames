@@ -15,7 +15,7 @@ namespace Models.Avalon.Roles.Types
 
         public override short GetRoleWeight(int numberOfPlayers)
         {
-            return -3;
+            return -2;
         }
     }
 }

@@ -28,7 +28,7 @@ namespace GooseGames.Services.Avalon
             var numberOfPlayers = await _playerService.GetCountForSessionAsync(request.SessionId);
 
             var array = Enum.GetValues(typeof(GameRoleEnum)) as IEnumerable<GameRoleEnum>;
-            var roles = array.ToList().Where(x => !(x == GameRoleEnum.LoyalServantOfArthur) && !(x == GameRoleEnum.MinionOfMordred)).Select(x => AvalonRoleKey.TryGetRole(x)).Where(x => x != null);
+            var roles = array.ToList().Where(x => !(x == GameRoleEnum.LoyalServantOfArthur) && !(x == GameRoleEnum.MinionOfMordred)).Select(x => AvalonRoleKey.GetRole(x)).Where(x => x != null);
 
             return GenericResponse<IEnumerable<RoleResponse>>.Ok(roles.Select(x => new RoleResponse
             {

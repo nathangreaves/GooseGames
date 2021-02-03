@@ -17,7 +17,7 @@
         <span *ngIf="intel.intelType === 2">Your nearest evil neighbour is {{intel.intelNumber}} seats away</span>
         <span *ngIf="intel.intelPlayer"><gg-emoji [emoji]="intel.intelPlayer.emoji"></gg-emoji> {{intel.intelPlayer.name}}</span>
         <span *ngIf="intel.intelType === 1"> appears as evil</span>
-        <span *ngIf="intel.intelType === 3">{{intel.roleName}} knows your identity</span>
+        <span *ngIf="intel.intelType === 3">{{intel.roleName}} saw you as evil</span>
         <span *ngIf="intel.intelType === 4"> appears as good</span>
         <span *ngIf="intel.intelType === 6"> appears as Merlin</span>
         <span *ngIf="intel.intelType === 7"> is definitely evil</span>

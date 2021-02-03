@@ -8,7 +8,7 @@ namespace Models.Avalon.Roles.Types
     public class Mordred : EvilRoleBase
     {
         public override GameRoleEnum RoleEnum => GameRoleEnum.Mordred;
-        public override bool KnownToMerlin => false;
+        public override bool AppearsEvilToMerlin => false;
         public override List<PlayerIntel> GeneratePlayerIntel(Guid currentPlayerId, List<Player> players)
         {
             return StandardEvilIntel(currentPlayerId, players);

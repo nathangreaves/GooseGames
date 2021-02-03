@@ -6,7 +6,7 @@ namespace Models.Avalon.Roles
 {
     public abstract class GoodRoleBase : AvalonRoleBase
     {
-        public override bool KnownToMerlin => false;
-        public override bool KnownToEvil => false;
+        public override bool AppearsEvilToMerlin => false;
+        public override bool AppearsEvilToEvil => false;
     }
 }

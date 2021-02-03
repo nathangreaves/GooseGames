@@ -5,10 +5,12 @@ using System.Text;
 
 namespace Models.Avalon.Roles.Types
 {
-    public class Oberon : EvilRoleBase
+    public class Yvain : GoodRoleBase
     {
-        public override GameRoleEnum RoleEnum => GameRoleEnum.Oberon;
-        public override bool AppearsEvilToEvil => false;
+        public override GameRoleEnum RoleEnum => GameRoleEnum.Yvain;
+
+        public override bool AppearsEvilToMerlin => true;
+        public override bool AppearsEvilToEvil => true;
 
         public override List<PlayerIntel> GeneratePlayerIntel(Guid currentPlayerId, List<Player> players)
         {

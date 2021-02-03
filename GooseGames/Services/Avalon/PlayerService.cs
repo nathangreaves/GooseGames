@@ -1,6 +1,7 @@
 ﻿using GooseGames.Services.Global;
 using Models.Avalon;
 using Models.Avalon.Roles;
+using Models.Avalon.Roles.Types;
 using Models.Requests;
 using Models.Responses;
 using Models.Responses.Avalon;
