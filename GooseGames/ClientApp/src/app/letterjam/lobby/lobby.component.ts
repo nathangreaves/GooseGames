@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { LetterJamComponentBase, LetterJamPlayerStatus } from '../../../models/letterjam/content';
 import { LetterJamSessionService } from '../../../services/letterjam/session';
 import { ILobbyComponentParameters } from '../../components/lobby/lobby';
+import { PlayerDetailsResponse } from '../../../models/player';
 
 const MinPlayers: number = 2;
 const MaxPlayers: number = 6;
@@ -60,7 +61,8 @@ export class LetterJamLobbyComponent extends LetterJamComponentBase implements O
       playerId: this.PlayerId,
       sessionId: this.SessionId,
       startSession: this.startSession,
-      startingSessionMessage: "Starting game. LETTER JAM moment please."
+      startingSessionMessage: "Starting game. LETTER JAM moment please.",
+      playerIsSessionMaster: (isSessionMaster: boolean) => { }
     }
   }
 

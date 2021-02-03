@@ -9,6 +9,7 @@ namespace Entities.Global.Enums
         JustOne = 1,
         FujiFlush = 2,
         Werewords = 3,
-        LetterJam = 4
+        LetterJam = 4,
+        Avalon = 5
     }
 }

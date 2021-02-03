@@ -1,0 +1,22 @@
+
+<div class="role-info container" [ngClass]="{
+     'evil-role-info' : !parameters.role.good,
+     'good-role-info' : parameters.role.good,
+     'selected-role-info' : parameters.role.selected
+     }"
+     (click)="onClick($event)"
+     >
+  <div class="row">
+    <div class="col-10 col-md-11 pl-0 pr-0">
+      <div class="col-12 role-name">
+        {{parameters.role.name}}
+      </div>
+      <div class="col-12 role-description">
+        {{parameters.role.description}}
+      </div>
+    </div>
+    <div class="col-2 col-md-1 role-weight" *ngIf="parameters.showWeight">
+      <div>{{parameters.role.roleWeight >= 0 ? '+' : ''}}{{parameters.role.roleWeight}}</div>
+    </div>
+  </div>
+</div>

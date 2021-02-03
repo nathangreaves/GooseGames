@@ -1,0 +1,38 @@
+
+<global-lobby-component [parameters]="lobbyParameters"
+                        [gameConfigTemplate]="gameConfigTemplate"
+                        [readOnlyGameConfigTemplate]="readOnlyGameConfigTemplate">
+
+</global-lobby-component>
+
+<ng-template #gameConfigTemplate>
+
+  <div *ngFor="let role of AllRoles">
+    <avalon-role-info [parameters]="{
+                        role: role,
+                        onClick: onRoleClicked,
+                        selectable: true,
+                    showWeight: true
+                      }"></avalon-role-info>
+  </div>
+
+  <form>
+
+
+
+    <!--<label for="lj-lobby-numletters">Number of Letters:</label>
+    <input id="lj-lobby-numletters" type="number" [(ngModel)]="NumberOfLetters" [max]="MaximumNumberOfLetters" [min]="MinimumNumberOfLetters" name="lj-lobby-numletters"/>-->
+  </form>
+
+</ng-template>
+
+<ng-template #readOnlyGameConfigTemplate>
+
+  <div *ngFor="let role of AllRoles">
+    <avalon-role-info [parameters]="{
+                        role: role,
+                    showWeight: true
+                      }"></avalon-role-info>
+  </div>
+
+</ng-template>

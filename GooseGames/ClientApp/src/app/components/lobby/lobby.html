@@ -60,14 +60,14 @@
   <div>
     <button class="btn btn-primary" type="submit" [disabled]="DisableButtons" (click)="Ready()"><span *ngIf="!playerReady">Ready</span><span *ngIf="playerReady">Not Ready</span></button>
   </div>
-  <div *ngIf="!SessionMaster">
+  <div *ngIf="!SessionMaster" class="pb-2 pt-2">
     <ng-container [ngTemplateOutlet]="readOnlyGameConfigTemplate" [ngTemplateOutletContext]="{}">
 
     </ng-container>
   </div>
-  <div *ngIf="SessionMaster">
+  <div *ngIf="SessionMaster" class="pb-2">
 
-    <button [disabled]="DisableButtons || Players.length < parameters.minPlayers || Players.length > parameters.maxPlayers" class="btn btn-primary" (click)="StartGame()">Start Game</button>
+    <button [disabled]="DisableButtons || Players.length < parameters.minPlayers || Players.length > parameters.maxPlayers" class="btn btn-primary mb-2" (click)="StartGame()">Start Game</button>
 
 
     <!-- [ngTemplateOutletContext]="{data: data}" use this if we need data to be passed to the template-->

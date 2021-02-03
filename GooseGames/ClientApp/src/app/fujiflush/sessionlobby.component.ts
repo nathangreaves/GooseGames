@@ -58,7 +58,8 @@ export class FujiSessionLobbyComponent implements IPlayerSessionComponent, OnIni
       playerId: this.PlayerId,
       sessionId: this.SessionId,
       startSession: this.startSession,
-      startingSessionMessage: "Starting game. FUJI FLUSH moment please."
+      startingSessionMessage: "Starting game. FUJI FLUSH moment please.",
+      playerIsSessionMaster: (isSessionMaster: boolean) => { }
     }
   }
   ngOnDestroy(): void {

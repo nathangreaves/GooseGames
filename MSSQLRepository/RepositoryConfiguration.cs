@@ -45,6 +45,10 @@ namespace MSSQLRepository
                 .UseSqlServer(configuration["ConnectionStrings:MSSQL"])
             );
 
+            services.AddDbContext<AvalonContext>(options => options
+                .UseSqlServer(configuration["ConnectionStrings:MSSQL"])
+            );
+
             services.AddScoped<RepositoryInterface.Global.ISessionRepository, Global.SessionRepository>();
             services.AddScoped<RepositoryInterface.Global.IPlayerRepository, Global.PlayerRepository>();
 
@@ -76,6 +80,11 @@ namespace MSSQLRepository
             services.AddScoped<RepositoryInterface.LetterJam.IClueVoteRepository, LetterJam.ClueVoteRepository>();
             services.AddScoped<RepositoryInterface.LetterJam.IClueLetterRepository, LetterJam.ClueLetterRepository>();
             services.AddScoped<RepositoryInterface.LetterJam.IFinalWordLetterRepository, LetterJam.FinalWordLetterRepository>();
+
+            services.AddScoped<RepositoryInterface.Avalon.IGameRepository, Avalon.GameRepository>();
+            services.AddScoped<RepositoryInterface.Avalon.IGameRoleRepository, Avalon.GameRoleRepository>();
+            services.AddScoped<RepositoryInterface.Avalon.IPlayerIntelRepository, Avalon.PlayerIntelRepository>();
+            services.AddScoped<RepositoryInterface.Avalon.IPlayerStateRepository, Avalon.PlayerStateRepository>();
         }
     }
 }

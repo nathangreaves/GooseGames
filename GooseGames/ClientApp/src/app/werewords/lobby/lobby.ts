@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { WerewordsComponentBase, WerewordsPlayerStatus } from '../../../models/werewords/content';
 import { WerewordsSessionService } from '../../../services/werewords/session';
 import { ILobbyComponentParameters } from '../../components/lobby/lobby';
+import { PlayerDetailsResponse } from '../../../models/player';
 
 const MinPlayers: number = 4;
 const MaxPlayers: number = 10;
@@ -50,7 +51,8 @@ export class WerewordsLobbyComponent extends WerewordsComponentBase implements O
       playerId: this.PlayerId,
       sessionId: this.SessionId,
       startSession: this.startSession,
-      startingSessionMessage: "Starting game. WEREWORDS moment please."
+      startingSessionMessage: "Starting game. WEREWORDS moment please.",
+      playerIsSessionMaster: (isSessionMaster: boolean) => { }
     }
   }
 

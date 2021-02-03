@@ -42,6 +42,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
       { path: 'codenames', component: CodenamesLandingComponent },
       { path: 'werewords', loadChildren: () => import('./werewords/werewords.module').then(m => m.WerewordsModule) },
       { path: 'letterjam', loadChildren: () => import('./letterjam/letterjam.module').then(m => m.LetterJamModule) },
+      { path: 'avalon', loadChildren: () => import('./avalon/avalon.module').then(m => m.AvalonModule) },
 
       { path: 'codenames/:id', component: NormalCodenamesSessionComponent },
       { path: 'codenames/big/:id', component: BigCodenamesSessionComponent },

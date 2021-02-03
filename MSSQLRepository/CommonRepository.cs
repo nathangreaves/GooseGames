@@ -31,10 +31,25 @@ namespace MSSQLRepository
         }
         public async Task<List<T>> FilterAsync(Expression<Func<T, bool>> func)
         {
-            var queryable = DbContext.Set<T>().AsQueryable();
+            var queryable = DbContext.Set<T>()
+                .AsQueryable();
 
             return await queryable.Where(func).ToListAsync().ConfigureAwait(false);
         }
+
+        public async Task<List<T>> FilterAsync(Expression<Func<T, bool>> func, params Expression<Func<T, object>>[] includes)
+        {
+            var dbSet = DbContext.Set<T>();
+            foreach (var include in includes)
+            {
+                dbSet.Include(include);
+            }
+            var queryable = dbSet
+                .AsQueryable();
+
+            return await queryable.Where(func).ToListAsync().ConfigureAwait(false);
+        }
+
         public async Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> func)
         {
             var queryable = DbContext.Set<T>().AsQueryable();

@@ -1,0 +1,48 @@
+
+.role-info {
+  margin-top: 3px;
+  margin-bottom: 3px;
+  padding: 5px;
+  border-width: 3px;
+  border-radius: 6px;
+  border-style: solid;
+  border-color: transparent;
+  color: white;
+  color: #333;
+}
+
+.good-role-info {
+  background: #1475c450;
+}
+.good-role-info.selected-role-info {
+  background: #1475c4;
+}
+
+.evil-role-info {
+  background: #85040450;
+}
+.evil-role-info.selected-role-info {
+  background: #850404;
+}
+
+.selected-role-info {
+  color: #FFF;
+}
+
+.role-name {
+    font-weight: bold;
+}
+
+.role-description{
+    font-size: 0.8rem;
+}
+
+.role-weight {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+
+  div{
+  }
+}

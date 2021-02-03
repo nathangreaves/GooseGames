@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\Avalon\20210202203506_InitialEntities.cs" />
+    <Compile Remove="Migrations\Avalon\20210202203506_InitialEntities.Designer.cs" />
     <Compile Remove="Migrations\Fuji\20200502140450_FujiInitial.cs" />
     <Compile Remove="Migrations\Fuji\20200502140450_FujiInitial.Designer.cs" />
     <Compile Remove="Migrations\Werewords\20200516095155_WerewordsEntities.cs" />
