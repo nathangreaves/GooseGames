@@ -2,6 +2,7 @@
 using GooseGames.Services.Avalon;
 using Microsoft.AspNetCore.Mvc;
 using Models.Requests;
+using Models.Requests.Avalon;
 using Models.Responses;
 using Models.Responses.Avalon;
 using System;
@@ -64,6 +65,29 @@ namespace GooseGames.Controllers.Avalon
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
                 return GenericResponse<IEnumerable<RoleResponse>>.Error($"Unknown Error {errorGuid}");
+            }
+        }
+
+
+        [HttpPost]
+        [Route("GetWeight")]
+        public async Task<GenericResponse<int>> GetWeightAsync(StartSessionRequest request)
+        {
+            try
+            {
+                _logger.LogInformation("Received request", request);
+
+                var result = await _rolesService.GetWeightAsync(request);
+
+                _logger.LogInformation("Returned result", result);
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                var errorGuid = Guid.NewGuid();
+                _logger.LogError($"Unknown Error {errorGuid}", e, request);
+                return GenericResponse<int>.Error($"Unknown Error {errorGuid}");
             }
         }
     }

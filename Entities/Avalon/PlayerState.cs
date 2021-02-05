@@ -14,7 +14,9 @@ namespace Entities.Avalon
         public Guid PlayerId { get; set; }
         public Guid GameId { get; set; }
         public Game Game { get; set; }
-        public Guid GameRoleId { get; set; }
-        public GameRole GameRole { get; set; }
+        public Guid AssumedRoleId { get; set; }
+        public GameRole AssumedRole { get; set; }
+        public Guid ActualRoleId { get; set; }
+        public GameRole ActualRole { get; set; }
     }
 }

@@ -8,9 +8,10 @@ namespace Models.Avalon.Roles.Types
     public class Cassia : Guinevere
     {
         public override GameRoleEnum RoleEnum => GameRoleEnum.Cassia;
-        public override short GetRoleWeight(int numberOfPlayers)
+        public override bool ViableForDrunkToMimic => false;
+        public override short GetRoleWeight(int numberOfPlayers, IEnumerable<AvalonRoleBase> rolesInPlay, IEnumerable<AvalonRoleBase> allRoles)
         {
-            return 2;
+            return 1;
         }
     }
 

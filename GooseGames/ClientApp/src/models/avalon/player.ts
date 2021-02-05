@@ -3,7 +3,8 @@ import { AvalonRoleEnum, IAvalonRole } from "./roles";
 
 export interface IAvalonPlayer {
   playerId: string;
-  role: IAvalonRole;
+  actualRole: IAvalonRole;
+  assumedRole: IAvalonRole;
   playerIntel: IAvalonPlayerIntel[];
 }
 export interface IAvalonPlayerIntel {
@@ -15,7 +16,9 @@ export interface IAvalonPlayerIntel {
 
 export class AvalonPlayer implements IAvalonPlayer {
   playerId: string;
-  role: IAvalonRole;
+  actualRole: IAvalonRole;
+  assumedRole: IAvalonRole;
+  actualAndAssumedDifferent: boolean;
   player: IGooseGamesPlayer;
   playerIntel: IAvalonPlayerIntel[];
 }

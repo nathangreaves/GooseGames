@@ -12,7 +12,9 @@ export interface IAvalonRoleInfoComponentParameters {
   role: AvalonRole;
   onClick: (role: AvalonRole) => void;
   selectable: boolean;
-  showWeight: boolean;
+  showDescription: boolean;
+  showDrunkViability: boolean;
+  showMyopiaViability: boolean;
 }
 
 @Component({

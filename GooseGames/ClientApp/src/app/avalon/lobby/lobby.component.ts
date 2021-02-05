@@ -14,12 +14,16 @@ const MaxPlayers: number = 13;
 @Component({
   selector: 'avalon-lobby-component',
   templateUrl: './lobby.component.html',
+  styleUrls: ['./lobby.component.scss'],
 })
 export class AvalonLobbyComponent extends AvalonComponentBase implements OnInit, OnDestroy {
 
   public SessionMaster: boolean;
   public SelectedRoles: AvalonRoleEnum[] = [];
   public AllRoles: AvalonRole[];
+  public Weight: number = 0;
+  public ShowDescription: boolean = false;
+  public OnlyShowSelected: boolean = true;
 
   lobbyParameters: ILobbyComponentParameters;
 
@@ -46,7 +50,7 @@ export class AvalonLobbyComponent extends AvalonComponentBase implements OnInit,
       this.Route(AvalonPlayerStatus.InGame);
     });
 
-    this.HubConnection.on("selectedRoles", (playerId: string,  roles: AvalonRoleEnum[]) => {
+    this.HubConnection.on("selectedRoles", (playerId: string, roles: AvalonRoleEnum[]) => {
       if (true) {
         if (this.PlayerId !== playerId) {
           this.SelectedRoles = roles;
@@ -68,6 +72,11 @@ export class AvalonLobbyComponent extends AvalonComponentBase implements OnInit,
         this.pushSelectedRoles();
       }
     });
+    this.HubConnection.on("weight", (weight: number) => {
+      if (!this.SessionMaster) {
+        this.Weight = weight;
+      }
+    });
 
     this.lobbyParameters = {
       canStartSession: () => true,
@@ -81,6 +90,7 @@ export class AvalonLobbyComponent extends AvalonComponentBase implements OnInit,
         this.SessionMaster = isSessionMaster;
         if (this.SessionMaster) {
           this.HubConnection.send("requestSelectedRolesAsSessionMaster", this.SessionId);
+          this.OnlyShowSelected = false;
         }
         else {
           this.HubConnection.send("requestSelectedRoles", this.SessionId);
@@ -123,10 +133,31 @@ export class AvalonLobbyComponent extends AvalonComponentBase implements OnInit,
     }
     role.selected = !role.selected;
     this.pushSelectedRoles();
+    this._avalonRolesService.GetWeight(this, this.SelectedRoles)
+      .then(response => this.HandleGenericResponse(response, r => {
+
+        this.Weight = r;
+
+        return response;
+      }))
   }
 
   private pushSelectedRoles() {
     this.HubConnection.invoke("pushSelectedRoles", this.PlayerId, this.SessionId, this.SelectedRoles);    
+  }
+
+  showDrunkViability = () => {
+    return _.find(this.SelectedRoles, r => r === AvalonRoleEnum.Drunk);
+  }
+  showMyopiaViability = () => {
+    return _.find(this.SelectedRoles, r => r === AvalonRoleEnum.Myopia);
+  }
+
+  goodWidth = () => {
+    return (50 + (this.Weight * 5)) + "%" ;
+  }
+  evilWidth = () => {
+    return (50 - (this.Weight * 5)) + "%";
   }
 
   ngOnDestroy(): void {

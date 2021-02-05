@@ -9,9 +9,9 @@ namespace Models.Avalon.Roles.Types
     {
         public override GameRoleEnum RoleEnum => GameRoleEnum.Karenevere;
 
-        public override short GetRoleWeight(int numberOfPlayers)
+        public override short GetRoleWeight(int numberOfPlayers, IEnumerable<AvalonRoleBase> rolesInPlay, IEnumerable<AvalonRoleBase> allRoles)
         {
-            return -1;
+            return 0;
         }
     }
 }

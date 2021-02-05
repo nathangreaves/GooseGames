@@ -7,10 +7,20 @@
   <div *ngFor="let player of Players" class="player-secret-info">
     <div *ngIf="player.player" class="player-name"><gg-emoji [emoji]="player.player.emoji"></gg-emoji><span> {{player.player.name}}</span></div>
 
-    <avalon-role-info [parameters]="{
-                        role: player.role,
-                        showWeight: false
+    <div *ngIf="player.actualAndAssumedDifferent">
+      <avalon-role-info [parameters]="{
+                        role: player.actualRole,
+                        showDescription: true
                       }"></avalon-role-info>
+    </div>
+    <div>
+      <div *ngIf="player.actualAndAssumedDifferent">Assumed Role:</div>
+      <avalon-role-info [parameters]="{
+                        role: player.assumedRole,
+                        showWeight: false,
+                        showDescription: true
+                      }"></avalon-role-info>
+    </div>
 
     <div *ngFor="let intel of player.playerIntel">
       <div class="pl-2">
@@ -22,7 +32,7 @@
         <span *ngIf="intel.intelType === 6"> appears as Merlin</span>
         <span *ngIf="intel.intelType === 7"> is definitely evil</span>
         <span *ngIf="intel.intelType === 8"> is definitely good</span>
-      </div>      
+      </div>
     </div>
   </div>
 
@@ -32,6 +42,7 @@
 <div *ngFor="let role of RolesInPlay">
   <avalon-role-info [parameters]="{
                         role: role,
-                        showWeight: false
+                        showDescription: true,
+                        showDrunkViability: true
                       }"></avalon-role-info>
 </div>

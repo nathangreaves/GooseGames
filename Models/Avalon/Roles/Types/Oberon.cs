@@ -10,12 +10,12 @@ namespace Models.Avalon.Roles.Types
         public override GameRoleEnum RoleEnum => GameRoleEnum.Oberon;
         public override bool AppearsEvilToEvil => false;
 
-        public override List<PlayerIntel> GeneratePlayerIntel(Guid currentPlayerId, List<Player> players)
+        public override List<PlayerIntel> GeneratePlayerIntel(Player currentPlayer, List<Player> players, List<AvalonRoleBase> allRoles)
         {
             return new List<PlayerIntel>();
         }
 
-        public override short GetRoleWeight(int numberOfPlayers)
+        public override short GetRoleWeight(int numberOfPlayers, IEnumerable<AvalonRoleBase> rolesInPlay, IEnumerable<AvalonRoleBase> allRoles)
         {
             return 1;
         }

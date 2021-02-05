@@ -60,20 +60,20 @@ namespace GooseGames.Services.Avalon
 
             var roles = request.Roles.Select(x => AvalonRoleKey.GetRole(x)).ToList();
             var gameConfiguration = GameConfigurationService.Get(numberOfActualPlayers);
-            if (roles.Count > numberOfActualPlayers)
-            {
-                return GenericResponseBase.Error("Too many roles selected for number of players");
-            }
+            //if (roles.Count > numberOfActualPlayers)
+            //{
+            //    return GenericResponseBase.Error("Too many roles selected for number of players");
+            //}
             int numberOfEvilRoles = roles.Where(x => x is EvilRoleBase).Count();
             if (numberOfEvilRoles > gameConfiguration.NumberOfEvil)
             {
                 return GenericResponseBase.Error("Too many evil roles selected");
             }
             int numberOfGoodRoles = roles.Where(x => !(x is EvilRoleBase)).Count();
-            if (numberOfGoodRoles > gameConfiguration.NumberOfPlayers - gameConfiguration.NumberOfEvil)
-            {
-                return GenericResponseBase.Error("Too many good roles selected");
-            }
+            //if (numberOfGoodRoles > gameConfiguration.NumberOfPlayers - gameConfiguration.NumberOfEvil)
+            //{
+            //    return GenericResponseBase.Error("Too many good roles selected");
+            //}
             var missingEvilPlayers = gameConfiguration.NumberOfEvil - numberOfEvilRoles;
             var missingGoodPlayers = (gameConfiguration.NumberOfPlayers - gameConfiguration.NumberOfEvil) - numberOfGoodRoles;
             for (int i = 0; i < missingEvilPlayers; i++)
@@ -106,21 +106,40 @@ namespace GooseGames.Services.Avalon
             await _gameRoleRepository.InsertRangeAsync(gameRoles);
 
             var random = new Random();
-            var rolesQueue = new Queue<GameRole>(gameRoles.OrderBy(x => random.Next()));
 
+            var allRoles = gameRoles.Select(x => AvalonRoleKey.GetRole(x.RoleEnum)).ToList();
+            var goodRoles = allRoles.Where(x => x is GoodRoleBase).OrderBy(x => random.Next()).ToList();
+            var evilRoles = allRoles.Where(x => x is EvilRoleBase);
+
+            var inPlayRoles = evilRoles.Concat(goodRoles.Take(gameConfiguration.NumberOfPlayers - gameConfiguration.NumberOfEvil)).ToList();
+            var inPlayRoleEnums = inPlayRoles.Select(x => x.RoleEnum).ToList();
+            var inPlayGameRoles = gameRoles.Where(x => inPlayRoleEnums.Contains(x.RoleEnum));
+
+            var rolesQueue = new Queue<GameRole>(inPlayGameRoles);
+            
             var playerStates = players
                 .Where(x => x.Id != request.PlayerId) //Remove when God no longer required
-                .Select(x => {
-                var role = rolesQueue.Dequeue();
-                return new PlayerState
+                .Select(x => 
                 {
-                    PlayerId = x.Id,
-                    GameId = game.Id,
-                    SessionId = game.SessionId,
-                    GameRole = role,
-                    GameRoleId = role.Id
-                };
-            }).ToList();
+                    var role = rolesQueue.Dequeue();
+
+                    var assumedRole = AvalonRoleKey.GetRole(role.RoleEnum).GetAssumedRole(allRoles);
+                    var assumedRoleGameRole = gameRoles.First(x => x.RoleEnum == assumedRole);
+
+                    return new PlayerState
+                    {
+                        PlayerId = x.Id,
+                        GameId = game.Id,
+                        SessionId = game.SessionId,
+                        ActualRole = role,
+                        ActualRoleId = role.Id,
+                        AssumedRoleId = assumedRoleGameRole.Id,
+                        AssumedRole = assumedRoleGameRole
+                    };
+                }).ToList();
+
+
+
             await _playerStateRepository.InsertRangeAsync(playerStates);
 
             var seatNumbers = await _globalPlayerService.GetPlayerNumbersAsync(playerStates.Select(x => x.PlayerId));
@@ -128,15 +147,17 @@ namespace GooseGames.Services.Avalon
             var playersWithRole = playerStates.Select(x => new Player
             {
                 PlayerId = x.PlayerId,
-                RoleEnum = x.GameRole.RoleEnum,
-                Role = AvalonRoleKey.GetRole(x.GameRole.RoleEnum),
+                ActualRoleEnum = x.ActualRole.RoleEnum,
+                AssumedRoleEnum = x.AssumedRole.RoleEnum,
+                ActualRole = AvalonRoleKey.GetRole(x.ActualRole.RoleEnum),
+                AssumedRole = AvalonRoleKey.GetRole(x.AssumedRole.RoleEnum),
                 SeatNumber = seatNumbers[x.PlayerId]
             }).ToList();
 
             var intel = new List<Entities.Avalon.PlayerIntel>();
             foreach (var playerWithRole in playersWithRole)
             {
-                intel.AddRange(playerWithRole.Role.GeneratePlayerIntel(playerWithRole.PlayerId, playersWithRole).Select(p => {
+                intel.AddRange(playerWithRole.ActualRole.GeneratePlayerIntel(playerWithRole, playersWithRole, allRoles).Select(p => {
                     return new Entities.Avalon.PlayerIntel 
                     { 
                         GameId = game.Id,

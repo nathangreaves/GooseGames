@@ -36,7 +36,7 @@ namespace Models.Avalon.Roles
             { GameRoleEnum.SirHector, new SirHector() },
             { GameRoleEnum.Visionary, new Visionary() },
             { GameRoleEnum.Myopia, new Myopia() },
-            //{ GameRoleEnum.Drunk, new Drunk() },
+            { GameRoleEnum.Drunk, new Drunk() },
             { GameRoleEnum.Sage, new Sage() },
             { GameRoleEnum.Karenevere, new Karenevere() },
             { GameRoleEnum.VoodooDoodooDoer, new VoodooDoodooDoer() },

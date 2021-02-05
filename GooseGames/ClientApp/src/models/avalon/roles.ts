@@ -40,6 +40,8 @@ export interface IAvalonRole {
   roleEnum: AvalonRoleEnum;
   roleWeight: number;
   good: boolean;
+  viableForDrunkToMimic: boolean;
+  viableForMyopiaInfo: boolean;
 }
 
 
@@ -52,6 +54,8 @@ export class AvalonRole implements IAvalonRole, IAvalonRoleDetail {
   roleEnum: AvalonRoleEnum;
   roleWeight: number;
   good: boolean;
+  viableForDrunkToMimic: boolean;
+  viableForMyopiaInfo: boolean;
   name: string;
   description: string;
   selected: boolean;
@@ -185,12 +189,12 @@ const RoleDetails: IAvalonRoleDetail[] = [
   },
   {
     roleEnum: AvalonRoleEnum.Myopia,
-    name: "Myopia",
+    name: "Myopia 👓",
     description: "After every mission, can learn whether it was as simple as it looked, or whether character abilities affected the outcomes"
   },
   {
     roleEnum: AvalonRoleEnum.Drunk,
-    name: "Drunk",
+    name: "Drunk 🍺",
     description: "Believes that they are a different good character that receives information. The information they think they know/receive is actually random nonsense "
   },
   {

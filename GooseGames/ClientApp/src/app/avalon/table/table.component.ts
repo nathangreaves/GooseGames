@@ -48,11 +48,17 @@ export class AvalonTableComponent extends AvalonComponentBase implements OnInit,
         this.Players = r.map(player => {
           return <AvalonPlayer>{
             ...player,
-            role: <AvalonRole>{
-              ...player.role,
-              ...GetAvalonRoleDetail(player.role.roleEnum),
+            actualRole: <AvalonRole>{
+              ...player.actualRole,
+              ...GetAvalonRoleDetail(player.actualRole.roleEnum),
               selected: true
             },
+            assumedRole: <AvalonRole>{
+              ...player.assumedRole,
+              ...GetAvalonRoleDetail(player.assumedRole.roleEnum),
+              selected: true
+            },
+            actualAndAssumedDifferent: player.actualRole.roleEnum !== player.assumedRole.roleEnum,
             playerIntel: player.playerIntel.map(pI => {
               return <AvalonPlayerIntel>{
                 ...pI,

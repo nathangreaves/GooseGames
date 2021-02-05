@@ -8,5 +8,6 @@ namespace Models.Avalon.Roles
     {
         public override bool AppearsEvilToMerlin => false;
         public override bool AppearsEvilToEvil => false;
+        public override bool ViableForMyopiaInfo => false;
     }
 }

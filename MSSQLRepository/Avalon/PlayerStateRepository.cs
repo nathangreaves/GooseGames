@@ -27,7 +27,8 @@ namespace MSSQLRepository.Avalon
         public async Task<List<PlayerState>> GetForPlayerIds(List<Guid> playerIds)
         {
             return await Context.PlayerStates
-                .Include(p => p.GameRole)
+                .Include(p => p.ActualRole)
+                .Include(p => p.AssumedRole)
                 .AsQueryable()
                 .Where(p => playerIds.Contains(p.PlayerId))
                 .ToListAsync()

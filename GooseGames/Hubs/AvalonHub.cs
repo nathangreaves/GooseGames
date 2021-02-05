@@ -69,5 +69,11 @@ namespace GooseGames.Hubs
             _logger.LogInformation($"Sending beginSession: to {sessionId} : gameId={gameId}");
             await _hub.Clients.Group(sessionId.ToString()).SendAsync("beginSession", gameId);
         }
+
+        internal async Task SendWeightAsync(Guid sessionId, int weight)
+        {
+            _logger.LogInformation($"Sending weight: to {sessionId} : weight={weight}");
+            await _hub.Clients.Group(sessionId.ToString()).SendAsync("weight", weight);
+        }
     }
 }

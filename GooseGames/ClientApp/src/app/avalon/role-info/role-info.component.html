@@ -9,14 +9,15 @@
   <div class="row">
     <div class="col-10 col-md-11 pl-0 pr-0">
       <div class="col-12 role-name">
-        {{parameters.role.name}}
+        <gg-emoji [emoji]="parameters.role.name"></gg-emoji>
       </div>
-      <div class="col-12 role-description">
+      <div class="col-12 role-description" *ngIf="parameters.showDescription">
         {{parameters.role.description}}
       </div>
     </div>
-    <div class="col-2 col-md-1 role-weight" *ngIf="parameters.showWeight">
-      <div>{{parameters.role.roleWeight >= 0 ? '+' : ''}}{{parameters.role.roleWeight}}</div>
+    <div class="col-2 col-md-1 drunk-viable">
+      <div *ngIf="parameters.showDrunkViability && parameters.role.viableForDrunkToMimic"><gg-emoji emoji="🍺"></gg-emoji></div>
+      <div *ngIf="parameters.showMyopiaViability && parameters.role.viableForMyopiaInfo"><gg-emoji emoji="👓"></gg-emoji></div>
     </div>
   </div>
 </div>

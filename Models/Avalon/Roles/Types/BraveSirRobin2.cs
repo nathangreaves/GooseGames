@@ -1,6 +1,7 @@
 ﻿using Enums.Avalon;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Models.Avalon.Roles.Types
@@ -8,17 +9,18 @@ namespace Models.Avalon.Roles.Types
     public class BraveSirRobin2 : GoodRoleBase
     {
         public override GameRoleEnum RoleEnum => GameRoleEnum.BraveSirRobin2;
-
-        public override List<PlayerIntel> GeneratePlayerIntel(Guid currentPlayerId, List<Player> players)
+        public override bool ViableForDrunkToMimic => true;
+        public override bool ViableForMyopiaInfo => true;
+        public override List<PlayerIntel> GeneratePlayerIntel(Player currentPlayer, List<Player> players, List<AvalonRoleBase> allRoles)
         {
-            var player = GetRandomSeenByMerlinAsEvilExcept(new List<Guid> { currentPlayerId }, players);
+            var player = GetRandomSeenByMerlinAsEvilExcept(new List<Guid> { currentPlayer.PlayerId }, players);
 
             return new List<PlayerIntel>
             {
                 new PlayerIntel
                 {
                     IntelType = IntelTypeEnum.AppearsEvil,
-                    PlayerId = currentPlayerId,
+                    PlayerId = currentPlayer.PlayerId,
                     IntelPlayerId = player.PlayerId
                 },
                 new PlayerIntel
@@ -30,9 +32,20 @@ namespace Models.Avalon.Roles.Types
             };
         }
 
-        public override short GetRoleWeight(int numberOfPlayers)
+        internal override List<PlayerIntel> GenerateDrunkIntel(Player currentPlayer, List<Player> players, List<AvalonRoleBase> allRoles)
         {
-            return 0;
+            var list = new List<Player> 
+            { 
+                GetRandomPlayerExcept(new List<Guid> { currentPlayer.PlayerId }, players) 
+            };
+            return list
+                .Select(ConvertPlayerToPlayerIntel(currentPlayer.PlayerId, IntelTypeEnum.AppearsEvil))
+                .ToList();
+        }
+
+        public override short GetRoleWeight(int numberOfPlayers, IEnumerable<AvalonRoleBase> rolesInPlay, IEnumerable<AvalonRoleBase> allRoles)
+        {
+            return 1;
         }
     }
 }

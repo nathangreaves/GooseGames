@@ -20,7 +20,8 @@ namespace MSSQLRepository.Contexts
             modelBuilder.Entity<Game>().HasMany(x => x.Roles).WithOne(x => x.Game).HasForeignKey(x => x.GameId);
             modelBuilder.Entity<Game>().HasMany(x => x.PlayerStates).WithOne(x => x.Game).HasForeignKey(x => x.GameId);
             modelBuilder.Entity<Game>().HasMany(x => x.PlayerIntel).WithOne(x => x.Game).HasForeignKey(x => x.GameId);
-            modelBuilder.Entity<PlayerState>().HasOne(x => x.GameRole).WithMany().HasForeignKey(x => x.GameRoleId).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<PlayerState>().HasOne(x => x.ActualRole).WithMany().HasForeignKey(x => x.ActualRoleId).OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<PlayerState>().HasOne(x => x.AssumedRole).WithMany().HasForeignKey(x => x.AssumedRoleId).OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<PlayerState>().HasIndex(x => x.PlayerId);
             modelBuilder.Entity<PlayerIntel>().HasIndex(x => x.PlayerId);            
         }

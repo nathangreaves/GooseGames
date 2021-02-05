@@ -6,9 +6,9 @@ namespace Models.Avalon.Roles
 {
     public abstract class EvilRoleWithStandardInfo : EvilRoleBase
     {
-        public override List<PlayerIntel> GeneratePlayerIntel(Guid currentPlayerId, List<Player> players)
+        public override List<PlayerIntel> GeneratePlayerIntel(Player currentPlayer, List<Player> players, List<AvalonRoleBase> allRoles)
         {
-            return StandardEvilIntel(currentPlayerId, players);
+            return StandardEvilIntel(currentPlayer, players);
         }
 
     }

@@ -8,8 +8,9 @@ namespace Models.Avalon.Roles.Types
     public class SirHector : GoodRoleWithNoInfoBase
     {
         public override GameRoleEnum RoleEnum => GameRoleEnum.SirHector;
+        public override bool ViableForDrunkToMimic => false;
 
-        public override short GetRoleWeight(int numberOfPlayers)
+        public override short GetRoleWeight(int numberOfPlayers, IEnumerable<AvalonRoleBase> rolesInPlay, IEnumerable<AvalonRoleBase> allRoles)
         {
             return 0;
         }

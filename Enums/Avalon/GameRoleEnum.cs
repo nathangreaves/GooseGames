@@ -32,7 +32,7 @@ namespace Enums.Avalon
         SirHector = 21,
         Visionary = 22,
         Myopia = 23,
-        //Drunk = 24, //TODO: Need to add new column to PlayerState table for drunk role and populate/validate when setting up the game before intel is generated
+        Drunk = 24,
         Sage = 25,
         Karenevere = 26,
         VoodooDoodooDoer = 27,

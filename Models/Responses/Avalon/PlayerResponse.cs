@@ -10,7 +10,8 @@ namespace Models.Responses.Avalon
     {
         public Guid PlayerId { get; set; }
         public int SeatNumber { get; set; }
-        public RoleResponse Role { get; set; }
+        public RoleResponse AssumedRole { get; set; }
+        public RoleResponse ActualRole { get; set; }
         public IEnumerable<PlayerIntel> PlayerIntel { get; set; }
     }
 }

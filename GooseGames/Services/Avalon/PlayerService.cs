@@ -40,7 +40,8 @@ namespace GooseGames.Services.Avalon
             {
                 request.PlayerId
             };
-            if (game.GodPlayerId == request.PlayerId)
+            bool requestingPlayerIsGod = game.GodPlayerId == request.PlayerId;
+            if (requestingPlayerIsGod)
             {
                 playerRequestIds = (await _playerService.GetForSessionAsync(request.SessionId)).Select(x => x.Id).Where(x => x != request.PlayerId).ToList();
             }
@@ -65,15 +66,24 @@ namespace GooseGames.Services.Avalon
             var seatNumbers = await _playerService.GetPlayerNumbersAsync(playerRequestIds);
             return GenericResponse<IEnumerable<PlayerResponse>>.Ok(playerStates.Select(p => 
             {
-                var role = AvalonRoleKey.GetRole(p.GameRole.RoleEnum);
+                var assumedRole = AvalonRoleKey.GetRole(p.AssumedRole.RoleEnum);
+                var actualRole = requestingPlayerIsGod ? AvalonRoleKey.GetRole(p.ActualRole.RoleEnum) : assumedRole;
                 return new PlayerResponse
                 {
                     PlayerId = p.PlayerId,
-                    Role = new RoleResponse 
+                    AssumedRole = new RoleResponse 
                     {
-                        Good = role is GoodRoleBase,
-                        RoleEnum = role.RoleEnum,
-                        RoleWeight = 0
+                        Good = assumedRole is GoodRoleBase,
+                        RoleEnum = assumedRole.RoleEnum,
+                        ViableForDrunkToMimic = assumedRole.ViableForDrunkToMimic,
+                        ViableForMyopiaInfo = assumedRole.ViableForMyopiaInfo
+                    },
+                    ActualRole = new RoleResponse
+                    {
+                        Good = actualRole is GoodRoleBase,
+                        RoleEnum = actualRole.RoleEnum,
+                        ViableForDrunkToMimic = actualRole.ViableForDrunkToMimic,
+                        ViableForMyopiaInfo = actualRole.ViableForMyopiaInfo
                     },
                     SeatNumber = seatNumbers[p.PlayerId],
                     PlayerIntel = (playerIntelDictionary.ContainsKey(p.PlayerId) ? playerIntelDictionary[p.PlayerId] : new List<Entities.Avalon.PlayerIntel>()).Select(pI =>

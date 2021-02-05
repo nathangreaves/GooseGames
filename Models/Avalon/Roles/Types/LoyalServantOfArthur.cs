@@ -9,7 +9,8 @@ namespace Models.Avalon.Roles.Types
     {
         public override GameRoleEnum RoleEnum => GameRoleEnum.LoyalServantOfArthur;
 
-        public override short GetRoleWeight(int numberOfPlayers)
+        public override bool ViableForDrunkToMimic => false;
+        public override short GetRoleWeight(int numberOfPlayers, IEnumerable<AvalonRoleBase> rolesInPlay, IEnumerable<AvalonRoleBase> allRoles)
         {
             return 0;
         }

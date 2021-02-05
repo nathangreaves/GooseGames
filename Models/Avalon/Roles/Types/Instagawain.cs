@@ -5,16 +5,12 @@ using System.Text;
 
 namespace Models.Avalon.Roles.Types
 {
-    public class Instagawain : GoodRoleBase
+    public class Instagawain : GoodRoleWithNoInfoBase
     {
         public override GameRoleEnum RoleEnum => GameRoleEnum.Instagawain;
+        public override bool ViableForDrunkToMimic => false;
 
-        public override List<PlayerIntel> GeneratePlayerIntel(Guid currentPlayerId, List<Player> players)
-        {
-            return new List<PlayerIntel>();
-        }
-
-        public override short GetRoleWeight(int numberOfPlayers)
+        public override short GetRoleWeight(int numberOfPlayers, IEnumerable<AvalonRoleBase> rolesInPlay, IEnumerable<AvalonRoleBase> allRoles)
         {
             return 0;
         }

@@ -9,18 +9,30 @@ namespace Models.Avalon.Roles
     public abstract class AvalonRoleBase
     {
         internal static readonly Random s_Random = new Random();
-        public abstract List<PlayerIntel> GeneratePlayerIntel(Guid currentPlayerId, List<Player> players);
+        public abstract GameRoleEnum RoleEnum { get; }
         public abstract bool AppearsEvilToMerlin { get; }
         public abstract bool AppearsEvilToEvil { get; }
-        public abstract short GetRoleWeight(int numberOfPlayers);
-        public abstract GameRoleEnum RoleEnum { get; }
-
-        public List<PlayerIntel> StandardEvilIntel(Guid currentPlayerId, List<Player> players)
+        public abstract bool ViableForDrunkToMimic { get; }
+        public abstract bool ViableForMyopiaInfo { get; }
+        public abstract List<PlayerIntel> GeneratePlayerIntel(Player currentPlayer, List<Player> players, List<AvalonRoleBase> allRoles);
+        internal abstract List<PlayerIntel> GenerateDrunkIntel(Player currentPlayer, List<Player> players, List<AvalonRoleBase> allRoles);
+        public abstract short GetRoleWeight(int numberOfPlayers, IEnumerable<AvalonRoleBase> rolesInPlay, IEnumerable<AvalonRoleBase> allRoles);
+        public virtual short GetRoleWeightInPlayAgnostic(int numberOfPlayers, int numberOfGoodPlayers, IEnumerable<AvalonRoleBase> allRoles)
         {
-            return players.Where(x => x.Role.AppearsEvilToEvil).Select(ConvertPlayerToPlayerIntel(currentPlayerId, IntelTypeEnum.AppearsEvil)).ToList();
+            return 0;
+        }
+        public virtual GameRoleEnum GetAssumedRole(IEnumerable<AvalonRoleBase> allRoles)
+        {
+            return RoleEnum;
         }
 
-        public static Func<Player, PlayerIntel> ConvertPlayerToPlayerIntel(Guid currentPlayerId, IntelTypeEnum intelType)
+        internal List<PlayerIntel> StandardEvilIntel(Player currentPlayer, List<Player> players)
+        {
+            return players.Where(x => x.ActualRole.AppearsEvilToEvil).Select(ConvertPlayerToPlayerIntel(currentPlayer.PlayerId, IntelTypeEnum.AppearsEvil)).ToList();
+        }
+
+
+        internal static Func<Player, PlayerIntel> ConvertPlayerToPlayerIntel(Guid currentPlayerId, IntelTypeEnum intelType)
         {
             return x => new PlayerIntel
             {
@@ -32,15 +44,15 @@ namespace Models.Avalon.Roles
 
         private static List<Player> GetGoodPlayersExcept(List<Guid> excludingPlayerIds, List<Player> players)
         {
-            return players.Where(x => !excludingPlayerIds.Contains(x.PlayerId) && x.Role is GoodRoleBase).ToList();
+            return players.Where(x => !excludingPlayerIds.Contains(x.PlayerId) && x.ActualRole is GoodRoleBase).ToList();
         }
         private static List<Player> GetSeenByMerlinAsEvilExcept(List<Guid> excludingPlayerIds, List<Player> players)
         {
-            return players.Where(x => !excludingPlayerIds.Contains(x.PlayerId) && x.Role.AppearsEvilToMerlin).ToList();
+            return players.Where(x => !excludingPlayerIds.Contains(x.PlayerId) && x.ActualRole.AppearsEvilToMerlin).ToList();
         }
         private static List<Player> GetEvilPlayersExcept(List<Guid> excludingPlayerIds, List<Player> players)
         {
-            return players.Where(x => !excludingPlayerIds.Contains(x.PlayerId) && x.Role is EvilRoleBase).ToList();
+            return players.Where(x => !excludingPlayerIds.Contains(x.PlayerId) && x.ActualRole is EvilRoleBase).ToList();
         }
         private static List<Player> GetPlayersExcept(List<Guid> excludingPlayerIds, List<Player> players)
         {

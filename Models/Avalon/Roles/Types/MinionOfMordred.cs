@@ -8,12 +8,12 @@ namespace Models.Avalon.Roles.Types
     public class MinionOfMordred : EvilRoleBase
     {
         public override GameRoleEnum RoleEnum => GameRoleEnum.MinionOfMordred;
-        public override List<PlayerIntel> GeneratePlayerIntel(Guid currentPlayerId, List<Player> players)
+        public override List<PlayerIntel> GeneratePlayerIntel(Player currentPlayer, List<Player> players, List<AvalonRoleBase> allRoles)
         {
-            return StandardEvilIntel(currentPlayerId, players);
+            return StandardEvilIntel(currentPlayer, players);
         }
 
-        public override short GetRoleWeight(int numberOfPlayers)
+        public override short GetRoleWeight(int numberOfPlayers, IEnumerable<AvalonRoleBase> rolesInPlay, IEnumerable<AvalonRoleBase> allRoles)
         {
             return 0;
         }
