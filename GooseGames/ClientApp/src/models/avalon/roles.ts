@@ -33,7 +33,8 @@ export enum AvalonRoleEnum {
   VoodooDoodooDoer = 27,
   Armless = 28,
   BlindAndArmless = 29,
-  BraveSirRobin2 = 30
+  BraveSirRobin2 = 30,
+  Oberoff = 31
 }
 
 export interface IAvalonRole {
@@ -226,6 +227,11 @@ const RoleDetails: IAvalonRoleDetail[] = [
     roleEnum: AvalonRoleEnum.BraveSirRobin2,
     name: "Brave Sir Robin v2",
     description: "At start of game, sees 1 evil player (or Yvain), who also knows they have been seen by Brave Sir Robin. Once per round can optionally pick a player who is on a mission. Does not learn which card that person played, but gets to choose to invert it"
+  },
+  {
+    roleEnum: AvalonRoleEnum.Oberoff,
+    name: "Oberoff",
+    description: "Unknown to evil, knows other evil players. Once per round can optionally pick an evil player who is on a mission. Does not learn which card that person played, but inverts it. If Oberoff is in play, all players find out any time a mission card has been inverted by any player or effect, but not which card or how many times it was inverted."
   }
 ];
 

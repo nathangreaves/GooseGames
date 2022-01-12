@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AvalonComponentBase, AllPlayersFromCacheRequest } from '../../../models/avalon/content';
 import { AvalonRolesService } from '../../../services/avalon/roles';
-import { AvalonRole, GetAvalonRoleDetail } from '../../../models/avalon/roles';
+import { AvalonRole, GetAvalonRoleDetail, AvalonRoleEnum } from '../../../models/avalon/roles';
 import { AvalonPlayerService } from '../../../services/avalon/player';
 import { AvalonPlayer, AvalonPlayerIntel } from '../../../models/avalon/player';
 import _ from 'lodash';
@@ -88,5 +88,13 @@ export class AvalonTableComponent extends AvalonComponentBase implements OnInit,
   ngOnDestroy(): void {
 
   }
+
+  showDrunkViability = () => {
+    return _.find(this.RolesInPlay, r => r.roleEnum === AvalonRoleEnum.Drunk);
+  }
+  showMyopiaViability = () => {
+    return _.find(this.RolesInPlay, r => r.roleEnum === AvalonRoleEnum.Myopia);
+  }
+
 
 }

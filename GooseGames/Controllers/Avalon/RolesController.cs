@@ -71,7 +71,7 @@ namespace GooseGames.Controllers.Avalon
 
         [HttpPost]
         [Route("GetWeight")]
-        public async Task<GenericResponse<int>> GetWeightAsync(StartSessionRequest request)
+        public async Task<GenericResponse<double>> GetWeightAsync(StartSessionRequest request)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace GooseGames.Controllers.Avalon
             {
                 var errorGuid = Guid.NewGuid();
                 _logger.LogError($"Unknown Error {errorGuid}", e, request);
-                return GenericResponse<int>.Error($"Unknown Error {errorGuid}");
+                return GenericResponse<double>.Error($"Unknown Error {errorGuid}");
             }
         }
     }

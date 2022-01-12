@@ -64,28 +64,34 @@ namespace GooseGames.Services.Avalon
             }).OrderByDescending(x => x.Good).ThenBy(x => x.RoleEnum));
         }
 
-        public async Task<GenericResponse<int>> GetWeightAsync(StartSessionRequest request)
+        public async Task<GenericResponse<double>> GetWeightAsync(StartSessionRequest request)
         {
             var numberOfPlayers = await _playerService.GetCountForSessionAsync(request.SessionId);
             if (request.GodMode)
             {
                 numberOfPlayers -= 1;
             }
-            int weight = GetWeight(request, numberOfPlayers);
+            var weight = GetWeight(request, numberOfPlayers);
 
             await _avalonHubContext.SendWeightAsync(request.SessionId, weight);
 
-            return GenericResponse<int>.Ok(weight);
+            return GenericResponse<double>.Ok(weight);
         }
 
-        private static int GetWeight(StartSessionRequest request, int numberOfPlayers)
+        private static double GetWeight(StartSessionRequest request, int numberOfPlayers)
         {
+            //If we currently don't have enough players, assume the minimum viable.
+            if (numberOfPlayers < 5)
+            {
+                numberOfPlayers = 5;
+            }
+
             var allRoles = request.Roles.Select(x => AvalonRoleKey.GetRole(x));
 
             var goodRoles = allRoles.Count(x => x is GoodRoleBase);
             var expectedGoodRoles = numberOfPlayers - GameConfigurationService.Get(numberOfPlayers).NumberOfEvil;
 
-            int weight = allRoles.Sum(x => x.GetRoleWeightInPlayAgnostic(numberOfPlayers, expectedGoodRoles, allRoles));
+            double weight = allRoles.Sum(x => x.GetRoleWeightInPlayAgnostic(numberOfPlayers, expectedGoodRoles, allRoles));
             if (goodRoles > expectedGoodRoles)
             {
                 //var numberOfExtraRoles = goodRoles - expectedGoodRoles;
@@ -99,7 +105,7 @@ namespace GooseGames.Services.Avalon
                     var rolesInPlay = allRoles.OrderBy(x => s_Random.Next()).Take(expectedGoodRoles).ToList() as IEnumerable<AvalonRoleBase>;
                     weights.Add(rolesInPlay.Sum(x => x.GetRoleWeight(numberOfPlayers, rolesInPlay, allRoles)));
                 }
-                weight += (short)Math.Round((weights.Sum() / 100.0));
+                weight += Math.Round((weights.Sum() / 100.0));
             }
             else
             {

@@ -42,7 +42,8 @@ namespace Models.Avalon.Roles
             { GameRoleEnum.VoodooDoodooDoer, new VoodooDoodooDoer() },
             { GameRoleEnum.Armless, new Armless() },
             //{ GameRoleEnum.BlindAndArmless, new MinionOfMordred() },
-            { GameRoleEnum.BraveSirRobin2, new BraveSirRobin2() }
+            { GameRoleEnum.BraveSirRobin2, new BraveSirRobin2() },
+            { GameRoleEnum.Oberoff, new Oberoff() }
         };
 
         public static AvalonRoleBase GetRole(GameRoleEnum x)

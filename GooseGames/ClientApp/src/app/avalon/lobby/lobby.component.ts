@@ -65,6 +65,7 @@ export class AvalonLobbyComponent extends AvalonComponentBase implements OnInit,
     this.HubConnection.on("requestedSelectedRoles", () => {
       if (this.SessionMaster) {
         this.pushSelectedRoles();
+        this.getWeight();
       }
     });
     this.HubConnection.on("requestedSelectedRolesAsSessionMaster", () => {
@@ -133,14 +134,17 @@ export class AvalonLobbyComponent extends AvalonComponentBase implements OnInit,
     }
     role.selected = !role.selected;
     this.pushSelectedRoles();
-    this._avalonRolesService.GetWeight(this, this.SelectedRoles)
-      .then(response => this.HandleGenericResponse(response, r => {
 
-        this.Weight = r;
-
-        return response;
-      }))
+    this.getWeight();
   }
+
+    private getWeight() {
+        this._avalonRolesService.GetWeight(this, this.SelectedRoles)
+            .then(response => this.HandleGenericResponse(response, r => {
+                this.Weight = r;
+                return response;
+            }));
+    }
 
   private pushSelectedRoles() {
     this.HubConnection.invoke("pushSelectedRoles", this.PlayerId, this.SessionId, this.SelectedRoles);    

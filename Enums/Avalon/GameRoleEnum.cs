@@ -38,6 +38,7 @@ namespace Enums.Avalon
         VoodooDoodooDoer = 27,
         Armless = 28,
         //BlindAndArmless = 29, ////TODO: Needs to work in similar way to drunk where we pick what they think they are from viable evil targets and store it.
-        BraveSirRobin2 = 30
+        BraveSirRobin2 = 30,
+        Oberoff = 31
     }
 }
