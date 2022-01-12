@@ -15,8 +15,8 @@ namespace RepositoryInterface
         Task UpdateAsync(T entity);
         Task UpdateRangeAsync(IEnumerable<T> entities);
         Task DeleteAsync(T entity);
-        Task<List<T>> FilterAsync(params IEntityFilter<T>[] filters); 
         Task<List<T>> FilterAsync(Expression<Func<T, bool>> func);
+        Task<List<T>> FilterAsync(Expression<Func<T, bool>> func, params Expression<Func<T, object>>[] includes);
         Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> func);
         Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> func);
         Task<TProperty> GetPropertyAsync<TProperty>(Guid id, Expression<Func<T, TProperty>> select);

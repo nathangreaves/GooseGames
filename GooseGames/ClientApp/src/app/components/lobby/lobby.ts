@@ -17,6 +17,7 @@ export interface ILobbyComponentParameters {
   canStartSession: () => boolean;
   startSession: (sessionId: string, playerId: string) => Promise<GenericResponseBase>;
   startingSessionMessage: string;
+  playerIsSessionMaster: (isSessionMaster: boolean) => void;
 }
 
 @Component({
@@ -242,6 +243,9 @@ export class LobbyComponent implements OnInit, OnDestroy {
         if (data.success) {
 
           this.SessionMaster = data.data.sessionMaster;
+          if (this.parameters.playerIsSessionMaster) {
+            this.parameters.playerIsSessionMaster(this.SessionMaster);
+          }
           this.SessionMasterName = data.data.sessionMasterName ? data.data.sessionMasterName : "Session Master";
           this.SessionMasterPlayerNumber = data.data.sessionMasterPlayerNumber ? data.data.sessionMasterPlayerNumber : null;
           this.Password = data.data.password;

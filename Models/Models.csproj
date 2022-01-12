@@ -9,4 +9,8 @@
     <Folder Include="Requests\JustOne\PlayerStatus\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Enums\Enums.csproj" />
+  </ItemGroup>
+
 </Project>

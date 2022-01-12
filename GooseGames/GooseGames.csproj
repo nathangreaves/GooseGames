@@ -36,6 +36,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\src\app\avalon\avalon.module.ts" />
+    <None Remove="ClientApp\src\app\avalon\scaffolding\content.ts" />
+    <None Remove="ClientApp\src\app\avalon\scaffolding\registered-content.ts" />
     <None Remove="ClientApp\src\app\codenames\landing.component.ts" />
     <None Remove="ClientApp\src\app\codenames\session.component.ts" />
     <None Remove="ClientApp\src\app\components\hub.ts" />
@@ -94,6 +97,9 @@
     <None Remove="ClientApp\src\app\werewords\scaffolding\content.ts" />
     <None Remove="ClientApp\src\app\werewords\werewords.component.ts" />
     <None Remove="ClientApp\src\assets\tristate-switch.component.ts" />
+    <None Remove="ClientApp\src\models\avalon\content.ts" />
+    <None Remove="ClientApp\src\models\avalon\player.ts" />
+    <None Remove="ClientApp\src\models\avalon\roles.ts" />
     <None Remove="ClientApp\src\models\error.ts" />
     <None Remove="ClientApp\src\models\fujiflush\card.ts" />
     <None Remove="ClientApp\src\models\fujiflush\fujiupdate.ts" />
@@ -120,6 +126,9 @@
     <None Remove="ClientApp\src\models\werewords\playerroundinformation.ts" />
     <None Remove="ClientApp\src\models\werewords\registered-content.ts" />
     <None Remove="ClientApp\src\models\werewords\round.ts" />
+    <None Remove="ClientApp\src\services\avalon\player.ts" />
+    <None Remove="ClientApp\src\services\avalon\roles.ts" />
+    <None Remove="ClientApp\src\services\avalon\session.ts" />
     <None Remove="ClientApp\src\services\fujiflush\card.ts" />
     <None Remove="ClientApp\src\services\fujiflush\hand.ts" />
     <None Remove="ClientApp\src\services\fujiflush\localstorage.ts" />
@@ -163,6 +172,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\src\app\avalon\avalon.module.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\avalon\scaffolding\content.ts" />
+    <TypeScriptCompile Include="ClientApp\src\app\avalon\scaffolding\registered-content.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\app\codenames\landing.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\codenames\session.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\components\lobby\hub.ts" />
@@ -245,6 +259,11 @@
     <TypeScriptCompile Include="ClientApp\src\app\werewords\werewords.module.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\werewords\werewords.component.ts" />
     <TypeScriptCompile Include="ClientApp\src\assets\tristate-switch.component.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\avalon\content.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="ClientApp\src\models\avalon\player.ts" />
+    <TypeScriptCompile Include="ClientApp\src\models\avalon\roles.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\error.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\card.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\fujiflush\fujiupdate.ts" />
@@ -266,6 +285,9 @@
     <TypeScriptCompile Include="ClientApp\src\models\werewords\playerroundinformation.ts" />
     <TypeScriptCompile Include="ClientApp\src\app\werewords\registered-content.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\werewords\round.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\avalon\player.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\avalon\roles.ts" />
+    <TypeScriptCompile Include="ClientApp\src\services\avalon\session.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\card.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\hand.ts" />
     <TypeScriptCompile Include="ClientApp\src\services\fujiflush\localstorage.ts">

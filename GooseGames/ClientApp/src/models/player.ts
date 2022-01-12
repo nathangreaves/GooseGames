@@ -44,6 +44,10 @@ export class PlayerStatusValidationResponse {
   requiredStatus: string;
 }
 
+export class PlayerStatusGameValidationResponse extends PlayerStatusValidationResponse {  
+  gameId: string;
+}
+
 export class PlayerAction {
   id: string;
   playerName: string;

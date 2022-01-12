@@ -3,6 +3,7 @@ using Entities.LetterJam.Enums;
 using GooseGames.Hubs;
 using GooseGames.Logging;
 using GooseGames.Services.Global;
+using Models.Enum;
 using Models.Enums;
 using Models.Requests;
 using Models.Requests.LetterJam;

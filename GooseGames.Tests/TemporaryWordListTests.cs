@@ -1,6 +1,6 @@
 using FluentAssertions;
 using GooseGames.Services;
-using Models.Enums;
+using Models.Enum;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;

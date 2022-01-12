@@ -21,6 +21,7 @@ namespace GooseGames.Services.Global
         private readonly GlobalHubContext _globalHubContext;
         private readonly RequestLogger<PlayerService> _logger;
 
+
         private static readonly Random s_Random = new Random();
 
         private static readonly List<string> emojis = new List<string>{
@@ -137,6 +138,10 @@ namespace GooseGames.Services.Global
             return await _playerRepository.FilterAsync(p => p.SessionId == sessionId);
         }
 
+        internal async Task<int> GetCountForSessionAsync(Guid sessionId)
+        {
+            return await _playerRepository.CountAsync(p => p.SessionId == sessionId);
+        }
         internal async Task<GenericResponseBase> UpdatePlayerDetailsAsync(UpdatePlayerDetailsRequest request)
         {
             _logger.LogTrace("Starting update of player details");

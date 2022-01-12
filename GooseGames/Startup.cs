@@ -93,6 +93,10 @@ namespace GooseGames
             services.AddScoped<Services.LetterJam.StartWordService>();
             services.AddScoped<Services.LetterJam.TableService>();
 
+            services.AddScoped<Services.Avalon.LobbyService>();
+            services.AddScoped<Services.Avalon.PlayerService>();
+            services.AddScoped<Services.Avalon.RolesService>();
+
             //Hub Contexts
             services.AddScoped<GlobalHubContext>();
             services.AddScoped<JustOneHubContext>();
@@ -100,6 +104,7 @@ namespace GooseGames
             services.AddScoped<CodenamesHubContext>();
             services.AddScoped<WerewordsHubContext>();
             services.AddScoped<LetterJamHubContext>();
+            services.AddScoped<AvalonHubContext>();
         }
 
         private void AddKeyedServices<T>(IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Transient)
@@ -145,6 +150,7 @@ namespace GooseGames
                 endpoints.MapHub<CodenamesHub>("/codenameshub");
                 endpoints.MapHub<WerewordsHub>("/werewordshub");
                 endpoints.MapHub<LetterJamHub>("/letterjamhub");
+                endpoints.MapHub<AvalonHub>("/avalonhub");
             });
 
             app.UseSpa(spa =>

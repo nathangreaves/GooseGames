@@ -2,6 +2,7 @@
 using GooseGames.Hubs;
 using GooseGames.Logging;
 using GooseGames.Services;
+using Models.Enum;
 using Models.Enums;
 using Models.Requests.Codenames;
 using Models.Responses;

@@ -7,6 +7,7 @@ using GooseGames.Logging;
 using GooseGames.Services;
 using GooseGames.Services.Global;
 using Microsoft.Extensions.Caching.Memory;
+using Models.Enum;
 using Models.Enums;
 using Models.Enums.Werewords;
 using Models.Requests;

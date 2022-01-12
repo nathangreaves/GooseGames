@@ -1,0 +1,88 @@
+
+<global-lobby-component [parameters]="lobbyParameters"
+                        [gameConfigTemplate]="gameConfigTemplate"
+                        [readOnlyGameConfigTemplate]="readOnlyGameConfigTemplate">
+
+</global-lobby-component>
+<div class="filler">
+
+</div>
+<ng-template #gameConfigTemplate>
+
+  <div class="weight-container">
+    <div class="weight-bar">
+      <div class="weight-bar-internal evil-weight-bar" [ngStyle]="{ width: evilWidth()}">
+        <span >Evil Win %</span>
+      </div>
+      <div class="weight-bar-internal good-weight-bar" [ngStyle]="{ width: goodWidth()}">
+        <span>% Good Win</span>
+      </div>
+    </div>
+  </div>
+  <div class="weight-container-click">
+  </div>
+  <div class="container">
+    <div class="role-selection-controls row">
+      <div class="col-6 avalon-cb">
+        <input type="checkbox" class="form-check-input" id="show-description" [checked]="ShowDescription"
+               (change)="ShowDescription = !ShowDescription">
+        <label class="form-check-label" for="show-description">Show Description</label>
+      </div>
+      <div class="col-6 avalon-cb">
+        <input type="checkbox" class="form-check-input" id="show-selected" [checked]="OnlyShowSelected"
+               (change)="OnlyShowSelected = !OnlyShowSelected">
+        <label class="form-check-label" for="show-selected">Only Show Selected</label>
+      </div>
+    </div>
+  </div>
+  <div *ngFor="let role of AllRoles">
+    <avalon-role-info *ngIf="!OnlyShowSelected || role.selected" [parameters]="{
+                        role: role,
+                        onClick: onRoleClicked,
+                        selectable: true,
+                        showWeight: true,
+                        showDescription: ShowDescription,
+                        showDrunkViability: showDrunkViability(),
+                        showMyopiaViability: showMyopiaViability()
+                      }"></avalon-role-info>
+  </div>
+</ng-template>
+
+<ng-template #readOnlyGameConfigTemplate>
+  <div class="weight-container">
+    <div class="weight-bar">
+      <div class="weight-bar-internal evil-weight-bar" [ngStyle]="{ width: evilWidth()}">
+        <span>Evil Win %</span>
+      </div>
+      <div class="weight-bar-internal good-weight-bar" [ngStyle]="{ width: goodWidth()}">
+        <span>% Good Win</span>
+      </div>
+    </div>
+  </div>
+  <div class="weight-container-click">
+  </div>
+  <div class="container">
+    <div class="role-selection-controls row">
+      <div class="col-6 avalon-cb">
+        <input type="checkbox" class="form-check-input" id="show-description" [checked]="ShowDescription"
+               (change)="ShowDescription = !ShowDescription">
+        <label class="form-check-label" for="show-description">Show Description</label>
+      </div>
+      <div class="col-6 avalon-cb">
+        <input type="checkbox" class="form-check-input" id="show-selected" [checked]="OnlyShowSelected"
+               (change)="OnlyShowSelected = !OnlyShowSelected">
+        <label class="form-check-label" for="show-selected">Only Show Selected</label>
+      </div>
+    </div>
+  </div>
+  <div *ngFor="let role of AllRoles">
+    <avalon-role-info *ngIf="!OnlyShowSelected || role.selected" [parameters]="{
+                        role: role,
+                        showWeight: true,
+                        showDescription: ShowDescription,
+                        showDrunkViability: showDrunkViability(),
+                        showMyopiaViability: showMyopiaViability()
+                      }"></avalon-role-info>
+  </div>
+
+</ng-template>
